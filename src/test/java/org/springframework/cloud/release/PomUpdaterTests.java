@@ -64,8 +64,8 @@ public class PomUpdaterTests {
 
 		then(model.dirty).isTrue();
 		then(model.model.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
-		then(model.model.getParent().getVersion()).isEqualTo("1.3.1.BUILD-SNAPSHOT");
 		// the rest is the same
+		then(model.model.getParent().getVersion()).isEqualTo("1.3.1.BUILD-SNAPSHOT");
 		then(model.model.getProperties())
 			.containsEntry("spring-cloud-foo.version", "1.3.1.BUILD-SNAPSHOT")
 			.containsEntry("foo.version", "1.2.0.BUILD-SNAPSHOT");
