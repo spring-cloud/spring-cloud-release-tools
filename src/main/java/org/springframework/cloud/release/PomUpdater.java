@@ -15,6 +15,9 @@
  */
 package org.springframework.cloud.release;
 
+import static org.springframework.cloud.release.SpringCloudConstants.BUILD_ARTIFACT_ID;
+import static org.springframework.cloud.release.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
+
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.Properties;
@@ -24,9 +27,6 @@ import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-
-import static org.springframework.cloud.release.SpringCloudConstants.BUILD_ARTIFACT_ID;
-import static org.springframework.cloud.release.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
 
 /**
  * @author Marcin Grzejszczak
@@ -47,26 +47,38 @@ class PomUpdater {
 		return true;
 	}
 
-	ModelWrapper updatePom(File pom, Versions versions) {
+	ModelWrapper updateParentPom(File pom, Versions versions) {
+		Model model = this.pomReader.readPom(pom);
+		if (!isParentPom(model)) {
+			return new ModelWrapper(model, false);
+		}
+		boolean dirty = false;
+		dirty = updateRootParentIfPossible(versions, model) || dirty ;
+		dirty = updateVersionIfPossible(versions, model) || dirty ;
+		dirty = updateProperties(versions, model) || dirty;
+		return new ModelWrapper(model, dirty);
+	}
+
+	ModelWrapper updateChildPom(String rootProjectName, File pom, Versions versions) {
 		Model model = this.pomReader.readPom(pom);
 		boolean dirty = false;
 		if (isParentPom(model)) {
 			dirty = updateRootParentIfPossible(versions, model) || dirty ;
 			dirty = updateVersionIfPossible(versions, model) || dirty ;
 		} else {
-			dirty = updateParentVersionIfPossible(versions, model) || dirty;
+			dirty = updateParentVersionIfPossible(rootProjectName, versions, model) || dirty;
 		}
 		dirty = updateProperties(versions, model) || dirty;
 		return new ModelWrapper(model, dirty);
 	}
 
-	private boolean updateParentVersionIfPossible(Versions versions, Model model) {
-		String version = versions.versionForProject(model.getArtifactId());
+	private boolean updateParentVersionIfPossible(String rootProjectName, Versions versions, Model model) {
+		String version = versions.versionForProject(rootProjectName);
 		if (StringUtils.isEmpty(version)) {
-			log.warn("There was no version set for project [{}], skipping parent version setting", model.getArtifactId());
+			log.warn("There was no version set for project [{}], skipping parent version setting for project [{}]", rootProjectName, model.getArtifactId());
 			return false;
 		}
-		log.info("Setting parent [{}] version to [{}]", model.getArtifactId(), version);
+		log.info("Setting parent [{}] version to [{}] for project [{}]", rootProjectName, version, model.getArtifactId());
 		model.getParent().setVersion(version);
 		return true;
 	}
