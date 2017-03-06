@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.springframework.cloud.release;
+package org.springframework.cloud.release.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,21 +35,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author Marcin Grzejszczak
  */
-class ProjectRepo {
+class GitProjectRepo {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(MethodHandles.lookup().lookupClass());
 
-	private final ProjectRepo.JGitFactory gitFactory;
+	private final GitProjectRepo.JGitFactory gitFactory;
 
 	private final File basedir;
 
-	ProjectRepo(File basedir) {
+	GitProjectRepo(File basedir) {
 		this.basedir = basedir;
-		this.gitFactory = new ProjectRepo.JGitFactory();
+		this.gitFactory = new GitProjectRepo.JGitFactory();
 	}
 
-	ProjectRepo(File basedir, ProjectRepo.JGitFactory factory) {
+	GitProjectRepo(File basedir, GitProjectRepo.JGitFactory factory) {
 		this.basedir = basedir;
 		this.gitFactory = factory;
 	}
@@ -61,12 +61,15 @@ class ProjectRepo {
 	 */
 	File cloneProject(URI projectUri) {
 		try {
-			log.debug("Cloning repo from [{}] to [{}]", projectUri, this.basedir);
-			Git git = cloneToBasedir(projectUri, this.basedir);
+			File file = new File(projectUri.getPath());
+			URI modifiedUri = file.getName().endsWith(File.separator) ?
+					projectUri : new File(file.getPath() + File.separator).toURI();
+			log.debug("Cloning repo from [{}] to [{}]", modifiedUri, this.basedir);
+			Git git = cloneToBasedir(modifiedUri, this.basedir);
 			if (git != null) {
 				git.close();
 			}
-			File clonedRepo = git.getRepository().getDirectory();
+			File clonedRepo = git.getRepository().getWorkTree();
 			log.debug("Cloned repo to [{}]", clonedRepo);
 			return clonedRepo;
 		}

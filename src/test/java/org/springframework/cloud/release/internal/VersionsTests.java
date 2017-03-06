@@ -14,12 +14,14 @@
  *  limitations under the License.
  */
 
-package org.springframework.cloud.release;
+package org.springframework.cloud.release.internal;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+import org.springframework.cloud.release.internal.Project;
+import org.springframework.cloud.release.internal.Versions;
 
 import static org.assertj.core.api.BDDAssertions.then;
 

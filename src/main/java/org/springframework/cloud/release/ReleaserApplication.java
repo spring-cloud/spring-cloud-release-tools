@@ -15,13 +15,34 @@
  */
 package org.springframework.cloud.release;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.io.File;
+import java.lang.invoke.MethodHandles;
+
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.release.internal.ProjectUpdater;
 
 @SpringBootApplication
-public class ReleaserApplication {
+public class ReleaserApplication implements CommandLineRunner {
+
+	private static final Logger log = getLogger(MethodHandles.lookup().lookupClass());
 
 	public static void main(String[] args) {
 		SpringApplication.run(ReleaserApplication.class, args);
+	}
+
+	@Autowired ProjectUpdater projectUpdater;
+
+	@Override public void run(String... strings) throws Exception {
+		String workingDir = System.getProperty("user.dir");
+		log.info("Will run the application for root folder [{}]", workingDir);
+		log.info("Press any key to continue...");
+		System.in.read();
+		this.projectUpdater.updateProject(new File(workingDir));
 	}
 }

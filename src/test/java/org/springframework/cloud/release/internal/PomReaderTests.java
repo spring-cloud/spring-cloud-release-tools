@@ -14,7 +14,10 @@
  *  limitations under the License.
  */
 
-package org.springframework.cloud.release;
+package org.springframework.cloud.release.internal;
+
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +28,6 @@ import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -40,7 +40,7 @@ public class PomReaderTests {
 
 	@Before
 	public void setup() throws URISyntaxException {
-		URI scRelease = ProjectClonerTests.class.getResource("/projects/spring-cloud-release").toURI();
+		URI scRelease = GitProjectRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
 		this.springCloudReleaseProject = new File(scRelease.getPath(), "pom.xml");
 		this.licenseFile = new File(scRelease.getPath(), "LICENSE.txt");
 	}

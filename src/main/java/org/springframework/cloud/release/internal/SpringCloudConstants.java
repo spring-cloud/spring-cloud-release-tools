@@ -13,32 +13,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.springframework.cloud.release;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+package org.springframework.cloud.release.internal;
 
 /**
  * @author Marcin Grzejszczak
  */
-class PomReader {
+final class SpringCloudConstants {
+	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter-parent";
+	static final String CLOUD_DEPENDENCIES_ARTIFACT_ID = "spring-cloud-dependencies-parent";
+	static final String BUILD_ARTIFACT_ID = "spring-cloud-build";
 
-	/**
-	 * Returns a parsed POM
-	 */
-	Model readPom(File pom) {
-		try(Reader reader = new FileReader(pom)) {
-			MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();
-			return xpp3Reader.read(reader);
-		}
-		catch (XmlPullParserException | IOException e) {
-			throw new IllegalStateException("Failed to read file", e);
-		}
+	private SpringCloudConstants() {
+		throw new IllegalStateException("Don't instantiate a utility class");
 	}
+
 }

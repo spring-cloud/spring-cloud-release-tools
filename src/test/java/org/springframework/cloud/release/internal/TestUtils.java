@@ -1,4 +1,4 @@
-package org.springframework.cloud.release;
+package org.springframework.cloud.release.internal;
 
 import java.io.File;
 import java.io.IOException;

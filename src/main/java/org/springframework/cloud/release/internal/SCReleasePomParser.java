@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.springframework.cloud.release;
+package org.springframework.cloud.release.internal;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -30,11 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parses the poms for a given project and populates versions.
+ * Parses the poms for a given project and populates versions from Spring Cloud Release
  *
  * @author Marcin Grzejszczak
  */
-class PomParser {
+class SCReleasePomParser {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -42,17 +42,17 @@ class PomParser {
 	private static final String DEPENDENCIES_POM = "spring-cloud-dependencies/pom.xml";
 	private static final Pattern SC_VERSION_PATTERN = Pattern.compile("^(spring-cloud-.*)\\.version$");
 
-	private final File projectRootDir;
+	private final File springCloudReleaseDir;
 	private final String bootPom;
 	private final String dependenciesPom;
 	private final PomReader pomReader = new PomReader();
 
-	PomParser(File projectRootDir) {
-		this(projectRootDir, STARTER_POM, DEPENDENCIES_POM);
+	SCReleasePomParser(File springCloudReleaseDir) {
+		this(springCloudReleaseDir, STARTER_POM, DEPENDENCIES_POM);
 	}
 
-	PomParser(File projectRootDir, String bootPom, String dependenciesPom) {
-		this.projectRootDir = projectRootDir;
+	SCReleasePomParser(File springCloudReleaseDir, String bootPom, String dependenciesPom) {
+		this.springCloudReleaseDir = springCloudReleaseDir;
 		this.bootPom = bootPom;
 		this.dependenciesPom = dependenciesPom;
 	}
@@ -79,7 +79,7 @@ class PomParser {
 		if (pom == null) {
 			throw new IllegalStateException("Pom is not present");
 		}
-		File pomFile = new File(this.projectRootDir, pom);
+		File pomFile = new File(this.springCloudReleaseDir, pom);
 		if (!pomFile.exists()) {
 			throw new IllegalStateException("Pom is not present");
 		}

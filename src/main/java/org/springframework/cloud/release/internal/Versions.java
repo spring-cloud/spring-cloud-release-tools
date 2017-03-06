@@ -1,4 +1,7 @@
-package org.springframework.cloud.release;
+package org.springframework.cloud.release.internal;
+
+import static org.springframework.cloud.release.internal.SpringCloudConstants.BUILD_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,12 +26,16 @@ class Versions {
 
 	Versions(String scBuildVersion, Set<Project> projects) {
 		this.scBuildVersion = scBuildVersion;
+		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
+		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
 		this.projects.addAll(projects);
 	}
 
 	Versions(String bootVersion, String scBuildVersion, Set<Project> projects) {
 		this.bootVersion = bootVersion;
 		this.scBuildVersion = scBuildVersion;
+		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
+		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
 		this.projects.addAll(projects);
 	}
 
