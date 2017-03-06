@@ -10,27 +10,49 @@ import java.util.Set;
  */
 class Versions {
 
-	String boot;
-	String build;
+	private static final String SPRING_BOOT_PROJECT_NAME = "spring-boot";
+
+	String bootVersion;
+	String scBuildVersion;
 	Set<Project> projects = new HashSet<>();
 
-	Versions(String boot) {
-		this.boot = boot;
+	Versions(String bootVersion) {
+		this.bootVersion = bootVersion;
+		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
 	}
 
-	Versions(String build, Set<Project> projects) {
-		this.build = build;
-		this.projects = projects;
+	Versions(String scBuildVersion, Set<Project> projects) {
+		this.scBuildVersion = scBuildVersion;
+		this.projects.addAll(projects);
 	}
 
-	Versions(String boot, String build, Set<Project> projects) {
-		this.boot = boot;
-		this.build = build;
-		this.projects = projects;
+	Versions(String bootVersion, String scBuildVersion, Set<Project> projects) {
+		this.bootVersion = bootVersion;
+		this.scBuildVersion = scBuildVersion;
+		this.projects.addAll(projects);
+	}
+
+	String versionForProject(String projectName) {
+		return this.projects.stream()
+				.filter(project -> project.name.equals(projectName))
+				.findFirst()
+				.orElse(Project.EMPTY_PROJECT)
+				.version;
+	}
+
+	boolean shouldBeUpdated(String projectName) {
+		return this.projects.stream()
+				.anyMatch(project -> project.name.equals(projectName));
 	}
 }
 
+/**
+ * @author Marcin Grzejszczak
+ */
 class Project {
+
+	static Project EMPTY_PROJECT = new Project("", "");
+
 	final String name;
 	final String version;
 

@@ -13,15 +13,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 package org.springframework.cloud.release;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+/**
+ * @author Marcin Grzejszczak
+ */
+final class SpringCloudConstants {
+	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter-parent";
+	static final String CLOUD_DEPENDENCIES_ARTIFACT_ID = "spring-cloud-dependencies-parent";
+	static final String BUILD_ARTIFACT_ID = "spring-cloud-build";
 
-@SpringBootApplication
-public class ReleaserApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(ReleaserApplication.class, args);
+	private SpringCloudConstants() {
+		throw new IllegalStateException("Don't instantiate a utility class");
 	}
+
 }

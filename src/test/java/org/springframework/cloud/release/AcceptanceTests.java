@@ -14,8 +14,8 @@ public class AcceptanceTests {
 	 - should parse spring-cloud-starter-parent/pom.xml and resolve:
 	 	- Boot version (x)
 	 - should parse spring-cloud-dependencies/pom.xml and resolve:
-	 	- Project versions from properties
-	 	- Spring Cloud Build version from parent
+	 	- Project versions from properties (x)
+	 	- Spring Cloud Build version from parent (x)
 	 - should update the existing poms with the taken versions
 	 */
 	@Test

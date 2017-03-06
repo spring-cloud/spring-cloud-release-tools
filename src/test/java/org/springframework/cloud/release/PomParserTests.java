@@ -53,7 +53,7 @@ public class PomParserTests {
 	public void should_populate_boot_version() {
 		PomParser parser = new PomParser(this.springCloudReleaseProject);
 
-		String bootVersion = parser.bootVersion().boot;
+		String bootVersion = parser.bootVersion().bootVersion;
 
 		then(bootVersion).isEqualTo("1.5.1.BUILD-SNAPSHOT");
 	}
@@ -91,24 +91,36 @@ public class PomParserTests {
 
 		Versions cloudVersions = parser.springCloudVersions();
 
-		then(cloudVersions.build).isEqualTo("1.3.1.BUILD-SNAPSHOT");
-		then(cloudVersions.projects)
-				.contains(
-						project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-bus", "1.3.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-contract", "1.1.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-cloudfoundry", "1.1.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-commons", "1.2.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-config", "1.3.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-netflix", "1.3.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-security", "1.2.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-consul", "1.2.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-stream", "Chelsea.BUILD-SNAPSHOT"),
-						project("spring-cloud-task", "1.1.2.BUILD-SNAPSHOT"),
-						project("spring-cloud-vault", "1.0.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-zookeeper", "1.1.0.BUILD-SNAPSHOT")
-				);
+		then(cloudVersions.scBuildVersion).isEqualTo("1.3.1.BUILD-SNAPSHOT");
+		then(cloudVersions.projects).contains(allProjects());
+	}
+
+	@Test
+	public void should_populate_boot_and_cloud_version() {
+		PomParser parser = new PomParser(this.springCloudReleaseProject);
+
+		Versions cloudVersions = parser.allVersions();
+
+		then(cloudVersions.bootVersion).isEqualTo("1.5.1.BUILD-SNAPSHOT");
+		then(cloudVersions.scBuildVersion).isEqualTo("1.3.1.BUILD-SNAPSHOT");
+		then(cloudVersions.projects).contains(allProjects());
+	}
+
+	private Project[] allProjects() {
+		return new Project[] { project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-bus", "1.3.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-contract", "1.1.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-cloudfoundry", "1.1.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-commons", "1.2.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-config", "1.3.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-netflix", "1.3.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-security", "1.2.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-consul", "1.2.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-stream", "Chelsea.BUILD-SNAPSHOT"),
+				project("spring-cloud-task", "1.1.2.BUILD-SNAPSHOT"),
+				project("spring-cloud-vault", "1.0.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-zookeeper", "1.1.0.BUILD-SNAPSHOT") };
 	}
 
 	Project project(String name, String value) {
