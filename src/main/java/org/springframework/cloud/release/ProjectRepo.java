@@ -46,17 +46,13 @@ class ProjectRepo {
 	 */
 	File cloneProject(URI projectUri) {
 		try {
-			if (log.isDebugEnabled()) {
-				log.debug("Cloning repo from [{}] to [{}]", projectUri, this.basedir);
-			}
+			log.debug("Cloning repo from [{}] to [{}]", projectUri, this.basedir);
 			Git git = cloneToBasedir(projectUri, this.basedir);
 			if (git != null) {
 				git.close();
 			}
 			File clonedRepo = git.getRepository().getDirectory();
-			if (log.isDebugEnabled()) {
-				log.debug("Cloned repo to [{}]", clonedRepo);
-			}
+			log.debug("Cloned repo to [{}]", clonedRepo);
 			return clonedRepo;
 		}
 		catch (Exception e) {
@@ -71,13 +67,9 @@ class ProjectRepo {
 	 */
 	void checkout(File project, String branch) {
 		try {
-			if (log.isDebugEnabled()) {
-				log.debug("Checking out branch [{}] for repo [{}] to [{}]", this.basedir, branch);
-			}
+			log.debug("Checking out branch [{}] for repo [{}] to [{}]", this.basedir, branch);
 			checkoutBranch(project, branch);
-			if (log.isDebugEnabled()) {
-				log.debug("Successfully checked out the branch [{}]", branch);
-			}
+			log.debug("Successfully checked out the branch [{}]", branch);
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);

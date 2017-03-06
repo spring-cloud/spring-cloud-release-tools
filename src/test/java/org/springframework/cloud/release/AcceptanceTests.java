@@ -9,10 +9,11 @@ public class AcceptanceTests {
 
 	/**
 
-	 - should clone spring cloud release
-	 - should check out a branch / tag
+	 - should clone spring cloud release (x)
+	 - should check out a branch / tag (x)
+	 - should parse spring-cloud-starter-parent/pom.xml and resolve:
+	 	- Boot version (x)
 	 - should parse spring-cloud-dependencies/pom.xml and resolve:
-	 	- Boot version
 	 	- Project versions from properties
 	 	- Spring Cloud Build version from parent
 	 - should update the existing poms with the taken versions
