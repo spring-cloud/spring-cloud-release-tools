@@ -51,6 +51,11 @@ class Versions {
 		return this.projects.stream()
 				.anyMatch(project -> project.name.equals(projectName));
 	}
+
+	boolean versionAlreadySet(String projectName, String version) {
+		String versionForProject = versionForProject(projectName);
+		return version.equals(versionForProject);
+	}
 }
 
 /**

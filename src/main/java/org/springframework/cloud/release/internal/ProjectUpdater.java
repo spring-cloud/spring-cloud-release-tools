@@ -45,7 +45,7 @@ public class ProjectUpdater {
 		SCReleasePomParser SCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = SCReleasePomParser.allVersions();
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
-			log.info("Project is not on the list of projects to be updated. Skipping.");
+			log.info("Skipping project updating");
 			return;
 		}
 		File rootPom = new File(projectRoot, "pom.xml");

@@ -53,6 +53,9 @@ class PomUpdater {
 		if (!versions.shouldBeUpdated(model.getArtifactId())) {
 			log.info("Skipping project [{}] since it's not on the list of projects to update", model.getArtifactId());
 			return false;
+		} else if (versions.versionAlreadySet(model.getArtifactId(), model.getVersion())) {
+			log.info("Version has already been set. The project shouldn't be updated.");
+			return false;
 		}
 		log.info("Project [{}] will have its dependencies updated", model.getArtifactId());
 		return true;
@@ -112,6 +115,9 @@ class PomUpdater {
 	}
 
 	private boolean updateParentIfPossible(String rootProjectName, Versions versions, Model model) {
+		if (model.getParent() == null || StringUtils.isEmpty(model.getParent().getVersion())) {
+			return false;
+		}
 		String parentArtifactId = model.getParent().getArtifactId();
 		String version = versions.versionForProject(parentArtifactId);
 		if (StringUtils.isEmpty(version)) {
@@ -129,7 +135,7 @@ class PomUpdater {
 
 	private boolean updateVersionIfPossible(String rootProjectName, Versions versions, Model model) {
 		String version = versions.versionForProject(rootProjectName);
-		if (StringUtils.isEmpty(version)) {
+		if (StringUtils.isEmpty(version) || StringUtils.isEmpty(model.getVersion())) {
 			log.warn("There was no version set for project [{}], skipping version setting for module [{}]", rootProjectName, model.getArtifactId());
 			return false;
 		}

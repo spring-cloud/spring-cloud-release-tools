@@ -61,16 +61,13 @@ class GitProjectRepo {
 	 */
 	File cloneProject(URI projectUri) {
 		try {
-			File file = new File(projectUri.getPath());
-			URI modifiedUri = file.getName().endsWith(File.separator) ?
-					projectUri : new File(file.getPath() + File.separator).toURI();
-			log.debug("Cloning repo from [{}] to [{}]", modifiedUri, this.basedir);
-			Git git = cloneToBasedir(modifiedUri, this.basedir);
+			log.info("Cloning repo from [{}] to [{}]", projectUri, this.basedir);
+			Git git = cloneToBasedir(projectUri, this.basedir);
 			if (git != null) {
 				git.close();
 			}
 			File clonedRepo = git.getRepository().getWorkTree();
-			log.debug("Cloned repo to [{}]", clonedRepo);
+			log.info("Cloned repo to [{}]", clonedRepo);
 			return clonedRepo;
 		}
 		catch (Exception e) {
@@ -85,9 +82,9 @@ class GitProjectRepo {
 	 */
 	void checkout(File project, String branch) {
 		try {
-			log.debug("Checking out branch [{}] for repo [{}] to [{}]", this.basedir, branch);
+			log.info("Checking out branch [{}] for repo [{}] to [{}]", this.basedir, branch);
 			checkoutBranch(project, branch);
-			log.debug("Successfully checked out the branch [{}]", branch);
+			log.info("Successfully checked out the branch [{}]", branch);
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);

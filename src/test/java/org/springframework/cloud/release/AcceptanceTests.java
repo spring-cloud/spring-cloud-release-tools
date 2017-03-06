@@ -73,7 +73,7 @@ public class AcceptanceTests {
 
 	private ReleaserProperties releaserProperties() throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
-		releaserProperties.setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").getPath());
+		releaserProperties.setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
 		return releaserProperties;
 	}
 

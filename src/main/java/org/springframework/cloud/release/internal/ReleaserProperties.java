@@ -11,7 +11,7 @@ public class ReleaserProperties {
 	/**
 	 * URL to Spring Cloud Release Git repository
 	 */
-	private String springCloudReleaseGitUrl = "https://github.com/spring-cloud/spring-cloud-release.git";
+	private String springCloudReleaseGitUrl = "https://github.com/spring-cloud/spring-cloud-release";
 
 	/**
 	 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
