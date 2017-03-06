@@ -1,3 +1,0 @@
-0000000000000000000000000000000000000000 e1248f716b5656af04ded489b481db45ad3dfc8f Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1473364042 +0200	clone: from git@github.com:spring-cloud/spring-cloud-release.git
-e1248f716b5656af04ded489b481db45ad3dfc8f 32ebcd2c317339400d65ad43999d4e5ddc05bd30 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1486379095 +0100	rebase finished: refs/heads/master onto 32ebcd2c317339400d65ad43999d4e5ddc05bd30
-32ebcd2c317339400d65ad43999d4e5ddc05bd30 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1488827673 +0100	rebase finished: refs/heads/master onto 320597b84bb0312c15228c4d42f46c189b86ed90
