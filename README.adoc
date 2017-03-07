@@ -8,7 +8,55 @@ image::https://circleci.com/gh/{org}/{repo}/tree/1.1.x.svg?style=svg["CircleCI",
 image::https://codecov.io/gh/{org}/{repo}/branch/1.1.x/graph/badge.svg["codecov", link="https://codecov.io/gh/{org}/{repo}"]
 image::https://badges.gitter.im/{org}/{repo}.svg[Gitter, link="https://gitter.im/{org}/{repo}?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
 
-Unresolved directive in README.adoc - include::spring-cloud-releaser.adoc[]
+:github-tag: master
+:org: spring-cloud
+:repo: spring-cloud-release-tools
+:github-repo: {org}/{repo}
+:github-raw: http://raw.github.com/{github-repo}/{github-tag}
+:github-code: http://github.com/{github-repo}/tree/{github-tag}
+:toc: left
+:toclevels: 8
+:nofooter:
+
+Spring Cloud Release Tools
+====================
+
+This project can be used to
+
+- update all versions in your Spring Cloud Project according to the Spring Cloud Release setup
+
+== How to run it
+
+Currently we only support running the releaser to update the poms from Java
+
+[source,bash]
+----
+git clone https://github.com/spring-cloud/spring-cloud-release-tools
+cd releaser
+./mvnw clean package
+----
+
+and then go to your project (e.g. Spring Cloud Sleuth)
+
+[source,bash]
+----
+git clone https://github.com/spring-cloud/spring-cloud-sleuth
+cd spring-cloud-sleuth
+java -jar ~/path/to/cloned/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/releaser-spring-1.0.0.M1.jar
+----
+
+The application will start running from your working directory.
+
+== Future plans
+
+In the future it can also:
+
+- commit the changed values
+- perform a release
+
+Other plans:
+
+- add a Maven plugin to perform the work from Maven
 
 == Building
 
