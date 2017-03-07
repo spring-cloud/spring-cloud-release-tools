@@ -29,20 +29,15 @@ This project can be used to
 
 Currently we only support running the releaser to update the poms from Java
 
-[source,bash]
-----
-git clone https://github.com/spring-cloud/spring-cloud-release-tools
-cd releaser
-./mvnw clean package
-----
-
-and then go to your project (e.g. Spring Cloud Sleuth)
+Go to your project (e.g. Spring Cloud Sleuth)
 
 [source,bash]
 ----
 git clone https://github.com/spring-cloud/spring-cloud-sleuth
 cd spring-cloud-sleuth
-java -jar ~/path/to/cloned/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/releaser-spring-1.0.0.M1.jar
+mkdir -p target
+wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+java -jar ~target/spring-cloud-release-tools-spring-1.0.0.M1.jar
 ----
 
 The application will start running from your working directory.
