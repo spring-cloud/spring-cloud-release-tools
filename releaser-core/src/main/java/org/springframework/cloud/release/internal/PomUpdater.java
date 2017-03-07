@@ -15,16 +15,25 @@
  */
 package org.springframework.cloud.release.internal;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.plugin.logging.Log;
+import org.codehaus.mojo.versions.api.PomHelper;
+import org.codehaus.mojo.versions.change.AbstractVersionChanger;
+import org.codehaus.mojo.versions.change.VersionChange;
+import org.codehaus.mojo.versions.change.VersionChanger;
+import org.codehaus.mojo.versions.change.VersionChangerFactory;
+import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
+import org.codehaus.stax2.XMLInputFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -53,33 +62,29 @@ class PomUpdater {
 		if (!versions.shouldBeUpdated(model.getArtifactId())) {
 			log.info("Skipping project [{}] since it's not on the list of projects to update", model.getArtifactId());
 			return false;
-		} else if (versions.versionAlreadySet(model.getArtifactId(), model.getVersion())) {
-			log.info("Version has already been set. The project shouldn't be updated.");
-			return false;
 		}
 		log.info("Project [{}] will have its dependencies updated", model.getArtifactId());
 		return true;
 	}
 
 	ModelWrapper readModel(File pom) {
-		return new ModelWrapper(this.pomReader.readPom(pom), false);
+		return new ModelWrapper(this.pomReader.readPom(pom));
 	}
 
 	/**
 	 * Updates the root / child module model
 	 *
-	 * @param rootProjectName - name of the artifactId of the root project
+	 * @param rootProject - root project model
 	 * @param pom - file with the pom
 	 * @param versions - versions to update
 	 * @return updated model
 	 */
-	ModelWrapper updateModel(String rootProjectName, File pom, Versions versions) {
+	ModelWrapper updateModel(ModelWrapper rootProject, File pom, Versions versions) {
 		Model model = this.pomReader.readPom(pom);
-		boolean dirty = false;
-		dirty = updateParentIfPossible(rootProjectName, versions, model) || dirty ;
-		dirty = updateVersionIfPossible(rootProjectName, versions, model) || dirty ;
-		dirty = updateProperties(versions, model) || dirty;
-		return new ModelWrapper(model, dirty);
+		List<VersionChange> sourceChanges = new ArrayList<>();
+		sourceChanges = updateParentIfPossible(rootProject, versions, model, sourceChanges);
+		sourceChanges = updateVersionIfPossible(rootProject, versions, model, sourceChanges);
+		return new ModelWrapper(model, sourceChanges, versions);
 	}
 
 	/**
@@ -88,85 +93,256 @@ class PomUpdater {
 	 *
 	 * @return - the pom file
 	 */
-	File overwritePomIfDirty(ModelWrapper wrapper, File pom) {
-		if (wrapper.dirty) {
+	File overwritePomIfDirty(ModelWrapper wrapper, Versions versions, File pom) {
+		if (wrapper.isDirty()) {
 			log.debug("There were changes in the pom so file will be overridden");
-			this.pomWriter.write(wrapper.model, pom);
+			this.pomWriter.write(wrapper, versions, pom);
 			log.info("Successfully stored [{}]", pom);
 		}
 		return pom;
 	}
 
-
-	private boolean updateProperties(Versions versions, Model model) {
-		final AtomicBoolean atomicBoolean = new AtomicBoolean();
-		versions.projects
-				.forEach(project -> {
-					Properties properties = model.getProperties();
-					String projectVersionKey = project.name + ".version";
-					if (properties.containsKey(projectVersionKey)) {
-						Object previous = properties.setProperty(projectVersionKey, project.version);
-						log.info("Updated property [{}] => [{}]. Previous version [{}]",
-								projectVersionKey, project.version, previous);
-						atomicBoolean.set(true);
-					}
-				});
-		return atomicBoolean.get();
-	}
-
-	private boolean updateParentIfPossible(String rootProjectName, Versions versions, Model model) {
+	private List<VersionChange> updateParentIfPossible(ModelWrapper wrapper, Versions versions,
+			Model model, List<VersionChange> sourceChanges) {
+		String rootProjectName = wrapper.projectName();
+		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		if (model.getParent() == null || StringUtils.isEmpty(model.getParent().getVersion())) {
-			return false;
+			return changes;
 		}
+		String parentGroupId = model.getParent().getGroupId();
 		String parentArtifactId = model.getParent().getArtifactId();
+		String oldVersion = model.getParent().getVersion();
 		String version = versions.versionForProject(parentArtifactId);
 		if (StringUtils.isEmpty(version)) {
 			if (StringUtils.hasText(model.getParent().getRelativePath())) {
 				version = versions.versionForProject(rootProjectName);
 			} else {
 				log.warn("There is no info on the [{}] version", model.getArtifactId());
-				return false;
+				return changes;
 			}
 		}
-		log.info("Setting version of parent [{}] to [{}] for module [{}]", parentArtifactId, version, model.getArtifactId());
-		model.getParent().setVersion(version);
-		return true;
+		log.info("Setting version of parent [{}] to [{}] for module [{}]", parentArtifactId,
+				version, model.getArtifactId());
+		changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion, version));
+		return changes;
 	}
 
-	private boolean updateVersionIfPossible(String rootProjectName, Versions versions, Model model) {
+	private List<VersionChange> updateVersionIfPossible(ModelWrapper wrapper, Versions versions,
+			Model model, List<VersionChange> sourceChanges) {
+		String rootProjectName = wrapper.projectName();
+		List<VersionChange> changes = new ArrayList<>(sourceChanges);
+		String parentGroupId = groupId(model);
+		String parentArtifactId = model.getArtifactId();
+		String oldVersion = model.getVersion();
 		String version = versions.versionForProject(rootProjectName);
 		if (StringUtils.isEmpty(version) || StringUtils.isEmpty(model.getVersion())) {
 			log.warn("There was no version set for project [{}], skipping version setting for module [{}]", rootProjectName, model.getArtifactId());
-			return false;
+			return changes;
 		}
 		log.info("Setting [{}] version to [{}]", model.getArtifactId(), version);
-		model.setVersion(version);
-		return true;
+		changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion, version));
+		return changes;
+	}
+
+	private String groupId(Model model) {
+		if (StringUtils.hasText(model.getGroupId())) {
+			return model.getGroupId();
+		}
+		if (model.getParent() != null) {
+			return model.getParent().getGroupId();
+		}
+		return "";
 	}
 }
 
 class ModelWrapper {
 	final Model model;
-	final boolean dirty;
+	final Versions versions;
+	final List<VersionChange> sourceChanges = new ArrayList<>();
 
-	ModelWrapper(Model model, boolean dirty) {
+	ModelWrapper(Model model, List<VersionChange> sourceChanges, Versions versions) {
 		this.model = model;
-		this.dirty = dirty;
+		this.versions = versions;
+		this.sourceChanges.addAll(sourceChanges);
+	}
+
+	ModelWrapper(Model model) {
+		this.model = model;
+		this.versions = Versions.EMPTY_VERSION;
 	}
 
 	String projectName() {
 		return this.model.getArtifactId();
 	}
+
+	boolean isDirty() {
+		return !this.sourceChanges.isEmpty() || this.versions.shouldSetProperty(this.model.getProperties());
+	}
 }
 
 class PomWriter {
-	void write(Model model, File pom) {
-		try(Writer writer = new FileWriter(pom)) {
-			MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-			pomWriter.write(writer, model);
+
+	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+	void write(ModelWrapper wrapper, Versions versions, File pom) {
+		try {
+			VersionChangerFactory versionChangerFactory = new VersionChangerFactory();
+			StringBuilder input = PomHelper.readXmlFile(pom);
+			ModifiedPomXMLEventReader parsedPom = newModifiedPomXER(input);
+			versionChangerFactory.setPom(parsedPom);
+			LoggerToMavenLog loggerToMavenLog = new LoggerToMavenLog(PomWriter.log);
+			versionChangerFactory.setLog(loggerToMavenLog);
+			versionChangerFactory.setModel(wrapper.model);
+			log.info("Applying version / parent / plugin / project changes to the pom [{}]", pom);
+			VersionChanger changer = versionChangerFactory.newVersionChanger( true,
+					true, true, true);
+			for (VersionChange versionChange : wrapper.sourceChanges) {
+				changer.apply(versionChange);
+			}
+			log.info("Applying properties changes to the pom [{}]", pom);
+			new PropertyVersionChanger(wrapper, versions, parsedPom, loggerToMavenLog)
+					.apply(null);
+			try (BufferedWriter bw = new BufferedWriter(new FileWriter(pom))) {
+				bw.write(input.toString());
+			}
+			log.info("Flushed changes to the pom file [{}]", pom);
+		} catch (Exception e) {
+			log.error("Exception occurred while trying to apply changes to the POM", e);
 		}
-		catch (IOException e) {
-			throw new IllegalStateException("Failed to write file", e);
+	}
+
+	/**
+	 * Creates a {@link org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader} from a StringBuilder.
+	 *
+	 * @param input The XML to read and modify.
+	 * @return The {@link org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader}.
+	 */
+	private ModifiedPomXMLEventReader newModifiedPomXER(StringBuilder input) {
+		ModifiedPomXMLEventReader newPom = null;
+		try {
+			XMLInputFactory inputFactory = XMLInputFactory2.newInstance();
+			inputFactory.setProperty(XMLInputFactory2.P_PRESERVE_LOCATION, Boolean.TRUE);
+			newPom = new ModifiedPomXMLEventReader(input, inputFactory);
 		}
+		catch (XMLStreamException e) {
+			log.error("Exception occurred while trying to parse pom", e);
+		}
+		return newPom;
+	}
+}
+
+class PropertyVersionChanger extends AbstractVersionChanger {
+
+	private final Versions versions;
+	private final Log log;
+
+	public PropertyVersionChanger(ModelWrapper wrapper, Versions versions, ModifiedPomXMLEventReader pom, Log log) {
+		super(wrapper.model, pom, log);
+		this.versions = versions;
+		this.log = log;
+	}
+
+	@Override public void apply(final VersionChange versionChange) throws XMLStreamException {
+		this.versions.projects
+				.stream()
+				.filter(project -> {
+					Properties properties = getModel().getProperties();
+					String projectVersionKey = propertyName(project);
+					return properties.containsKey(projectVersionKey);
+				})
+				.forEach(project -> {
+					String propertyName = propertyName(project);
+					if (setPropertyVersion(propertyName, project.version)) {
+						info("    Updating property " + propertyName);
+						info("        to version " + project.version);
+					}
+				});
+	}
+
+	private String propertyName(Project project) {
+		return project.name + ".version";
+	}
+
+	private boolean setPropertyVersion(String propertyName, String version) {
+		try {
+			return PomHelper.setPropertyVersion(getPom(), null, propertyName, version);
+		}
+		catch (XMLStreamException e) {
+			this.log.error("Exception occurred while trying to set property version", e);
+			return false;
+		}
+	}
+}
+
+class LoggerToMavenLog implements Log {
+
+	private final Logger logger;
+
+	LoggerToMavenLog(Logger logger) {
+		this.logger = logger;
+	}
+
+	@Override public boolean isDebugEnabled() {
+		return this.logger.isDebugEnabled();
+	}
+
+	@Override public void debug(CharSequence content) {
+		this.logger.debug(content.toString());
+	}
+
+	@Override public void debug(CharSequence content, Throwable error) {
+		this.logger.debug(content.toString(), error);
+	}
+
+	@Override public void debug(Throwable error) {
+		this.debug("Exception occurred", error);
+	}
+
+	@Override public boolean isInfoEnabled() {
+		return this.logger.isInfoEnabled();
+	}
+
+	@Override public void info(CharSequence content) {
+		this.logger.info(content.toString());
+	}
+
+	@Override public void info(CharSequence content, Throwable error) {
+		this.logger.info(content.toString(), error);
+	}
+
+	@Override public void info(Throwable error) {
+		this.info("Exception occurred", error);
+	}
+
+	@Override public boolean isWarnEnabled() {
+		return this.logger.isWarnEnabled();
+	}
+
+	@Override public void warn(CharSequence content) {
+		this.logger.warn(content.toString());
+	}
+
+	@Override public void warn(CharSequence content, Throwable error) {
+		this.logger.warn(content.toString(), error);
+	}
+
+	@Override public void warn(Throwable error) {
+		this.warn("Exception occurred", error);
+	}
+
+	@Override public boolean isErrorEnabled() {
+		return this.logger.isErrorEnabled();
+	}
+
+	@Override public void error(CharSequence content) {
+		this.logger.error(content.toString());
+	}
+
+	@Override public void error(CharSequence content, Throwable error) {
+		this.logger.error(content.toString(), error);
+	}
+
+	@Override public void error(Throwable error) {
+		this.error("Exception occurred", error);
 	}
 }

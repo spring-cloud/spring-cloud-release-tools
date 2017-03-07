@@ -42,8 +42,8 @@ public class ProjectUpdater {
 		File clonedScRelease = this.gitProjectRepo.cloneProject(
 				URI.create(this.properties.getSpringCloudReleaseGitUrl()));
 		this.gitProjectRepo.checkout(clonedScRelease, this.properties.getBranch());
-		SCReleasePomParser SCReleasePomParser = new SCReleasePomParser(clonedScRelease);
-		Versions versions = SCReleasePomParser.allVersions();
+		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
+		Versions versions = sCReleasePomParser.allVersions();
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
 			log.info("Skipping project updating");
 			return;
@@ -80,8 +80,8 @@ public class ProjectUpdater {
 		public FileVisitResult visitFile(Path path, BasicFileAttributes attr) {
 			File file = path.toFile();
 			if (POM_XML.equals(file.getName())) {
-				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom.projectName(), file, this.versions);
-				this.pomUpdater.overwritePomIfDirty(model, file);
+				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file, this.versions);
+				this.pomUpdater.overwritePomIfDirty(model, this.versions, file);
 			}
 			return FileVisitResult.CONTINUE;
 		}

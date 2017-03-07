@@ -17,11 +17,10 @@
 package org.springframework.cloud.release.internal;
 
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.junit.Test;
-import org.springframework.cloud.release.internal.Project;
-import org.springframework.cloud.release.internal.Versions;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -58,9 +57,31 @@ public class VersionsTests {
 		then(this.versions.versionForProject("missing")).isEmpty();
 	}
 
+	@Test
+	public void should_return_true_if_properties_contains_project_key() {
+		then(this.versions.shouldSetProperty(validProps())).isTrue();
+	}
+
+	@Test
+	public void should_return_False_if_properties_does_not_contain_project_key() {
+		then(this.versions.shouldSetProperty(missingProps())).isFalse();
+	}
+
 	Set<Project> projects() {
 		Set<Project> projects = new HashSet<>();
 		projects.add(new Project("foo", "bar"));
 		return projects;
+	}
+
+	Properties validProps() {
+		Properties properties = new Properties();
+		properties.setProperty("foo.version", "1.0.0");
+		return properties;
+	}
+
+	Properties missingProps() {
+		Properties properties = new Properties();
+		properties.setProperty("missing.version", "1.0.0");
+		return properties;
 	}
 }

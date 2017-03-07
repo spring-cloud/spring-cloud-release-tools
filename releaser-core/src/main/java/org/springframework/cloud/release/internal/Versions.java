@@ -1,10 +1,11 @@
 package org.springframework.cloud.release.internal;
 
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
+
 import static org.springframework.cloud.release.internal.SpringCloudConstants.BUILD_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents versions taken out from Spring Cloud Release pom
@@ -14,6 +15,7 @@ import java.util.Set;
 class Versions {
 
 	private static final String SPRING_BOOT_PROJECT_NAME = "spring-boot";
+	static final Versions EMPTY_VERSION = new Versions("");
 
 	String bootVersion;
 	String scBuildVersion;
@@ -52,9 +54,9 @@ class Versions {
 				.anyMatch(project -> project.name.equals(projectName));
 	}
 
-	boolean versionAlreadySet(String projectName, String version) {
-		String versionForProject = versionForProject(projectName);
-		return version.equals(versionForProject);
+	boolean shouldSetProperty(Properties properties) {
+		return this.projects.stream()
+				.anyMatch(project -> properties.containsKey(project.name + ".version"));
 	}
 }
 

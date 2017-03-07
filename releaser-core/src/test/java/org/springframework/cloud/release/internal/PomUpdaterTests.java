@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.release.internal;
 
-import static org.assertj.core.api.BDDAssertions.then;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,11 +23,14 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.maven.model.Model;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.util.FileSystemUtils;
+
+import static org.springframework.cloud.release.internal.VersionChangeAssertions.then;
 
 /**
  * @author Marcin Grzejszczak
@@ -64,68 +65,44 @@ public class PomUpdaterTests {
 	public void should_not_update_the_model_if_no_changes_were_made() throws Exception {
 		File nonMatchingPom = pom("/projects/project");
 
-		ModelWrapper model = this.pomUpdater.updateModel("foo", nonMatchingPom, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("foo"), nonMatchingPom, this.versions);
 
-		then(model.dirty).isFalse();
+		then(model.isDirty()).isFalse();
 	}
 
 	@Test
 	public void should_update_the_model_if_only_artifact_id_is_matched_in_the_root_pom() throws Exception {
 		File matchingArtifactId = pom("/projects/project", "pom_matching_artifact.xml");
 
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", matchingArtifactId, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"), matchingArtifactId, this.versions);
 
-		then(model.dirty).isTrue();
-		then(model.model.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
-		// the rest is the same
-		then(model.model.getParent().getVersion()).isEqualTo("1.3.1.BUILD-SNAPSHOT");
-		then(model.model.getProperties())
-			.containsEntry("spring-cloud-foo.version", "1.3.1.BUILD-SNAPSHOT")
-			.containsEntry("foo.version", "1.2.0.BUILD-SNAPSHOT");
+		then(model.isDirty()).isTrue();
+		then(new ListOfChanges(model))
+				.newParentVersionIsEqualTo("parentGroup", "spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT");
 	}
 
 	@Test
 	public void should_update_the_model_if_parent_is_matched_via_sc_build() throws Exception {
 		File matchingArtifactId = pom("/projects/project", "pom_matching_parent_v2.xml");
 
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", matchingArtifactId, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"), matchingArtifactId, this.versions);
 
-		then(model.dirty).isTrue();
-		then(model.model.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
-		then(model.model.getParent().getVersion()).isEqualTo("0.0.2");
-		// the rest is the same
-		then(model.model.getProperties())
-				.containsEntry("spring-cloud-foo.version", "1.3.1.BUILD-SNAPSHOT")
-				.containsEntry("foo.version", "1.2.0.BUILD-SNAPSHOT");
+		then(model.isDirty()).isTrue();
+		then(new ListOfChanges(model))
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT")
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-build", "0.0.2");
 	}
 
 	@Test
 	public void should_update_the_model_if_parent_is_matched_via_sc_dependencies_parent() throws Exception {
 		File matchingArtifactId = pom("/projects/project", "pom_matching_parent.xml");
 
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", matchingArtifactId, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"), matchingArtifactId, this.versions);
 
-		then(model.dirty).isTrue();
-		then(model.model.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
-		then(model.model.getParent().getVersion()).isEqualTo("0.0.2");
-		// the rest is the same
-		then(model.model.getProperties())
-			.containsEntry("spring-cloud-foo.version", "1.3.1.BUILD-SNAPSHOT")
-			.containsEntry("foo.version", "1.2.0.BUILD-SNAPSHOT");
-	}
-
-	@Test
-	public void should_update_the_model_if_properties_are_matched() throws Exception {
-		File matchingArtifactId = pom("/projects/project", "pom_matching_properties.xml");
-
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", matchingArtifactId, this.versions);
-
-		then(model.dirty).isTrue();
-		then(model.model.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
-		then(model.model.getParent().getVersion()).isEqualTo("0.0.2");
-		then(model.model.getProperties())
-			.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT")
-			.containsEntry("spring-cloud-vault.version", "0.0.4.BUILD-SNAPSHOT");
+		then(model.isDirty()).isTrue();
+		then(new ListOfChanges(model))
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT")
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-build", "0.0.2");
 	}
 
 	@Test
@@ -146,10 +123,11 @@ public class PomUpdaterTests {
 	public void should_update_the_child_model_if_parent_is_matched_via_sc_build() throws Exception {
 		File matchingArtifactId = pom("/projects/project/children", "pom_matching_parent_v2.xml");
 
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", matchingArtifactId, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"), matchingArtifactId, this.versions);
 
-		then(model.dirty).isTrue();
-		then(model.model.getParent().getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
+		then(model.isDirty()).isTrue();
+		then(new ListOfChanges(model))
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT");
 		// the rest is the same
 		then(model.model.getProperties())
 				.containsEntry("spring-cloud-foo.version", "1.3.1.BUILD-SNAPSHOT")
@@ -160,10 +138,11 @@ public class PomUpdaterTests {
 	public void should_update_the_child_model_if_parent_is_matched_via_sc_dependencies_parent() throws Exception {
 		File matchingArtifactId = pom("/projects/project/children", "pom_matching_parent.xml");
 
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", matchingArtifactId, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"), matchingArtifactId, this.versions);
 
-		then(model.dirty).isTrue();
-		then(model.model.getParent().getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
+		then(model.isDirty()).isTrue();
+		then(new ListOfChanges(model))
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT");
 		// the rest is the same
 		then(model.model.getProperties())
 			.containsEntry("spring-cloud-foo.version", "1.3.1.BUILD-SNAPSHOT")
@@ -174,13 +153,11 @@ public class PomUpdaterTests {
 	public void should_update_the_child_model_if_properties_are_matched() throws Exception {
 		File matchingArtifactId = pom("/projects/project/children", "pom_matching_properties.xml");
 
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", matchingArtifactId, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"), matchingArtifactId, this.versions);
 
-		then(model.dirty).isTrue();
-		then(model.model.getParent().getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
-		then(model.model.getProperties())
-			.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT")
-			.containsEntry("spring-cloud-vault.version", "0.0.4.BUILD-SNAPSHOT");
+		then(model.isDirty()).isTrue();
+		then(new ListOfChanges(model))
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT");
 	}
 
 	@Test
@@ -188,9 +165,9 @@ public class PomUpdaterTests {
 		FileSystemUtils.copyRecursively(file("/projects/project"), this.temporaryFolder);
 		File beforeProcessing = pom("/projects/project/children", "pom_matching_properties.xml");
 		File afterProcessing = new File(this.temporaryFolder, "/children/pom_matching_properties.xml");
-		ModelWrapper model = this.pomUpdater.updateModel("spring-cloud-sleuth", afterProcessing, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"), afterProcessing, this.versions);
 
-		File processedPom = this.pomUpdater.overwritePomIfDirty(model, afterProcessing);
+		File processedPom = this.pomUpdater.overwritePomIfDirty(model, Versions.EMPTY_VERSION, afterProcessing);
 
 		then(processedPom).isSameAs(afterProcessing);
 		String processedPomText = asString(processedPom);
@@ -203,9 +180,9 @@ public class PomUpdaterTests {
 		FileSystemUtils.copyRecursively(file("/projects/project"), this.temporaryFolder);
 		File beforeProcessing = pom("/projects/project/");
 		File afterProcessing = new File(this.temporaryFolder, "/pom.xml");
-		ModelWrapper model = this.pomUpdater.updateModel("foo", afterProcessing, this.versions);
+		ModelWrapper model = this.pomUpdater.updateModel(model("foo"), afterProcessing, this.versions);
 
-		File processedPom = this.pomUpdater.overwritePomIfDirty(model, afterProcessing);
+		File processedPom = this.pomUpdater.overwritePomIfDirty(model, Versions.EMPTY_VERSION, afterProcessing);
 
 		then(processedPom).isSameAs(afterProcessing);
 		then(asString(processedPom)).isEqualTo(asString(beforeProcessing));
@@ -216,6 +193,12 @@ public class PomUpdaterTests {
 		projects.add(new Project("spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT"));
 		projects.add(new Project("spring-cloud-vault", "0.0.4.BUILD-SNAPSHOT"));
 		return projects;
+	}
+
+	private ModelWrapper model(String projectName) {
+		Model parent = new Model();
+		parent.setArtifactId(projectName);
+		return new ModelWrapper(parent);
 	}
 
 	private File file(String relativePath) throws URISyntaxException {
