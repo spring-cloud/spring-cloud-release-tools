@@ -57,14 +57,30 @@ class PomUpdater {
 	 * @return {@code true} if the project is on the list of projects to be updated
 	 */
 	boolean shouldProjectBeUpdated(File rootFolder, Versions versions) {
-		File rootPom = new File(rootFolder, "pom.xml");
+		File rootPom = rootPom(rootFolder);
 		Model model = this.pomReader.readPom(rootPom);
-		if (!versions.shouldBeUpdated(model.getArtifactId())) {
+		String artifactId =  artifactId(model);
+		if (!versions.shouldBeUpdated(artifactId)) {
 			log.info("Skipping project [{}] since it's not on the list of projects to update", model.getArtifactId());
 			return false;
 		}
 		log.info("Project [{}] will have its dependencies updated", model.getArtifactId());
 		return true;
+	}
+
+	private File rootPom(File rootFolder) {
+		if (rootFolder.getName().endsWith(".xml")) {
+			return rootFolder;
+		}
+		return new File(rootFolder, "pom.xml");
+	}
+
+	private String artifactId(Model model) {
+		boolean parent = model.getArtifactId().endsWith("-parent");
+		if (!parent) {
+			return model.getArtifactId();
+		}
+		return model.getArtifactId().substring(0, model.getArtifactId().indexOf("-parent"));
 	}
 
 	ModelWrapper readModel(File pom) {

@@ -55,6 +55,20 @@ public class PomUpdaterTests {
 	}
 
 	@Test
+	public void should_not_update_pom_when_project_with_parent_suffix_is_not_on_the_versions_list() throws Exception {
+		File springCloud = pom("/projects/project", "pom_with_parent_suffix.xml");
+
+		then(this.pomUpdater.shouldProjectBeUpdated(springCloud, this.versions)).isFalse();
+	}
+
+	@Test
+	public void should_update_pom_for_project_with_suffix_when_project_is_on_the_versions_list() throws Exception {
+		File springCloud = pom("/projects/project", "pom_matching_with_parent_suffix.xml");
+
+		then(this.pomUpdater.shouldProjectBeUpdated(springCloud, this.versions)).isTrue();
+	}
+
+	@Test
 	public void should_update_pom_when_project_is_not_on_the_versions_list() throws Exception {
 		File springCloudSleuthPom = file("/projects/spring-cloud-sleuth");
 
