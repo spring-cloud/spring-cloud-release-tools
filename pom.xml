@@ -4,8 +4,9 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>releaser-parent</artifactId>
-	<version>0.0.1.BUILD-SNAPSHOT</version>
+	<groupId>org.springframework.cloud.internal</groupId>
+	<artifactId>spring-cloud-release-tools-parent</artifactId>
+	<version>1.0.0.M1</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -18,8 +19,8 @@
 
 	<modules>
 		<module>docs</module>
-		<module>releaser-core</module>
-		<module>releaser-spring</module>
+		<module>spring-cloud-release-tools-core</module>
+		<module>spring-cloud-release-tools-spring</module>
 	</modules>
 
 </project>

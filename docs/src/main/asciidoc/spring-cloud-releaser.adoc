@@ -1,6 +1,6 @@
 :github-tag: master
-:org: marcingrzejszczak
-:repo: releaser
+:org: spring-cloud
+:repo: spring-cloud-release-tools
 :github-repo: {org}/{repo}
 :github-raw: http://raw.github.com/{github-repo}/{github-tag}
 :github-code: http://github.com/{github-repo}/tree/{github-tag}
@@ -21,7 +21,7 @@ Currently we only support running the releaser to update the poms from Java
 
 [source,bash]
 ----
-git clone https://github.com/marcingrzejszczak/releaser
+git clone https://github.com/spring-cloud/spring-cloud-release-tools
 cd releaser
 ./mvnw clean package
 ----
@@ -32,7 +32,7 @@ and then go to your project (e.g. Spring Cloud Sleuth)
 ----
 git clone https://github.com/spring-cloud/spring-cloud-sleuth
 cd spring-cloud-sleuth
-java -jar ~/path/to/cloned/releaser/releaser-spring/target/releaser-spring-0.0.1.BUILD-SNAPSHOT.jar
+java -jar ~/path/to/cloned/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/releaser-spring-1.0.0.M1.jar
 ----
 
 The application will start running from your working directory.

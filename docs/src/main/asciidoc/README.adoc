@@ -1,6 +1,6 @@
 :jdkversion: 1.8
-:org: marcingrzejszczak
-:repo: releaser
+:org: spring-cloud
+:repo: spring-cloud-release-tools
 
 image::https://circleci.com/gh/{org}/{repo}/tree/1.1.x.svg?style=svg["CircleCI", link="https://circleci.com/gh/{org}/{repo}/tree/1.1.x"]
 image::https://codecov.io/gh/{org}/{repo}/branch/1.1.x/graph/badge.svg["codecov", link="https://codecov.io/gh/{org}/{repo}"]
