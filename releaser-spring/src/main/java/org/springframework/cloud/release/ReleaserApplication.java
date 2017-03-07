@@ -41,7 +41,7 @@ public class ReleaserApplication implements CommandLineRunner {
 	@Override public void run(String... strings) throws Exception {
 		String workingDir = System.getProperty("user.dir");
 		log.info("Will run the application for root folder [{}]", workingDir);
-		log.info("Press any key to continue...");
+		log.info("Press Enter to continue...");
 		System.in.read();
 		this.projectUpdater.updateProject(new File(workingDir));
 		System.exit(0);

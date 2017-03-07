@@ -17,6 +17,7 @@
 	</parent>
 
 	<modules>
+		<module>docs</module>
 		<module>releaser-core</module>
 		<module>releaser-spring</module>
 	</modules>

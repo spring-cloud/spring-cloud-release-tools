@@ -1,0 +1,49 @@
+:github-tag: master
+:org: marcingrzejszczak
+:repo: releaser
+:github-repo: {org}/{repo}
+:github-raw: http://raw.github.com/{github-repo}/{github-tag}
+:github-code: http://github.com/{github-repo}/tree/{github-tag}
+:toc: left
+:toclevels: 8
+:nofooter:
+
+Spring Cloud Releaser
+====================
+
+This project can be used to
+
+- update all versions in your Spring Cloud Project according to the Spring Cloud Release setup
+
+== How to run it
+
+Currently we only support running the releaser to update the poms from Java
+
+[source,bash]
+----
+git clone https://github.com/marcingrzejszczak/releaser
+cd releaser
+./mvnw clean package
+----
+
+and then go to your project (e.g. Spring Cloud Sleuth)
+
+[source,bash]
+----
+git clone https://github.com/spring-cloud/spring-cloud-sleuth
+cd spring-cloud-sleuth
+java -jar ~/path/to/cloned/releaser/releaser-spring/target/releaser-spring-0.0.1.BUILD-SNAPSHOT.jar
+----
+
+You'll be asked to press `Enter` to continue (to check whether you're running it from a proper path).
+
+== Future plans
+
+In the future it can also:
+
+- commit the changed values
+- perform a release
+
+Other plans:
+
+- add a Maven plugin to perform the work from Maven
