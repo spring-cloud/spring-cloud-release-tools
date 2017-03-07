@@ -35,7 +35,7 @@ cd spring-cloud-sleuth
 java -jar ~/path/to/cloned/releaser/releaser-spring/target/releaser-spring-0.0.1.BUILD-SNAPSHOT.jar
 ----
 
-You'll be asked to press `Enter` to continue (to check whether you're running it from a proper path).
+The application will start running from your working directory.
 
 == Future plans
 

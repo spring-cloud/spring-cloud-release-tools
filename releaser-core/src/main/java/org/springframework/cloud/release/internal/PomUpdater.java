@@ -262,12 +262,18 @@ class PomWriter {
 class PropertyVersionChanger extends AbstractVersionChanger {
 
 	private final Versions versions;
-	private final Log log;
+	private final PropertyStorer propertyStorer;
 
-	public PropertyVersionChanger(ModelWrapper wrapper, Versions versions, ModifiedPomXMLEventReader pom, Log log) {
+	PropertyVersionChanger(ModelWrapper wrapper, Versions versions, ModifiedPomXMLEventReader pom, Log log) {
 		super(wrapper.model, pom, log);
 		this.versions = versions;
-		this.log = log;
+		this.propertyStorer = new PropertyStorer(log, pom);
+	}
+
+	PropertyVersionChanger(ModelWrapper wrapper, Versions versions, ModifiedPomXMLEventReader pom, Log log, PropertyStorer propertyStorer) {
+		super(wrapper.model, pom, log);
+		this.versions = versions;
+		this.propertyStorer = propertyStorer;
 	}
 
 	@Override public void apply(final VersionChange versionChange) throws XMLStreamException {
@@ -282,13 +288,30 @@ class PropertyVersionChanger extends AbstractVersionChanger {
 					String version = properties.getProperty(projectVersionKey);
 					return !version.equals(project.version);
 				})
-				.forEach(project -> {
-					String propertyName = propertyName(project);
-					if (setPropertyVersion(propertyName, project.version)) {
-						info("    Updating property " + propertyName);
-						info("        to version " + project.version);
-					}
-				});
+				.forEach(this.propertyStorer::setPropertyVersionIfApplicable);
+	}
+
+	private String propertyName(Project project) {
+		return project.name + ".version";
+	}
+}
+
+class PropertyStorer {
+
+	private final Log log;
+	private final ModifiedPomXMLEventReader pom;
+
+	PropertyStorer(Log log, ModifiedPomXMLEventReader pom) {
+		this.log = log;
+		this.pom = pom;
+	}
+
+	void setPropertyVersionIfApplicable(Project project) {
+		String propertyName = propertyName(project);
+		if (setPropertyVersion(propertyName, project.version)) {
+			log.info("    Updating property " + propertyName);
+			log.info("        to version " + project.version);
+		}
 	}
 
 	private String propertyName(Project project) {
@@ -297,7 +320,7 @@ class PropertyVersionChanger extends AbstractVersionChanger {
 
 	private boolean setPropertyVersion(String propertyName, String version) {
 		try {
-			return PomHelper.setPropertyVersion(getPom(), null, propertyName, version);
+			return PomHelper.setPropertyVersion(this.pom, null, propertyName, version);
 		}
 		catch (XMLStreamException e) {
 			this.log.error("Exception occurred while trying to set property version", e);
