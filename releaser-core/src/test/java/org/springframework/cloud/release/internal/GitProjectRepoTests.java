@@ -1,9 +1,5 @@
 package org.springframework.cloud.release.internal;
 
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -14,6 +10,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -64,6 +64,16 @@ public class GitProjectRepoTests {
 		File pom = new File(this.tmpFolder, "pom.xml");
 		then(pom).exists();
 		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.SR3</version>"))).isTrue();
+	}
+
+	@Test
+	public void should_check_out_a_branch_on_cloned_repo2() throws IOException {
+		File project = this.gitProjectRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		this.gitProjectRepo.checkout(project, "Camden.x");
+
+		File pom = new File(this.tmpFolder, "pom.xml");
+		then(pom).exists();
+		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.BUILD-SNAPSHOT</version>"))).isTrue();
 	}
 
 	@Test

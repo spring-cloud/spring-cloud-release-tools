@@ -19,10 +19,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.List;
 
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.util.FileUtils;
@@ -109,6 +112,9 @@ class GitProjectRepo {
 		Git git = this.gitFactory.open(projectDir);
 		CheckoutCommand command = git.checkout().setName(branch);
 		try {
+			if (shouldTrack(git, branch)) {
+				trackBranch(command, branch);
+			}
 			return command.call();
 		}
 		catch (GitAPIException e) {
@@ -117,6 +123,39 @@ class GitProjectRepo {
 		} finally {
 			git.close();
 		}
+	}
+
+	private boolean shouldTrack(Git git, String label) throws GitAPIException {
+		return isBranch(git, label) && !isLocalBranch(git, label);
+	}
+
+	private void trackBranch(CheckoutCommand checkout, String label) {
+		checkout.setCreateBranch(true).setName(label)
+				.setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+				.setStartPoint("origin/" + label);
+	}
+
+	private boolean isBranch(Git git, String label) throws GitAPIException {
+		return containsBranch(git, label, ListBranchCommand.ListMode.ALL);
+	}
+
+	private boolean isLocalBranch(Git git, String label) throws GitAPIException {
+		return containsBranch(git, label, null);
+	}
+
+	private boolean containsBranch(Git git, String label, ListBranchCommand.ListMode listMode)
+			throws GitAPIException {
+		ListBranchCommand command = git.branchList();
+		if (listMode != null) {
+			command.setListMode(listMode);
+		}
+		List<Ref> branches = command.call();
+		for (Ref ref : branches) {
+			if (ref.getName().endsWith("/" + label)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void deleteBaseDirIfExists() {
