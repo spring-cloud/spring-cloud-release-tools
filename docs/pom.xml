@@ -10,7 +10,7 @@
 	<artifactId>releaser-docs</artifactId>
 	<packaging>pom</packaging>
 	<properties>
-		<docs.main>spring-cloud-releaser</docs.main>
+		<docs.main>spring-cloud-release-tools</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
 	</properties>
 	<profiles>
