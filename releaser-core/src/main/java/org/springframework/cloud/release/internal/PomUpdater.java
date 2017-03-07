@@ -127,18 +127,20 @@ class PomUpdater {
 		}
 		String parentGroupId = model.getParent().getGroupId();
 		String parentArtifactId = model.getParent().getArtifactId();
+		log.debug("Searching for a version of parent [{}:{}]", parentGroupId, parentArtifactId);
 		String oldVersion = model.getParent().getVersion();
 		String version = versions.versionForProject(parentArtifactId);
+		log.debug("Found version is [{}]", version);
 		if (StringUtils.isEmpty(version)) {
 			if (StringUtils.hasText(model.getParent().getRelativePath())) {
 				version = versions.versionForProject(rootProjectName);
 			} else {
-				log.warn("There is no info on the [{}] version", model.getArtifactId());
+				log.warn("There is no info on the [{}:{}] version", parentGroupId, parentArtifactId);
 				return changes;
 			}
 		}
 		if (oldVersion.equals(version)) {
-			log.info("Won't update the version of [{}]:[{}] since you're already using the proper one", parentGroupId, parentArtifactId);
+			log.debug("Won't update the version of [{}:{}] since you're already using the proper one", parentGroupId, parentArtifactId);
 			return changes;
 		}
 		log.info("Setting version of parent [{}] to [{}] for module [{}]", parentArtifactId,
@@ -153,14 +155,16 @@ class PomUpdater {
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		String groupId = groupId(model);
 		String artifactId = model.getArtifactId();
+		log.debug("Searching for a version [{}:{}]", groupId, artifactId);
 		String oldVersion = model.getVersion();
 		String version = versions.versionForProject(rootProjectName);
+		log.debug("Found version is [{}]", version);
 		if (StringUtils.isEmpty(version) || StringUtils.isEmpty(model.getVersion())) {
-			log.warn("There was no version set for project [{}], skipping version setting for module [{}]", rootProjectName, model.getArtifactId());
+			log.debug("There was no version set for project [{}], skipping version setting for module [{}]", rootProjectName, model.getArtifactId());
 			return changes;
 		}
 		if (oldVersion.equals(version)) {
-			log.info("Won't update the version of [{}]:[{}] since you're already using the proper one", groupId, artifactId);
+			log.debug("Won't update the version of [{}]:[{}] since you're already using the proper one", groupId, artifactId);
 			return changes;
 		}
 		log.info("Setting [{}] version to [{}]", artifactId, version);
@@ -223,13 +227,13 @@ class PomWriter {
 			for (VersionChange versionChange : wrapper.sourceChanges) {
 				changer.apply(versionChange);
 			}
-			log.info("Applying properties changes to the pom [{}]", pom);
+			log.debug("Applying properties changes to the pom [{}]", pom);
 			new PropertyVersionChanger(wrapper, versions, parsedPom, loggerToMavenLog)
 					.apply(null);
 			try (BufferedWriter bw = new BufferedWriter(new FileWriter(pom))) {
 				bw.write(input.toString());
 			}
-			log.info("Flushed changes to the pom file [{}]", pom);
+			log.debug("Flushed changes to the pom file [{}]", pom);
 		} catch (Exception e) {
 			log.error("Exception occurred while trying to apply changes to the POM", e);
 		}
@@ -272,7 +276,11 @@ class PropertyVersionChanger extends AbstractVersionChanger {
 				.filter(project -> {
 					Properties properties = getModel().getProperties();
 					String projectVersionKey = propertyName(project);
-					return properties.containsKey(projectVersionKey);
+					if (!properties.containsKey(projectVersionKey)) {
+						return false;
+					}
+					String version = properties.getProperty(projectVersionKey);
+					return !version.equals(project.version);
 				})
 				.forEach(project -> {
 					String propertyName = propertyName(project);

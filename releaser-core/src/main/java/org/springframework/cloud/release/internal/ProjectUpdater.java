@@ -44,13 +44,15 @@ public class ProjectUpdater {
 		this.gitProjectRepo.checkout(clonedScRelease, this.properties.getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();
+		log.info("Retrieved the following versions\n{}", versions);
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
 			log.info("Skipping project updating");
 			return;
 		}
 		File rootPom = new File(projectRoot, "pom.xml");
 		ModelWrapper rootPomModel = this.pomUpdater.readModel(rootPom);
-		processAllPoms(projectRoot, new PomWalker(rootPomModel, versions, this.pomUpdater));
+		processAllPoms(projectRoot, new PomWalker(rootPomModel, versions, this.pomUpdater,
+				properties));
 	}
 
 	private void processAllPoms(File projectRoot, PomWalker pomWalker) {
@@ -64,26 +66,38 @@ public class ProjectUpdater {
 
 	private class PomWalker extends SimpleFileVisitor<Path> {
 
-		private  static final String POM_XML = "pom.xml";
+		private static final String POM_XML = "pom.xml";
 
 		private final ModelWrapper rootPom;
 		private final Versions versions;
 		private final PomUpdater pomUpdater;
+		private final ReleaserProperties properties;
 
-		private PomWalker(ModelWrapper rootPom, Versions versions, PomUpdater pomUpdater) {
+		private PomWalker(ModelWrapper rootPom, Versions versions, PomUpdater pomUpdater,
+				ReleaserProperties properties) {
 			this.rootPom = rootPom;
 			this.versions = versions;
 			this.pomUpdater = pomUpdater;
+			this.properties = properties;
 		}
 
 		@Override
 		public FileVisitResult visitFile(Path path, BasicFileAttributes attr) {
 			File file = path.toFile();
 			if (POM_XML.equals(file.getName())) {
+				if (pathIgnored(file)) {
+					log.debug("Ignoring file [{}] since it's on a list of patterns to ignore", file);
+					return FileVisitResult.CONTINUE;
+				}
 				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file, this.versions);
 				this.pomUpdater.overwritePomIfDirty(model, this.versions, file);
 			}
 			return FileVisitResult.CONTINUE;
+		}
+
+		private boolean pathIgnored(File file) {
+			String path = file.getPath();
+			return this.properties.getIgnoredPomRegex().stream().anyMatch(path::matches);
 		}
 	}
 

@@ -34,7 +34,10 @@ public class VersionsTests {
 	@Test
 	public void should_add_boot_to_versions_when_version_is_created() {
 		then(new Versions("1.2.3.RELEASE").projects)
-				.containsExactly(new Project("spring-boot", "1.2.3.RELEASE"));
+				.contains(
+						new Project("spring-boot", "1.2.3.RELEASE"),
+						new Project("spring-boot-starter-parent", "1.2.3.RELEASE")
+						);
 	}
 
 	@Test

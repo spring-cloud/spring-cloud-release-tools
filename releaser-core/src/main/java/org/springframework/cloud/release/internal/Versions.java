@@ -3,7 +3,9 @@ package org.springframework.cloud.release.internal;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.springframework.cloud.release.internal.SpringCloudConstants.BOOT_STARTER_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.SpringCloudConstants.BUILD_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
 
@@ -24,6 +26,7 @@ class Versions {
 	Versions(String bootVersion) {
 		this.bootVersion = bootVersion;
 		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
+		this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, bootVersion));
 	}
 
 	Versions(String scBuildVersion, Set<Project> projects) {
@@ -70,6 +73,12 @@ class Versions {
 		String withoutParent = projectName.substring(0, projectName.indexOf("-parent"));
 		return project.name.equals(withoutParent);
 	}
+
+	@Override public String toString() {
+		return "Spring Boot Version=[" + this.bootVersion + ']' + "\nSpring Cloud Build Version=["
+				+ this.scBuildVersion + ']' + "\nProjects=\n\t" + this.projects.stream().map(Object::toString).collect(
+				Collectors.joining("\n\t"));
+	}
 }
 
 /**
@@ -107,6 +116,6 @@ class Project {
 	}
 
 	@Override public String toString() {
-		return "Project{" + "name='" + this.name + '\'' + ", version='" + this.version + '\'' + '}';
+		return "name=[" + this.name + "], version=[" + this.version + ']';
 	}
 }

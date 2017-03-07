@@ -17,6 +17,7 @@ package org.springframework.cloud.release.internal;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -60,7 +61,14 @@ class SCReleasePomParser {
 	Versions allVersions() {
 		Versions boot = bootVersion();
 		Versions cloud = springCloudVersions();
-		return new Versions(boot.bootVersion, cloud.scBuildVersion, cloud.projects);
+		return new Versions(boot.bootVersion, cloud.scBuildVersion, allProjects(boot, cloud));
+	}
+
+	private Set<Project> allProjects(Versions boot, Versions cloud) {
+		Set<Project> allProjects = new HashSet<>();
+		allProjects.addAll(boot.projects);
+		allProjects.addAll(cloud.projects);
+		return allProjects;
 	}
 
 	Versions bootVersion() {
