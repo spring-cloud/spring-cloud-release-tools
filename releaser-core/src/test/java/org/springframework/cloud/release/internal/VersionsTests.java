@@ -43,6 +43,11 @@ public class VersionsTests {
 	}
 
 	@Test
+	public void should_return_true_when_project_has_a_parent_suffix_and_project_is_on_the_list() {
+		then(this.versions.shouldBeUpdated("foo-parent")).isTrue();
+	}
+
+	@Test
 	public void should_return_false_when_project_is_not_on_the_list() {
 		then(this.versions.shouldBeUpdated("missing")).isFalse();
 	}
@@ -63,7 +68,7 @@ public class VersionsTests {
 	}
 
 	@Test
-	public void should_return_False_if_properties_does_not_contain_project_key() {
+	public void should_return_false_if_properties_does_not_contain_project_key() {
 		then(this.versions.shouldSetProperty(missingProps())).isFalse();
 	}
 

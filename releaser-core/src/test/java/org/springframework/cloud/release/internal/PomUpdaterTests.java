@@ -202,8 +202,20 @@ public class PomUpdaterTests {
 		then(asString(processedPom)).isEqualTo(asString(beforeProcessing));
 	}
 
+	@Test
+	public void should_update_the_model_when_root_project_has_parent_suffix() throws Exception {
+		File pom = pom("/projects/spring-cloud-contract");
+
+		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-contract-parent"), pom, this.versions);
+
+		then(model.isDirty()).isTrue();
+		then(new ListOfChanges(model))
+				.newParentVersionIsEqualTo("org.springframework.cloud", "spring-cloud-contract-parent", "0.0.2.BUILD-SNAPSHOT");
+	}
+
 	Set<Project> projects() {
 		Set<Project> projects = new HashSet<>();
+		projects.add(new Project("spring-cloud-contract", "0.0.2.BUILD-SNAPSHOT"));
 		projects.add(new Project("spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT"));
 		projects.add(new Project("spring-cloud-vault", "0.0.4.BUILD-SNAPSHOT"));
 		return projects;

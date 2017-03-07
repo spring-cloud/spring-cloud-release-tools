@@ -43,7 +43,7 @@ class Versions {
 
 	String versionForProject(String projectName) {
 		return this.projects.stream()
-				.filter(project -> project.name.equals(projectName))
+				.filter(project -> nameMatches(projectName, project))
 				.findFirst()
 				.orElse(Project.EMPTY_PROJECT)
 				.version;
@@ -51,12 +51,24 @@ class Versions {
 
 	boolean shouldBeUpdated(String projectName) {
 		return this.projects.stream()
-				.anyMatch(project -> project.name.equals(projectName));
+				.anyMatch(project -> nameMatches(projectName, project));
 	}
 
 	boolean shouldSetProperty(Properties properties) {
 		return this.projects.stream()
 				.anyMatch(project -> properties.containsKey(project.name + ".version"));
+	}
+
+	private boolean nameMatches(String projectName, Project project) {
+		if (project.name.equals(projectName)) {
+			return true;
+		}
+		boolean containsParent = projectName.endsWith("-parent");
+		if (!containsParent) {
+			return false;
+		}
+		String withoutParent = projectName.substring(0, projectName.indexOf("-parent"));
+		return project.name.equals(withoutParent);
 	}
 }
 

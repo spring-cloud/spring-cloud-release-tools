@@ -87,7 +87,7 @@ class PomUpdater {
 		return new ModelWrapper(this.pomReader.readPom(pom));
 	}
 
-	/**
+	/**q
 	 * Updates the root / child module model
 	 *
 	 * @param rootProject - root project model
