@@ -121,6 +121,10 @@ class PomUpdater {
 				return changes;
 			}
 		}
+		if (oldVersion.equals(version)) {
+			log.info("Won't update the version of [{}]:[{}] since you're already using the proper one", parentGroupId, parentArtifactId);
+			return changes;
+		}
 		log.info("Setting version of parent [{}] to [{}] for module [{}]", parentArtifactId,
 				version, model.getArtifactId());
 		changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion, version));
@@ -131,16 +135,20 @@ class PomUpdater {
 			Model model, List<VersionChange> sourceChanges) {
 		String rootProjectName = wrapper.projectName();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
-		String parentGroupId = groupId(model);
-		String parentArtifactId = model.getArtifactId();
+		String groupId = groupId(model);
+		String artifactId = model.getArtifactId();
 		String oldVersion = model.getVersion();
 		String version = versions.versionForProject(rootProjectName);
 		if (StringUtils.isEmpty(version) || StringUtils.isEmpty(model.getVersion())) {
 			log.warn("There was no version set for project [{}], skipping version setting for module [{}]", rootProjectName, model.getArtifactId());
 			return changes;
 		}
-		log.info("Setting [{}] version to [{}]", model.getArtifactId(), version);
-		changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion, version));
+		if (oldVersion.equals(version)) {
+			log.info("Won't update the version of [{}]:[{}] since you're already using the proper one", groupId, artifactId);
+			return changes;
+		}
+		log.info("Setting [{}] version to [{}]", artifactId, version);
+		changes.add(new VersionChange(groupId, artifactId, oldVersion, version));
 		return changes;
 	}
 

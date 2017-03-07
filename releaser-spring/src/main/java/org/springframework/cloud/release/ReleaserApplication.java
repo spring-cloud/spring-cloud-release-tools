@@ -15,8 +15,6 @@
  */
 package org.springframework.cloud.release;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 
@@ -26,6 +24,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.release.internal.ProjectUpdater;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 @SpringBootApplication
 public class ReleaserApplication implements CommandLineRunner {
@@ -44,5 +44,6 @@ public class ReleaserApplication implements CommandLineRunner {
 		log.info("Press any key to continue...");
 		System.in.read();
 		this.projectUpdater.updateProject(new File(workingDir));
+		System.exit(0);
 	}
 }
