@@ -42,7 +42,7 @@ If you would like to use another branch you can specify it using the `releaser.p
 
 [source,bash]
 ----
-java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --Dreleaser.pom.branch=Camden.SR6
+java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6
 ----
 
 == Future plans
