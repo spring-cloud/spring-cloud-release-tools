@@ -32,8 +32,17 @@ java -jar ~target/spring-cloud-release-tools-spring-1.0.0.M1.jar
 
 The application will start running from your working directory.
 
-== Future plans
+=== Specifying A Branch
 
+By deafult the releaser will default to using the `master` branch of `spring-cloud-release`.
+If you would like to use another branch you can specify it using the `releaser.branch` property.
+
+[source,bash]
+----
+java -jar ~target/spring-cloud-release-tools-spring-1.0.0.M1.jar --Dreleaser.branch=Camden.SR6
+----
+
+== Future plans
 In the future it can also:
 
 - commit the changed values
