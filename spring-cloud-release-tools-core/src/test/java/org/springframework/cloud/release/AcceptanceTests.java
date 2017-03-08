@@ -1,7 +1,5 @@
 package org.springframework.cloud.release;
 
-import static org.assertj.core.api.BDDAssertions.then;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,6 +15,8 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.TestPomReader;
 import org.springframework.cloud.release.internal.TestUtils;
 import org.springframework.util.FileSystemUtils;
+
+import static org.assertj.core.api.BDDAssertions.then;
 
 /**
  * @author Marcin Grzejszczak
@@ -64,7 +64,7 @@ public class AcceptanceTests {
 		ProjectUpdater projectUpdater = new ProjectUpdater(releaserProperties);
 		File beforeProcessing = pom("/projects/project/");
 
-		projectUpdater.updateProject(new File(this.temporaryFolder, "/project/"));
+		projectUpdater.updateProject(tmpFile("/project/"));
 
 		then(this.temporaryFolder).exists();
 		File afterProcessing = tmpFile("/project/pom.xml");

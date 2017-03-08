@@ -90,16 +90,16 @@ class PomUpdater {
 	/**q
 	 * Updates the root / child module model
 	 *
-	 * @param rootProject - root project model
+	 * @param rootPom - root project model
 	 * @param pom - file with the pom
 	 * @param versions - versions to update
 	 * @return updated model
 	 */
-	ModelWrapper updateModel(ModelWrapper rootProject, File pom, Versions versions) {
+	ModelWrapper updateModel(ModelWrapper rootPom, File pom, Versions versions) {
 		Model model = this.pomReader.readPom(pom);
 		List<VersionChange> sourceChanges = new ArrayList<>();
-		sourceChanges = updateParentIfPossible(rootProject, versions, model, sourceChanges);
-		sourceChanges = updateVersionIfPossible(rootProject, versions, model, sourceChanges);
+		sourceChanges = updateParentIfPossible(rootPom, versions, model, sourceChanges);
+		sourceChanges = updateVersionIfPossible(rootPom, versions, model, sourceChanges);
 		return new ModelWrapper(model, sourceChanges, versions);
 	}
 
@@ -109,10 +109,10 @@ class PomUpdater {
 	 *
 	 * @return - the pom file
 	 */
-	File overwritePomIfDirty(ModelWrapper wrapper, Versions versions, File pom) {
-		if (wrapper.isDirty()) {
+	File overwritePomIfDirty(ModelWrapper updatedPomModel, Versions versions, File pom) {
+		if (updatedPomModel.isDirty()) {
 			log.debug("There were changes in the pom so file will be overridden");
-			this.pomWriter.write(wrapper, versions, pom);
+			this.pomWriter.write(updatedPomModel, versions, pom);
 			log.info("Successfully stored [{}]", pom);
 		}
 		return pom;
