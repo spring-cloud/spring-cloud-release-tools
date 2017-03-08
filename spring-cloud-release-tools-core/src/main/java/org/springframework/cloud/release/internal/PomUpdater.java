@@ -123,6 +123,7 @@ class PomUpdater {
 		String rootProjectName = wrapper.projectName();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		if (model.getParent() == null || StringUtils.isEmpty(model.getParent().getVersion())) {
+			log.debug("Can't set the value for parent... Will return {}", sourceChanges);
 			return changes;
 		}
 		String parentGroupId = model.getParent().getGroupId();
@@ -140,7 +141,7 @@ class PomUpdater {
 			}
 		}
 		if (oldVersion.equals(version)) {
-			log.debug("Won't update the version of [{}:{}] since you're already using the proper one", parentGroupId, parentArtifactId);
+			log.debug("Won't update the version of parent [{}:{}] since you're already using the proper one", parentGroupId, parentArtifactId);
 			return changes;
 		}
 		log.info("Setting version of parent [{}] to [{}] for module [{}]", parentArtifactId,
@@ -164,12 +165,20 @@ class PomUpdater {
 			return changes;
 		}
 		if (oldVersion.equals(version)) {
-			log.debug("Won't update the version of [{}]:[{}] since you're already using the proper one", groupId, artifactId);
+			log.debug("Won't update the version of module [{}]:[{}] since you're already using the proper one", groupId, artifactId);
 			return changes;
 		}
 		log.info("Setting [{}] version to [{}]", artifactId, version);
 		changes.add(new VersionChange(groupId, artifactId, oldVersion, version));
 		return changes;
+	}
+
+	private boolean relativePathIsSet(Model model) {
+		return model.getParent() != null && StringUtils.hasText(model.getParent().getRelativePath());
+	}
+
+	private String parentName(Model model) {
+		return model.getParent() != null ? model.getParent().getArtifactId() : "";
 	}
 
 	private String groupId(Model model) {

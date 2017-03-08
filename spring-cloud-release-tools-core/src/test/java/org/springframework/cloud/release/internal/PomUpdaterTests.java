@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.util.FileSystemUtils;
 
 import static org.springframework.cloud.release.internal.VersionChangeAssertions.then;
@@ -40,6 +41,7 @@ public class PomUpdaterTests {
 	Versions versions = new Versions("0.0.1", "0.0.2", projects());
 	PomUpdater pomUpdater = new PomUpdater();
 	PomReader pomReader = new PomReader();
+	@Rule public OutputCapture capture = new OutputCapture();
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	File temporaryFolder;
 
@@ -86,7 +88,7 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		then(asString(originalPom)).isEqualTo(asString(storedPom));
+		then(asString(storedPom)).isEqualTo(asString(originalPom));
 	}
 
 	@Test
@@ -98,7 +100,7 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		then(asString(originalPom)).isNotEqualTo(asString(storedPom));
+		then(asString(storedPom)).isNotEqualTo(asString(originalPom));
 		Model overriddenPomModel = this.pomReader.readPom(storedPom);
 		then(overriddenPomModel.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
 	}
@@ -127,7 +129,7 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		then(asString(originalPom)).isNotEqualTo(asString(storedPom));
+		then(asString(storedPom)).isNotEqualTo(asString(originalPom));
 		Model overriddenPomModel = this.pomReader.readPom(storedPom);
 		then(overriddenPomModel.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.2");
@@ -156,7 +158,7 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		then(asString(originalPom)).isNotEqualTo(asString(storedPom));
+		then(asString(storedPom)).isNotEqualTo(asString(originalPom));
 		Model overriddenPomModel = this.pomReader.readPom(storedPom);
 		then(overriddenPomModel.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
@@ -175,7 +177,7 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		then(asString(originalPom)).isNotEqualTo(asString(storedPom));
+		then(asString(storedPom)).isNotEqualTo(asString(originalPom));
 		Model overriddenPomModel = this.pomReader.readPom(storedPom);
 		then(overriddenPomModel.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
@@ -194,7 +196,7 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		then(asString(originalPom)).isNotEqualTo(asString(storedPom));
+		then(asString(storedPom)).isNotEqualTo(asString(originalPom));
 		Model overriddenPomModel = this.pomReader.readPom(storedPom);
 		then(overriddenPomModel.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
@@ -211,7 +213,6 @@ public class PomUpdaterTests {
 
 		File processedPom = this.pomUpdater.overwritePomIfDirty(model, Versions.EMPTY_VERSION, afterProcessing);
 
-		then(processedPom).isSameAs(afterProcessing);
 		String processedPomText = asString(processedPom);
 		String beforeProcessingText = asString(beforeProcessing);
 		then(processedPomText).isNotEqualTo(beforeProcessingText);
@@ -225,7 +226,6 @@ public class PomUpdaterTests {
 
 		File processedPom = this.pomUpdater.overwritePomIfDirty(model, Versions.EMPTY_VERSION, afterProcessing);
 
-		then(processedPom).isSameAs(afterProcessing);
 		then(asString(processedPom)).isEqualTo(asString(beforeProcessing));
 	}
 
@@ -238,10 +238,25 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		then(asString(originalPom)).isNotEqualTo(asString(storedPom));
+		then(asString(storedPom)).isNotEqualTo(asString(originalPom));
 		Model overriddenPomModel = this.pomReader.readPom(storedPom);
 		then(overriddenPomModel.getVersion()).isEqualTo("0.0.2.BUILD-SNAPSHOT");
 		then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.2");
+	}
+
+	@Test
+	public void should_not_update_the_model_when_project_uses_same_version_for_artifact() throws Exception {
+		File originalPom = pom("/projects/project/", "pom_matching_artifact_same_version.xml");
+		File pomInTemp = tmpFile("/project/pom_matching_artifact_same_version.xml");
+		ModelWrapper rootPom = model("spring-cloud-sleuth");
+		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
+
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
+
+		then(asString(storedPom)).isEqualTo(asString(originalPom));
+		then(this.capture.toString())
+				.contains("Won't update the version of parent")
+				.contains("Won't update the version of module");
 	}
 
 	Set<Project> projects() {
