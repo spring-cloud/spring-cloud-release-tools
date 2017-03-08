@@ -31,12 +31,14 @@ public class Releaser {
 		try {
 			String workingDir = StringUtils.hasText(this.properties.getWorkingDir()) ?
 					this.properties.getWorkingDir() : System.getProperty("user.dir");
-			log.info("Will run the application for root folder [{}]", workingDir);
+			log.info("\n\n\n=== UPDATING POMS ===\n\nWill run the application for root folder [{}]", workingDir);
 			this.projectUpdater.updateProject(new File(workingDir));
-			log.info("Project was successfully updated.\nPress ENTER to build the project");
+			log.info("\n\nProject was successfully updated");
+			log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project\n\n");
 			System.in.read();
 			this.projectBuilder.build();
-			log.info("Project was successfully built.\nPress ENTER to commit, tag and push the tag");
+			log.info("\nProject was successfully built");
+			log.info("\n\n\n=== COMMITTING AND PUSHING TAGS ===\n\nPress ENTER to commit, tag and push the tag\n\n");
 			System.in.read();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
