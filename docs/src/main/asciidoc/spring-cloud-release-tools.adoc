@@ -8,8 +8,7 @@
 :toclevels: 8
 :nofooter:
 
-Spring Cloud Release Tools
-====================
+# Spring Cloud Release Tools
 
 This project can be used to
 
@@ -27,7 +26,7 @@ git clone https://github.com/spring-cloud/spring-cloud-sleuth
 cd spring-cloud-sleuth
 mkdir -p target
 wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
-java -jar ~target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar
 ----
 
 The application will start running from your working directory.
@@ -43,7 +42,6 @@ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --Dreleaser.bran
 ----
 
 == Future plans
-
 In the future it can also:
 
 - commit the changed values

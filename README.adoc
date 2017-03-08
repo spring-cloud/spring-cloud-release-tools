@@ -3,9 +3,10 @@
 :jdkversion: 1.8
 :org: spring-cloud
 :repo: spring-cloud-release-tools
+:branch: master
 
-image::https://circleci.com/gh/{org}/{repo}/tree/1.1.x.svg?style=svg["CircleCI", link="https://circleci.com/gh/{org}/{repo}/tree/1.1.x"]
-image::https://codecov.io/gh/{org}/{repo}/branch/1.1.x/graph/badge.svg["codecov", link="https://codecov.io/gh/{org}/{repo}"]
+image::https://circleci.com/gh/{org}/{repo}/tree/{branch}.svg?style=svg["CircleCI", link="https://circleci.com/gh/{org}/{repo}/tree/{branch}"]
+image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codecov", link="https://codecov.io/gh/{org}/{repo}"]
 image::https://badges.gitter.im/{org}/{repo}.svg[Gitter, link="https://gitter.im/{org}/{repo}?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
 
 :github-tag: master
@@ -37,7 +38,7 @@ git clone https://github.com/spring-cloud/spring-cloud-sleuth
 cd spring-cloud-sleuth
 mkdir -p target
 wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
-java -jar ~target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar
 ----
 
 The application will start running from your working directory.
@@ -49,7 +50,7 @@ If you would like to use another branch you can specify it using the `releaser.b
 
 [source,bash]
 ----
-java -jar ~target/spring-cloud-release-tools-spring-1.0.0.M1.jar --Dreleaser.branch=Camden.SR6
+java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --Dreleaser.branch=Camden.SR6
 ----
 
 == Future plans
