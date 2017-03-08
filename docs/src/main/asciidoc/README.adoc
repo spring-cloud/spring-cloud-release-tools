@@ -5,7 +5,6 @@
 
 image::https://circleci.com/gh/{org}/{repo}/tree/{branch}.svg?style=svg["CircleCI", link="https://circleci.com/gh/{org}/{repo}/tree/{branch}"]
 image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codecov", link="https://codecov.io/gh/{org}/{repo}"]
-image::https://badges.gitter.im/{org}/{repo}.svg[Gitter, link="https://gitter.im/{org}/{repo}?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
 
 include::spring-cloud-release-tools.adoc[]
 
