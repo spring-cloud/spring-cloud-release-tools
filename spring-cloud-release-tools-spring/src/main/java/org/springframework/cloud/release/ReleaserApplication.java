@@ -15,19 +15,11 @@
  */
 package org.springframework.cloud.release;
 
-import java.io.File;
-import java.lang.invoke.MethodHandles;
-
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.release.internal.Releaser;
-import org.springframework.cloud.release.internal.build.ProjectBuilder;
-import org.springframework.cloud.release.internal.pom.ProjectUpdater;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 @SpringBootApplication
 public class ReleaserApplication implements CommandLineRunner {
