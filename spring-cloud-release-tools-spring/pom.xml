@@ -20,6 +20,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<build.plugins.plugin.version>2.19.1</build.plugins.plugin.version>
 	</properties>
 
 	<dependencies>
