@@ -31,14 +31,18 @@ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar
 
 The application will start running from your working directory.
 
+=== Changing working directory
+
+To change the working directory just run the app with `releaser.workingDir` property.
+
 === Specifying A Branch
 
 By deafult the releaser will default to using the `master` branch of `spring-cloud-release`.
-If you would like to use another branch you can specify it using the `releaser.branch` property.
+If you would like to use another branch you can specify it using the `releaser.pom.branch` property.
 
 [source,bash]
 ----
-java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --Dreleaser.branch=Camden.SR6
+java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --Dreleaser.pom.branch=Camden.SR6
 ----
 
 == Future plans

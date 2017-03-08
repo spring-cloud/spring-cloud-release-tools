@@ -16,8 +16,10 @@
 package org.springframework.cloud.release.spring;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.release.internal.ProjectUpdater;
+import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.build.ProjectBuilder;
+import org.springframework.cloud.release.internal.pom.ProjectUpdater;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(ReleaserProperties.class)
 class ReleaserConfiguration {
 
-	@Bean ProjectUpdater projectUpdater(ReleaserProperties properties) {
-		return new ProjectUpdater(properties);
+	@Bean Releaser releaser(ReleaserProperties properties) {
+		return new Releaser(properties, new ProjectUpdater(properties), new ProjectBuilder(properties));
 	}
 }

@@ -23,25 +23,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.release.internal.ProjectUpdater;
+import org.springframework.cloud.release.internal.Releaser;
+import org.springframework.cloud.release.internal.build.ProjectBuilder;
+import org.springframework.cloud.release.internal.pom.ProjectUpdater;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 @SpringBootApplication
 public class ReleaserApplication implements CommandLineRunner {
 
-	private static final Logger log = getLogger(MethodHandles.lookup().lookupClass());
-
 	public static void main(String[] args) {
 		SpringApplication.run(ReleaserApplication.class, args);
 	}
 
-	@Autowired ProjectUpdater projectUpdater;
+	@Autowired Releaser releaser;
 
 	@Override public void run(String... strings) throws Exception {
-		String workingDir = System.getProperty("user.dir");
-		log.info("Will run the application for root folder [{}]", workingDir);
-		this.projectUpdater.updateProject(new File(workingDir));
+		this.releaser.release();
 		System.exit(0);
 	}
 }

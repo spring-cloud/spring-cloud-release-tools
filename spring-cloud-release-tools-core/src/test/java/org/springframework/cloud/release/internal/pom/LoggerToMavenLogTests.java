@@ -1,4 +1,4 @@
-package org.springframework.cloud.release.internal;
+package org.springframework.cloud.release.internal.pom;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
+import org.springframework.cloud.release.internal.pom.LoggerToMavenLog;
 
 import static org.mockito.BDDMockito.then;
 

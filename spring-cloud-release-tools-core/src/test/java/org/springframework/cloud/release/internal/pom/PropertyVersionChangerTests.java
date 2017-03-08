@@ -1,4 +1,4 @@
-package org.springframework.cloud.release.internal;
+package org.springframework.cloud.release.internal.pom;
 
 import java.util.HashSet;
 import java.util.Properties;
@@ -9,6 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.cloud.release.internal.pom.ModelWrapper;
+import org.springframework.cloud.release.internal.pom.Project;
+import org.springframework.cloud.release.internal.pom.PropertyStorer;
+import org.springframework.cloud.release.internal.pom.PropertyVersionChanger;
+import org.springframework.cloud.release.internal.pom.Versions;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 

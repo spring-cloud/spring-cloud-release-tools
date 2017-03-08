@@ -13,16 +13,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.springframework.cloud.release.internal;
+package org.springframework.cloud.release.internal.pom;
 
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.springframework.cloud.release.internal.SpringCloudConstants.BOOT_STARTER_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.SpringCloudConstants.BUILD_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_STARTER_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BUILD_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
 
 /**
  * Represents versions taken out from Spring Cloud Release pom

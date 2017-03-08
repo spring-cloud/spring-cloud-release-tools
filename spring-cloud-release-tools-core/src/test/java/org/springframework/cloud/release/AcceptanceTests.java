@@ -10,10 +10,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.springframework.cloud.release.internal.ProjectUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectUpdater;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.TestPomReader;
-import org.springframework.cloud.release.internal.TestUtils;
+import org.springframework.cloud.release.internal.pom.TestPomReader;
+import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -73,7 +73,7 @@ public class AcceptanceTests {
 
 	private ReleaserProperties releaserProperties() throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
-		releaserProperties.setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
+		releaserProperties.getPom().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
 		return releaserProperties;
 	}
 

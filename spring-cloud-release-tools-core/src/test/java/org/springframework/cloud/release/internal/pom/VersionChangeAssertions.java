@@ -1,4 +1,4 @@
-package org.springframework.cloud.release.internal;
+package org.springframework.cloud.release.internal.pom;
 
 import java.util.ArrayList;
 import java.util.List;

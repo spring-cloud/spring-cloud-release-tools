@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.springframework.cloud.release.internal;
+package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +27,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.release.internal.ReleaserProperties;
 
 /**
  * @author Marcin Grzejszczak
@@ -42,8 +43,8 @@ public class ProjectUpdater {
 
 	public ProjectUpdater(ReleaserProperties properties) {
 		try {
-			this.destinationDir = properties.getCloneDestinationDir() != null ?
-					new File(properties.getCloneDestinationDir()) :
+			this.destinationDir = properties.getPom().getCloneDestinationDir() != null ?
+					new File(properties.getPom().getCloneDestinationDir()) :
 					Files.createTempDirectory("releaser").toFile();
 			this.properties = properties;
 			this.gitProjectRepo = new GitProjectRepo(this.destinationDir);
@@ -61,8 +62,8 @@ public class ProjectUpdater {
 	 */
 	public void updateProject(File projectRoot) {
 		File clonedScRelease = this.gitProjectRepo.cloneProject(
-				URI.create(this.properties.getSpringCloudReleaseGitUrl()));
-		this.gitProjectRepo.checkout(clonedScRelease, this.properties.getBranch());
+				URI.create(this.properties.getPom().getSpringCloudReleaseGitUrl()));
+		this.gitProjectRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();
 		log.info("Retrieved the following versions\n{}", versions);
@@ -118,7 +119,7 @@ public class ProjectUpdater {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.properties.getIgnoredPomRegex().stream().anyMatch(path::matches);
+			return this.properties.getPom().getIgnoredPomRegex().stream().anyMatch(path::matches);
 		}
 	}
 

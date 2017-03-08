@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.springframework.cloud.release.internal;
+package org.springframework.cloud.release.internal.pom;
 
 /**
  * @author Marcin Grzejszczak

@@ -28,58 +28,123 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 public class ReleaserProperties {
 
 	/**
-	 * URL to Spring Cloud Release Git repository
+	 * By default Releaser assumes running the program from the current working directory.
+	 * If you want to change this behaviour - just change this value.
 	 */
-	private String springCloudReleaseGitUrl = "https://github.com/spring-cloud/spring-cloud-release";
+	private String workingDir;
 
-	/**
-	 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
-	 */
-	private String cloneDestinationDir;
+	private Pom pom = new Pom();
 
-	/**
-	 * List of regular expressions of ignored poms. Defaults to test projects and samples.
-	 */
-	@SuppressWarnings("unchecked")
-	private List<String> ignoredPomRegex = Arrays.asList(new String[] {
-			"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
-			"^.*samples/standalone.*$"
-	});
+	private Build build = new Build();
 
-	/**
-	 * Which branch of Spring Cloud Release should be checked out. Defaults to {@code master}
-	 */
-	private String branch = "master";
+	public static class Pom {
+		/**
+		 * URL to Spring Cloud Release Git repository
+		 */
+		private String springCloudReleaseGitUrl = "https://github.com/spring-cloud/spring-cloud-release";
 
-	public String getSpringCloudReleaseGitUrl() {
-		return this.springCloudReleaseGitUrl;
+		/**
+		 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
+		 */
+		private String cloneDestinationDir;
+
+		/**
+		 * Which branch of Spring Cloud Release should be checked out. Defaults to {@code master}
+		 */
+		private String branch = "master";
+
+		/**
+		 * List of regular expressions of ignored poms. Defaults to test projects and samples.
+		 */
+		@SuppressWarnings("unchecked")
+		private List<String> ignoredPomRegex = Arrays.asList(new String[] {
+				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
+				"^.*samples/standalone.*$"
+		});
+
+		public String getSpringCloudReleaseGitUrl() {
+			return this.springCloudReleaseGitUrl;
+		}
+
+		public void setSpringCloudReleaseGitUrl(String springCloudReleaseGitUrl) {
+			this.springCloudReleaseGitUrl = springCloudReleaseGitUrl;
+		}
+
+		public String getCloneDestinationDir() {
+			return this.cloneDestinationDir;
+		}
+
+		public void setCloneDestinationDir(String cloneDestinationDir) {
+			this.cloneDestinationDir = cloneDestinationDir;
+		}
+
+		public String getBranch() {
+			return this.branch;
+		}
+
+		public void setBranch(String branch) {
+			this.branch = branch;
+		}
+
+		public List<String> getIgnoredPomRegex() {
+			return this.ignoredPomRegex;
+		}
+
+		public void setIgnoredPomRegex(List<String> ignoredPomRegex) {
+			this.ignoredPomRegex = ignoredPomRegex;
+		}
 	}
 
-	public void setSpringCloudReleaseGitUrl(String springCloudReleaseGitUrl) {
-		this.springCloudReleaseGitUrl = springCloudReleaseGitUrl;
+	public static class Build {
+
+		/**
+		 * Command to be executed to build the project
+		 */
+		private String command = "./mvnw clean install -Pdocs";
+
+		/**
+		 * Max wait time in minutes for the build to finish
+		 */
+		private long waitTimeInMinutes = 20;
+
+		public String getCommand() {
+			return this.command;
+		}
+
+		public void setCommand(String command) {
+			this.command = command;
+		}
+
+		public long getWaitTimeInMinutes() {
+			return this.waitTimeInMinutes;
+		}
+
+		public void setWaitTimeInMinutes(long waitTimeInMinutes) {
+			this.waitTimeInMinutes = waitTimeInMinutes;
+		}
 	}
 
-	public String getCloneDestinationDir() {
-		return this.cloneDestinationDir;
+	public String getWorkingDir() {
+		return this.workingDir;
 	}
 
-	public void setCloneDestinationDir(String cloneDestinationDir) {
-		this.cloneDestinationDir = cloneDestinationDir;
+	public void setWorkingDir(String workingDir) {
+		this.workingDir = workingDir;
 	}
 
-	public String getBranch() {
-		return this.branch;
+	public Pom getPom() {
+		return this.pom;
 	}
 
-	public void setBranch(String branch) {
-		this.branch = branch;
+	public void setPom(Pom pom) {
+		this.pom = pom;
 	}
 
-	public List<String> getIgnoredPomRegex() {
-		return this.ignoredPomRegex;
+	public Build getBuild() {
+		return this.build;
 	}
 
-	public void setIgnoredPomRegex(List<String> ignoredPomRegex) {
-		this.ignoredPomRegex = ignoredPomRegex;
+	public void setBuild(Build build) {
+		this.build = build;
 	}
 }
