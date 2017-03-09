@@ -37,8 +37,8 @@ public class ProjectBuilder {
 
 	public void build() {
 		try {
-			String[] commands = this.properties.getBuild().getCommand().split(" ");
-			long waitTimeInMinutes = this.properties.getBuild().getWaitTimeInMinutes();
+			String[] commands = this.properties.getMaven().getBuildCommand().split(" ");
+			long waitTimeInMinutes = this.properties.getMaven().getWaitTimeInMinutes();
 			this.executor.runCommand(commands, waitTimeInMinutes);
 			assertNoHtmlFilesContainUnresolvedTags();
 			log.info("No HTML files from docs contain unresolved tags");

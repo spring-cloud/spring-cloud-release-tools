@@ -44,8 +44,8 @@ public class ProjectUpdater {
 
 	public ProjectUpdater(ReleaserProperties properties) {
 		try {
-			this.destinationDir = properties.getPom().getCloneDestinationDir() != null ?
-					new File(properties.getPom().getCloneDestinationDir()) :
+			this.destinationDir = properties.getGit().getCloneDestinationDir() != null ?
+					new File(properties.getGit().getCloneDestinationDir()) :
 					Files.createTempDirectory("releaser").toFile();
 			this.properties = properties;
 			this.gitRepo = new GitRepo(this.destinationDir);
@@ -63,7 +63,7 @@ public class ProjectUpdater {
 	 */
 	public void updateProject(File projectRoot) {
 		File clonedScRelease = this.gitRepo.cloneProject(
-				URI.create(this.properties.getPom().getSpringCloudReleaseGitUrl()));
+				URI.create(this.properties.getGit().getSpringCloudReleaseGitUrl()));
 		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();

@@ -33,11 +33,14 @@ public class ReleaserProperties {
 	 */
 	private String workingDir;
 
+	private Git git = new Git();
+
 	private Pom pom = new Pom();
 
-	private Build build = new Build();
+	private Maven maven = new Maven();
 
-	public static class Pom {
+	public static class Git {
+
 		/**
 		 * URL to Spring Cloud Release Git repository
 		 */
@@ -47,20 +50,6 @@ public class ReleaserProperties {
 		 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
 		 */
 		private String cloneDestinationDir;
-
-		/**
-		 * Which branch of Spring Cloud Release should be checked out. Defaults to {@code master}
-		 */
-		private String branch = "master";
-
-		/**
-		 * List of regular expressions of ignored poms. Defaults to test projects and samples.
-		 */
-		@SuppressWarnings("unchecked")
-		private List<String> ignoredPomRegex = Arrays.asList(new String[] {
-				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
-				"^.*samples/standalone.*$"
-		});
 
 		public String getSpringCloudReleaseGitUrl() {
 			return this.springCloudReleaseGitUrl;
@@ -77,6 +66,24 @@ public class ReleaserProperties {
 		public void setCloneDestinationDir(String cloneDestinationDir) {
 			this.cloneDestinationDir = cloneDestinationDir;
 		}
+
+	}
+
+	public static class Pom {
+
+		/**
+		 * Which branch of Spring Cloud Release should be checked out. Defaults to {@code master}
+		 */
+		private String branch = "master";
+
+		/**
+		 * List of regular expressions of ignored poms. Defaults to test projects and samples.
+		 */
+		@SuppressWarnings("unchecked")
+		private List<String> ignoredPomRegex = Arrays.asList(new String[] {
+				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
+				"^.*samples/standalone.*$"
+		});
 
 		public String getBranch() {
 			return this.branch;
@@ -95,24 +102,29 @@ public class ReleaserProperties {
 		}
 	}
 
-	public static class Build {
+	public static class Maven {
 
 		/**
 		 * Command to be executed to build the project
 		 */
-		private String command = "./mvnw clean install -Pdocs";
+		private String buildCommand = "./mvnw clean install -Pdocs";
+
+		/**
+		 * Command to be executed to deploy a built project
+		 */
+		private String deployCommand = "./mvnw deploy -DskipTests -Pfast";
 
 		/**
 		 * Max wait time in minutes for the build to finish
 		 */
 		private long waitTimeInMinutes = 20;
 
-		public String getCommand() {
-			return this.command;
+		public String getBuildCommand() {
+			return this.buildCommand;
 		}
 
-		public void setCommand(String command) {
-			this.command = command;
+		public void setBuildCommand(String buildCommand) {
+			this.buildCommand = buildCommand;
 		}
 
 		public long getWaitTimeInMinutes() {
@@ -121,6 +133,14 @@ public class ReleaserProperties {
 
 		public void setWaitTimeInMinutes(long waitTimeInMinutes) {
 			this.waitTimeInMinutes = waitTimeInMinutes;
+		}
+
+		public String getDeployCommand() {
+			return deployCommand;
+		}
+
+		public void setDeployCommand(String deployCommand) {
+			this.deployCommand = deployCommand;
 		}
 	}
 
@@ -132,6 +152,14 @@ public class ReleaserProperties {
 		this.workingDir = workingDir;
 	}
 
+	public Git getGit() {
+		return this.git;
+	}
+
+	public void setGit(Git git) {
+		this.git = git;
+	}
+
 	public Pom getPom() {
 		return this.pom;
 	}
@@ -140,11 +168,11 @@ public class ReleaserProperties {
 		this.pom = pom;
 	}
 
-	public Build getBuild() {
-		return this.build;
+	public Maven getMaven() {
+		return this.maven;
 	}
 
-	public void setBuild(Build build) {
-		this.build = build;
+	public void setMaven(Maven maven) {
+		this.maven = maven;
 	}
 }

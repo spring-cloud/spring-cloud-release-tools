@@ -26,7 +26,7 @@ public class ProjectBuilderTests {
 	@Test
 	public void should_successfully_execute_a_command_when_after_running_there_is_no_html_file_with_unresolved_tag() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBuild().setCommand("ls -al");
+		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
@@ -40,7 +40,7 @@ public class ProjectBuilderTests {
 	@Test
 	public void should_throw_exception_when_after_running_there_is_an_html_file_with_unresolved_tag() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBuild().setCommand("ls -al");
+		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
@@ -50,8 +50,8 @@ public class ProjectBuilderTests {
 	@Test
 	public void should_throw_exception_when_command_took_too_long_to_execute() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBuild().setCommand("sleep 1");
-		properties.getBuild().setWaitTimeInMinutes(0);
+		properties.getMaven().setBuildCommand("sleep 1");
+		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
