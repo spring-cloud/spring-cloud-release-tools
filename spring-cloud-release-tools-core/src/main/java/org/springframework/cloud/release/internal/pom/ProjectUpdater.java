@@ -28,6 +28,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.git.GitRepo;
 
 /**
  * @author Marcin Grzejszczak
@@ -38,7 +39,7 @@ public class ProjectUpdater {
 
 	private final File destinationDir;
 	private final ReleaserProperties properties;
-	private final GitProjectRepo gitProjectRepo;
+	private final GitRepo gitRepo;
 	private final PomUpdater pomUpdater = new PomUpdater();
 
 	public ProjectUpdater(ReleaserProperties properties) {
@@ -47,7 +48,7 @@ public class ProjectUpdater {
 					new File(properties.getPom().getCloneDestinationDir()) :
 					Files.createTempDirectory("releaser").toFile();
 			this.properties = properties;
-			this.gitProjectRepo = new GitProjectRepo(this.destinationDir);
+			this.gitRepo = new GitRepo(this.destinationDir);
 		}
 		catch (IOException e) {
 			throw new IllegalStateException("Failed to create a temporary folder", e);
@@ -61,9 +62,9 @@ public class ProjectUpdater {
 	 * @param projectRoot - root folder with project to update
 	 */
 	public void updateProject(File projectRoot) {
-		File clonedScRelease = this.gitProjectRepo.cloneProject(
+		File clonedScRelease = this.gitRepo.cloneProject(
 				URI.create(this.properties.getPom().getSpringCloudReleaseGitUrl()));
-		this.gitProjectRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
+		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();
 		log.info("Retrieved the following versions\n{}", versions);

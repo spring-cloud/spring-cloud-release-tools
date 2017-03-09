@@ -30,6 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.internal.git.GitProjectRepoTests;
 import org.springframework.util.FileSystemUtils;
 
 /**

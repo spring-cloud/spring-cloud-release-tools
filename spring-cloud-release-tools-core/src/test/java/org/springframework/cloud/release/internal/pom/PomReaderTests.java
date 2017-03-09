@@ -16,9 +16,6 @@
 
 package org.springframework.cloud.release.internal.pom;
 
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -28,6 +25,10 @@ import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.cloud.release.internal.git.GitProjectRepoTests;
+
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -35,18 +36,28 @@ import org.junit.Test;
 public class PomReaderTests {
 
 	PomReader pomReader = new PomReader();
+	File springCloudReleaseProjectPom;
 	File springCloudReleaseProject;
 	File licenseFile;
 
 	@Before
 	public void setup() throws URISyntaxException {
 		URI scRelease = GitProjectRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
-		this.springCloudReleaseProject = new File(scRelease.getPath(), "pom.xml");
+		this.springCloudReleaseProject = new File(scRelease);
+		this.springCloudReleaseProjectPom = new File(scRelease.getPath(), "pom.xml");
 		this.licenseFile = new File(scRelease.getPath(), "LICENSE.txt");
 	}
 
 	@Test
 	public void should_parse_a_valid_pom() {
+		Model pom = this.pomReader.readPom(this.springCloudReleaseProjectPom);
+
+		then(pom).isNotNull();
+		then(pom.getArtifactId()).isEqualTo("spring-cloud-starter-build");
+	}
+
+	@Test
+	public void should_parse_a_valid_pom_when_passing_direcory() {
 		Model pom = this.pomReader.readPom(this.springCloudReleaseProject);
 
 		then(pom).isNotNull();

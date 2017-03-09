@@ -32,7 +32,11 @@ class PomReader {
 	/**
 	 * Returns a parsed POM
 	 */
-	Model readPom(File pom) {
+	Model readPom(File file) {
+		File pom = file;
+		if (file.isDirectory()) {
+			pom = new File(file,"pom.xml");
+		}
 		try(Reader reader = new FileReader(pom)) {
 			MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();
 			return xpp3Reader.read(reader);
