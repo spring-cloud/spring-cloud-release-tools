@@ -16,6 +16,7 @@
 package org.springframework.cloud.release.internal.git;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -28,6 +29,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
@@ -40,7 +42,7 @@ import org.springframework.util.ResourceUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class GitRepo {
+class GitRepo {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -48,7 +50,7 @@ public class GitRepo {
 
 	private final File basedir;
 
-	public GitRepo(File basedir) {
+	GitRepo(File basedir) {
 		this.basedir = basedir;
 		this.gitFactory = new GitRepo.JGitFactory();
 	}
@@ -63,7 +65,7 @@ public class GitRepo {
 	 * @param projectUri - URI of the project
 	 * @return file where the project was cloned
 	 */
-	public File cloneProject(URI projectUri) {
+	File cloneProject(URI projectUri) {
 		try {
 			log.info("Cloning repo from [{}] to [{}]", projectUri, this.basedir);
 			Git git = cloneToBasedir(projectUri, this.basedir);
@@ -84,7 +86,7 @@ public class GitRepo {
 	 * @param project - a Git project
 	 * @param branch - branch to check out
 	 */
-	public void checkout(File project, String branch) {
+	void checkout(File project, String branch) {
 		try {
 			log.info("Checking out branch [{}] for repo [{}] to [{}]", this.basedir, branch);
 			checkoutBranch(project, branch);
@@ -100,8 +102,8 @@ public class GitRepo {
 	 * @param project - a Git project
 	 * @param message - commit message
 	 */
-	public void commit(File project, String message) {
-		try(Git git = this.gitFactory.open(ResourceUtils.getFile(project.toURI()).getAbsoluteFile())) {
+	void commit(File project, String message) {
+		try(Git git = this.gitFactory.open(file(project))) {
 			git.commit().setMessage(message).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -113,8 +115,8 @@ public class GitRepo {
 	 * @param project
 	 * @param tagName
 	 */
-	public void tag(File project, String tagName) {
-		try(Git git = this.gitFactory.open(ResourceUtils.getFile(project.toURI()).getAbsoluteFile())) {
+	void tag(File project, String tagName) {
+		try(Git git = this.gitFactory.open(file(project))) {
 			git.tag().setName(tagName).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -126,11 +128,23 @@ public class GitRepo {
 	 * @param project - Git project
 	 * @param branch - remote branch to which the code should be pushed
 	 */
-	public void pushBranch(File project, String branch) {
-		try(Git git = this.gitFactory.open(ResourceUtils.getFile(project.toURI()).getAbsoluteFile())) {
+	void pushBranch(File project, String branch) {
+		try(Git git = this.gitFactory.open(file(project))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + branch);
 			git.push().setPushTags().setRefSpecs(refSpec).call();
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
+	 * Pushes the commits od current branch
+	 * @param project - Git project
+	 */
+	void pushCurrentBranch(File project) {
+		try(Git git = this.gitFactory.open(file(project))) {
+			git.push().call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -141,14 +155,28 @@ public class GitRepo {
 	 * @param project - Git project
 	 * @param tagName - remote tag to which the code should be pushed
 	 */
-	public void pushTag(File project, String tagName) {
-		try(Git git = this.gitFactory.open(ResourceUtils.getFile(project.toURI()).getAbsoluteFile())) {
+	void pushTag(File project, String tagName) {
+		try(Git git = this.gitFactory.open(file(project))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + "refs/tags/" + tagName);
 			git.push().setPushTags().setRefSpecs(refSpec).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	void revert(File project, String message) {
+		try(Git git = this.gitFactory.open(file(project))) {
+			RevCommit commit = git.log().setMaxCount(1).call().iterator().next();
+			git.revert().include(commit).call();
+			git.commit().setAmend(true).setMessage(message).call();
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private File file(File project) throws FileNotFoundException {
+		return ResourceUtils.getFile(project.toURI()).getAbsoluteFile();
 	}
 
 	private Git cloneToBasedir(URI projectUrl, File destinationFolder)

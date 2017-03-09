@@ -20,7 +20,7 @@ import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.Project;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
 class ReleaserConfiguration {
 
 	@Bean Releaser releaser(ReleaserProperties properties) {
-		return new Releaser(properties, new ProjectUpdater(properties),
-				new Project(properties), new ProjectGitUpdater());
+		return new Releaser(properties, new ProjectPomUpdater(properties),
+				new Project(properties), new ProjectGitUpdater(properties));
 	}
 }

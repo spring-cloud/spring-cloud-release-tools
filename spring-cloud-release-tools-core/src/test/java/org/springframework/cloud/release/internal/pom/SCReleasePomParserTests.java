@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.cloud.release.internal.git.GitProjectRepoTests;
+import org.springframework.cloud.release.internal.git.GitRepoTests;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
@@ -20,7 +20,7 @@ public class SCReleasePomParserTests {
 
 	@Before
 	public void setup() throws IOException, URISyntaxException {
-		this.springCloudReleaseProject = new File(GitProjectRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
+		this.springCloudReleaseProject = new File(GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 	}
 
 	@Test

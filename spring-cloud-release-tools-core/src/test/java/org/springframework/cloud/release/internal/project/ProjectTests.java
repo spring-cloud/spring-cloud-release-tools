@@ -16,7 +16,7 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectBuilderTests {
+public class ProjectTests {
 
 	@Before
 	public void checkOs() {
@@ -107,6 +107,36 @@ public class ProjectBuilderTests {
 		thenThrownBy(builder::publishDocs).hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
 
+	@Test
+	public void should_successfully_execute_a_bump_versions_command() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
+		Project builder = new Project(properties, executor(properties)) {
+			@Override String bumpVersionsCommand() {
+				return "%s";
+			}
+		};
+
+		builder.bumpVersions("ls -al");
+
+		then(asString(file("/projects/builder/resolved/resolved.log")))
+				.contains("file.txt");
+	}
+
+	@Test
+	public void should_throw_exception_when_bump_command_took_too_long_to_execute() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setWaitTimeInMinutes(0);
+		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
+		Project builder = new Project(properties, executor(properties)) {
+			@Override String bumpVersionsCommand() {
+				return "echo '%s'";
+			}
+		};
+
+		thenThrownBy(() -> builder.bumpVersions("1.0.0")).hasMessageContaining("Process waiting time of [0] minutes exceeded");
+	}
+
 	private TestProcessExecutor executor(ReleaserProperties properties) {
 		return new TestProcessExecutor(properties);
 	}
@@ -128,7 +158,7 @@ public class ProjectBuilderTests {
 
 	private File file(String relativePath) {
 		try {
-			File root = new File(ProjectBuilderTests.class.getResource("/").toURI());
+			File root = new File(ProjectTests.class.getResource("/").toURI());
 			File file = new File(root, relativePath);
 			if (!file.exists()) {
 				file.createNewFile();

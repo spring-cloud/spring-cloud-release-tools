@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.springframework.cloud.release.internal.pom.ProjectUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
@@ -37,9 +37,10 @@ public class AcceptanceTests {
 	@Test
 	public void should_update_all_versions_for_a_release_train() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
-		ProjectUpdater projectUpdater = new ProjectUpdater(releaserProperties);
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 
-		projectUpdater.updateProject(new File(this.temporaryFolder, "/spring-cloud-sleuth"));
+		projectPomUpdater
+				.updateProject(new File(this.temporaryFolder, "/spring-cloud-sleuth"));
 
 		then(this.temporaryFolder).exists();
 		Model rootPom = this.testPomReader.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
@@ -61,10 +62,10 @@ public class AcceptanceTests {
 	@Test
 	public void should_not_update_a_project_that_is_not_on_the_list() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
-		ProjectUpdater projectUpdater = new ProjectUpdater(releaserProperties);
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		File beforeProcessing = pom("/projects/project/");
 
-		projectUpdater.updateProject(tmpFile("/project/"));
+		projectPomUpdater.updateProject(tmpFile("/project/"));
 
 		then(this.temporaryFolder).exists();
 		File afterProcessing = tmpFile("/project/pom.xml");

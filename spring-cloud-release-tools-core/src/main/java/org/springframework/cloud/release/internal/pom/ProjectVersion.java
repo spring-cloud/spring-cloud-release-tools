@@ -10,8 +10,6 @@ import java.io.File;
  */
 public class ProjectVersion {
 
-	public static ProjectVersion NO_VERSION = new ProjectVersion("");
-
 	public final String version;
 	private final PomReader pomReader = new PomReader();
 

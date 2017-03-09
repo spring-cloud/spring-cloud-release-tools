@@ -18,7 +18,6 @@ package org.springframework.cloud.release.internal.pom;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,31 +27,22 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.git.GitRepo;
+import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectUpdater {
+public class ProjectPomUpdater {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	private final File destinationDir;
 	private final ReleaserProperties properties;
-	private final GitRepo gitRepo;
+	private final ProjectGitUpdater gitRepo;
 	private final PomUpdater pomUpdater = new PomUpdater();
 
-	public ProjectUpdater(ReleaserProperties properties) {
-		try {
-			this.destinationDir = properties.getGit().getCloneDestinationDir() != null ?
-					new File(properties.getGit().getCloneDestinationDir()) :
-					Files.createTempDirectory("releaser").toFile();
-			this.properties = properties;
-			this.gitRepo = new GitRepo(this.destinationDir);
-		}
-		catch (IOException e) {
-			throw new IllegalStateException("Failed to create a temporary folder", e);
-		}
+	public ProjectPomUpdater(ReleaserProperties properties) {
+		this.properties = properties;
+		this.gitRepo = new ProjectGitUpdater(properties);
 	}
 
 	/**
@@ -62,8 +52,7 @@ public class ProjectUpdater {
 	 * @param projectRoot - root folder with project to update
 	 */
 	public void updateProject(File projectRoot) {
-		File clonedScRelease = this.gitRepo.cloneProject(
-				URI.create(this.properties.getGit().getSpringCloudReleaseGitUrl()));
+		File clonedScRelease = this.gitRepo.cloneScReleaseProject();
 		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();

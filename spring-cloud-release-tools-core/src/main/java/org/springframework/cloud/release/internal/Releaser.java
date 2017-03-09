@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.project.Project;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -21,14 +20,14 @@ public class Releaser {
 	private static final String QUIT = "q";
 
 	private final ReleaserProperties properties;
-	private final ProjectUpdater projectUpdater;
+	private final ProjectPomUpdater projectPomUpdater;
 	private final Project project;
 	private final ProjectGitUpdater projectGitUpdater;
 
-	public Releaser(ReleaserProperties properties, ProjectUpdater projectUpdater,
+	public Releaser(ReleaserProperties properties, ProjectPomUpdater projectPomUpdater,
 			Project project, ProjectGitUpdater projectGitUpdater) {
 		this.properties = properties;
-		this.projectUpdater = projectUpdater;
+		this.projectPomUpdater = projectPomUpdater;
 		this.project = project;
 		this.projectGitUpdater = projectGitUpdater;
 	}
@@ -41,7 +40,7 @@ public class Releaser {
 		boolean skipPoms = skipStep();
 		ProjectVersion version = new ProjectVersion(project);
 		if (!skipPoms) {
-			this.projectUpdater.updateProject(project);
+			this.projectPomUpdater.updateProject(project);
 			log.info("\n\nProject was successfully updated");
 		}
 		log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project {}", MSG);
@@ -64,6 +63,19 @@ public class Releaser {
 		boolean skipDocs = skipStep();
 		if (!skipDocs) {
 			this.project.publishDocs();
+		}
+		if (!version.isSnapshot()) {
+			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go back to snapshots and bump version by patch {}", MSG);
+			boolean skipRevert = skipStep();
+			if (!skipRevert) {
+				this.projectGitUpdater.revertChangesIfApplicable(project, version);
+				this.project.bumpVersions(version.bumpedVersion());
+			}
+		}
+		log.info("\n\n\n=== PUSHING CHANGES===\n\nPress ENTER to push the commits {}", MSG);
+		boolean skipPush = skipStep();
+		if (!skipPush) {
+			this.projectGitUpdater.pushCurrentBranch(project);
 		}
 	}
 

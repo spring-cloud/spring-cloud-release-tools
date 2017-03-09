@@ -30,7 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.rule.OutputCapture;
-import org.springframework.cloud.release.internal.git.GitProjectRepoTests;
+import org.springframework.cloud.release.internal.git.GitRepoTests;
 import org.springframework.util.FileSystemUtils;
 
 /**
@@ -282,7 +282,7 @@ public class PomUpdaterTests {
 	}
 
 	private File file(String relativePath) throws URISyntaxException {
-		return new File(GitProjectRepoTests.class.getResource(relativePath).toURI());
+		return new File(GitRepoTests.class.getResource(relativePath).toURI());
 	}
 
 	private File pom(String relativePath) throws URISyntaxException {
@@ -290,7 +290,7 @@ public class PomUpdaterTests {
 	}
 
 	private File pom(String relativePath, String pomName) throws URISyntaxException {
-		return new File(new File(GitProjectRepoTests.class.getResource(relativePath).toURI()), pomName);
+		return new File(new File(GitRepoTests.class.getResource(relativePath).toURI()), pomName);
 	}
 
 	private String asString(File file) throws IOException {

@@ -30,7 +30,7 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 /**
  * @author Marcin Grzejszczak
  */
-public class GitProjectRepoTests {
+public class GitRepoTests {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	File springCloudReleaseProject;
@@ -40,7 +40,7 @@ public class GitProjectRepoTests {
 	@Before
 	public void setup() throws IOException, URISyntaxException {
 		this.tmpFolder = this.tmp.newFolder();
-		this.springCloudReleaseProject = new File(GitProjectRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
+		this.springCloudReleaseProject = new File(GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 		TestUtils.prepareLocalRepo();
 		this.gitRepo = new GitRepo(this.tmpFolder);
 	}
@@ -55,7 +55,7 @@ public class GitProjectRepoTests {
 	@Test
 	public void should_throw_exception_when_there_is_no_repo() throws IOException, URISyntaxException {
 		thenThrownBy(() -> this.gitRepo
-				.cloneProject(GitProjectRepoTests.class.getResource("/projects/").toURI()))
+				.cloneProject(GitRepoTests.class.getResource("/projects/").toURI()))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Exception occurred while cloning repo");
 	}
@@ -148,6 +148,22 @@ public class GitProjectRepoTests {
 	}
 
 	@Test
+	public void should_push_changes_to_current_branch() throws Exception {
+		File origin = clonedProject();
+		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		setOriginOnProjectToTmp(origin, project);
+		createNewFile(project);
+		this.gitRepo.commit(project, "some message");
+
+		this.gitRepo.pushCurrentBranch(project);
+
+		try(Git git = openGitProject(origin)) {
+			RevCommit revCommit = git.log().call().iterator().next();
+			then(revCommit.getShortMessage()).isEqualTo("some message");
+		}
+	}
+
+	@Test
 	public void should_push_a_tag_to_new_branch_in_origin() throws Exception {
 		File origin = clonedProject();
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
@@ -199,6 +215,18 @@ public class GitProjectRepoTests {
 		}
 		try(Git git = openGitProject(project)) {
 			git.add().addFilepattern("newFile").call();
+		}
+	}
+
+	@Test
+	public void should_revert_changes() throws Exception {
+		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+
+		this.gitRepo.revert(project, "some message");
+
+		try(Git git = openGitProject(project)) {
+			RevCommit revCommit = git.log().call().iterator().next();
+			then(revCommit.getShortMessage()).isEqualTo("some message");
 		}
 	}
 

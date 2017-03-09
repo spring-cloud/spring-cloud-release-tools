@@ -20,6 +20,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 public class Project {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final String BUMP_VERSIONS = "./mvnw versions:set -DnewVersion=%s";
 
 	private final ReleaserProperties properties;
 	private final ProcessExecutor executor;
@@ -81,6 +82,21 @@ public class Project {
 			throw new IllegalStateException(e);
 		}
 	}
+
+	public void bumpVersions(String version) {
+		try {
+			log.info("Bumping versions to [{}]", version);
+			String[] commands = String.format(bumpVersionsCommand(), version).split(" ");
+			runCommand(commands);
+			log.info("Versions successfully bumped");
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	String bumpVersionsCommand() {
+		return BUMP_VERSIONS;
+	}
 }
 
 class ProcessExecutor {
@@ -128,6 +144,7 @@ class HtmlFileWalker extends SimpleFileVisitor<Path> {
 		}
 		return FileVisitResult.CONTINUE;
 	}
+
 	private String asString(File file) {
 		try {
 			return new String(Files.readAllBytes(file.toPath()));
