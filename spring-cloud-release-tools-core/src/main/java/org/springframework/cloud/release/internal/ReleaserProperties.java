@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -36,6 +37,8 @@ public class ReleaserProperties {
 	private Git git = new Git();
 
 	private Pom pom = new Pom();
+
+	private Docs docs = new Docs();
 
 	private Maven maven = new Maven();
 
@@ -102,6 +105,18 @@ public class ReleaserProperties {
 		}
 	}
 
+	public static class Docs {
+		private String ghPagesUrl = "https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh";
+
+		public String getGhPagesUrl() {
+			return this.ghPagesUrl;
+		}
+
+		public void setGhPagesUrl(String ghPagesUrl) {
+			this.ghPagesUrl = ghPagesUrl;
+		}
+	}
+
 	public static class Maven {
 
 		/**
@@ -115,7 +130,16 @@ public class ReleaserProperties {
 		private String deployCommand = "./mvnw deploy -DskipTests -Pfast";
 
 		/**
-		 * Max wait time in minutes for the build to finish
+		 * Command to be executed to deploy a built project
+		 */
+		private String[] publishDocsCommands = {
+				"wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh",
+				"chmod +x target/gh-pages.sh",
+				"./target/gh-pages.sh"
+		};
+
+		/**
+		 * Max wait time in minutes for the process to finish
 		 */
 		private long waitTimeInMinutes = 20;
 
@@ -142,10 +166,19 @@ public class ReleaserProperties {
 		public void setDeployCommand(String deployCommand) {
 			this.deployCommand = deployCommand;
 		}
+
+		public String[] getPublishDocsCommands() {
+			return this.publishDocsCommands;
+		}
+
+		public void setPublishDocsCommands(String[] publishDocsCommands) {
+			this.publishDocsCommands = publishDocsCommands;
+		}
 	}
 
 	public String getWorkingDir() {
-		return this.workingDir;
+		return StringUtils.hasText(this.workingDir) ?
+				this.workingDir : System.getProperty("user.dir");
 	}
 
 	public void setWorkingDir(String workingDir) {
@@ -158,6 +191,14 @@ public class ReleaserProperties {
 
 	public void setGit(Git git) {
 		this.git = git;
+	}
+
+	public Docs getDocs() {
+		return this.docs;
+	}
+
+	public void setDocs(Docs docs) {
+		this.docs = docs;
 	}
 
 	public Pom getPom() {

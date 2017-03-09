@@ -1,4 +1,4 @@
-package org.springframework.cloud.release.internal.builder;
+package org.springframework.cloud.release.internal.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,24 +13,23 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectBuilder {
+public class Project {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private final ReleaserProperties properties;
 	private final ProcessExecutor executor;
 
-	public ProjectBuilder(ReleaserProperties properties) {
+	public Project(ReleaserProperties properties) {
 		this.properties = properties;
 		this.executor = new ProcessExecutor(properties);
 	}
 
-	ProjectBuilder(ReleaserProperties properties, ProcessExecutor executor) {
+	Project(ReleaserProperties properties, ProcessExecutor executor) {
 		this.properties = properties;
 		this.executor = executor;
 	}
@@ -38,8 +37,7 @@ public class ProjectBuilder {
 	public void build() {
 		try {
 			String[] commands = this.properties.getMaven().getBuildCommand().split(" ");
-			long waitTimeInMinutes = this.properties.getMaven().getWaitTimeInMinutes();
-			this.executor.runCommand(commands, waitTimeInMinutes);
+			runCommand(commands);
 			assertNoHtmlFilesContainUnresolvedTags();
 			log.info("No HTML files from docs contain unresolved tags");
 		} catch (Exception e) {
@@ -48,8 +46,7 @@ public class ProjectBuilder {
 	}
 
 	private void assertNoHtmlFilesContainUnresolvedTags() {
-		String workingDir = StringUtils.hasText(this.properties.getWorkingDir()) ?
-				this.properties.getWorkingDir() : System.getProperty("user.dir");
+		String workingDir = this.properties.getWorkingDir();
 		try {
 			Files.walkFileTree(new File(workingDir).toPath(), new HtmlFileWalker());
 		}
@@ -59,7 +56,30 @@ public class ProjectBuilder {
 	}
 
 	public void deploy() {
+		try {
+			String[] commands = this.properties.getMaven().getDeployCommand().split(" ");
+			runCommand(commands);
+			log.info("The project has successfully been deployed");
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
+	private void runCommand(String[] commands) {
+		long waitTimeInMinutes = this.properties.getMaven().getWaitTimeInMinutes();
+		this.executor.runCommand(commands, waitTimeInMinutes);
+	}
+
+	public void publishDocs() {
+		try {
+			for (String command : this.properties.getMaven().getPublishDocsCommands()) {
+				String[] commands = command.split(" ");
+				runCommand(commands);
+			}
+			log.info("The docs got published successfully");
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }
 
@@ -74,8 +94,7 @@ class ProcessExecutor {
 
 	void runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
-			String workingDir = StringUtils.hasText(this.properties.getWorkingDir()) ?
-					this.properties.getWorkingDir() : System.getProperty("user.dir");
+			String workingDir = this.properties.getWorkingDir();
 			log.info("Will run the build via {} and wait for result for [{}] minutes", commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
 			Process process = builder.start();
@@ -83,7 +102,7 @@ class ProcessExecutor {
 			if (!finished) {
 				log.error("The build hasn't managed to finish in [{}] minutes", waitTimeInMinutes);
 				process.destroyForcibly();
-				throw new IllegalStateException("Build waiting time of [" + waitTimeInMinutes + "] minutes exceeded");
+				throw new IllegalStateException("Process waiting time of [" + waitTimeInMinutes + "] minutes exceeded");
 			}
 		}
 		catch (InterruptedException | IOException e) {

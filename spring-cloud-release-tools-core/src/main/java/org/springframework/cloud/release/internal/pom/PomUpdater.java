@@ -173,14 +173,6 @@ class PomUpdater {
 		return changes;
 	}
 
-	private boolean relativePathIsSet(Model model) {
-		return model.getParent() != null && StringUtils.hasText(model.getParent().getRelativePath());
-	}
-
-	private String parentName(Model model) {
-		return model.getParent() != null ? model.getParent().getArtifactId() : "";
-	}
-
 	private String groupId(Model model) {
 		if (StringUtils.hasText(model.getGroupId())) {
 			return model.getGroupId();
@@ -318,8 +310,7 @@ class PropertyStorer {
 	void setPropertyVersionIfApplicable(Project project) {
 		String propertyName = propertyName(project);
 		if (setPropertyVersion(propertyName, project.version)) {
-			log.info("    Updating property " + propertyName);
-			log.info("        to version " + project.version);
+			log.info("Updating property [" + propertyName + "] to version [" + project.version + "]");
 		}
 	}
 
