@@ -1,27 +1,24 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
-
-### STS ###
-.apt_generated
+*~
+#*
+*#
+.#*
 .classpath
-.factorypath
 .project
-.settings
+.settings/
 .springBeans
-
-### IntelliJ IDEA ###
+target/
+_site/
 .idea
-*.iws
 *.iml
-*.ipr
-
-### NetBeans ###
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
-
-.DS_Store
+*.swp
+.factorypath
+*.logtjmeter
+.checkstyle
 *.log
+.DS_Store
+/spring-cloud-sleuth-core/nb-configuration.xml
+/spring-cloud-sleuth-core/nbactions.xml
+*.sw[op]
+.project
+sample-pages
+.class
