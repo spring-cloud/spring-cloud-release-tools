@@ -6,6 +6,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.release.internal.build.ProjectBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectUpdater;
 import org.springframework.util.StringUtils;
 
@@ -17,19 +18,13 @@ public class Releaser {
 
 	private final ReleaserProperties properties;
 	private final ProjectUpdater projectUpdater;
-	//private final ProjectBuilder projectBuilder;
+	private final ProjectBuilder projectBuilder;
 
-	/*public Releaser(ReleaserProperties properties,
+	public Releaser(ReleaserProperties properties,
 			ProjectUpdater projectUpdater, ProjectBuilder projectBuilder) {
 		this.properties = properties;
 		this.projectUpdater = projectUpdater;
 		this.projectBuilder = projectBuilder;
-	}
-*/
-	public Releaser(ReleaserProperties properties,
-			ProjectUpdater projectUpdater) {
-		this.properties = properties;
-		this.projectUpdater = projectUpdater;
 	}
 
 	public void release() {
@@ -41,10 +36,10 @@ public class Releaser {
 			log.info("\n\nProject was successfully updated");
 			log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project\n\n");
 			System.in.read();
-			/*this.projectBuilder.build();
+			this.projectBuilder.build();
 			log.info("\nProject was successfully built");
 			log.info("\n\n\n=== COMMITTING AND PUSHING TAGS ===\n\nPress ENTER to commit, tag and push the tag\n\n");
-			System.in.read();*/
+			System.in.read();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
