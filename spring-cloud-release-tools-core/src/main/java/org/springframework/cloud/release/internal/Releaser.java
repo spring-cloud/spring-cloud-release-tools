@@ -6,7 +6,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.release.internal.build.ProjectBuilder;
+import org.springframework.cloud.release.internal.builder.ProjectBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectUpdater;
 import org.springframework.util.StringUtils;
 

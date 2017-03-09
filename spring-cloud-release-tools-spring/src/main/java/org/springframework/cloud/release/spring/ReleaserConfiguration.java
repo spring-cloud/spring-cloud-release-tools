@@ -18,7 +18,7 @@ package org.springframework.cloud.release.spring;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.build.ProjectBuilder;
+import org.springframework.cloud.release.internal.builder.ProjectBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectUpdater;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
