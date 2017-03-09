@@ -25,3 +25,4 @@ nbdist/
 
 .DS_Store
 *.log
+_site
