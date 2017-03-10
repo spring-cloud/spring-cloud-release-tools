@@ -53,7 +53,11 @@ public class Project {
 	private void assertNoHtmlFilesInDocsContainUnresolvedTags() {
 		String workingDir = this.properties.getWorkingDir();
 		try {
-			Files.walkFileTree(new File(workingDir, "docs").toPath(), new HtmlFileWalker());
+			File docs = new File(workingDir, "docs");
+			if (!docs.exists()) {
+				return;
+			}
+			Files.walkFileTree(docs.toPath(), new HtmlFileWalker());
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);

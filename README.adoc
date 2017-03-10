@@ -18,15 +18,14 @@ image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codec
 :toclevels: 8
 :nofooter:
 
-# Spring Cloud Release Tools
+== Spring Cloud Release Tools
 
-This project can be used to
+Spring Cloud projects reuse the same pattern of building and deploying the applications. That's
+why this tool makes it easy to automate the release / dependency update process of our applications.
 
-- update all versions in your Spring Cloud Project according to the Spring Cloud Release setup
+=== How to run it
 
-== How to run it
-
-Currently we only support running the releaser to update the poms from Java
+Currently we only support running the Releaser to update the poms from Java
 
 Go to your project (e.g. Spring Cloud Sleuth)
 
@@ -41,11 +40,39 @@ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar
 
 The application will start running from your working directory.
 
-=== Changing working directory
+=== Project options
 
-To change the working directory just run the app with `releaser.workingDir` property.
+- `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
+- `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to "https://github.com/spring-cloud/spring-cloud-release"
+- `releaser.maven.build-command` - Command to be executed to build the project. Defaults to `./mvnw clean install -Pdocs`
+- `releaser.maven.deploy-command` - Command to be executed to deploy a built project". Defaults to `./mvnw deploy -DskipTests -Pfast`
+- `releaser.maven.publish-docs-commands` - Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the proper version.
+Defaults to the standard Spring Cloud wget and execution of ghpages.
+- `releaser.maven.wait-time-in-minutes` - Max wait time in minutes for the process to finish. Defaults to `20`
+- `releaser.pom.branch` - Which branch of Spring Cloud Release should be checked out. Defaults to "master",
+- `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.",
+- `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.\n If you want to change this behaviour - just change this value.",
 
-=== Specifying A Branch
+TIP: You can pass the options either via system properties or via application arguments.
+Example for system properties: `java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar`
+Example for application argumemts: `java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6`
+
+=== Examples
+
+==== Keeping configuration in the project
+
+If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed
+to build the project and properly merge the docs) then you can put a file named e.g. `releaser.yml` under `config`
+folder and run your application like this:
+
+[source,bash]
+----
+mkdir -p target
+wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser
+----
+
+==== Specifying A Branch
 
 By deafult the releaser will default to using the `master` branch of `spring-cloud-release`.
 If you would like to use another branch you can specify it using the `releaser.pom.branch` property.
@@ -54,16 +81,6 @@ If you would like to use another branch you can specify it using the `releaser.p
 ----
 java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6
 ----
-
-== Future plans
-In the future it can also:
-
-- commit the changed values
-- perform a release
-
-Other plans:
-
-- add a Maven plugin to perform the work from Maven
 
 == Building
 
