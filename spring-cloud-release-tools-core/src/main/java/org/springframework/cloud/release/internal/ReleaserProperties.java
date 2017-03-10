@@ -38,8 +38,6 @@ public class ReleaserProperties {
 
 	private Pom pom = new Pom();
 
-	private Docs docs = new Docs();
-
 	private Maven maven = new Maven();
 
 	public static class Git {
@@ -102,18 +100,6 @@ public class ReleaserProperties {
 
 		public void setIgnoredPomRegex(List<String> ignoredPomRegex) {
 			this.ignoredPomRegex = ignoredPomRegex;
-		}
-	}
-
-	public static class Docs {
-		private String ghPagesUrl = "https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh";
-
-		public String getGhPagesUrl() {
-			return this.ghPagesUrl;
-		}
-
-		public void setGhPagesUrl(String ghPagesUrl) {
-			this.ghPagesUrl = ghPagesUrl;
 		}
 	}
 
@@ -192,14 +178,6 @@ public class ReleaserProperties {
 
 	public void setGit(Git git) {
 		this.git = git;
-	}
-
-	public Docs getDocs() {
-		return this.docs;
-	}
-
-	public void setDocs(Docs docs) {
-		this.docs = docs;
 	}
 
 	public Pom getPom() {
