@@ -43,7 +43,7 @@ public class Releaser {
 		if (!skipPoms) {
 			this.projectPomUpdater.updateProjectFromSCRelease(project);
 			changedVersion = new ProjectVersion(project);
-			log.info("\n\nProject was successfully updated to [{}]", originalVersion);
+			log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 		}
 		log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project {}", MSG);
 		boolean skipBuild = skipStep();
