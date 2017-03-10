@@ -111,6 +111,20 @@ public class GitRepoTests {
 	}
 
 	@Test
+	public void should_not_commit_empty_changes() throws Exception {
+		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		createNewFile(project);
+		this.gitRepo.commit(project, "some message");
+
+		this.gitRepo.commit(project, "empty commit");
+
+		try(Git git = openGitProject(project)) {
+			RevCommit revCommit = git.log().call().iterator().next();
+			then(revCommit.getShortMessage()).isNotEqualTo("empty commit");
+		}
+	}
+
+	@Test
 	public void should_create_a_tag() throws Exception {
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
 		createNewFile(project);

@@ -27,6 +27,7 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.errors.EmtpyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -105,7 +106,9 @@ class GitRepo {
 	void commit(File project, String message) {
 		try(Git git = this.gitFactory.open(file(project))) {
 			git.add().addFilepattern(".").call();
-			git.commit().setMessage(message).call();
+			git.commit().setAllowEmpty(false).setMessage(message).call();
+		} catch (EmtpyCommitException e) {
+			log.info("There were no changes detected. Will not commit an empty commit");
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
