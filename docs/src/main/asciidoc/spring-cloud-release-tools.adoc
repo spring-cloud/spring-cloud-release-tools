@@ -33,15 +33,15 @@ The application will start running from your working directory.
 === Project options
 
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
-- `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to "https://github.com/spring-cloud/spring-cloud-release"
+- `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
 - `releaser.maven.build-command` - Command to be executed to build the project. Defaults to `./mvnw clean install -Pdocs`
 - `releaser.maven.deploy-command` - Command to be executed to deploy a built project". Defaults to `./mvnw deploy -DskipTests -Pfast`
-- `releaser.maven.publish-docs-commands` - Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the proper version.
+- `releaser.maven.publish-docs-commands` - Command to be executed to deploy a built project. If present `{{version}}` will be replaced by the proper version.
 Defaults to the standard Spring Cloud wget and execution of ghpages.
 - `releaser.maven.wait-time-in-minutes` - Max wait time in minutes for the process to finish. Defaults to `20`
 - `releaser.pom.branch` - Which branch of Spring Cloud Release should be checked out. Defaults to "master",
-- `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.",
-- `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.\n If you want to change this behaviour - just change this value.",
+- `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.,
+- `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.
 
 TIP: You can pass the options either via system properties or via application arguments.
 Example for system properties: `java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar`
