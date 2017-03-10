@@ -441,7 +441,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	color: #ffffff;
 }
 </style>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
 <script type="text/javascript">
 function addBlockSwitches() {
 	$('.primary').each(function() {
@@ -493,40 +493,36 @@ $(addBlockSwitches);
 
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Spring Cloud Release Tools</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_how_to_run_it">How to run it</a>
+<li><a href="#_spring_cloud_release_tools">Spring Cloud Release Tools</a>
 <ul class="sectlevel2">
-<li><a href="#_changing_working_directory">Changing working directory</a></li>
+<li><a href="#_how_to_run_it">How to run it</a></li>
+<li><a href="#_project_options">Project options</a></li>
+<li><a href="#_examples">Examples</a>
+<ul class="sectlevel3">
+<li><a href="#_keeping_configuration_in_the_project">Keeping configuration in the project</a></li>
 <li><a href="#_specifying_a_branch">Specifying A Branch</a></li>
 </ul>
 </li>
-<li><a href="#_future_plans">Future plans</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>This project can be used to</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>update all versions in your Spring Cloud Project according to the Spring Cloud Release setup</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
 <div class="sect1">
-<h2 id="_how_to_run_it">How to run it</h2>
+<h2 id="_spring_cloud_release_tools">Spring Cloud Release Tools</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Currently we only support running the releaser to update the poms from Java</p>
+<p>Spring Cloud projects reuse the same pattern of building and deploying the applications. That&#8217;s
+why this tool makes it easy to automate the release / dependency update process of our applications.</p>
+</div>
+<div class="sect2">
+<h3 id="_how_to_run_it">How to run it</h3>
+<div class="paragraph">
+<p>Currently we only support running the Releaser to update the poms from Java</p>
 </div>
 <div class="paragraph">
 <p>Go to your project (e.g. Spring Cloud Sleuth)</p>
@@ -543,14 +539,75 @@ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
 <div class="paragraph">
 <p>The application will start running from your working directory.</p>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_changing_working_directory">Changing working directory</h3>
+<h3 id="_project_options">Project options</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>releaser.git.clone-destination-dir</code> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory</p>
+</li>
+<li>
+<p><code>releaser.git.spring-cloud-release-git-url</code> - URL to Spring Cloud Release Git repository. Defaults to "https://github.com/spring-cloud/spring-cloud-release"</p>
+</li>
+<li>
+<p><code>releaser.maven.build-command</code> - Command to be executed to build the project. Defaults to <code>./mvnw clean install -Pdocs</code></p>
+</li>
+<li>
+<p><code>releaser.maven.deploy-command</code> - Command to be executed to deploy a built project". Defaults to <code>./mvnw deploy -DskipTests -Pfast</code></p>
+</li>
+<li>
+<p><code>releaser.maven.publish-docs-commands</code> - Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the proper version.
+Defaults to the standard Spring Cloud wget and execution of ghpages.</p>
+</li>
+<li>
+<p><code>releaser.maven.wait-time-in-minutes</code> - Max wait time in minutes for the process to finish. Defaults to <code>20</code></p>
+</li>
+<li>
+<p><code>releaser.pom.branch</code> - Which branch of Spring Cloud Release should be checked out. Defaults to "master",</p>
+</li>
+<li>
+<p><code>releaser.pom.ignored-pom-regex</code> - List of regular expressions of ignored poms. Defaults to test projects and samples.",</p>
+</li>
+<li>
+<p><code>releaser.working-dir</code> - By default Releaser assumes running the program from the current working directory.\n If you want to change this behaviour - just change this value.",</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+You can pass the options either via system properties or via application arguments.
+Example for system properties: <code>java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code>
+Example for application argumemts: <code>java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_examples">Examples</h3>
+<div class="sect3">
+<h4 id="_keeping_configuration_in_the_project">Keeping configuration in the project</h4>
 <div class="paragraph">
-<p>To change the working directory just run the app with <code>releaser.workingDir</code> property.</p>
+<p>If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed
+to build the project and properly merge the docs) then you can put a file named e.g. <code>releaser.yml</code> under <code>config</code>
+folder and run your application like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">mkdir -p target
+wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_specifying_a_branch">Specifying A Branch</h3>
+</div>
+<div class="sect3">
+<h4 id="_specifying_a_branch">Specifying A Branch</h4>
 <div class="paragraph">
 <p>By deafult the releaser will default to using the <code>master</code> branch of <code>spring-cloud-release</code>.
 If you would like to use another branch you can specify it using the <code>releaser.pom.branch</code> property.</p>
@@ -561,33 +618,6 @@ If you would like to use another branch you can specify it using the <code>relea
 </div>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_future_plans">Future plans</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>In the future it can also:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>commit the changed values</p>
-</li>
-<li>
-<p>perform a release</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Other plans:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>add a Maven plugin to perform the work from Maven</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
