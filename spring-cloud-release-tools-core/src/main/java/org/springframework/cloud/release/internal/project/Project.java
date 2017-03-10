@@ -20,7 +20,6 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 public class Project {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	private static final String BUMP_VERSIONS = "./mvnw versions:set -DnewVersion=%s";
 
 	private final ReleaserProperties properties;
 	private final ProcessExecutor executor;
@@ -95,7 +94,7 @@ public class Project {
 	}
 
 	String bumpVersionsCommand() {
-		return BUMP_VERSIONS;
+		return this.properties.getMaven().getBumpVersionsCommand();
 	}
 }
 

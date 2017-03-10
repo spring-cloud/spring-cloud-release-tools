@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
 /**
- * Abstraction over a Git repo. Can clonea repo from a given location
+ * Abstraction over a Git repo. Can cloned repo from a given location
  * and check its branch.
  *
  * @author Marcin Grzejszczak
@@ -104,6 +104,7 @@ class GitRepo {
 	 */
 	void commit(File project, String message) {
 		try(Git git = this.gitFactory.open(file(project))) {
+			git.add().addFilepattern(".").call();
 			git.commit().setMessage(message).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -168,6 +169,7 @@ class GitRepo {
 	void revert(File project, String message) {
 		try(Git git = this.gitFactory.open(file(project))) {
 			RevCommit commit = git.log().setMaxCount(1).call().iterator().next();
+			log.debug("The commit to be reverted is [{}]", commit);
 			git.revert().include(commit).call();
 			git.commit().setAmend(true).setMessage(message).call();
 		} catch (Exception e) {

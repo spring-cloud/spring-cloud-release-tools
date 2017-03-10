@@ -4,19 +4,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.RemoteRemoveCommand;
-import org.eclipse.jgit.api.RemoteSetUrlCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.URIish;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +22,8 @@ import org.springframework.cloud.release.internal.pom.TestUtils;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+import static org.springframework.cloud.release.internal.git.GitTestUtils.clonedProject;
+import static org.springframework.cloud.release.internal.git.GitTestUtils.setOriginOnProjectToTmp;
 
 /**
  * @author Marcin Grzejszczak
@@ -133,7 +131,7 @@ public class GitRepoTests {
 
 	@Test
 	public void should_push_changes_to_master_branch() throws Exception {
-		File origin = clonedProject();
+		File origin = clonedProject(this.tmp.newFolder(), this.springCloudReleaseProject);
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
 		setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
@@ -149,7 +147,7 @@ public class GitRepoTests {
 
 	@Test
 	public void should_push_changes_to_current_branch() throws Exception {
-		File origin = clonedProject();
+		File origin = clonedProject(this.tmp.newFolder(), this.springCloudReleaseProject);
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
 		setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
@@ -165,7 +163,7 @@ public class GitRepoTests {
 
 	@Test
 	public void should_push_a_tag_to_new_branch_in_origin() throws Exception {
-		File origin = clonedProject();
+		File origin = clonedProject(this.tmp.newFolder(), this.springCloudReleaseProject);
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
 		setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
@@ -182,29 +180,9 @@ public class GitRepoTests {
 		}
 	}
 
-	private void setOriginOnProjectToTmp(File origin, File project)
-			throws GitAPIException, MalformedURLException {
-		try(Git git = openGitProject(project)) {
-			RemoteRemoveCommand remove = git.remoteRemove();
-			remove.setName("origin");
-			remove.call();
-			RemoteSetUrlCommand command = git.remoteSetUrl();
-			command.setUri(new URIish(origin.toURI().toURL()));
-			command.setName("origin");
-			command.setPush(true);
-			command.call();
-		}
-	}
 
 	private Git openGitProject(File project) {
 		return new GitRepo.JGitFactory().open(project);
-	}
-
-	private File clonedProject() throws IOException {
-		File anotherFolder = this.tmp.newFolder();
-		GitRepo projectRepo = new GitRepo(anotherFolder);
-		projectRepo.cloneProject(this.springCloudReleaseProject.toURI());
-		return anotherFolder;
 	}
 
 	private void createNewFile(File project) throws Exception {

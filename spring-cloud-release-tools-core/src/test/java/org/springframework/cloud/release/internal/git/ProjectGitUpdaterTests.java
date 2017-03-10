@@ -47,6 +47,22 @@ public class ProjectGitUpdaterTests {
 	}
 
 	@Test
+	public void should_commit_when_snapshot_version_is_present_with_post_release_msg() {
+		this.updater.commitAfterBumpingVersions(this.file, new ProjectVersion("1.0.0.BUILD-SNAPSHOT"));
+
+		then(this.gitRepo).should().commit(any(File.class), eq("Bumping versions after release"));
+		then(this.gitRepo).should(never()).tag(any(File.class), anyString());
+	}
+
+	@Test
+	public void should_not_commit_when_non_snapshot_version_is_present() {
+		this.updater.commitAfterBumpingVersions(this.file, new ProjectVersion("1.0.0.RELEASE"));
+
+		then(this.gitRepo).should(never()).commit(any(File.class), eq("Bumping versions after release"));
+		then(this.gitRepo).should(never()).tag(any(File.class), anyString());
+	}
+
+	@Test
 	public void should_not_revert_changes_for_snapshots() {
 		this.updater.revertChangesIfApplicable(this.file, new ProjectVersion("1.0.0.BUILD-SNAPSHOT"));
 

@@ -38,10 +38,12 @@ public class Releaser {
 		log.info("\n\n\n=== UPDATING POMS ===\n\nWill run the application "
 				+ "for root folder [{}]. \n\nPress ENTER to continue {}", workingDir, MSG);
 		boolean skipPoms = skipStep();
-		ProjectVersion version = new ProjectVersion(project);
+		ProjectVersion originalVersion = new ProjectVersion(project);
+		ProjectVersion changedVersion = new ProjectVersion(project);
 		if (!skipPoms) {
 			this.projectPomUpdater.updateProject(project);
-			log.info("\n\nProject was successfully updated");
+			changedVersion = new ProjectVersion(project);
+			log.info("\n\nProject was successfully updated to [{}]", originalVersion);
 		}
 		log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project {}", MSG);
 		boolean skipBuild = skipStep();
@@ -52,7 +54,7 @@ public class Releaser {
 		log.info("\n\n\n=== COMMITTING AND PUSHING TAGS ===\n\nPress ENTER to commit, tag and push the tag {}", MSG);
 		boolean skipCommit = skipStep();
 		if (!skipCommit) {
-			this.projectGitUpdater.commitAndTagIfApplicable(project, version);
+			this.projectGitUpdater.commitAndTagIfApplicable(project, changedVersion);
 		}
 		log.info("\n\n\n=== ARTIFACT DEPLOYMENT ===\n\nPress ENTER to deploy the artifacts {}", MSG);
 		boolean skipDeployment = skipStep();
@@ -64,12 +66,13 @@ public class Releaser {
 		if (!skipDocs) {
 			this.project.publishDocs();
 		}
-		if (!version.isSnapshot()) {
-			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go back to snapshots and bump version by patch {}", MSG);
+		if (!changedVersion.isSnapshot()) {
+			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go back to snapshots and bump originalVersion by patch {}", MSG);
 			boolean skipRevert = skipStep();
 			if (!skipRevert) {
-				this.projectGitUpdater.revertChangesIfApplicable(project, version);
-				this.project.bumpVersions(version.bumpedVersion());
+				this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
+				this.project.bumpVersions(originalVersion.bumpedVersion());
+				this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
 			}
 		}
 		log.info("\n\n\n=== PUSHING CHANGES===\n\nPress ENTER to push the commits {}", MSG);

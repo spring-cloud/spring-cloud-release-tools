@@ -22,6 +22,7 @@ public class ProjectGitUpdater {
 	private static final String MSG = "Bumping versions";
 	private static final String PRE_RELEASE_MSG = "Bumping versions before release";
 	private static final String POST_RELEASE_MSG = "Going back to snapshots";
+	private static final String POST_RELEASE_BUMP_MSG = MSG + " after release";
 
 	private final ReleaserProperties properties;
 
@@ -40,6 +41,16 @@ public class ProjectGitUpdater {
 			String tagName = "v" + version.version;
 			gitRepo.tag(project, tagName);
 			gitRepo.pushTag(project, tagName);
+		}
+	}
+
+	public void commitAfterBumpingVersions(File project, ProjectVersion version) {
+		GitRepo gitRepo = gitRepo(project);
+		if (version.isSnapshot()) {
+			log.info("Snapshot version [{}] found. Will only commit the changed poms", version);
+			gitRepo.commit(project, POST_RELEASE_BUMP_MSG);
+		} else {
+			log.info("Non snapshot version [{}] found. Won't do anything", version);
 		}
 	}
 
@@ -65,6 +76,7 @@ public class ProjectGitUpdater {
 			log.info("Won't revert a snapshot version");
 			return;
 		}
+		log.info("Reverting last commit");
 		gitRepo(project).revert(project, POST_RELEASE_MSG);
 	}
 

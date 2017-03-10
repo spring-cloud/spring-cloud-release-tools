@@ -1,4 +1,4 @@
-package org.springframework.cloud.release;
+package org.springframework.cloud.release.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.util.FileSystemUtils;
@@ -21,7 +20,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 /**
  * @author Marcin Grzejszczak
  */
-public class AcceptanceTests {
+public class PomUpdateAcceptanceTests {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	TestPomReader testPomReader = new TestPomReader();
@@ -83,11 +82,11 @@ public class AcceptanceTests {
 	}
 
 	private File file(String relativePath) throws URISyntaxException {
-		return new File(AcceptanceTests.class.getResource(relativePath).toURI());
+		return new File(PomUpdateAcceptanceTests.class.getResource(relativePath).toURI());
 	}
 
 	private File pom(String relativePath) throws URISyntaxException {
-		return new File(new File(AcceptanceTests.class.getResource(relativePath).toURI()), "pom.xml");
+		return new File(new File(PomUpdateAcceptanceTests.class.getResource(relativePath).toURI()), "pom.xml");
 	}
 
 	private String asString(File file) throws IOException {
