@@ -20,6 +20,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 public class Project {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final String VERSION_MUSTACHE = "{{version}}";
 
 	private final ReleaserProperties properties;
 	private final ProcessExecutor executor;
@@ -70,9 +71,10 @@ public class Project {
 		this.executor.runCommand(commands, waitTimeInMinutes);
 	}
 
-	public void publishDocs() {
+	public void publishDocs(String version) {
 		try {
 			for (String command : this.properties.getMaven().getPublishDocsCommands()) {
+				command = command.replace(VERSION_MUSTACHE, version);
 				String[] commands = command.split(" ");
 				runCommand(commands);
 			}

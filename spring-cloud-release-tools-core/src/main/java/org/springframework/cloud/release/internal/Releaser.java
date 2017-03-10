@@ -64,7 +64,7 @@ public class Releaser {
 		log.info("\n\n\n=== PUBLISHING DOCS ===\n\nPress ENTER to deploy the artifacts {}", MSG);
 		boolean skipDocs = skipStep();
 		if (!skipDocs) {
-			this.project.publishDocs();
+			this.project.publishDocs(changedVersion.version);
 		}
 		if (!changedVersion.isSnapshot()) {
 			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go back to snapshots and bump originalVersion by patch {}", MSG);

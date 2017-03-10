@@ -132,15 +132,16 @@ public class ReleaserProperties {
 		/**
 		 * Command to be executed to bump versions. The new version will be passed under %s param
 		 */
-		private String bumpVersionsCommand = "./mvnw versions:set -DnewVersion=%s";
+		private String bumpVersionsCommand = "./mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=%s";
 
 		/**
-		 * Command to be executed to deploy a built project
+		 * Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the
+		 * provided version
 		 */
 		private String[] publishDocsCommands = {
 				"wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh",
 				"chmod +x target/gh-pages.sh",
-				"./target/gh-pages.sh"
+				"./target/gh-pages.sh -v {{version}} -b -c"
 		};
 
 		/**

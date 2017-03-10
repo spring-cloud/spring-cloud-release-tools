@@ -89,11 +89,25 @@ public class ProjectTests {
 		TestProcessExecutor executor = executor(properties);
 		Project builder = new Project(properties, executor);
 
-		builder.publishDocs();
+		builder.publishDocs("");
 
 		then(asString(file("/projects/builder/resolved/resolved.log")))
 				.contains("file.txt");
 		then(executor.counter).isEqualTo(2);
+	}
+
+	@Test
+	public void should_successfully_execute_a_publish_docs_command_and_substitute_the_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setPublishDocsCommands(new String[] { "echo '{{version}}'" });
+		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
+		TestProcessExecutor executor = executor(properties);
+		Project builder = new Project(properties, executor);
+
+		builder.publishDocs("1.1.0.RELEASE");
+
+		then(asString(file("/projects/builder/resolved/resolved.log")))
+				.contains("1.1.0.RELEASE");
 	}
 
 	@Test
@@ -104,7 +118,7 @@ public class ProjectTests {
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
 		Project builder = new Project(properties, executor(properties));
 
-		thenThrownBy(builder::publishDocs).hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.publishDocs("")).hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -150,7 +164,7 @@ public class ProjectTests {
 		}
 
 		@Override ProcessBuilder builder(String[] commands, String workingDir) {
-			counter++;
+			this.counter++;
 			return super.builder(commands, workingDir)
 					.redirectOutput(file("/projects/builder/resolved/resolved.log"));
 		}
