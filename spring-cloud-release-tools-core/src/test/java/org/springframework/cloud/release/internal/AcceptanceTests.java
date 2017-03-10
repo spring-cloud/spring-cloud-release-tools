@@ -1,11 +1,11 @@
 package org.springframework.cloud.release.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.util.Iterator;
 
+import org.apache.maven.model.Model;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,24 +45,49 @@ public class AcceptanceTests {
 	@Test
 	public void should_perform_a_release_of_consul() throws Exception {
 		File origin = clonedProject(this.tmp.newFolder(), this.springCloudConsulProject);
+		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		pomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
 		File project = clonedProject(this.tmp.newFolder(), tmpFile("spring-cloud-consul"));
 		setOriginOnProjectToTmp(origin, project);
 		Releaser releaser = releaser(project);
 
 		releaser.release();
 
-		then(this.temporaryFolder).exists();
-		File afterProcessing = new File(project, "bumped");
-		then(afterProcessing).exists();
-		Iterable<RevCommit> commits = openGitProject(project).log().call();
+		Iterable<RevCommit> commits = listOfCommits(project);
 		Iterator<RevCommit> iterator = commits.iterator();
-		RevCommit afterRelease = iterator.next();
-		RevCommit goingBackToSnapshots = iterator.next();
-		RevCommit bumping = iterator.next();
+		tagIsPresentInOrigin(origin);
+		commitIsPresent(iterator, "Bumping versions after release");
+		commitIsPresent(iterator, "Going back to snapshots");
+		commitIsPresent(iterator, "Bumping versions before release");
+		pomVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
+		pomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
+	}
+
+	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
+		return openGitProject(project).log().call();
+	}
+
+	private void pomParentVersionIsEqualTo(File project, String expected) {
+		then(pom(new File(project, "spring-cloud-starter-consul")).getParent()
+				.getVersion()).isEqualTo(expected);
+	}
+
+	private void pomVersionIsEqualTo(File project, String expected) {
+		then(pom(project).getVersion()).isEqualTo(expected);
+	}
+
+	private void commitIsPresent(Iterator<RevCommit> iterator,
+			String expected) {
+		RevCommit commit = iterator.next();
+		then(commit.getShortMessage()).isEqualTo(expected);
+	}
+
+	private void tagIsPresentInOrigin(File origin) throws GitAPIException {
 		then(openGitProject(origin).tagList().call().iterator().next().getName()).endsWith("v1.1.2.RELEASE");
-		then(afterRelease.getShortMessage()).isEqualTo("Bumping versions after release");
-		then(goingBackToSnapshots.getShortMessage()).isEqualTo("Going back to snapshots");
-		then(bumping.getShortMessage()).isEqualTo("Bumping versions before release");
+	}
+
+	private Model pom(File dir) {
+		return this.testPomReader.readPom(new File(dir, "pom.xml"));
 	}
 
 	private ReleaserProperties releaserProperties(File project) throws URISyntaxException {
@@ -73,14 +98,13 @@ public class AcceptanceTests {
 		releaserProperties.getMaven().setBuildCommand("touch build");
 		releaserProperties.getMaven().setDeployCommand("touch deploy");
 		releaserProperties.getMaven().setPublishDocsCommands(new String[] { "touch docs"} );
-		releaserProperties.getMaven().setBumpVersionsCommand("touch bumped");
 		return releaserProperties;
 	}
 
 	private Releaser releaser(File projectFile) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile);
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		Project project = new Project(properties);
+		Project project = new Project(properties, pomUpdater);
 		ProjectGitUpdater gitUpdater = new ProjectGitUpdater(properties);
 		return new Releaser(properties, pomUpdater, project, gitUpdater) {
 			@Override boolean skipStep() {
@@ -95,13 +119,5 @@ public class AcceptanceTests {
 
 	private File file(String relativePath) throws URISyntaxException {
 		return new File(AcceptanceTests.class.getResource(relativePath).toURI());
-	}
-
-	private File pom(String relativePath) throws URISyntaxException {
-		return new File(new File(AcceptanceTests.class.getResource(relativePath).toURI()), "pom.xml");
-	}
-
-	private String asString(File file) throws IOException {
-		return new String(Files.readAllBytes(file.toPath()));
 	}
 }

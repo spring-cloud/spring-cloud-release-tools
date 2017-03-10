@@ -39,7 +39,7 @@ public class PomUpdateAcceptanceTests {
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 
 		projectPomUpdater
-				.updateProject(new File(this.temporaryFolder, "/spring-cloud-sleuth"));
+				.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth"));
 
 		then(this.temporaryFolder).exists();
 		Model rootPom = this.testPomReader.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
@@ -64,7 +64,7 @@ public class PomUpdateAcceptanceTests {
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		File beforeProcessing = pom("/projects/project/");
 
-		projectPomUpdater.updateProject(tmpFile("/project/"));
+		projectPomUpdater.updateProjectFromSCRelease(tmpFile("/project/"));
 
 		then(this.temporaryFolder).exists();
 		File afterProcessing = tmpFile("/project/pom.xml");

@@ -9,6 +9,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.pom.TestPomReader;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
@@ -17,6 +18,8 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  * @author Marcin Grzejszczak
  */
 public class ProjectTests {
+
+	TestPomReader reader = new TestPomReader();
 
 	@Before
 	public void checkOs() {
@@ -124,31 +127,17 @@ public class ProjectTests {
 	@Test
 	public void should_successfully_execute_a_bump_versions_command() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
-		Project builder = new Project(properties, executor(properties)) {
-			@Override String bumpVersionsCommand() {
-				return "%s";
-			}
-		};
+		properties.setWorkingDir(file("/projects/spring-cloud-contract").getPath());
+		Project builder = new Project(properties, executor(properties));
 
-		builder.bumpVersions("ls -al");
+		builder.bumpVersions("2.3.4.BUILD-SNAPSHOT");
 
-		then(asString(file("/projects/builder/resolved/resolved.log")))
-				.contains("file.txt");
-	}
-
-	@Test
-	public void should_throw_exception_when_bump_command_took_too_long_to_execute() throws Exception {
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getMaven().setWaitTimeInMinutes(0);
-		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
-		Project builder = new Project(properties, executor(properties)) {
-			@Override String bumpVersionsCommand() {
-				return "echo '%s'";
-			}
-		};
-
-		thenThrownBy(() -> builder.bumpVersions("1.0.0")).hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		File rootPom = file("/projects/spring-cloud-contract/pom.xml");
+		File tools = file("/projects/spring-cloud-contract/spring-cloud-contract-tools/pom.xml");
+		File converters = file("/projects/spring-cloud-contract/spring-cloud-contract-tools/spring-cloud-contract-converters/pom.xml");
+		then(this.reader.readPom(rootPom).getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
+		then(this.reader.readPom(tools).getParent().getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
+		then(this.reader.readPom(converters).getParent().getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
 	}
 
 	private TestProcessExecutor executor(ReleaserProperties properties) {

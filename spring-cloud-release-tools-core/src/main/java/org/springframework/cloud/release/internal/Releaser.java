@@ -41,7 +41,7 @@ public class Releaser {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		if (!skipPoms) {
-			this.projectPomUpdater.updateProject(project);
+			this.projectPomUpdater.updateProjectFromSCRelease(project);
 			changedVersion = new ProjectVersion(project);
 			log.info("\n\nProject was successfully updated to [{}]", originalVersion);
 		}

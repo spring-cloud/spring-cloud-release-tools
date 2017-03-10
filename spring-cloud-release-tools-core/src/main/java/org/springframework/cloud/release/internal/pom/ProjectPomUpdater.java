@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,7 @@ public class ProjectPomUpdater {
 	 *
 	 * @param projectRoot - root folder with project to update
 	 */
-	public void updateProject(File projectRoot) {
+	public void updateProjectFromSCRelease(File projectRoot) {
 		File clonedScRelease = this.gitRepo.cloneScReleaseProject();
 		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
@@ -61,10 +63,27 @@ public class ProjectPomUpdater {
 			log.info("Skipping project updating");
 			return;
 		}
+		updatePoms(projectRoot, versions);
+	}
+
+	private void updatePoms(File projectRoot, Versions versions) {
 		File rootPom = new File(projectRoot, "pom.xml");
 		ModelWrapper rootPomModel = this.pomUpdater.readModel(rootPom);
 		processAllPoms(projectRoot, new PomWalker(rootPomModel, versions, this.pomUpdater,
-				properties));
+				this.properties));
+	}
+
+	public void updatePomsForRootVersion(File directory, String version) {
+		File pom = new File(directory, "pom.xml");
+		Versions versions = versions(version, pom);
+		updatePoms(directory, versions);
+	}
+
+	private Versions versions(String version, File pom) {
+		ModelWrapper model = this.pomUpdater.readModel(pom);
+		Set<Project> projects = new HashSet<>();
+		projects.add(new Project(model.projectName(), version));
+		return new Versions("", "", projects);
 	}
 
 	private void processAllPoms(File projectRoot, PomWalker pomWalker) {

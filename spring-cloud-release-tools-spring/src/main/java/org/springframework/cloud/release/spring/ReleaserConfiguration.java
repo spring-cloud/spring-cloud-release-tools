@@ -29,7 +29,8 @@ import org.springframework.context.annotation.Configuration;
 class ReleaserConfiguration {
 
 	@Bean Releaser releaser(ReleaserProperties properties) {
-		return new Releaser(properties, new ProjectPomUpdater(properties),
-				new Project(properties), new ProjectGitUpdater(properties));
+		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
+		return new Releaser(properties, pomUpdater,
+				new Project(properties, pomUpdater), new ProjectGitUpdater(properties));
 	}
 }

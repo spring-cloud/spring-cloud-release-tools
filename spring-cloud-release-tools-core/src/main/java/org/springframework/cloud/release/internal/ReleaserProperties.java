@@ -130,11 +130,6 @@ public class ReleaserProperties {
 		private String deployCommand = "./mvnw deploy -DskipTests -Pfast";
 
 		/**
-		 * Command to be executed to bump versions. The new version will be passed under %s param
-		 */
-		private String bumpVersionsCommand = "./mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=%s";
-
-		/**
 		 * Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the
 		 * provided version
 		 */
@@ -179,14 +174,6 @@ public class ReleaserProperties {
 
 		public void setPublishDocsCommands(String[] publishDocsCommands) {
 			this.publishDocsCommands = publishDocsCommands;
-		}
-
-		public String getBumpVersionsCommand() {
-			return this.bumpVersionsCommand;
-		}
-
-		public void setBumpVersionsCommand(String bumpVersionsCommand) {
-			this.bumpVersionsCommand = bumpVersionsCommand;
 		}
 	}
 

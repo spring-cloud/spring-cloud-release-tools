@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 
 /**
  * @author Marcin Grzejszczak
@@ -24,15 +25,18 @@ public class Project {
 
 	private final ReleaserProperties properties;
 	private final ProcessExecutor executor;
+	private final ProjectPomUpdater pomUpdater;
 
-	public Project(ReleaserProperties properties) {
+	public Project(ReleaserProperties properties, ProjectPomUpdater pomUpdater) {
 		this.properties = properties;
 		this.executor = new ProcessExecutor(properties);
+		this.pomUpdater = pomUpdater;
 	}
 
 	Project(ReleaserProperties properties, ProcessExecutor executor) {
 		this.properties = properties;
 		this.executor = executor;
+		this.pomUpdater = new ProjectPomUpdater(properties);
 	}
 
 	public void build() {
@@ -85,18 +89,9 @@ public class Project {
 	}
 
 	public void bumpVersions(String version) {
-		try {
-			log.info("Bumping versions to [{}]", version);
-			String[] commands = String.format(bumpVersionsCommand(), version).split(" ");
-			runCommand(commands);
-			log.info("Versions successfully bumped");
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
-	String bumpVersionsCommand() {
-		return this.properties.getMaven().getBumpVersionsCommand();
+		String workingDir = this.properties.getWorkingDir();
+		File dir = new File(workingDir);
+		this.pomUpdater.updatePomsForRootVersion(dir, version);
 	}
 }
 
