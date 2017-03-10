@@ -109,17 +109,24 @@ class ProcessExecutor {
 			String workingDir = this.properties.getWorkingDir();
 			log.info("Will run the build via {} and wait for result for [{}] minutes", commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
-			Process process = builder.start();
+			Process process = startProcess(builder);
 			boolean finished = process.waitFor(waitTimeInMinutes, TimeUnit.MINUTES);
 			if (!finished) {
 				log.error("The build hasn't managed to finish in [{}] minutes", waitTimeInMinutes);
 				process.destroyForcibly();
 				throw new IllegalStateException("Process waiting time of [" + waitTimeInMinutes + "] minutes exceeded");
 			}
+			if (process.exitValue() != 0) {
+				throw new IllegalStateException("The process has exited with exit code [" + process.exitValue() + "]");
+			}
 		}
 		catch (InterruptedException | IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	Process startProcess(ProcessBuilder builder) throws IOException {
+		return builder.start();
 	}
 
 	ProcessBuilder builder(String[] commands, String workingDir) {

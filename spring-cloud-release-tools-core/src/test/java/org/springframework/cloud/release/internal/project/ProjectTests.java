@@ -2,6 +2,8 @@ package org.springframework.cloud.release.internal.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 
@@ -125,6 +127,20 @@ public class ProjectTests {
 	}
 
 	@Test
+	public void should_throw_exception_when_process_exits_with_invalid_code() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("exit 1");
+		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
+		Project builder = new Project(properties, new ProcessExecutor(properties) {
+			@Override Process startProcess(ProcessBuilder builder) throws IOException {
+				return processWithInvalidExitCode();
+			}
+		});
+
+		thenThrownBy(builder::build).hasMessageContaining("The process has exited with exit code [1]");
+	}
+
+	@Test
 	public void should_successfully_execute_a_bump_versions_command() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.setWorkingDir(file("/projects/spring-cloud-contract").getPath());
@@ -138,6 +154,34 @@ public class ProjectTests {
 		then(this.reader.readPom(rootPom).getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
 		then(this.reader.readPom(tools).getParent().getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
 		then(this.reader.readPom(converters).getParent().getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
+	}
+
+	private Process processWithInvalidExitCode() {
+		return new Process() {
+			@Override public OutputStream getOutputStream() {
+				return null;
+			}
+
+			@Override public InputStream getInputStream() {
+				return null;
+			}
+
+			@Override public InputStream getErrorStream() {
+				return null;
+			}
+
+			@Override public int waitFor() throws InterruptedException {
+				return 0;
+			}
+
+			@Override public int exitValue() {
+				return 1;
+			}
+
+			@Override public void destroy() {
+
+			}
+		};
 	}
 
 	private TestProcessExecutor executor(ReleaserProperties properties) {
