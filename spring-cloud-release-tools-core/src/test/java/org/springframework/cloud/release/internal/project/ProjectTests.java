@@ -38,7 +38,7 @@ public class ProjectTests {
 		builder.build();
 
 		then(asString(file("/projects/builder/resolved/resolved.log")))
-				.contains("file.txt");
+				.contains("resolved.log");
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class ProjectTests {
 		builder.deploy();
 
 		then(asString(file("/projects/builder/resolved/resolved.log")))
-				.contains("file.txt");
+				.contains("resolved.log");
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class ProjectTests {
 		builder.publishDocs("");
 
 		then(asString(file("/projects/builder/resolved/resolved.log")))
-				.contains("file.txt");
+				.contains("resolved.log");
 		then(executor.counter).isEqualTo(2);
 	}
 

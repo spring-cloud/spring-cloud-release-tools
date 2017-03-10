@@ -43,17 +43,17 @@ public class Project {
 		try {
 			String[] commands = this.properties.getMaven().getBuildCommand().split(" ");
 			runCommand(commands);
-			assertNoHtmlFilesContainUnresolvedTags();
+			assertNoHtmlFilesInDocsContainUnresolvedTags();
 			log.info("No HTML files from docs contain unresolved tags");
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private void assertNoHtmlFilesContainUnresolvedTags() {
+	private void assertNoHtmlFilesInDocsContainUnresolvedTags() {
 		String workingDir = this.properties.getWorkingDir();
 		try {
-			Files.walkFileTree(new File(workingDir).toPath(), new HtmlFileWalker());
+			Files.walkFileTree(new File(workingDir, "docs").toPath(), new HtmlFileWalker());
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);
