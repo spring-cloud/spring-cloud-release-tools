@@ -55,16 +55,19 @@ public class Releaser {
 		boolean skipCommit = skipStep();
 		if (!skipCommit) {
 			this.projectGitUpdater.commitAndTagIfApplicable(project, changedVersion);
+			log.info("\nCommit was made and tag was pushed successfully");
 		}
 		log.info("\n\n\n=== ARTIFACT DEPLOYMENT ===\n\nPress ENTER to deploy the artifacts {}", MSG);
 		boolean skipDeployment = skipStep();
 		if (!skipDeployment) {
 			this.project.deploy();
+			log.info("\nThe artifact was deployed successfully");
 		}
 		log.info("\n\n\n=== PUBLISHING DOCS ===\n\nPress ENTER to deploy the artifacts {}", MSG);
 		boolean skipDocs = skipStep();
 		if (!skipDocs) {
 			this.project.publishDocs(changedVersion.version);
+			log.info("\nThe docs were published successfully");
 		}
 		if (!changedVersion.isSnapshot()) {
 			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go back to snapshots and bump originalVersion by patch {}", MSG);
@@ -73,12 +76,14 @@ public class Releaser {
 				this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
 				this.project.bumpVersions(originalVersion.bumpedVersion());
 				this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
+				log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 			}
 		}
 		log.info("\n\n\n=== PUSHING CHANGES===\n\nPress ENTER to push the commits {}", MSG);
 		boolean skipPush = skipStep();
 		if (!skipPush) {
 			this.projectGitUpdater.pushCurrentBranch(project);
+			log.info("\nSuccessfully pushed current branch");
 		}
 	}
 
