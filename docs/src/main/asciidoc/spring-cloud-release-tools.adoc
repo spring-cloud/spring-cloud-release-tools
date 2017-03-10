@@ -13,6 +13,17 @@
 Spring Cloud projects reuse the same pattern of building and deploying the applications. That's
 why this tool makes it easy to automate the release / dependency update process of our applications.
 
+=== What does it do?
+
+- Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)
+- Modifies the project versions with values from SC-Release
+- Performs the build and checks if the `docs` modules have properly created the documentation (no `unresolved` tags are present)
+- Commits changed poms (ONLY FOR NON-SNAPSHOT VERSIONS)
+- Creates a tag for the release / milestone (ONLY FOR NON-SNAPSHOT VERSIONS)
+- Runs the deployment of the artifacts
+- Publishes the docs (to `spring-cloud-static` for non-snapshots, to `gh-pages` for snapshots)
+- Reverts back to snapshots, bumps the version by a patch (`1.0.1.RELEASE` -> `1.0.2.BUILD-SNAPSHOT`) (ONLY FOR NON-SNAPSHOT VERSIONS)
+
 === How to run it
 
 Currently we only support running the Releaser to update the poms from Java
