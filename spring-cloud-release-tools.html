@@ -498,6 +498,7 @@ $(addBlockSwitches);
 <ul class="sectlevel1">
 <li><a href="#_spring_cloud_release_tools">Spring Cloud Release Tools</a>
 <ul class="sectlevel2">
+<li><a href="#_what_does_it_do">What does it do?</a></li>
 <li><a href="#_how_to_run_it">How to run it</a></li>
 <li><a href="#_project_options">Project options</a></li>
 <li><a href="#_examples">Examples</a>
@@ -518,6 +519,37 @@ $(addBlockSwitches);
 <div class="paragraph">
 <p>Spring Cloud projects reuse the same pattern of building and deploying the applications. That&#8217;s
 why this tool makes it easy to automate the release / dependency update process of our applications.</p>
+</div>
+<div class="sect2">
+<h3 id="_what_does_it_do">What does it do?</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)</p>
+</li>
+<li>
+<p>Modifies the project versions with values from SC-Release</p>
+</li>
+<li>
+<p>Performs the build and checks if the <code>docs</code> modules have properly created the documentation (no <code>unresolved</code> tags are present)</p>
+</li>
+<li>
+<p>Commits changed poms (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
+</li>
+<li>
+<p>Creates a tag for the release / milestone (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
+</li>
+<li>
+<p>Runs the deployment of the artifacts</p>
+</li>
+<li>
+<p>Publishes the docs (to <code>spring-cloud-static</code> for non-snapshots, to <code>gh-pages</code> for snapshots)</p>
+</li>
+<li>
+<p>Reverts back to snapshots, bumps the version by a patch (<code>1.0.1.RELEASE</code> &#8594; <code>1.0.2.BUILD-SNAPSHOT</code>) (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
+</li>
+</ul>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_how_to_run_it">How to run it</h3>
@@ -548,7 +580,7 @@ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
 <p><code>releaser.git.clone-destination-dir</code> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory</p>
 </li>
 <li>
-<p><code>releaser.git.spring-cloud-release-git-url</code> - URL to Spring Cloud Release Git repository. Defaults to "https://github.com/spring-cloud/spring-cloud-release"</p>
+<p><code>releaser.git.spring-cloud-release-git-url</code> - URL to Spring Cloud Release Git repository. Defaults to <code><a href="https://github.com/spring-cloud/spring-cloud-release" class="bare">https://github.com/spring-cloud/spring-cloud-release</a></code></p>
 </li>
 <li>
 <p><code>releaser.maven.build-command</code> - Command to be executed to build the project. Defaults to <code>./mvnw clean install -Pdocs</code></p>
@@ -557,7 +589,7 @@ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
 <p><code>releaser.maven.deploy-command</code> - Command to be executed to deploy a built project". Defaults to <code>./mvnw deploy -DskipTests -Pfast</code></p>
 </li>
 <li>
-<p><code>releaser.maven.publish-docs-commands</code> - Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the proper version.
+<p><code>releaser.maven.publish-docs-commands</code> - Command to be executed to deploy a built project. If present <code>{{version}}</code> will be replaced by the proper version.
 Defaults to the standard Spring Cloud wget and execution of ghpages.</p>
 </li>
 <li>
@@ -567,10 +599,10 @@ Defaults to the standard Spring Cloud wget and execution of ghpages.</p>
 <p><code>releaser.pom.branch</code> - Which branch of Spring Cloud Release should be checked out. Defaults to "master",</p>
 </li>
 <li>
-<p><code>releaser.pom.ignored-pom-regex</code> - List of regular expressions of ignored poms. Defaults to test projects and samples.",</p>
+<p><code>releaser.pom.ignored-pom-regex</code> - List of regular expressions of ignored poms. Defaults to test projects and samples.,</p>
 </li>
 <li>
-<p><code>releaser.working-dir</code> - By default Releaser assumes running the program from the current working directory.\n If you want to change this behaviour - just change this value.",</p>
+<p><code>releaser.working-dir</code> - By default Releaser assumes running the program from the current working directory.</p>
 </li>
 </ul>
 </div>
