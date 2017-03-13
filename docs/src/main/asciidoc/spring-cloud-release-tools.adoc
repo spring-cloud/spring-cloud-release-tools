@@ -32,11 +32,11 @@ Go to your project (e.g. Spring Cloud Sleuth)
 
 [source,bash]
 ----
-git clone https://github.com/spring-cloud/spring-cloud-sleuth
-cd spring-cloud-sleuth
-mkdir -p target
-wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
-java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ git clone https://github.com/spring-cloud/spring-cloud-sleuth
+$ cd spring-cloud-sleuth
+$ mkdir -p target
+$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar
 ----
 
 The application will start running from your working directory.
@@ -68,9 +68,9 @@ folder and run your application like this:
 
 [source,bash]
 ----
-mkdir -p target
-wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
-java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser
+$ mkdir -p target
+$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser
 ----
 
 ==== Specifying A Branch
@@ -80,5 +80,5 @@ If you would like to use another branch you can specify it using the `releaser.p
 
 [source,bash]
 ----
-java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6
 ----
