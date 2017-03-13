@@ -18,7 +18,7 @@ import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 /**
  * @author Marcin Grzejszczak
  */
-public class Project {
+public class ProjectBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static final String VERSION_MUSTACHE = "{{version}}";
@@ -27,13 +27,13 @@ public class Project {
 	private final ProcessExecutor executor;
 	private final ProjectPomUpdater pomUpdater;
 
-	public Project(ReleaserProperties properties, ProjectPomUpdater pomUpdater) {
+	public ProjectBuilder(ReleaserProperties properties, ProjectPomUpdater pomUpdater) {
 		this.properties = properties;
 		this.executor = new ProcessExecutor(properties);
 		this.pomUpdater = pomUpdater;
 	}
 
-	Project(ReleaserProperties properties, ProcessExecutor executor) {
+	ProjectBuilder(ReleaserProperties properties, ProcessExecutor executor) {
 		this.properties = properties;
 		this.executor = executor;
 		this.pomUpdater = new ProjectPomUpdater(properties);

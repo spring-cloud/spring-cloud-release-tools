@@ -5,7 +5,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -21,15 +21,54 @@ public class Releaser {
 
 	private final ReleaserProperties properties;
 	private final ProjectPomUpdater projectPomUpdater;
-	private final Project project;
+	private final ProjectBuilder projectBuilder;
 	private final ProjectGitUpdater projectGitUpdater;
 
 	public Releaser(ReleaserProperties properties, ProjectPomUpdater projectPomUpdater,
-			Project project, ProjectGitUpdater projectGitUpdater) {
+			ProjectBuilder projectBuilder, ProjectGitUpdater projectGitUpdater) {
 		this.properties = properties;
 		this.projectPomUpdater = projectPomUpdater;
-		this.project = project;
+		this.projectBuilder = projectBuilder;
 		this.projectGitUpdater = projectGitUpdater;
+	}
+
+	public ProjectVersion updateProjectFromScRelease(File project) {
+		this.projectPomUpdater.updateProjectFromSCRelease(project);
+		ProjectVersion changedVersion = new ProjectVersion(project);
+		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
+		return changedVersion;
+	}
+
+	public void buildProject() {
+		this.projectBuilder.build();
+		log.info("\nProject was successfully built");
+	}
+
+	public void commitAndPushTags(File project, ProjectVersion changedVersion) {
+		this.projectGitUpdater.commitAndTagIfApplicable(project, changedVersion);
+		log.info("\nCommit was made and tag was pushed successfully");
+	}
+
+	public void deploy() {
+		this.projectBuilder.deploy();
+		log.info("\nThe artifact was deployed successfully");
+	}
+
+	public void publishDocs(ProjectVersion changedVersion) {
+		this.projectBuilder.publishDocs(changedVersion.version);
+		log.info("\nThe docs were published successfully");
+	}
+
+	public void rollbackReleaseVersion(File project, ProjectVersion originalVersion, ProjectVersion changedVersion) {
+		this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
+		this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
+		this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
+		log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
+	}
+
+	public void pushCurrentBranch(File project) {
+		this.projectGitUpdater.pushCurrentBranch(project);
+		log.info("\nSuccessfully pushed current branch");
 	}
 
 	public void release() {
@@ -41,49 +80,39 @@ public class Releaser {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		if (!skipPoms) {
-			this.projectPomUpdater.updateProjectFromSCRelease(project);
-			changedVersion = new ProjectVersion(project);
-			log.info("\n\nProject was successfully updated to [{}]", changedVersion);
+			changedVersion = this.updateProjectFromScRelease(project);
 		}
 		log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project {}", MSG);
 		boolean skipBuild = skipStep();
 		if (!skipBuild) {
-			this.project.build();
-			log.info("\nProject was successfully built");
+			this.buildProject();
 		}
 		log.info("\n\n\n=== COMMITTING AND PUSHING TAGS ===\n\nPress ENTER to commit, tag and push the tag {}", MSG);
 		boolean skipCommit = skipStep();
 		if (!skipCommit) {
-			this.projectGitUpdater.commitAndTagIfApplicable(project, changedVersion);
-			log.info("\nCommit was made and tag was pushed successfully");
+			this.commitAndPushTags(project, changedVersion);
 		}
 		log.info("\n\n\n=== ARTIFACT DEPLOYMENT ===\n\nPress ENTER to deploy the artifacts {}", MSG);
 		boolean skipDeployment = skipStep();
 		if (!skipDeployment) {
-			this.project.deploy();
-			log.info("\nThe artifact was deployed successfully");
+			this.deploy();
 		}
 		log.info("\n\n\n=== PUBLISHING DOCS ===\n\nPress ENTER to deploy the artifacts {}", MSG);
 		boolean skipDocs = skipStep();
 		if (!skipDocs) {
-			this.project.publishDocs(changedVersion.version);
-			log.info("\nThe docs were published successfully");
+			this.publishDocs(changedVersion);
 		}
 		if (!changedVersion.isSnapshot()) {
 			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go back to snapshots and bump originalVersion by patch {}", MSG);
 			boolean skipRevert = skipStep();
 			if (!skipRevert) {
-				this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
-				this.project.bumpVersions(originalVersion.bumpedVersion());
-				this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
-				log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
+				rollbackReleaseVersion(project, originalVersion, changedVersion);
 			}
 		}
 		log.info("\n\n\n=== PUSHING CHANGES===\n\nPress ENTER to push the commits {}", MSG);
 		boolean skipPush = skipStep();
 		if (!skipPush) {
-			this.projectGitUpdater.pushCurrentBranch(project);
-			log.info("\nSuccessfully pushed current branch");
+			this.pushCurrentBranch(project);
 		}
 	}
 

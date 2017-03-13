@@ -16,7 +16,7 @@ import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
-import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -56,9 +56,9 @@ public class AcceptanceTests {
 		Iterable<RevCommit> commits = listOfCommits(project);
 		Iterator<RevCommit> iterator = commits.iterator();
 		tagIsPresentInOrigin(origin);
-		commitIsPresent(iterator, "Bumping versions after release");
+		commitIsPresent(iterator, "Bumping versions to 1.2.1.BUILD-SNAPSHOT after release");
 		commitIsPresent(iterator, "Going back to snapshots");
-		commitIsPresent(iterator, "Bumping versions before release");
+		commitIsPresent(iterator, "Update SNAPSHOT to 1.1.2.RELEASE");
 		pomVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 	}
@@ -104,9 +104,9 @@ public class AcceptanceTests {
 	private Releaser releaser(File projectFile) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile);
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		Project project = new Project(properties, pomUpdater);
+		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
 		ProjectGitUpdater gitUpdater = new ProjectGitUpdater(properties);
-		return new Releaser(properties, pomUpdater, project, gitUpdater) {
+		return new Releaser(properties, pomUpdater, projectBuilder, gitUpdater) {
 			@Override boolean skipStep() {
 				return false;
 			}

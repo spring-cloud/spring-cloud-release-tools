@@ -41,7 +41,7 @@ public class ProjectGitUpdaterTests {
 	public void should_commit_tag_and_push_tag_when_version_is_not_snapshot() {
 		this.updater.commitAndTagIfApplicable(this.file, new ProjectVersion("1.0.0.RELEASE"));
 
-		then(this.gitRepo).should().commit(any(File.class), eq("Bumping versions before release"));
+		then(this.gitRepo).should().commit(any(File.class), eq("Update SNAPSHOT to 1.0.0.RELEASE"));
 		then(this.gitRepo).should().tag(any(File.class), eq("v1.0.0.RELEASE"));
 		then(this.gitRepo).should().pushTag(any(File.class), eq("v1.0.0.RELEASE"));
 	}
@@ -50,7 +50,7 @@ public class ProjectGitUpdaterTests {
 	public void should_commit_when_snapshot_version_is_present_with_post_release_msg() {
 		this.updater.commitAfterBumpingVersions(this.file, new ProjectVersion("1.0.0.BUILD-SNAPSHOT"));
 
-		then(this.gitRepo).should().commit(any(File.class), eq("Bumping versions after release"));
+		then(this.gitRepo).should().commit(any(File.class), eq("Bumping versions to 1.0.1.BUILD-SNAPSHOT after release"));
 		then(this.gitRepo).should(never()).tag(any(File.class), anyString());
 	}
 

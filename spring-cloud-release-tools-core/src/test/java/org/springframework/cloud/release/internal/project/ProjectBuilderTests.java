@@ -19,7 +19,7 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectTests {
+public class ProjectBuilderTests {
 
 	TestPomReader reader = new TestPomReader();
 
@@ -33,7 +33,7 @@ public class ProjectTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
-		Project builder = new Project(properties, executor(properties));
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		builder.build();
 
@@ -46,7 +46,7 @@ public class ProjectTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
-		Project builder = new Project(properties, executor(properties));
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		thenThrownBy(builder::build).hasMessageContaining("contains a tag that wasn't resolved properly");
 	}
@@ -57,7 +57,7 @@ public class ProjectTests {
 		properties.getMaven().setBuildCommand("sleep 1");
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
-		Project builder = new Project(properties, executor(properties));
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		thenThrownBy(builder::build).hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
@@ -67,7 +67,7 @@ public class ProjectTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("ls -al");
 		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
-		Project builder = new Project(properties, executor(properties));
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		builder.deploy();
 
@@ -81,7 +81,7 @@ public class ProjectTests {
 		properties.getMaven().setDeployCommand("sleep 1");
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
-		Project builder = new Project(properties, executor(properties));
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		thenThrownBy(builder::deploy).hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
@@ -92,7 +92,7 @@ public class ProjectTests {
 		properties.getMaven().setPublishDocsCommands(new String[] { "ls -al", "ls -al" });
 		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
 		TestProcessExecutor executor = executor(properties);
-		Project builder = new Project(properties, executor);
+		ProjectBuilder builder = new ProjectBuilder(properties, executor);
 
 		builder.publishDocs("");
 
@@ -107,7 +107,7 @@ public class ProjectTests {
 		properties.getMaven().setPublishDocsCommands(new String[] { "echo '{{version}}'" });
 		properties.setWorkingDir(file("/projects/builder/resolved").getPath());
 		TestProcessExecutor executor = executor(properties);
-		Project builder = new Project(properties, executor);
+		ProjectBuilder builder = new ProjectBuilder(properties, executor);
 
 		builder.publishDocs("1.1.0.RELEASE");
 
@@ -121,7 +121,7 @@ public class ProjectTests {
 		properties.getMaven().setPublishDocsCommands(new String[] { "ls -al", "ls -al" });
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
-		Project builder = new Project(properties, executor(properties));
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		thenThrownBy(() -> builder.publishDocs("")).hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
@@ -131,7 +131,7 @@ public class ProjectTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("exit 1");
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
-		Project builder = new Project(properties, new ProcessExecutor(properties) {
+		ProjectBuilder builder = new ProjectBuilder(properties, new ProcessExecutor(properties) {
 			@Override Process startProcess(ProcessBuilder builder) throws IOException {
 				return processWithInvalidExitCode();
 			}
@@ -144,7 +144,7 @@ public class ProjectTests {
 	public void should_successfully_execute_a_bump_versions_command() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.setWorkingDir(file("/projects/spring-cloud-contract").getPath());
-		Project builder = new Project(properties, executor(properties));
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		builder.bumpVersions("2.3.4.BUILD-SNAPSHOT");
 
@@ -205,7 +205,7 @@ public class ProjectTests {
 
 	private File file(String relativePath) {
 		try {
-			File root = new File(ProjectTests.class.getResource("/").toURI());
+			File root = new File(ProjectBuilderTests.class.getResource("/").toURI());
 			File file = new File(root, relativePath);
 			if (!file.exists()) {
 				file.createNewFile();
