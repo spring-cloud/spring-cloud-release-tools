@@ -561,11 +561,11 @@ why this tool makes it easy to automate the release / dependency update process 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">git clone https://github.com/spring-cloud/spring-cloud-sleuth
-cd spring-cloud-sleuth
-mkdir -p target
-wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
-java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ git clone https://github.com/spring-cloud/spring-cloud-sleuth
+$ cd spring-cloud-sleuth
+$ mkdir -p target
+$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -632,9 +632,9 @@ folder and run your application like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">mkdir -p target
-wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
-java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ mkdir -p target
+$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</code></pre>
 </div>
 </div>
 </div>
@@ -646,7 +646,7 @@ If you would like to use another branch you can specify it using the <code>relea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
 </div>
 </div>
 </div>
