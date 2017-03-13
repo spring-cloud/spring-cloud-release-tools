@@ -36,7 +36,7 @@ import org.springframework.util.FileSystemUtils;
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectPomUpdaterTests {
+public class PomUpdaterTests {
 
 	Versions versions = new Versions("0.0.1", "0.0.2", projects());
 	PomUpdater pomUpdater = new PomUpdater();
@@ -250,21 +250,6 @@ public class ProjectPomUpdaterTests {
 
 	@Test
 	public void should_not_update_the_model_when_project_uses_same_version_for_artifact() throws Exception {
-		File originalPom = pom("/projects/project/", "pom_matching_artifact_same_version.xml");
-		File pomInTemp = tmpFile("/project/pom_matching_artifact_same_version.xml");
-		ModelWrapper rootPom = model("spring-cloud-sleuth");
-		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
-
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
-
-		BDDAssertions.then(asString(storedPom)).isEqualTo(asString(originalPom));
-		BDDAssertions.then(this.capture.toString())
-				.contains("Won't update the version of parent")
-				.contains("Won't update the version of module");
-	}
-
-	@Test
-	public void should_return_a_change_version() throws Exception {
 		File originalPom = pom("/projects/project/", "pom_matching_artifact_same_version.xml");
 		File pomInTemp = tmpFile("/project/pom_matching_artifact_same_version.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");

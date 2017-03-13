@@ -21,8 +21,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.junit.Test;
-import org.springframework.cloud.release.internal.pom.Project;
-import org.springframework.cloud.release.internal.pom.Versions;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -77,9 +75,43 @@ public class VersionsTests {
 		then(this.versions.shouldSetProperty(missingProps())).isFalse();
 	}
 
+	@Test
+	public void should_return_true_when_all_versions_are_snapshot() {
+		then(new Versions("", snapshotProjects()).isSnapshot()).isTrue();
+	}
+
+	@Test
+	public void should_return_true_when_there_only_release_versions() {
+		then(new Versions("1.0.0.RELEASE", releaseProjects()).isSnapshot()).isFalse();
+	}
+
+	@Test
+	public void should_return_true_when_there_are_mixed_versions() {
+		then(new Versions("", mixedProjects()).isSnapshot()).isTrue();
+	}
+
 	Set<Project> projects() {
 		Set<Project> projects = new HashSet<>();
 		projects.add(new Project("foo", "bar"));
+		return projects;
+	}
+
+	Set<Project> snapshotProjects() {
+		Set<Project> projects = new HashSet<>();
+		projects.add(new Project("foo", "1.0.0.BUILD-SNAPSHOT"));
+		return projects;
+	}
+
+	Set<Project> releaseProjects() {
+		Set<Project> projects = new HashSet<>();
+		projects.add(new Project("foo", "1.0.0.RELEASE"));
+		return projects;
+	}
+
+	Set<Project> mixedProjects() {
+		Set<Project> projects = new HashSet<>();
+		projects.add(new Project("foo", "1.0.0.BUILD-SNAPSHOT"));
+		projects.add(new Project("fooBar", "1.0.0.RELEASE"));
 		return projects;
 	}
 

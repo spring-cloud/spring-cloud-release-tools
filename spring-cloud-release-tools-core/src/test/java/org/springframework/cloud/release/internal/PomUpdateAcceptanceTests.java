@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 
 import org.apache.maven.model.Model;
+import org.assertj.core.api.BDDAssertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +60,17 @@ public class PomUpdateAcceptanceTests {
 	}
 
 	@Test
+	public void should_update_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version() throws Exception {
+		ReleaserProperties releaserProperties = branchReleaserProperties();
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
+
+		BDDAssertions.thenThrownBy(() ->
+			projectPomUpdater
+					.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property"))
+		).hasMessageContaining("<spring-cloud-unmatched.version>0.6.0.BUILD-SNAPSHOT</spring-cloud-unmatched.version>");
+	}
+
+	@Test
 	public void should_not_update_a_project_that_is_not_on_the_list() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
@@ -74,6 +86,12 @@ public class PomUpdateAcceptanceTests {
 	private ReleaserProperties releaserProperties() throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
 		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
+		return releaserProperties;
+	}
+
+	private ReleaserProperties branchReleaserProperties() throws URISyntaxException {
+		ReleaserProperties releaserProperties = releaserProperties();
+		releaserProperties.getPom().setBranch("vCamden.SR4");
 		return releaserProperties;
 	}
 

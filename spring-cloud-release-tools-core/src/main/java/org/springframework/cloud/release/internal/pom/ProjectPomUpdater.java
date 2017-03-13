@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -103,6 +104,7 @@ public class ProjectPomUpdater {
 		private final Versions versions;
 		private final PomUpdater pomUpdater;
 		private final ReleaserProperties properties;
+		private final boolean snapshotVersion;
 
 		private PomWalker(ModelWrapper rootPom, Versions versions, PomUpdater pomUpdater,
 				ReleaserProperties properties) {
@@ -110,6 +112,7 @@ public class ProjectPomUpdater {
 			this.versions = versions;
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
+			this.snapshotVersion = versions.isSnapshot();
 		}
 
 		@Override
@@ -122,6 +125,21 @@ public class ProjectPomUpdater {
 				}
 				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file, this.versions);
 				this.pomUpdater.overwritePomIfDirty(model, this.versions, file);
+				if (!this.snapshotVersion) {
+					log.debug("Update is a non-snapshot one. Checking if no snapshot versions remained in the pom");
+					Scanner scanner = new Scanner(asString(path));
+					int lineNumber = 0;
+					while (scanner.hasNextLine()) {
+						String line = scanner.nextLine();
+						lineNumber++;
+						boolean containsSnapshot = line.contains("BUILD-SNAPSHOT");
+						if (containsSnapshot) {
+							throw new IllegalStateException("The file [" + path + "] contains a BUILD-SNAPSHOT "
+									+ "version for a non snapshot release in line number [" + lineNumber + "]\n\n" + line);
+						}
+					}
+					log.info("No snapshot versions remained in the pom");
+				}
 			}
 			return FileVisitResult.CONTINUE;
 		}
@@ -129,6 +147,15 @@ public class ProjectPomUpdater {
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
 			return this.properties.getPom().getIgnoredPomRegex().stream().anyMatch(path::matches);
+		}
+
+		private String asString(Path path) {
+			try {
+				return new String(Files.readAllBytes(path));
+			}
+			catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
 		}
 	}
 

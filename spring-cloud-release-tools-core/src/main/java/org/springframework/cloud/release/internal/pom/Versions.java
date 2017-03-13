@@ -89,6 +89,10 @@ class Versions {
 		return project.name.equals(withoutParent);
 	}
 
+	boolean isSnapshot() {
+		return this.projects.stream().anyMatch(project -> project.version.endsWith("BUILD-SNAPSHOT"));
+	}
+
 	@Override public String toString() {
 		return "Spring Boot Version=[" + this.bootVersion + ']' + "\nSpring Cloud Build Version=["
 				+ this.scBuildVersion + ']' + "\nProjects=\n\t" + this.projects.stream().map(Object::toString).collect(

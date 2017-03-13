@@ -36,7 +36,9 @@ import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
+
+import static org.springframework.util.StringUtils.hasText;
+import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author Marcin Grzejszczak
@@ -122,7 +124,7 @@ class PomUpdater {
 			Model model, List<VersionChange> sourceChanges) {
 		String rootProjectName = wrapper.projectName();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
-		if (model.getParent() == null || StringUtils.isEmpty(model.getParent().getVersion())) {
+		if (model.getParent() == null || isEmpty(model.getParent().getVersion())) {
 			log.debug("Can't set the value for parent... Will return {}", sourceChanges);
 			return changes;
 		}
@@ -132,8 +134,8 @@ class PomUpdater {
 		String oldVersion = model.getParent().getVersion();
 		String version = versions.versionForProject(parentArtifactId);
 		log.debug("Found version is [{}]", version);
-		if (StringUtils.isEmpty(version)) {
-			if (StringUtils.hasText(model.getParent().getRelativePath())) {
+		if (isEmpty(version)) {
+			if (hasText(model.getParent().getRelativePath())) {
 				version = versions.versionForProject(rootProjectName);
 			} else {
 				log.warn("There is no info on the [{}:{}] version", parentGroupId, parentArtifactId);
@@ -146,7 +148,9 @@ class PomUpdater {
 		}
 		log.info("Setting version of parent [{}] to [{}] for module [{}]", parentArtifactId,
 				version, model.getArtifactId());
-		changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion, version));
+		if (hasText(version)) {
+			changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion, version));
+		}
 		return changes;
 	}
 
@@ -160,7 +164,7 @@ class PomUpdater {
 		String oldVersion = model.getVersion();
 		String version = versions.versionForProject(rootProjectName);
 		log.debug("Found version is [{}]", version);
-		if (StringUtils.isEmpty(version) || StringUtils.isEmpty(model.getVersion())) {
+		if (isEmpty(version) || isEmpty(model.getVersion())) {
 			log.debug("There was no version set for project [{}], skipping version setting for module [{}]", rootProjectName, model.getArtifactId());
 			return changes;
 		}
@@ -174,7 +178,7 @@ class PomUpdater {
 	}
 
 	private String groupId(Model model) {
-		if (StringUtils.hasText(model.getGroupId())) {
+		if (hasText(model.getGroupId())) {
 			return model.getGroupId();
 		}
 		if (model.getParent() != null) {
