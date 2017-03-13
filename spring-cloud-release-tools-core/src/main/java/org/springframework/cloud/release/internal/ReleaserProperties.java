@@ -52,6 +52,11 @@ public class ReleaserProperties {
 		 */
 		private String cloneDestinationDir;
 
+		/**
+		 * GitHub OAuth token to be used to interact with GitHub repo
+		 */
+		private String oauthToken;
+
 		public String getSpringCloudReleaseGitUrl() {
 			return this.springCloudReleaseGitUrl;
 		}
@@ -68,6 +73,13 @@ public class ReleaserProperties {
 			this.cloneDestinationDir = cloneDestinationDir;
 		}
 
+		public String getOauthToken() {
+			return this.oauthToken;
+		}
+
+		public void setOauthToken(String oauthToken) {
+			this.oauthToken = oauthToken;
+		}
 	}
 
 	public static class Pom {

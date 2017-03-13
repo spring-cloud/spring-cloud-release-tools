@@ -25,9 +25,11 @@ public class ProjectGitUpdater {
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
 
 	private final ReleaserProperties properties;
+	private final MilestoneCloser milestoneCloser;
 
 	public ProjectGitUpdater(ReleaserProperties properties) {
 		this.properties = properties;
+		this.milestoneCloser = new MilestoneCloser(properties);
 	}
 
 	public void commitAndTagIfApplicable(File project, ProjectVersion version) {
@@ -82,6 +84,10 @@ public class ProjectGitUpdater {
 
 	public void pushCurrentBranch(File project) {
 		gitRepo(project).pushCurrentBranch(project);
+	}
+
+	public void closeMilestone(ProjectVersion releaseVersion) {
+		this.milestoneCloser.closeMilestone(releaseVersion);
 	}
 
 	GitRepo gitRepo(File workingDir) {

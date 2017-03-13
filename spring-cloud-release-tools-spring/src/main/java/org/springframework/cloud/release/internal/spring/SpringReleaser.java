@@ -61,7 +61,8 @@ public class SpringReleaser {
 			this.releaser.publishDocs(changedVersion);
 		}
 		if (!changedVersion.isSnapshot()) {
-			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go back to snapshots and bump originalVersion by patch {}", MSG);
+			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go "
+					+ "back to snapshots and bump originalVersion by patch {}", MSG);
 			boolean skipRevert = skipStep();
 			if (!skipRevert) {
 				this.releaser.rollbackReleaseVersion(project, originalVersion, changedVersion);
@@ -71,6 +72,13 @@ public class SpringReleaser {
 		boolean skipPush = skipStep();
 		if (!skipPush) {
 			this.releaser.pushCurrentBranch(project);
+		}
+		if (!changedVersion.isSnapshot()) {
+			log.info("\n\n\n=== CLOSING MILESTONE===\n\nPress ENTER to close the milestone at Github {}", MSG);
+			boolean skipMilestone = skipStep();
+			if (!skipMilestone) {
+				this.releaser.closeMilestone(changedVersion);
+			}
 		}
 	}
 

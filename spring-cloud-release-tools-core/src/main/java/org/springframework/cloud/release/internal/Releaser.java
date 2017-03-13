@@ -65,4 +65,9 @@ public class Releaser {
 		this.projectGitUpdater.pushCurrentBranch(project);
 		log.info("\nSuccessfully pushed current branch");
 	}
+
+	public void closeMilestone(ProjectVersion releaseVersion) {
+		this.projectGitUpdater.closeMilestone(releaseVersion);
+		log.info("\nSuccessfully closed milestone");
+	}
 }

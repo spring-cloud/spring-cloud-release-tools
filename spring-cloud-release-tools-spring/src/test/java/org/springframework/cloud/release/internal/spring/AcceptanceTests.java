@@ -17,6 +17,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
@@ -33,6 +34,7 @@ public class AcceptanceTests {
 	TestPomReader testPomReader = new TestPomReader();
 	File springCloudConsulProject;
 	File temporaryFolder;
+	TestProjectGitUpdater gitUpdater;
 
 	@Before
 	public void setup() throws Exception {
@@ -61,6 +63,7 @@ public class AcceptanceTests {
 		commitIsPresent(iterator, "Update SNAPSHOT to 1.1.2.RELEASE");
 		pomVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
+		then(this.gitUpdater.executed).isTrue();
 	}
 
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -106,12 +109,28 @@ public class AcceptanceTests {
 		ReleaserProperties properties = releaserProperties(projectFile);
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
-		ProjectGitUpdater gitUpdater = new ProjectGitUpdater(properties);
+		TestProjectGitUpdater gitUpdater = new TestProjectGitUpdater(properties);
+		this.gitUpdater = gitUpdater;
 		return new SpringReleaser(new Releaser(pomUpdater, projectBuilder, gitUpdater), properties) {
 			@Override boolean skipStep() {
 				return false;
 			}
 		};
+	}
+
+	class TestProjectGitUpdater extends ProjectGitUpdater {
+
+		boolean executed = false;
+
+		public TestProjectGitUpdater(ReleaserProperties properties) {
+			super(properties);
+		}
+
+		@Override public void closeMilestone(ProjectVersion releaseVersion) {
+			then(releaseVersion.projectName).isEqualTo("spring-cloud-consul");
+			then(releaseVersion.version).isEqualTo("1.1.2.RELEASE");
+			this.executed = true;
+		}
 	}
 
 	private File tmpFile(String relativePath) {

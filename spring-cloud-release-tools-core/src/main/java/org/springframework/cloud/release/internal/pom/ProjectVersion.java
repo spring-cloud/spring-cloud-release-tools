@@ -2,6 +2,8 @@ package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
 
+import org.apache.maven.model.Model;
+
 /**
  * Object representing a root project's version.
  * Knows how to provide a minor bumped version;
@@ -10,15 +12,27 @@ import java.io.File;
  */
 public class ProjectVersion {
 
+	public final String projectName;
 	public final String version;
 	private final PomReader pomReader = new PomReader();
 
-	public ProjectVersion(String version) {
+	public ProjectVersion(String projectName, String version) {
+		this.projectName = nameWithoutParent(projectName);
 		this.version = version;
 	}
 
 	public ProjectVersion(File project) {
-		this.version = this.pomReader.readPom(project).getVersion();
+		Model model = this.pomReader.readPom(project);
+		this.projectName = nameWithoutParent(model.getArtifactId());
+		this.version = model.getVersion();
+	}
+
+	private String nameWithoutParent(String projectName) {
+		boolean containsParent = projectName.endsWith("-parent");
+		if (!containsParent) {
+			return projectName;
+		}
+		return projectName.substring(0, projectName.indexOf("-parent"));
 	}
 
 	public String bumpedVersion() {

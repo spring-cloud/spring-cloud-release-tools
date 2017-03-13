@@ -68,6 +68,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.jcabi</groupId>
+			<artifactId>jcabi-github</artifactId>
+			<version>0.23</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
