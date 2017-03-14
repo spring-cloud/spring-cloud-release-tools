@@ -47,7 +47,7 @@ class MilestoneCloser {
 		for (Milestone milestone : milestones) {
 			Milestone.Smart smartMilestone = new Milestone.Smart(milestone);
 			try {
-				String tagVersion = "v" + version.version;
+				String tagVersion = version.version;
 				if (tagVersion.equals(milestoneTitle(smartMilestone))) {
 					log.info("Found a matching milestone - closing it");
 					smartMilestone.close();

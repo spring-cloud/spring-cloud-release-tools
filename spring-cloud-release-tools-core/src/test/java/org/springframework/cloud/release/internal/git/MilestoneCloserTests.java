@@ -38,10 +38,10 @@ public class MilestoneCloserTests {
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
 					throws IOException {
-				return "v0.2.0.BUILD-SNAPSHOT";
+				return "0.2.0.BUILD-SNAPSHOT";
 			}
 		};
-		repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
+		repo.milestones().create("0.2.0.BUILD-SNAPSHOT");
 
 		closer.closeMilestone(sleuthProject());
 	}
