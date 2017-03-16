@@ -441,7 +441,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	color: #ffffff;
 }
 </style>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js"></script>
 <script type="text/javascript">
 function addBlockSwitches() {
 	$('.primary').each(function() {
@@ -529,9 +529,23 @@ why this tool makes it easy to automate the release / dependency update process 
 </li>
 <li>
 <p>Modifies the project versions with values from SC-Release</p>
+<div class="ulist">
+<ul>
+<li>
+<p>throws an exception when we bump versions to release and there&#8217;s a SNAPSHOT version referenced in the POM</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
-<p>Performs the build and checks if the <code>docs</code> modules have properly created the documentation (no <code>unresolved</code> tags are present)</p>
+<p>Performs the build and checks if the <code>docs</code> modules have properly created the documentation</p>
+<div class="ulist">
+<ul>
+<li>
+<p>throws an exception when in the <code>docs</code> module there&#8217;s an unresolved tag in any HTML file</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>Commits changed poms (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
@@ -547,6 +561,9 @@ why this tool makes it easy to automate the release / dependency update process 
 </li>
 <li>
 <p>Reverts back to snapshots, bumps the version by a patch (<code>1.0.1.RELEASE</code> &#8594; <code>1.0.2.BUILD-SNAPSHOT</code>) (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
+</li>
+<li>
+<p>Closes the milestone on Github (e.g. <code>v1.0.1.RELEASE</code>) (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
 </li>
 </ul>
 </div>
@@ -581,6 +598,9 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
 </li>
 <li>
 <p><code>releaser.git.spring-cloud-release-git-url</code> - URL to Spring Cloud Release Git repository. Defaults to <code><a href="https://github.com/spring-cloud/spring-cloud-release" class="bare">https://github.com/spring-cloud/spring-cloud-release</a></code></p>
+</li>
+<li>
+<p><code>releaser.git.oauth-token</code> - GitHub OAuth token to be used to interact with GitHub repo.</p>
 </li>
 <li>
 <p><code>releaser.maven.build-command</code> - Command to be executed to build the project. Defaults to <code>./mvnw clean install -Pdocs</code></p>
