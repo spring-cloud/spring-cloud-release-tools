@@ -1,14 +1,1 @@
-320597b84bb0312c15228c4d42f46c189b86ed90		branch 'master' of github.com:spring-cloud/spring-cloud-release
-fb730db9b3999e45c350015c6cf83be35910a159	not-for-merge	branch '1.0.0.M2' of github.com:spring-cloud/spring-cloud-release
-474b03693496665434ab2615d6500bbb0b575a5b	not-for-merge	branch '1.0.0.M3' of github.com:spring-cloud/spring-cloud-release
-7fdc875cb2b1620e8bc87ef8a27da2858eef7cd1	not-for-merge	branch '1.0.0.RC1' of github.com:spring-cloud/spring-cloud-release
-75d0bc7cc0995ac76b6cfad962ea54d05262a664	not-for-merge	branch '1.0.0.RELEASE' of github.com:spring-cloud/spring-cloud-release
-8e8a2d41b4beb8985919bc5a2bca2aa66374bdbb	not-for-merge	branch '1.0.1.RELEASE' of github.com:spring-cloud/spring-cloud-release
-59414747ee8c095753a0b8c5641b328f80d47d33	not-for-merge	branch '1.0.2.RELEASE' of github.com:spring-cloud/spring-cloud-release
-73ec179d7ce96d5a98c2acd5697cd81c49dfd7d5	not-for-merge	branch '1.0.x' of github.com:spring-cloud/spring-cloud-release
-08c95747e807212c605d758bbb360f6d671b2932	not-for-merge	branch 'Angel.SR3' of github.com:spring-cloud/spring-cloud-release
-6882449721e48f955b102606ae3fc2535ebbd4cb	not-for-merge	branch 'Brixton' of github.com:spring-cloud/spring-cloud-release
-7745834b138ffe1f647b14dd3c7d4d71eee8aac3	not-for-merge	branch 'Brixton.M1' of github.com:spring-cloud/spring-cloud-release
-f2036f13515dc6aa997cc15827919acec634eaae	not-for-merge	branch 'Brixton.M2' of github.com:spring-cloud/spring-cloud-release
-928e0d8389dcee60189d6c0eb737ab9376e87f54	not-for-merge	branch 'Camden.RC1' of github.com:spring-cloud/spring-cloud-release
-b566ab3bea0506bccaa10f83784a41673606d6ee	not-for-merge	branch 'Camden.x' of github.com:spring-cloud/spring-cloud-release
+0ccd2833e149e9b8a7974ecf74a5e9e172322ab9		branch 'master' of github.com:spring-cloud/spring-cloud-release

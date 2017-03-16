@@ -51,18 +51,40 @@ public class AcceptanceTests {
 		pomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(), tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = releaser(project);
+		SpringReleaser releaser = releaser(project, "vCamden.SR5", "1.1.2.RELEASE");
 
 		releaser.release();
 
 		Iterable<RevCommit> commits = listOfCommits(project);
 		Iterator<RevCommit> iterator = commits.iterator();
-		tagIsPresentInOrigin(origin);
+		tagIsPresentInOrigin(origin, "v1.1.2.RELEASE");
 		commitIsPresent(iterator, "Bumping versions to 1.2.1.BUILD-SNAPSHOT after release");
 		commitIsPresent(iterator, "Going back to snapshots");
 		commitIsPresent(iterator, "Update SNAPSHOT to 1.1.2.RELEASE");
 		pomVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
+		then(this.gitUpdater.executed).isTrue();
+	}
+
+	@Test
+	public void should_perform_a_release_of_consul_rc1() throws Exception {
+		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(), this.springCloudConsulProject);
+		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		pomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		File project = GitTestUtils.clonedProject(this.tmp.newFolder(), tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		SpringReleaser releaser = releaser(project, "Dalston.RC1", "1.2.0.RC1");
+
+		releaser.release();
+
+		Iterable<RevCommit> commits = listOfCommits(project);
+		tagIsPresentInOrigin(origin, "v1.2.0.RC1");
+		commitIsNotPresent(commits, "Bumping versions to 1.2.1.BUILD-SNAPSHOT after release");
+		Iterator<RevCommit> iterator = listOfCommits(project).iterator();
+		commitIsPresent(iterator, "Going back to snapshots");
+		commitIsPresent(iterator, "Update SNAPSHOT to 1.2.0.RC1");
+		pomVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
+		pomParentVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
 		then(this.gitUpdater.executed).isTrue();
 	}
 
@@ -85,19 +107,42 @@ public class AcceptanceTests {
 		then(commit.getShortMessage()).isEqualTo(expected);
 	}
 
-	private void tagIsPresentInOrigin(File origin) throws GitAPIException {
+	private void commitIsNotPresent(Iterable<RevCommit> commits,
+			String expected) {
+		for (RevCommit commit : commits) {
+			then(commit.getShortMessage()).isNotEqualTo(expected);
+		}
+	}
+
+	private void tagIsPresentInOrigin(File origin, String expectedTag) throws GitAPIException {
 		BDDAssertions
-				.then(GitTestUtils.openGitProject(origin).tagList().call().iterator().next().getName()).endsWith("v1.1.2.RELEASE");
+				.then(GitTestUtils.openGitProject(origin).tagList()
+						.call().iterator().next().getName()).endsWith(expectedTag);
 	}
 
 	private Model pom(File dir) {
 		return this.testPomReader.readPom(new File(dir, "pom.xml"));
 	}
 
-	private ReleaserProperties releaserProperties(File project) throws URISyntaxException {
+	private SpringReleaser releaser(File projectFile, String branch, String expectedVersion) throws Exception {
+		ReleaserProperties properties = releaserProperties(projectFile, branch);
+		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
+		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
+		TestProjectGitUpdater gitUpdater = new TestProjectGitUpdater(properties,
+				expectedVersion);
+		Releaser releaser = new Releaser(pomUpdater, projectBuilder, gitUpdater);
+		this.gitUpdater = gitUpdater;
+		return new SpringReleaser(releaser, properties) {
+			@Override boolean skipStep() {
+				return false;
+			}
+		};
+	}
+
+	private ReleaserProperties releaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
 		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
-		releaserProperties.getPom().setBranch("vCamden.SR5");
+		releaserProperties.getPom().setBranch(branch);
 		releaserProperties.setWorkingDir(project.getPath());
 		releaserProperties.getMaven().setBuildCommand("touch build");
 		releaserProperties.getMaven().setDeployCommand("touch deploy");
@@ -105,30 +150,20 @@ public class AcceptanceTests {
 		return releaserProperties;
 	}
 
-	private SpringReleaser releaser(File projectFile) throws Exception {
-		ReleaserProperties properties = releaserProperties(projectFile);
-		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
-		TestProjectGitUpdater gitUpdater = new TestProjectGitUpdater(properties);
-		this.gitUpdater = gitUpdater;
-		return new SpringReleaser(new Releaser(pomUpdater, projectBuilder, gitUpdater), properties) {
-			@Override boolean skipStep() {
-				return false;
-			}
-		};
-	}
-
 	class TestProjectGitUpdater extends ProjectGitUpdater {
 
 		boolean executed = false;
+		final String expectedVersion;
 
-		public TestProjectGitUpdater(ReleaserProperties properties) {
+		public TestProjectGitUpdater(ReleaserProperties properties,
+				String expectedVersion) {
 			super(properties);
+			this.expectedVersion = expectedVersion;
 		}
 
 		@Override public void closeMilestone(ProjectVersion releaseVersion) {
 			then(releaseVersion.projectName).isEqualTo("spring-cloud-consul");
-			then(releaseVersion.version).isEqualTo("1.1.2.RELEASE");
+			then(releaseVersion.version).isEqualTo(this.expectedVersion);
 			this.executed = true;
 		}
 	}

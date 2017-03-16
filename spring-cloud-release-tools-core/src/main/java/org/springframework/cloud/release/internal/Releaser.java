@@ -56,9 +56,13 @@ public class Releaser {
 
 	public void rollbackReleaseVersion(File project, ProjectVersion originalVersion, ProjectVersion changedVersion) {
 		this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
-		this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
-		this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
-		log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
+		if (changedVersion.isRelease()) {
+			this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
+			this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
+			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
+		} else {
+			log.info("\nSuccessfully reverted the commit and came back to snapshot versions");
+		}
 	}
 
 	public void pushCurrentBranch(File project) {

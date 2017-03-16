@@ -1,7 +1,12 @@
 [core]
 	repositoryformatversion = 0
 	filemode = true
-	bare = true
+	bare = false
 	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
 [branch "master"]
 [branch "Camden.x"]
+[branch "Brixton"]
+[branch "Dalston.RC1"]

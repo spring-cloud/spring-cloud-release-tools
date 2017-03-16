@@ -89,6 +89,27 @@ public class ProjectVersionTests {
 		then(projectVersion(version).isSnapshot()).isFalse();
 	}
 
+	@Test
+	public void should_return_false_for_milestone_version() {
+		String version = "1.0.1.M1";
+
+		then(projectVersion(version).isRelease()).isFalse();
+	}
+
+	@Test
+	public void should_return_false_for_rc_version() {
+		String version = "1.0.1.RC1";
+
+		then(projectVersion(version).isRelease()).isFalse();
+	}
+
+	@Test
+	public void should_return_true_for_release_versions() {
+		String version = "1.0.1.RELEASE";
+
+		then(projectVersion(version).isRelease()).isTrue();
+	}
+
 	private ProjectVersion projectVersion(String version) {
 		return new ProjectVersion("foo", version);
 	}

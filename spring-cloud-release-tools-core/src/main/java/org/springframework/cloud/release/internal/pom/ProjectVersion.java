@@ -49,6 +49,10 @@ public class ProjectVersion {
 		return this.version.contains("SNAPSHOT");
 	}
 
+	public boolean isRelease() {
+		return this.version.contains("RELEASE");
+	}
+
 	@Override public String toString() {
 		return this.version;
 	}
