@@ -24,7 +24,7 @@ why this tool makes it easy to automate the release / dependency update process 
 - Creates a tag for the release / milestone (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Runs the deployment of the artifacts
 - Publishes the docs (to `spring-cloud-static` for non-snapshots, to `gh-pages` for snapshots)
-- Reverts back to snapshots, bumps the version by a patch (`1.0.1.RELEASE` -> `1.0.2.BUILD-SNAPSHOT`) (ONLY FOR NON-SNAPSHOT VERSIONS)
+- Reverts back to snapshots, bumps the version by a patch (`1.0.1.RELEASE` -> `1.0.2.BUILD-SNAPSHOT`) (ONLY FOR RELEASE VERSIONS)
 - Closes the milestone on Github (e.g. `v1.0.1.RELEASE`) (ONLY FOR NON-SNAPSHOT VERSIONS)
 
 === How to run it
