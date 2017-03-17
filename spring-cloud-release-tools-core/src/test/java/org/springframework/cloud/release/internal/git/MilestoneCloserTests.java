@@ -5,7 +5,9 @@ import java.net.URISyntaxException;
 import javax.json.Json;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
@@ -13,6 +15,7 @@ import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
 import com.jcabi.github.mock.MkGithub;
 
+import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
@@ -22,6 +25,7 @@ public class MilestoneCloserTests {
 
 	MkGithub github;
 	Repo repo;
+	@Rule public OutputCapture capture = new OutputCapture();
 
 	@Before
 	public void setup() throws URISyntaxException, IOException  {
@@ -64,9 +68,8 @@ public class MilestoneCloserTests {
 		};
 		repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
-		thenThrownBy(() -> closer.closeMilestone(sleuthProject()))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("No matching milestone was found");
+		closer.closeMilestone(sleuthProject());
+		then(this.capture.toString()).contains("No matching milestone was found");
 	}
 
 	@Test

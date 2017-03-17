@@ -60,7 +60,7 @@ class MilestoneCloser {
 			}
 		}
 		if (!matchingMilestone) {
-			throw new IllegalStateException("No matching milestone was found");
+			log.warn("No matching milestone was found");
 		}
 	}
 
