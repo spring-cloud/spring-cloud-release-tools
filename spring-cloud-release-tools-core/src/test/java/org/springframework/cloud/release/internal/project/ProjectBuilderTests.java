@@ -118,7 +118,7 @@ public class ProjectBuilderTests {
 	@Test
 	public void should_throw_exception_when_publish_docs_command_took_too_long_to_execute() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getMaven().setPublishDocsCommands(new String[] { "ls -al", "ls -al" });
+		properties.getMaven().setPublishDocsCommands(new String[] { "sleep 1", "sleep 1" });
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(file("/projects/builder/unresolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
