@@ -45,7 +45,7 @@ public class SpringReleaser {
 		if (!skipBuild) {
 			this.releaser.buildProject();
 		}
-		log.info("\n\n\n=== COMMITTING AND PUSHING TAGS ===\n\nPress ENTER to commit, tag and push the tag {}", MSG);
+		log.info("\n\n\n=== COMMITTING (ALL) AND PUSHING TAGS (NON-SNAPSHOTS) ===\n\nPress ENTER to commit, tag and push the tag {}", MSG);
 		boolean skipCommit = skipStep();
 		if (!skipCommit) {
 			this.releaser.commitAndPushTags(project, changedVersion);
@@ -61,7 +61,7 @@ public class SpringReleaser {
 			this.releaser.publishDocs(changedVersion);
 		}
 		if (!changedVersion.isSnapshot()) {
-			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION===\n\nPress ENTER to go "
+			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION (RELEASE ONLY)===\n\nPress ENTER to go "
 					+ "back to snapshots and bump originalVersion by patch {}", MSG);
 			boolean skipRevert = skipStep();
 			if (!skipRevert) {
