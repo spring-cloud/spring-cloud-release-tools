@@ -23,8 +23,8 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public class PomUpdateAcceptanceTests {
 
-	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	TestPomReader testPomReader = new TestPomReader();
+	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	File temporaryFolder;
 
 	@Before
