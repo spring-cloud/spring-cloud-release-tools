@@ -55,7 +55,7 @@ public class SpringReleaser {
 		if (!skipDeployment) {
 			this.releaser.deploy();
 		}
-		log.info("\n\n\n=== PUBLISHING DOCS ===\n\nPress ENTER to deploy the artifacts {}", MSG);
+		log.info("\n\n\n=== PUBLISHING DOCS ===\n\nPress ENTER to publish the docs {}", MSG);
 		boolean skipDocs = skipStep();
 		if (!skipDocs) {
 			this.releaser.publishDocs(changedVersion);
