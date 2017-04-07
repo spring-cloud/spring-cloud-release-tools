@@ -505,6 +505,7 @@ $(addBlockSwitches);
 <ul class="sectlevel3">
 <li><a href="#_keeping_configuration_in_the_project">Keeping configuration in the project</a></li>
 <li><a href="#_specifying_a_branch">Specifying A Branch</a></li>
+<li><a href="#_using_environment_variables">Using Environment Variables</a></li>
 </ul>
 </li>
 </ul>
@@ -578,15 +579,27 @@ why this tool makes it easy to automate the release / dependency update process 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ git clone https://github.com/spring-cloud/spring-cloud-sleuth
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
-$ mkdir -p target
-$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
-$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
+$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>The application will start running from your working directory.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+It is important that you clone the repository you are going to release using SSH in order for the
+<code>releaser</code> to be able to push tags and commit changes automatically.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -666,7 +679,24 @@ If you would like to use another branch you can specify it using the <code>relea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_environment_variables">Using Environment Variables</h4>
+<div class="paragraph">
+<p>In some cases it might be easier to specify environment variables instead of passing parameters to
+<code>releaser</code>.  For example, you might want to use environment variables if you are going to be
+releasing multiple projects, this keeps you from having to specify the same parameters for
+each release</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ export RELEASER_POM_BRANCH=Dalston.RELEASE
+$ export RELEASER_GIT_OAUTH_TOKEN=...
+$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root</code></pre>
 </div>
 </div>
 </div>
