@@ -132,7 +132,7 @@ public class ReleaserProperties {
 		 * provided version
 		 */
 		private String[] publishDocsCommands = {
-				"wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh",
+				"mkdir -p target && wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh",
 				"chmod +x target/gh-pages.sh",
 				"./target/gh-pages.sh -v {{version}} -c"
 		};
