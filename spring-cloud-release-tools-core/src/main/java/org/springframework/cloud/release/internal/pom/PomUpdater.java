@@ -36,6 +36,7 @@ import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -324,6 +325,10 @@ class PropertyStorer {
 
 	private boolean setPropertyVersion(String propertyName, String version) {
 		try {
+			if (StringUtils.isEmpty(version)) {
+				this.log.warn("Version for [" + propertyName + "] is empty. Will not set it");
+				return false;
+			}
 			return PomHelper.setPropertyVersion(this.pom, null, propertyName, version);
 		}
 		catch (XMLStreamException e) {
