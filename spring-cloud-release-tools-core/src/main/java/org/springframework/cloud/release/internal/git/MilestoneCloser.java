@@ -43,11 +43,12 @@ class MilestoneCloser {
 				"You have to pass Github OAuth token for milestone closing to be operational");
 		Iterable<Milestone> milestones = milestones(version);
 		log.info("Successfully received list of milestones");
+		String tagVersion = version.version;
+		log.info("Will try to match against tag version [{}]", tagVersion);
 		boolean matchingMilestone = false;
 		for (Milestone milestone : milestones) {
 			Milestone.Smart smartMilestone = new Milestone.Smart(milestone);
 			try {
-				String tagVersion = version.version;
 				if (tagVersion.equals(milestoneTitle(smartMilestone))) {
 					log.info("Found a matching milestone - closing it");
 					smartMilestone.close();
