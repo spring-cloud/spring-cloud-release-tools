@@ -55,13 +55,8 @@ public class Releaser {
 	}
 
 	public void rollbackReleaseVersion(File project, ProjectVersion originalVersion, ProjectVersion changedVersion) {
-		ProjectVersion version = new ProjectVersion(project);
-		if (version.isSnapshot()) {
-			log.info("\nCurrent pom contains snapshot version [{}]. Will not proceed with rollback", version.toString());
-			return;
-		}
 		this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
-		if (changedVersion.isRelease()) {
+		if (changedVersion.isRelease() && originalVersion.isSnapshot()) {
 			this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
 			this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");

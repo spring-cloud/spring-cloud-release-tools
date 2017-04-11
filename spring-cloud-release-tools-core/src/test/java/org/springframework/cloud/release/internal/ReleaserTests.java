@@ -12,9 +12,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 
 /**
  * @author Marcin Grzejszczak
@@ -35,12 +38,30 @@ public class ReleaserTests {
 	}
 
 	@Test
-	public void rollbackReleaseVersion() throws Exception {
-		this.releaser.rollbackReleaseVersion(this.pom, null, null);
+	public void should_not_bump_versions_for_original_release_project() throws Exception {
+		this.releaser.rollbackReleaseVersion(this.pom,
+				new ProjectVersion("original", "1.0.0.RELEASE"),
+				new ProjectVersion("changed", "1.0.0.RELEASE"));
 
-		verifyZeroInteractions(this.projectPomUpdater);
-		verifyZeroInteractions(this.projectBuilder);
-		verifyZeroInteractions(this.projectGitUpdater);
+		then(this.projectBuilder).should(never()).bumpVersions(anyString());
+	}
+
+	@Test
+	public void should_not_bump_versions_for_original_snapshot_project_and_current_snapshot() throws Exception {
+		this.releaser.rollbackReleaseVersion(this.pom,
+				new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"),
+				new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT"));
+
+		then(this.projectBuilder).should(never()).bumpVersions(anyString());
+	}
+
+	@Test
+	public void should_bump_versions_for_original_snapshot_project() throws Exception {
+		this.releaser.rollbackReleaseVersion(this.pom,
+				new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"),
+				new ProjectVersion("changed", "1.0.0.RELEASE"));
+
+		then(this.projectBuilder).should().bumpVersions(anyString());
 	}
 
 }
