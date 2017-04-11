@@ -95,6 +95,7 @@ public class ReleaserProperties {
 		@SuppressWarnings("unchecked")
 		private List<String> ignoredPomRegex = Arrays.asList(new String[] {
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
+				"^.*spring-cloud-contract-maven-plugin/target/.*$",
 				"^.*samples/standalone.*$"
 		});
 
