@@ -50,7 +50,7 @@ public class ProjectVersion {
 	}
 
 	public boolean isRelease() {
-		return this.version.contains("RELEASE");
+		return this.version.contains("RELEASE") || this.version.matches(".*.SR[0-9]+");
 	}
 
 	@Override public String toString() {

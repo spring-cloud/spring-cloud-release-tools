@@ -110,6 +110,13 @@ public class ProjectVersionTests {
 		then(projectVersion(version).isRelease()).isTrue();
 	}
 
+	@Test
+	public void should_return_true_for_service_release_versions() {
+		String version = "1.0.1.SR1";
+
+		then(projectVersion(version).isRelease()).isTrue();
+	}
+
 	private ProjectVersion projectVersion(String version) {
 		return new ProjectVersion("foo", version);
 	}
