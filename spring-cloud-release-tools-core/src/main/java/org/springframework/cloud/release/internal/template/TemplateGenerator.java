@@ -9,13 +9,14 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.helper.StringHelpers;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 
 /**
  * @author Marcin Grzejszczak
  */
 public class TemplateGenerator {
 
-	private final String emailTemplate = "/templates/email";
+	private static final String EMAIL_TEMPLATE = "email";
 	private final File emailOutput = new File("target/email.txt");
 	private final ReleaserProperties props;
 
@@ -52,10 +53,10 @@ public class TemplateGenerator {
 
 	private Template uncheckedCompileTemplate() {
 		try {
-			Handlebars handlebars = new Handlebars();
+			Handlebars handlebars = new Handlebars(new ClassPathTemplateLoader("/templates"));
 			handlebars.registerHelper("replace", StringHelpers.replace);
 			handlebars.registerHelper("capitalizeFirst", StringHelpers.capitalizeFirst);
-			return handlebars.compile(this.emailTemplate);
+			return handlebars.compile(this.EMAIL_TEMPLATE);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
