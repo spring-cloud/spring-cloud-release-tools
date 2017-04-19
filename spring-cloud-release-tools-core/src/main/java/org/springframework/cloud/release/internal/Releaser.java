@@ -64,7 +64,7 @@ public class Releaser {
 
 	public void rollbackReleaseVersion(File project, ProjectVersion originalVersion, ProjectVersion changedVersion) {
 		this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
-		if (changedVersion.isRelease() && originalVersion.isSnapshot()) {
+		if ((changedVersion.isRelease() || changedVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
 			this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
 			this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
@@ -85,10 +85,19 @@ public class Releaser {
 
 	public void createEmail(ProjectVersion releaseVersion) {
 		if (releaseVersion.isSnapshot()) {
-			log.info("\nWon't send an email for a SNAPSHOT version");
+			log.info("\nWon't create email template for a SNAPSHOT version");
 		} else {
 			File email = this.templateGenerator.email();
 			log.info("\nSuccessfully created email template at location [{}]", email);
+		}
+	}
+
+	public void createBlog(ProjectVersion releaseVersion, Projects projects) {
+		if (releaseVersion.isSnapshot()) {
+			log.info("\nWon't create blog template for a SNAPSHOT version");
+		} else {
+			File blog = this.templateGenerator.blog(projects);
+			log.info("\nSuccessfully created blog template at location [{}]", blog);
 		}
 	}
 }

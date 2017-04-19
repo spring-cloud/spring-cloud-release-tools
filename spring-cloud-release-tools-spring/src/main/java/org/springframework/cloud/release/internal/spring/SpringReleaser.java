@@ -89,6 +89,7 @@ public class SpringReleaser {
 			boolean skipTemplates = skipStep();
 			if (!skipTemplates) {
 				this.releaser.createEmail(versionFromScRelease);
+				this.releaser.createBlog(versionFromScRelease, projects);
 			}
 		}
 	}

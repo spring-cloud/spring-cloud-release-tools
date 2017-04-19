@@ -68,10 +68,12 @@ public class AcceptanceTests {
 		pomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 		then(this.gitUpdater.executed).isTrue();
 		then(emailTemplate()).exists();
-		String emailTemplateContents = emailTemplateContents();
-		then(emailTemplateContents)
+		then(emailTemplateContents())
 				.contains("Spring Cloud Camden.SR5 available")
 				.contains("Spring Cloud Camden SR5 Train release");
+		then(blogTemplate()).exists();
+		then(blogTemplateContents())
+				.contains("I am pleased to announce that the Service Release 5 (SR5)");
 	}
 
 	@Test
@@ -93,12 +95,14 @@ public class AcceptanceTests {
 		commitIsPresent(iterator, "Update SNAPSHOT to 1.2.0.RC1");
 		pomVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
+		then(this.gitUpdater.executed).isTrue();
 		then(emailTemplate()).exists();
-		String emailTemplateContents = emailTemplateContents();
-		then(emailTemplateContents)
+		then(emailTemplateContents())
 				.contains("Spring Cloud Dalston.RC1 available")
 				.contains("Spring Cloud Dalston RC1 Train release");
-		then(this.gitUpdater.executed).isTrue();
+		then(blogTemplate()).exists();
+		then(blogTemplateContents())
+				.contains("I am pleased to announce that the Release Candidate 1 (RC1)");
 	}
 
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -143,6 +147,14 @@ public class AcceptanceTests {
 
 	private String emailTemplateContents() throws URISyntaxException, IOException {
 		return new String(Files.readAllBytes(emailTemplate().toPath()));
+	}
+
+	private File blogTemplate() throws URISyntaxException {
+		return new File("target/blog.md");
+	}
+
+	private String blogTemplateContents() throws URISyntaxException, IOException {
+		return new String(Files.readAllBytes(blogTemplate().toPath()));
 	}
 
 	private SpringReleaser releaser(File projectFile, String branch, String expectedVersion) throws Exception {

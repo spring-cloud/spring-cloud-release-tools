@@ -114,7 +114,35 @@ public class ProjectVersionTests {
 	public void should_return_true_for_service_release_versions() {
 		String version = "1.0.1.SR1";
 
-		then(projectVersion(version).isRelease()).isTrue();
+		then(projectVersion(version).isServiceRelease()).isTrue();
+	}
+
+	@Test
+	public void should_return_true_when_checking_milestone_version_against_milestone() {
+		String version = "1.0.1.M1";
+
+		then(projectVersion(version).isMilestone()).isTrue();
+	}
+
+	@Test
+	public void should_return_false_when_checking_milestone_version_against_non_milestone() {
+		String version = "1.0.1.RC1";
+
+		then(projectVersion(version).isMilestone()).isFalse();
+	}
+
+	@Test
+	public void should_return_true_when_checking_rc_version_against_rc() {
+		String version = "1.0.1.RC3";
+
+		then(projectVersion(version).isRc()).isTrue();
+	}
+
+	@Test
+	public void should_return_false_when_checking_rc_version_against_non_rc() {
+		String version = "1.0.1.M1";
+
+		then(projectVersion(version).isRc()).isFalse();
 	}
 
 	private ProjectVersion projectVersion(String version) {

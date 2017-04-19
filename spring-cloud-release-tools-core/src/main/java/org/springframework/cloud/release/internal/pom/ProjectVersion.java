@@ -49,8 +49,20 @@ public class ProjectVersion {
 		return this.version.contains("SNAPSHOT");
 	}
 
+	public boolean isRc() {
+		return this.version.contains("RC");
+	}
+
+	public boolean isMilestone() {
+		return this.version.matches(".*M[0-9]+");
+	}
+
 	public boolean isRelease() {
-		return this.version.contains("RELEASE") || this.version.matches(".*.SR[0-9]+");
+		return this.version.contains("RELEASE");
+	}
+
+	public boolean isServiceRelease() {
+		return this.version.matches(".*.SR[0-9]+");
 	}
 
 	@Override public String toString() {
