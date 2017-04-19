@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.pom.Projects;
 
 /**
  * Releaser that gets input from console
@@ -30,15 +31,18 @@ public class SpringReleaser {
 	}
 
 	public void release() {
+		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone Spring Cloud Release"
+				+ " to retrieve all versions for the branch [{}]", this.properties.getPom().getBranch());
 		String workingDir = this.properties.getWorkingDir();
 		File project = new File(workingDir);
+		ProjectVersion originalVersion = new ProjectVersion(project);
+		Projects projects = this.releaser.retrieveVersionsFromSCRelease();
+		ProjectVersion changedVersion = projects.forFile(project);
 		log.info("\n\n\n=== UPDATING POMS ===\n\nWill run the application "
 				+ "for root folder [{}]. \n\nPress ENTER to continue {}", workingDir, MSG);
 		boolean skipPoms = skipStep();
-		ProjectVersion originalVersion = new ProjectVersion(project);
-		ProjectVersion changedVersion = new ProjectVersion(project);
 		if (!skipPoms) {
-			changedVersion = this.releaser.updateProjectFromScRelease(project);
+			changedVersion = this.releaser.updateProjectFromScRelease(project, projects);
 		}
 		log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project {}", MSG);
 		boolean skipBuild = skipStep();

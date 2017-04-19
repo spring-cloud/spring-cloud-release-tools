@@ -5,10 +5,11 @@ import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.project.ProjectBuilder;
 
 /**
  * @author Marcin Grzejszczak
@@ -27,8 +28,12 @@ public class Releaser {
 		this.projectGitUpdater = projectGitUpdater;
 	}
 
-	public ProjectVersion updateProjectFromScRelease(File project) {
-		this.projectPomUpdater.updateProjectFromSCRelease(project);
+	public Projects retrieveVersionsFromSCRelease() {
+		return this.projectPomUpdater.retrieveVersionsFromSCRelease();
+	}
+
+	public ProjectVersion updateProjectFromScRelease(File project, Projects versions) {
+		this.projectPomUpdater.updateProjectFromSCRelease(project, versions);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 		return changedVersion;

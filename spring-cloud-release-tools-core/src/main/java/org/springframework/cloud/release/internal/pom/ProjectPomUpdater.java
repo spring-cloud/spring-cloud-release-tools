@@ -49,17 +49,27 @@ public class ProjectPomUpdater {
 	}
 
 	/**
-	 * For the given root folder (typically the working directory) performs the whole
-	 * flow of updating {@code pom.xml} with values from Spring Cloud Release project.
-	 *
-	 * @param projectRoot - root folder with project to update
+	 * For the given root folder (typically the working directory) retrieves list of versions
+	 * for a given release version.
 	 */
-	public void updateProjectFromSCRelease(File projectRoot) {
+	public Projects retrieveVersionsFromSCRelease() {
 		File clonedScRelease = this.gitRepo.cloneScReleaseProject();
 		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();
 		log.info("Retrieved the following versions\n{}", versions);
+		return versions.toProjectVersions();
+	}
+
+	/**
+	 * For the given root folder (typically the working directory) performs the whole
+	 * flow of updating {@code pom.xml} with values from Spring Cloud Release project.
+	 *
+	 * @param projectRoot - root folder with project to update
+	 * @param projects - versions of projects used to update poms
+	 */
+	public void updateProjectFromSCRelease(File projectRoot, Projects projects) {
+		Versions versions = new Versions(projects);
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
 			log.info("Skipping project updating");
 			return;

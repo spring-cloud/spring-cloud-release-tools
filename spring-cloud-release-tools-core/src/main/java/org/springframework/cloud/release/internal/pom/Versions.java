@@ -54,9 +54,21 @@ class Versions {
 	Versions(String bootVersion, String scBuildVersion, Set<Project> projects) {
 		this.bootVersion = bootVersion;
 		this.scBuildVersion = scBuildVersion;
+		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
+		this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, bootVersion));
 		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
 		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
 		this.projects.addAll(projects);
+	}
+
+	Versions(Set<ProjectVersion> versions) {
+		this.bootVersion = versions.stream().filter(projectVersion -> SPRING_BOOT_PROJECT_NAME.equals(projectVersion.projectName))
+				.findFirst().orElseThrow(() -> new IllegalStateException("Boot Version is Missing")).version;
+		this.scBuildVersion = versions.stream().filter(projectVersion -> BUILD_ARTIFACT_ID.equals(projectVersion.projectName))
+				.findFirst().orElseThrow(() -> new IllegalStateException("Spring Cloud Build Version is Missing")).version;
+		this.projects = versions.stream()
+				.map(projectVersion -> new Project(projectVersion.projectName, projectVersion.version))
+				.collect(Collectors.toSet());
 	}
 
 	String versionForProject(String projectName) {
@@ -75,6 +87,11 @@ class Versions {
 	boolean shouldSetProperty(Properties properties) {
 		return this.projects.stream()
 				.anyMatch(project -> properties.containsKey(project.name + ".version"));
+	}
+
+	Projects toProjectVersions() {
+		return new Projects(this.projects.stream().map(project -> new ProjectVersion(project.name, project.version))
+				.collect(Collectors.toSet()));
 	}
 
 	private boolean nameMatches(String projectName, Project project) {

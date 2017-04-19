@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.util.FileSystemUtils;
@@ -38,9 +39,10 @@ public class PomUpdateAcceptanceTests {
 	public void should_update_all_versions_for_a_release_train() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
+		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
 
 		projectPomUpdater
-				.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth"));
+				.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth"), projects);
 
 		then(this.temporaryFolder).exists();
 		Model rootPom = this.testPomReader.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
@@ -63,10 +65,11 @@ public class PomUpdateAcceptanceTests {
 	public void should_update_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version() throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
+		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
 
 		BDDAssertions.thenThrownBy(() ->
 			projectPomUpdater
-					.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property"))
+					.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property"), projects)
 		).hasMessageContaining("<spring-cloud-unmatched.version>0.6.0.BUILD-SNAPSHOT</spring-cloud-unmatched.version>");
 	}
 
@@ -75,8 +78,9 @@ public class PomUpdateAcceptanceTests {
 		ReleaserProperties releaserProperties = releaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		File beforeProcessing = pom("/projects/project/");
+		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
 
-		projectPomUpdater.updateProjectFromSCRelease(tmpFile("/project/"));
+		projectPomUpdater.updateProjectFromSCRelease(tmpFile("/project/"), projects);
 
 		then(this.temporaryFolder).exists();
 		File afterProcessing = tmpFile("/project/pom.xml");
