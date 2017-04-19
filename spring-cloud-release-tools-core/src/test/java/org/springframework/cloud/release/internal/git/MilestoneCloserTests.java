@@ -48,6 +48,27 @@ public class MilestoneCloserTests {
 		repo.milestones().create("0.2.0.BUILD-SNAPSHOT");
 
 		closer.closeMilestone(sleuthProject());
+
+		then(this.capture.toString()).doesNotContain("No matching milestone was found");
+	}
+
+	@Test
+	public void should_close_milestone_when_the_milestone_contains_numeric_version_only() throws IOException {
+		MilestoneCloser closer = new MilestoneCloser(this.github, withToken()) {
+			@Override String org() {
+				return repo.coordinates().user();
+			}
+
+			@Override String milestoneTitle(Milestone.Smart milestone)
+					throws IOException {
+				return "0.2.0";
+			}
+		};
+		repo.milestones().create("0.2.0");
+
+		closer.closeMilestone(sleuthProject());
+
+		then(this.capture.toString()).doesNotContain("No matching milestone was found");
 	}
 
 	private ProjectVersion sleuthProject() {

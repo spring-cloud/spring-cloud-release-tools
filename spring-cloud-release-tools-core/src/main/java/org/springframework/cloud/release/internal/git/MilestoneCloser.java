@@ -49,7 +49,8 @@ class MilestoneCloser {
 		for (Milestone milestone : milestones) {
 			Milestone.Smart smartMilestone = new Milestone.Smart(milestone);
 			try {
-				if (tagVersion.equals(milestoneTitle(smartMilestone))) {
+				String title = milestoneTitle(smartMilestone);
+				if (tagVersion.equals(title) || numericVersion(tagVersion).equals(title)) {
 					log.info("Found a matching milestone - closing it");
 					smartMilestone.close();
 					matchingMilestone = true;
@@ -63,6 +64,10 @@ class MilestoneCloser {
 		if (!matchingMilestone) {
 			log.warn("No matching milestone was found");
 		}
+	}
+
+	private String numericVersion(String version) {
+		return version.substring(0, version.lastIndexOf("."));
 	}
 
 	String milestoneTitle(Milestone.Smart milestone) throws IOException {
