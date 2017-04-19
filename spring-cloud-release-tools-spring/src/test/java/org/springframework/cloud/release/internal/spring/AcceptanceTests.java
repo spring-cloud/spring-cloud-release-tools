@@ -1,7 +1,9 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.Iterator;
 
 import org.apache.maven.model.Model;
@@ -14,6 +16,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
@@ -64,6 +67,11 @@ public class AcceptanceTests {
 		pomVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 		then(this.gitUpdater.executed).isTrue();
+		then(emailTemplate()).exists();
+		String emailTemplateContents = emailTemplateContents();
+		then(emailTemplateContents)
+				.contains("Spring Cloud Camden.SR5 available")
+				.contains("Spring Cloud Camden SR5 Train release");
 	}
 
 	@Test
@@ -85,6 +93,11 @@ public class AcceptanceTests {
 		commitIsPresent(iterator, "Update SNAPSHOT to 1.2.0.RC1");
 		pomVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
+		then(emailTemplate()).exists();
+		String emailTemplateContents = emailTemplateContents();
+		then(emailTemplateContents)
+				.contains("Spring Cloud Dalston.RC1 available")
+				.contains("Spring Cloud Dalston RC1 Train release");
 		then(this.gitUpdater.executed).isTrue();
 	}
 
@@ -124,13 +137,23 @@ public class AcceptanceTests {
 		return this.testPomReader.readPom(new File(dir, "pom.xml"));
 	}
 
+	private File emailTemplate() throws URISyntaxException {
+		return new File("target/email.txt");
+	}
+
+	private String emailTemplateContents() throws URISyntaxException, IOException {
+		return new String(Files.readAllBytes(emailTemplate().toPath()));
+	}
+
 	private SpringReleaser releaser(File projectFile, String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
 		TestProjectGitUpdater gitUpdater = new TestProjectGitUpdater(properties,
 				expectedVersion);
-		Releaser releaser = new Releaser(pomUpdater, projectBuilder, gitUpdater);
+		TemplateGenerator templateGenerator = new TemplateGenerator(properties);
+		Releaser releaser = new Releaser(pomUpdater, projectBuilder, gitUpdater,
+				templateGenerator);
 		this.gitUpdater = gitUpdater;
 		return new SpringReleaser(releaser, properties) {
 			@Override boolean skipStep() {

@@ -37,12 +37,12 @@ public class SpringReleaser {
 		File project = new File(workingDir);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects projects = this.releaser.retrieveVersionsFromSCRelease();
-		ProjectVersion changedVersion = projects.forFile(project);
+		ProjectVersion versionFromScRelease = projects.forFile(project);
 		log.info("\n\n\n=== UPDATING POMS ===\n\nWill run the application "
 				+ "for root folder [{}]. \n\nPress ENTER to continue {}", workingDir, MSG);
 		boolean skipPoms = skipStep();
 		if (!skipPoms) {
-			changedVersion = this.releaser.updateProjectFromScRelease(project, projects);
+			versionFromScRelease = this.releaser.updateProjectFromScRelease(project, projects);
 		}
 		log.info("\n\n\n=== BUILD PROJECT ===\n\nPress ENTER to build the project {}", MSG);
 		boolean skipBuild = skipStep();
@@ -52,7 +52,7 @@ public class SpringReleaser {
 		log.info("\n\n\n=== COMMITTING (ALL) AND PUSHING TAGS (NON-SNAPSHOTS) ===\n\nPress ENTER to commit, tag and push the tag {}", MSG);
 		boolean skipCommit = skipStep();
 		if (!skipCommit) {
-			this.releaser.commitAndPushTags(project, changedVersion);
+			this.releaser.commitAndPushTags(project, versionFromScRelease);
 		}
 		log.info("\n\n\n=== ARTIFACT DEPLOYMENT ===\n\nPress ENTER to deploy the artifacts {}", MSG);
 		boolean skipDeployment = skipStep();
@@ -62,14 +62,14 @@ public class SpringReleaser {
 		log.info("\n\n\n=== PUBLISHING DOCS ===\n\nPress ENTER to publish the docs {}", MSG);
 		boolean skipDocs = skipStep();
 		if (!skipDocs) {
-			this.releaser.publishDocs(changedVersion);
+			this.releaser.publishDocs(versionFromScRelease);
 		}
-		if (!changedVersion.isSnapshot()) {
+		if (!versionFromScRelease.isSnapshot()) {
 			log.info("\n\n\n=== REVERTING CHANGES & BUMPING VERSION (RELEASE ONLY)===\n\nPress ENTER to go "
 					+ "back to snapshots and bump originalVersion by patch {}", MSG);
 			boolean skipRevert = skipStep();
 			if (!skipRevert) {
-				this.releaser.rollbackReleaseVersion(project, originalVersion, changedVersion);
+				this.releaser.rollbackReleaseVersion(project, originalVersion, versionFromScRelease);
 			}
 		}
 		log.info("\n\n\n=== PUSHING CHANGES===\n\nPress ENTER to push the commits {}", MSG);
@@ -77,11 +77,18 @@ public class SpringReleaser {
 		if (!skipPush) {
 			this.releaser.pushCurrentBranch(project);
 		}
-		if (!changedVersion.isSnapshot()) {
+		if (!versionFromScRelease.isSnapshot()) {
 			log.info("\n\n\n=== CLOSING MILESTONE===\n\nPress ENTER to close the milestone at Github {}", MSG);
 			boolean skipMilestone = skipStep();
 			if (!skipMilestone) {
-				this.releaser.closeMilestone(changedVersion);
+				this.releaser.closeMilestone(versionFromScRelease);
+			}
+		}
+		if (!versionFromScRelease.isSnapshot()) {
+			log.info("\n\n\n=== CREATING TEMPLATES===\n\nPress ENTER to create email / tweet etc. templates {}", MSG);
+			boolean skipTemplates = skipStep();
+			if (!skipTemplates) {
+				this.releaser.createEmail(versionFromScRelease);
 			}
 		}
 	}

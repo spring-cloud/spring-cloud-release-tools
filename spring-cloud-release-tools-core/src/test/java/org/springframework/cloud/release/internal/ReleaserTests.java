@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -28,6 +29,7 @@ public class ReleaserTests {
 	@Mock ProjectPomUpdater projectPomUpdater;
 	@Mock ProjectBuilder projectBuilder;
 	@Mock ProjectGitUpdater projectGitUpdater;
+	@Mock TemplateGenerator templateGenerator;
 	@InjectMocks Releaser releaser;
 	File pom;
 
@@ -62,6 +64,20 @@ public class ReleaserTests {
 				new ProjectVersion("changed", "1.0.0.RELEASE"));
 
 		then(this.projectBuilder).should().bumpVersions(anyString());
+	}
+
+	@Test
+	public void should_not_generate_email_for_snapshot_version() throws Exception {
+		this.releaser.createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+
+		then(this.templateGenerator).should(never()).email();
+	}
+
+	@Test
+	public void should_generate_email_for_release_version() throws Exception {
+		this.releaser.createEmail(new ProjectVersion("original", "1.0.0.RELEASE"));
+
+		then(this.templateGenerator).should().email();
 	}
 
 }

@@ -5,6 +5,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -20,12 +21,14 @@ public class Releaser {
 	private final ProjectPomUpdater projectPomUpdater;
 	private final ProjectBuilder projectBuilder;
 	private final ProjectGitUpdater projectGitUpdater;
+	private final TemplateGenerator templateGenerator;
 
-	public Releaser(ProjectPomUpdater projectPomUpdater,
-			ProjectBuilder projectBuilder, ProjectGitUpdater projectGitUpdater) {
+	public Releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
+			ProjectGitUpdater projectGitUpdater, TemplateGenerator templateGenerator) {
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectBuilder = projectBuilder;
 		this.projectGitUpdater = projectGitUpdater;
+		this.templateGenerator = templateGenerator;
 	}
 
 	public Projects retrieveVersionsFromSCRelease() {
@@ -78,5 +81,14 @@ public class Releaser {
 	public void closeMilestone(ProjectVersion releaseVersion) {
 		this.projectGitUpdater.closeMilestone(releaseVersion);
 		log.info("\nSuccessfully closed milestone");
+	}
+
+	public void createEmail(ProjectVersion releaseVersion) {
+		if (releaseVersion.isSnapshot()) {
+			log.info("\nWon't send an email for a SNAPSHOT version");
+		} else {
+			File email = this.templateGenerator.email();
+			log.info("\nSuccessfully created email template at location [{}]", email);
+		}
 	}
 }
