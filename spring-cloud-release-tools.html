@@ -607,6 +607,44 @@ It is important that you clone the repository you are going to release using SSH
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>You will see text similar to this one</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>=== WHAT DO YOU WANT TO DO? ===
+
+0) Perform a full release of this project without interruptions
+1) Perform a full release of this project in a verbose mode (you'll be asked about skipping steps)
+2) Update poms with versions from Spring Cloud Release
+3) Build the project
+4) Commit, tag and push the tag
+5) Deploy the artifacts to Artifactory
+6) Publish the docs
+7) Go back to snapshots and bump originalVersion by patch
+8) Push the commits
+9) Close the milestone at Github
+10) Create email / tweet etc. templates
+
+
+You can press 'q' to quit</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Just pick a number and continue! Pick either a full release or single steps.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Read before picking a number cause it might have changed between tool releases ;)
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_project_options">Project options</h3>
@@ -675,10 +713,22 @@ folder and run your application like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ mkdir -p target
-$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O target/spring-cloud-release-tools-spring-1.0.0.M1.jar
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</code></pre>
 </div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Notice that we&#8217;re downloading the jar to a parent folder, not to <code>target</code>. That&#8217;s because <code>target</code> get cleaned
+during the build process
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
