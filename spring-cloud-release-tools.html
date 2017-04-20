@@ -566,6 +566,12 @@ why this tool makes it easy to automate the release / dependency update process 
 <li>
 <p>Closes the milestone on Github (e.g. <code>v1.0.1.RELEASE</code>) (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
 </li>
+<li>
+<p>Generates an email template under <code>target/email.txt</code> (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
+</li>
+<li>
+<p>Generates a blog template under <code>target/blog.md</code> (ONLY FOR NON-SNAPSHOT VERSIONS)</p>
+</li>
 </ul>
 </div>
 </div>
@@ -606,6 +612,10 @@ It is important that you clone the repository you are going to release using SSH
 <h3 id="_project_options">Project options</h3>
 <div class="ulist">
 <ul>
+<li>
+<p><code>releaser.fixed-versions</code> - A String to String mapping of manually set versions. E.g. <code>"spring-cloud-cli" &#8594; "1.0.0.RELEASE"</code> will set
+the <code>spring-cloud-cli.version</code> to <code>1.0.0.RELEASE</code> regardless of what was set in <code>spring-cloud-release</code> project</p>
+</li>
 <li>
 <p><code>releaser.git.clone-destination-dir</code> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory</p>
 </li>
