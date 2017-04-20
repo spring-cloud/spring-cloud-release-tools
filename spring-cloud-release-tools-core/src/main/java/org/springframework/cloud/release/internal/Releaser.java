@@ -35,11 +35,10 @@ public class Releaser {
 		return this.projectPomUpdater.retrieveVersionsFromSCRelease();
 	}
 
-	public ProjectVersion updateProjectFromScRelease(File project, Projects versions) {
+	public void updateProjectFromScRelease(File project, Projects versions) {
 		this.projectPomUpdater.updateProjectFromSCRelease(project, versions);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
-		return changedVersion;
 	}
 
 	public void buildProject() {
@@ -62,9 +61,13 @@ public class Releaser {
 		log.info("\nThe docs were published successfully");
 	}
 
-	public void rollbackReleaseVersion(File project, ProjectVersion originalVersion, ProjectVersion changedVersion) {
-		this.projectGitUpdater.revertChangesIfApplicable(project, changedVersion);
-		if ((changedVersion.isRelease() || changedVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
+	public void rollbackReleaseVersion(File project, ProjectVersion originalVersion, ProjectVersion scReleaseVersion) {
+		if (scReleaseVersion.isSnapshot()) {
+			log.info("\nWon't rollback a snapshot version");
+			return;
+		}
+		this.projectGitUpdater.revertChangesIfApplicable(project, scReleaseVersion);
+		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
 			this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
 			this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
@@ -79,6 +82,10 @@ public class Releaser {
 	}
 
 	public void closeMilestone(ProjectVersion releaseVersion) {
+		if (releaseVersion.isSnapshot()) {
+			log.info("\nWon't close a milestone for a SNAPSHOT version");
+			return;
+		}
 		this.projectGitUpdater.closeMilestone(releaseVersion);
 		log.info("\nSuccessfully closed milestone");
 	}
@@ -86,18 +93,18 @@ public class Releaser {
 	public void createEmail(ProjectVersion releaseVersion) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create email template for a SNAPSHOT version");
-		} else {
-			File email = this.templateGenerator.email();
-			log.info("\nSuccessfully created email template at location [{}]", email);
+			return;
 		}
+		File email = this.templateGenerator.email();
+		log.info("\nSuccessfully created email template at location [{}]", email);
 	}
 
 	public void createBlog(ProjectVersion releaseVersion, Projects projects) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create blog template for a SNAPSHOT version");
-		} else {
-			File blog = this.templateGenerator.blog(projects);
-			log.info("\nSuccessfully created blog template at location [{}]", blog);
+			return;
 		}
+		File blog = this.templateGenerator.blog(projects);
+		log.info("\nSuccessfully created blog template at location [{}]", blog);
 	}
 }

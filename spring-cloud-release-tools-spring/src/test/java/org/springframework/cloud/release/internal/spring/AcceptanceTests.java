@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.util.Iterator;
 
 import org.apache.maven.model.Model;
-import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Before;
@@ -16,7 +15,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
@@ -24,6 +22,7 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -105,6 +104,27 @@ public class AcceptanceTests {
 				.contains("I am pleased to announce that the Release Candidate 1 (RC1)");
 	}
 
+	@Test
+	public void should_generate_templates_only() throws Exception {
+		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(), this.springCloudConsulProject);
+		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		pomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		File project = GitTestUtils.clonedProject(this.tmp.newFolder(), tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		SpringReleaser releaser = templateOnlyReleaser(project, "Dalston.RC1", "1.2.0.RC1");
+
+		releaser.release();
+
+		then(this.gitUpdater.executed).isFalse();
+		then(emailTemplate()).exists();
+		then(emailTemplateContents())
+				.contains("Spring Cloud Dalston.RC1 available")
+				.contains("Spring Cloud Dalston RC1 Train release");
+		then(blogTemplate()).exists();
+		then(blogTemplateContents())
+				.contains("I am pleased to announce that the Release Candidate 1 (RC1)");
+	}
+
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
 		return GitTestUtils.openGitProject(project).log().call();
 	}
@@ -132,8 +152,7 @@ public class AcceptanceTests {
 	}
 
 	private void tagIsPresentInOrigin(File origin, String expectedTag) throws GitAPIException {
-		BDDAssertions
-				.then(GitTestUtils.openGitProject(origin).tagList()
+		then(GitTestUtils.openGitProject(origin).tagList()
 						.call().iterator().next().getName()).endsWith(expectedTag);
 	}
 
@@ -159,6 +178,25 @@ public class AcceptanceTests {
 
 	private SpringReleaser releaser(File projectFile, String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
+		Releaser releaser = defaultReleaser(expectedVersion, properties);
+		return new SpringReleaser(releaser, properties) {
+			@Override int chosenOption() {
+				return 0;
+			}
+		};
+	}
+
+	private SpringReleaser templateOnlyReleaser(File projectFile, String branch, String expectedVersion) throws Exception {
+		ReleaserProperties properties = releaserProperties(projectFile, branch);
+		Releaser releaser = defaultReleaser(expectedVersion, properties);
+		return new SpringReleaser(releaser, properties) {
+			@Override int chosenOption() {
+				return 10;
+			}
+		};
+	}
+
+	private Releaser defaultReleaser(String expectedVersion, ReleaserProperties properties) throws Exception {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
 		TestProjectGitUpdater gitUpdater = new TestProjectGitUpdater(properties,
@@ -167,11 +205,7 @@ public class AcceptanceTests {
 		Releaser releaser = new Releaser(pomUpdater, projectBuilder, gitUpdater,
 				templateGenerator);
 		this.gitUpdater = gitUpdater;
-		return new SpringReleaser(releaser, properties) {
-			@Override boolean skipStep() {
-				return false;
-			}
-		};
+		return releaser;
 	}
 
 	private ReleaserProperties releaserProperties(File project, String branch) throws URISyntaxException {

@@ -17,6 +17,7 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 
@@ -78,6 +79,20 @@ public class ReleaserTests {
 		this.releaser.createEmail(new ProjectVersion("original", "1.0.0.RELEASE"));
 
 		then(this.templateGenerator).should().email();
+	}
+
+	@Test
+	public void should_not_close_milestone_for_snapshots() throws Exception {
+		this.releaser.closeMilestone(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+
+		then(this.projectGitUpdater).should(never()).closeMilestone(any(ProjectVersion.class));
+	}
+
+	@Test
+	public void should_not_rollback_for_snapshots() throws Exception {
+		this.releaser.rollbackReleaseVersion(null, null, new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+
+		then(this.projectGitUpdater).should(never()).revertChangesIfApplicable(any(File.class), any(ProjectVersion.class));
 	}
 
 }
