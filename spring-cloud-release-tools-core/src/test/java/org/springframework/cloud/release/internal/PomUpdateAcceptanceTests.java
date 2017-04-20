@@ -38,6 +38,7 @@ public class PomUpdateAcceptanceTests {
 	@Test
 	public void should_update_all_versions_for_a_release_train() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
+		releaserProperties.getFixedVersions().put("checkstyle", "100.0.0.RELEASE");
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
 
@@ -54,7 +55,8 @@ public class PomUpdateAcceptanceTests {
 				.containsEntry("spring-cloud-build.version","1.3.1.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud-commons.version","1.2.0.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud-stream.version","Chelsea.BUILD-SNAPSHOT")
-				.containsEntry("spring-cloud-netflix.version","1.3.0.BUILD-SNAPSHOT");
+				.containsEntry("spring-cloud-netflix.version","1.3.0.BUILD-SNAPSHOT")
+				.containsEntry("checkstyle.version","100.0.0.RELEASE");
 		then(depsPom.getVersion()).isEqualTo("1.2.0.BUILD-SNAPSHOT");
 		then(depsPom.getParent().getVersion()).isEqualTo("1.3.1.BUILD-SNAPSHOT");
 		then(corePom.getParent().getVersion()).isEqualTo("1.2.0.BUILD-SNAPSHOT");

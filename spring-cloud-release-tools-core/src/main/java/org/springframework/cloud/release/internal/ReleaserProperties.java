@@ -15,7 +15,9 @@
  */
 package org.springframework.cloud.release.internal;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
@@ -39,6 +41,8 @@ public class ReleaserProperties {
 	private Pom pom = new Pom();
 
 	private Maven maven = new Maven();
+
+	private Map<String, String> fixedVersions = new HashMap<>();
 
 	public static class Git {
 
@@ -208,5 +212,13 @@ public class ReleaserProperties {
 
 	public void setMaven(Maven maven) {
 		this.maven = maven;
+	}
+
+	public Map<String, String> getFixedVersions() {
+		return this.fixedVersions;
+	}
+
+	public void setFixedVersions(Map<String, String> fixedVersions) {
+		this.fixedVersions = fixedVersions;
 	}
 }

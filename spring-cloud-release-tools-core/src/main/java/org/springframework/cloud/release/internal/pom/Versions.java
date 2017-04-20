@@ -110,6 +110,35 @@ class Versions {
 		return this.projects.stream().anyMatch(project -> project.version.endsWith("BUILD-SNAPSHOT"));
 	}
 
+	Versions setVersion(String projectName, String version) {
+		switch (projectName) {
+			case SPRING_BOOT_PROJECT_NAME:
+			case BOOT_STARTER_ARTIFACT_ID:
+				this.bootVersion = version;
+				remove(SPRING_BOOT_PROJECT_NAME);
+				remove(BOOT_STARTER_ARTIFACT_ID);
+				this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, version));
+				this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, version));
+				break;
+			case BUILD_ARTIFACT_ID:
+			case CLOUD_DEPENDENCIES_ARTIFACT_ID:
+				this.scBuildVersion = version;
+				remove(BUILD_ARTIFACT_ID);
+				remove(CLOUD_DEPENDENCIES_ARTIFACT_ID);
+				this.projects.add(new Project(BUILD_ARTIFACT_ID, version));
+				this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, version));
+				break;
+			default:
+				remove(projectName);
+				this.projects.add(new Project(projectName, version));
+		}
+		return this;
+	}
+
+	private void remove(String expectedProjectName) {
+		this.projects.removeIf(project -> expectedProjectName.equals(project.name));
+	}
+
 	@Override public String toString() {
 		return "Spring Boot Version=[" + this.bootVersion + ']' + "\nSpring Cloud Build Version=["
 				+ this.scBuildVersion + ']' + "\nProjects=\n\t" + this.projects.stream().map(Object::toString).collect(

@@ -90,6 +90,43 @@ public class VersionsTests {
 		then(new Versions("", mixedProjects()).isSnapshot()).isTrue();
 	}
 
+	@Test
+	public void should_update_projects_for_boot() {
+		Versions versions = mixedVersions().setVersion("spring-boot", "3.0.0");
+
+		then(versions.versionForProject("spring-boot")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+
+		versions = mixedVersions().setVersion("spring-boot-starter-parent", "3.0.0");
+
+		then(versions.versionForProject("spring-boot")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+	}
+
+	@Test
+	public void should_update_projects_for_build() {
+		Versions versions = mixedVersions().setVersion("spring-cloud-build", "3.0.0");
+
+		then(versions.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-dependencies-parent")).isEqualTo("3.0.0");
+
+		versions = mixedVersions().setVersion("spring-cloud-dependencies-parent", "3.0.0");
+
+		then(versions.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-dependencies-parent")).isEqualTo("3.0.0");
+	}
+
+	@Test
+	public void should_update_projects_for_custom_project() {
+		Versions versions = mixedVersions().setVersion("foo", "3.0.0");
+
+		then(versions.versionForProject("foo")).isEqualTo("3.0.0");
+	}
+
+	private Versions mixedVersions() {
+		return new Versions("1.0.0", "2.0.0", mixedProjects());
+	}
+
 	Set<Project> projects() {
 		Set<Project> projects = new HashSet<>();
 		projects.add(new Project("foo", "bar"));

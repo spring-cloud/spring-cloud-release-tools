@@ -58,6 +58,8 @@ public class ProjectPomUpdater {
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();
 		log.info("Retrieved the following versions\n{}", versions);
+		log.info("Will update the following versions manually [{}]", this.properties.getFixedVersions());
+		this.properties.getFixedVersions().forEach(versions::setVersion);
 		return versions.toProjectVersions();
 	}
 

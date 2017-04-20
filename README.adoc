@@ -36,6 +36,8 @@ why this tool makes it easy to automate the release / dependency update process 
 - Publishes the docs (to `spring-cloud-static` for non-snapshots, to `gh-pages` for snapshots)
 - Reverts back to snapshots, bumps the version by a patch (`1.0.1.RELEASE` -> `1.0.2.BUILD-SNAPSHOT`) (ONLY FOR RELEASE VERSIONS)
 - Closes the milestone on Github (e.g. `v1.0.1.RELEASE`) (ONLY FOR NON-SNAPSHOT VERSIONS)
+- Generates an email template under `target/email.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
+- Generates a blog template under `target/blog.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 
 === How to run it
 
@@ -58,6 +60,8 @@ TIP:  It is important that you clone the repository you are going to release usi
 
 === Project options
 
+- `releaser.fixed-versions` - A String to String mapping of manually set versions. E.g. `"spring-cloud-cli" -> "1.0.0.RELEASE"` will set
+the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in `spring-cloud-release` project
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
 - `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
