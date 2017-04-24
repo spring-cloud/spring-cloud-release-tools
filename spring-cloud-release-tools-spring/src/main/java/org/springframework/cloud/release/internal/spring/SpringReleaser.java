@@ -80,13 +80,13 @@ public class SpringReleaser {
 	).flatMap(List::stream).collect(Collectors.toList());
 
 	public void release() {
-		log.info(buildOptionsText().toString());
 		printVersionRetreival();
 		String workingDir = this.properties.getWorkingDir();
 		File project = new File(workingDir);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects projects = this.releaser.retrieveVersionsFromSCRelease();
 		ProjectVersion versionFromScRelease = projects.forFile(project);
+		log.info(buildOptionsText().toString());
 		int chosenOption = chosenOption();
 		log.info("\n\n\nYou chose [{}]: [{}]\n\n\n", chosenOption, ALL_TASKS.get(chosenOption).description);
 		boolean verbose = chosenOption == 1;
