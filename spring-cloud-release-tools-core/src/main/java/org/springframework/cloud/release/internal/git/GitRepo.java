@@ -15,6 +15,17 @@
  */
 package org.springframework.cloud.release.internal.git;
 
+import com.jcraft.jsch.IdentityRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.agentproxy.AgentProxyException;
+import com.jcraft.jsch.agentproxy.Connector;
+import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
+import com.jcraft.jsch.agentproxy.USocketFactory;
+import com.jcraft.jsch.agentproxy.connector.SSHAgentConnector;
+import com.jcraft.jsch.agentproxy.usocket.JNAUSocketFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,11 +38,17 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.EmtpyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.OpenSshConfig;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +153,7 @@ class GitRepo {
 		try(Git git = this.gitFactory.open(file(project))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + branch);
-			git.push().setPushTags().setRefSpecs(refSpec).call();
+			this.gitFactory.push(git).setPushTags().setRefSpecs(refSpec).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -148,7 +165,7 @@ class GitRepo {
 	 */
 	void pushCurrentBranch(File project) {
 		try(Git git = this.gitFactory.open(file(project))) {
-			git.push().call();
+			this.gitFactory.push(git).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -163,7 +180,7 @@ class GitRepo {
 		try(Git git = this.gitFactory.open(file(project))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + "refs/tags/" + tagName);
-			git.push().setPushTags().setRefSpecs(refSpec).call();
+			this.gitFactory.push(git).setPushTags().setRefSpecs(refSpec).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -264,8 +281,49 @@ class GitRepo {
 	 * {@link org.eclipse.jgit.api.CloneCommand} allowing for easier unit testing.
 	 */
 	static class JGitFactory {
+		private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+		private final JschConfigSessionFactory factory = new JschConfigSessionFactory() {
+
+			@Override protected void configure(OpenSshConfig.Host host, Session session) {
+			}
+
+			@Override
+			protected JSch createDefaultJSch(FS fs) throws JSchException {
+				Connector connector = null;
+				try {
+					if(SSHAgentConnector.isConnectorAvailable()){
+						USocketFactory usf = new JNAUSocketFactory();
+						connector = new SSHAgentConnector(usf);
+					}
+				} catch (AgentProxyException e) {
+					log.error("Exception occurred while trying to connect to agent. Will create"
+							+ "the default JSch connection", e);
+					return super.createDefaultJSch(fs);
+				}
+				final JSch jsch = super.createDefaultJSch(fs);
+				if (connector != null) {
+					JSch.setConfig("PreferredAuthentications", "publickey");
+					IdentityRepository identityRepository = new RemoteIdentityRepository(connector);
+					jsch.setIdentityRepository(identityRepository);
+				}
+				return jsch;
+			}
+		};
+
+		private final TransportConfigCallback callback = transport -> {
+			if (transport instanceof SshTransport) {
+				SshTransport sshTransport = (SshTransport) transport;
+				sshTransport.setSshSessionFactory(this.factory);
+			}
+		};
+
 		CloneCommand getCloneCommandByCloneRepository() {
-			return Git.cloneRepository();
+			return Git.cloneRepository().setTransportConfigCallback(this.callback);
+		}
+
+		PushCommand push(Git git) {
+			return git.push().setTransportConfigCallback(this.callback);
 		}
 
 		Git open(File file) {
