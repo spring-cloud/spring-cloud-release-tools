@@ -43,7 +43,7 @@ public class SpringReleaser {
 					"Commit, tag and push the tag",
 					args -> args.releaser.commitAndPushTags(args.project, args.versionFromScRelease)),
 			task("ARTIFACT DEPLOYMENT",
-					"Deploy the artifacts to Artifactory",
+					"Deploy the artifacts",
 					args -> args.releaser.deploy()),
 			task("PUBLISHING DOCS",
 					"Publish the docs",
