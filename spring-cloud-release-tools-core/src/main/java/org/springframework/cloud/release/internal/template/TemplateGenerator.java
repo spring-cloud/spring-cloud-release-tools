@@ -1,15 +1,15 @@
 package org.springframework.cloud.release.internal.template;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.helper.StringHelpers;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.Projects;
-
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.helper.StringHelpers;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 
 /**
  * @author Marcin Grzejszczak
@@ -18,8 +18,10 @@ public class TemplateGenerator {
 
 	private static final String EMAIL_TEMPLATE = "email";
 	private static final String BLOG_TEMPLATE = "blog";
+	private static final String TWITTER_TEMPLATE = "tweet";
 	private final File emailOutput = new File("target/email.txt");
 	private final File blogOutput = new File("target/blog.md");
+	private final File tweetOutput = new File("target/tweet.txt");
 	private final ReleaserProperties props;
 
 	public TemplateGenerator(ReleaserProperties props) {
@@ -52,6 +54,13 @@ public class TemplateGenerator {
 		String releaseVersion = parsedVersion();
 		Template template = template(BLOG_TEMPLATE);
 		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects).blog();
+	}
+
+	public File tweet() {
+		File output = file(this.tweetOutput);
+		String releaseVersion = parsedVersion();
+		Template template = template(TWITTER_TEMPLATE);
+		return new TwitterTemplateGenerator(template, releaseVersion, output).tweet();
 	}
 
 	private String parsedVersion() {

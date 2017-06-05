@@ -58,10 +58,11 @@ public class SpringReleaser {
 					"Close the milestone at Github",
 					args -> args.releaser.closeMilestone(args.versionFromScRelease)),
 			task("CREATING TEMPLATES",
-					"Create email / tweet etc. templates",
+					"Create email / blog / tweet etc. templates",
 					args -> {
 						args.releaser.createEmail(args.versionFromScRelease);
 						args.releaser.createBlog(args.versionFromScRelease, args.projects);
+						args.releaser.createTweet(args.versionFromScRelease);
 					})
 	).collect(Collectors.toList());
 

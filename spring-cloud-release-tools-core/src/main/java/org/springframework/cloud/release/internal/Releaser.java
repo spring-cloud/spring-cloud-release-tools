@@ -107,4 +107,13 @@ public class Releaser {
 		File blog = this.templateGenerator.blog(projects);
 		log.info("\nSuccessfully created blog template at location [{}]", blog);
 	}
+
+	public void createTweet(ProjectVersion releaseVersion) {
+		if (releaseVersion.isSnapshot()) {
+			log.info("\nWon't create tweet template for a SNAPSHOT version");
+			return;
+		}
+		File blog = this.templateGenerator.tweet();
+		log.info("\nSuccessfully created tweet template at location [{}]", blog);
+	}
 }

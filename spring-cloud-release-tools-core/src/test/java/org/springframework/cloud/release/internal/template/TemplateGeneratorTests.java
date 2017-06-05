@@ -38,6 +38,26 @@ public class TemplateGeneratorTests {
 	}
 
 	@Test
+	public void should_generate_tweet_from_template_for_tag_with_v_prefix() {
+		ReleaserProperties props = new ReleaserProperties();
+		props.getPom().setBranch("vDalston.RELEASE");
+
+		File generatedTweet = new TemplateGenerator(props).tweet();
+
+		then(generatedTweet).hasContent(expectedTweet());
+	}
+
+	@Test
+	public void should_generate_tweet_from_template_for_tag_without_v_prefix() {
+		ReleaserProperties props = new ReleaserProperties();
+		props.getPom().setBranch("Dalston.RELEASE");
+
+		File generatedTweet = new TemplateGenerator(props).tweet();
+
+		then(generatedTweet).hasContent(expectedTweet());
+	}
+
+	@Test
 	public void should_generate_blog_from_template_for_tag_with_v_prefix_release()
 			throws IOException {
 		ReleaserProperties props = new ReleaserProperties();
@@ -243,5 +263,9 @@ public class TemplateGeneratorTests {
 				+ "link to blog post\n"
 				+ "link to twitter\n\n"
 				+ "Cheers,\n";
+	}
+
+	private String expectedTweet() {
+		return "The Dalston.RELEASE version of @springcloud has been released!";
 	}
 }

@@ -102,6 +102,9 @@ public class AcceptanceTests {
 		then(blogTemplate()).exists();
 		then(blogTemplateContents())
 				.contains("I am pleased to announce that the Release Candidate 1 (RC1)");
+		then(tweetTemplate()).exists();
+		then(tweetTemplateContents())
+				.contains("The Dalston.RC1 version of @springcloud has been released!");
 	}
 
 	@Test
@@ -123,6 +126,9 @@ public class AcceptanceTests {
 		then(blogTemplate()).exists();
 		then(blogTemplateContents())
 				.contains("I am pleased to announce that the Release Candidate 1 (RC1)");
+		then(tweetTemplate()).exists();
+		then(tweetTemplateContents())
+				.contains("The Dalston.RC1 version of @springcloud has been released!");
 	}
 
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -172,8 +178,16 @@ public class AcceptanceTests {
 		return new File("target/blog.md");
 	}
 
+	private File tweetTemplate() throws URISyntaxException {
+		return new File("target/tweet.txt");
+	}
+
 	private String blogTemplateContents() throws URISyntaxException, IOException {
 		return new String(Files.readAllBytes(blogTemplate().toPath()));
+	}
+
+	private String tweetTemplateContents() throws URISyntaxException, IOException {
+		return new String(Files.readAllBytes(tweetTemplate().toPath()));
 	}
 
 	private SpringReleaser releaser(File projectFile, String branch, String expectedVersion) throws Exception {
