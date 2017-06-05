@@ -28,6 +28,7 @@ why this tool makes it easy to automate the release / dependency update process 
 - Closes the milestone on Github (e.g. `v1.0.1.RELEASE`) (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates an email template under `target/email.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a blog template under `target/blog.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
+- Generates a tweet template under `target/tweet.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
 
 === How to run it
 
