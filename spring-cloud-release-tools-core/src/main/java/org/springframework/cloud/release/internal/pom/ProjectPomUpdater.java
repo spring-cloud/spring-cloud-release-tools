@@ -57,9 +57,9 @@ public class ProjectPomUpdater {
 		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
 		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();
-		log.info("Retrieved the following versions\n{}", versions);
 		log.info("Will update the following versions manually [{}]", this.properties.getFixedVersions());
 		this.properties.getFixedVersions().forEach(versions::setVersion);
+		log.info("Retrieved the following versions\n{}", versions);
 		return versions.toProjectVersions();
 	}
 
