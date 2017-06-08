@@ -32,7 +32,15 @@ why this tool makes it easy to automate the release / dependency update process 
 
 === How to run it
 
-Currently we only support running the Releaser to update the poms from Java
+Members of the Spring Cloud Team typically use this tool as follows. They first
+clone the releaser locally and build the jar manually
+
+[source,bash]
+----
+$ git clone git@github.com:spring-cloud/spring-cloud-release-tools.git
+$ cd spring-cloud-release-tools
+$ ./mvnw clean install
+----
 
 Go to your project (e.g. Spring Cloud Sleuth)
 
@@ -40,8 +48,8 @@ Go to your project (e.g. Spring Cloud Sleuth)
 ----
 $ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
-$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
-$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ # example of running the releaser agains Dalston.SR1 tag
+$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-*.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
 ----
 
 The application will start running from your working directory.
