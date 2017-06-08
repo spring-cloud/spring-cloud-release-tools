@@ -581,7 +581,15 @@ why this tool makes it easy to automate the release / dependency update process 
 <div class="sect2">
 <h3 id="_how_to_run_it">How to run it</h3>
 <div class="paragraph">
-<p>Currently we only support running the Releaser to update the poms from Java</p>
+<p>Members of the Spring Cloud Team typically use this tool as follows. They first
+clone the releaser locally and build the jar manually</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-release-tools.git
+$ cd spring-cloud-release-tools
+$ ./mvnw clean install</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Go to your project (e.g. Spring Cloud Sleuth)</p>
@@ -590,8 +598,8 @@ why this tool makes it easy to automate the release / dependency update process 
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
-$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
-$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar</code></pre>
+$ # example of running the releaser agains Dalston.SR1 tag
+$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-*.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser</code></pre>
 </div>
 </div>
 <div class="paragraph">
