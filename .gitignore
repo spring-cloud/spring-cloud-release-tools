@@ -26,3 +26,4 @@ nbdist/
 .DS_Store
 *.log
 _site
+effective.pom

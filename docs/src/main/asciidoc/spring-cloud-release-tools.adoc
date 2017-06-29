@@ -48,8 +48,8 @@ Go to your project (e.g. Spring Cloud Sleuth)
 ----
 $ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
-$ # example of running the releaser agains Dalston.SR1 tag
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-*.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
+$ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
+$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
 ----
 
 The application will start running from your working directory.
