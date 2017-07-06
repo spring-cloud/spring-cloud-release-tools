@@ -19,13 +19,23 @@ public class TemplateGenerator {
 	private static final String EMAIL_TEMPLATE = "email";
 	private static final String BLOG_TEMPLATE = "blog";
 	private static final String TWITTER_TEMPLATE = "tweet";
-	private final File emailOutput = new File("target/email.txt");
-	private final File blogOutput = new File("target/blog.md");
-	private final File tweetOutput = new File("target/tweet.txt");
+	private final File emailOutput;
+	private final File blogOutput;
+	private final File tweetOutput;
 	private final ReleaserProperties props;
 
 	public TemplateGenerator(ReleaserProperties props) {
 		this.props = props;
+		this.emailOutput = new File("target/email.txt");
+		this.blogOutput = new File("target/blog.md");
+		this.tweetOutput = new File("target/tweet.txt");
+	}
+
+	TemplateGenerator(ReleaserProperties props, File output) {
+		this.props = props;
+		this.emailOutput = output;
+		this.blogOutput = output;
+		this.tweetOutput = output;
 	}
 
 	public File email() {
@@ -39,6 +49,11 @@ public class TemplateGenerator {
 		try {
 			if (file.exists()) {
 				file.delete();
+			}
+			File parentFile = file.getParentFile();
+			boolean mkdirs = parentFile.mkdirs();
+			if (!mkdirs) {
+				throw new IllegalStateException("Failed to create the parent directory [" + parentFile + "]");
 			}
 			if (!file.createNewFile()) {
 				throw new IllegalStateException("Couldn't create a file [" + file + "]");

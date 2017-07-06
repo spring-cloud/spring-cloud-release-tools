@@ -28,6 +28,16 @@ public class TemplateGeneratorTests {
 	}
 
 	@Test
+	public void should_generate_email_from_template_when_output_folder_is_missing() {
+		ReleaserProperties props = new ReleaserProperties();
+		props.getPom().setBranch("vDalston.RELEASE");
+
+		File generatedMail = new TemplateGenerator(props, new File("target/foo/bar/baz/template.txt")).email();
+
+		then(generatedMail).hasContent(expectedEmail());
+	}
+
+	@Test
 	public void should_generate_email_from_template_for_tag_without_v_prefix() {
 		ReleaserProperties props = new ReleaserProperties();
 		props.getPom().setBranch("Dalston.RELEASE");
