@@ -51,10 +51,7 @@ public class TemplateGenerator {
 				file.delete();
 			}
 			File parentFile = file.getParentFile();
-			boolean mkdirs = parentFile.mkdirs();
-			if (!mkdirs) {
-				throw new IllegalStateException("Failed to create the parent directory [" + parentFile + "]");
-			}
+			parentFile.mkdirs();
 			if (!file.createNewFile()) {
 				throw new IllegalStateException("Couldn't create a file [" + file + "]");
 			}
