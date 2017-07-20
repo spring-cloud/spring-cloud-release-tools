@@ -67,7 +67,8 @@ class MilestoneCloser {
 	}
 
 	private String numericVersion(String version) {
-		return version.substring(0, version.lastIndexOf("."));
+		return version.contains("RELEASE") ?
+				version.substring(0, version.lastIndexOf(".")) : "";
 	}
 
 	String milestoneTitle(Milestone.Smart milestone) throws IOException {

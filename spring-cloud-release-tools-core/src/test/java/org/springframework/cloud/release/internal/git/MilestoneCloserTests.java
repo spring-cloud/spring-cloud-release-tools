@@ -47,13 +47,13 @@ public class MilestoneCloserTests {
 		};
 		repo.milestones().create("0.2.0.BUILD-SNAPSHOT");
 
-		closer.closeMilestone(sleuthProject());
+		closer.closeMilestone(nonGaSleuthProject());
 
 		then(this.capture.toString()).doesNotContain("No matching milestone was found");
 	}
 
 	@Test
-	public void should_close_milestone_when_the_milestone_contains_numeric_version_only() throws IOException {
+	public void should_close_milestone_when_the_milestone_contains_numeric_version_only_and_version_is_ga() throws IOException {
 		MilestoneCloser closer = new MilestoneCloser(this.github, withToken()) {
 			@Override String org() {
 				return repo.coordinates().user();
@@ -66,12 +66,35 @@ public class MilestoneCloserTests {
 		};
 		repo.milestones().create("0.2.0");
 
-		closer.closeMilestone(sleuthProject());
+		closer.closeMilestone(gaSleuthProject());
 
 		then(this.capture.toString()).doesNotContain("No matching milestone was found");
 	}
 
-	private ProjectVersion sleuthProject() {
+	private ProjectVersion gaSleuthProject() {
+		return new ProjectVersion("spring-cloud-sleuth", "0.2.0.RELEASE");
+	}
+
+	@Test
+	public void should_not_close_milestone_when_the_milestone_contains_numeric_version_only() throws IOException {
+		MilestoneCloser closer = new MilestoneCloser(this.github, withToken()) {
+			@Override String org() {
+				return repo.coordinates().user();
+			}
+
+			@Override String milestoneTitle(Milestone.Smart milestone)
+					throws IOException {
+				return "0.2.0";
+			}
+		};
+		repo.milestones().create("0.2.0");
+
+		closer.closeMilestone(nonGaSleuthProject());
+
+		then(this.capture.toString()).contains("No matching milestone was found");
+	}
+
+	private ProjectVersion nonGaSleuthProject() {
 		return new ProjectVersion("spring-cloud-sleuth", "0.2.0.BUILD-SNAPSHOT");
 	}
 
@@ -89,7 +112,7 @@ public class MilestoneCloserTests {
 		};
 		repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
-		closer.closeMilestone(sleuthProject());
+		closer.closeMilestone(nonGaSleuthProject());
 		then(this.capture.toString()).contains("No matching milestone was found");
 	}
 
@@ -107,7 +130,7 @@ public class MilestoneCloserTests {
 		};
 		repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
-		thenThrownBy(() -> closer.closeMilestone(sleuthProject()))
+		thenThrownBy(() -> closer.closeMilestone(nonGaSleuthProject()))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("foo");
 	}
@@ -125,7 +148,7 @@ public class MilestoneCloserTests {
 	public void should_throw_exception_when_no_token_was_passed() {
 		MilestoneCloser closer = new MilestoneCloser(new ReleaserProperties());
 
-		thenThrownBy(() -> closer.closeMilestone(sleuthProject()))
+		thenThrownBy(() -> closer.closeMilestone(nonGaSleuthProject()))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("You have to pass Github OAuth token for milestone closing to be operational");
 	}
