@@ -508,6 +508,11 @@ $(addBlockSwitches);
 <li><a href="#_using_environment_variables">Using Environment Variables</a></li>
 </ul>
 </li>
+<li><a href="#_faq">FAQ</a>
+<ul class="sectlevel3">
+<li><a href="#_jschexception_auth_fail">JSchException: Auth fail</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -769,6 +774,46 @@ $ export RELEASER_GIT_OAUTH_TOKEN=...
 $ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root</code></pre>
 </div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_faq">FAQ</h3>
+<div class="sect3">
+<h4 id="_jschexception_auth_fail">JSchException: Auth fail</h4>
+<div class="paragraph">
+<p>I got such an exception</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>Caused by: org.eclipse.jgit.errors.TransportException: git@github.com:spring-cloud/spring-cloud-sleuth.git: Auth fail
+	at org.eclipse.jgit.transport.JschConfigSessionFactory.getSession(JschConfigSessionFactory.java:160) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.SshTransport.getSession(SshTransport.java:137) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.TransportGitSsh$SshPushConnection.&lt;init&gt;(TransportGitSsh.java:322) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.TransportGitSsh.openPush(TransportGitSsh.java:167) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.PushProcess.execute(PushProcess.java:160) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.Transport.push(Transport.java:1275) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.api.PushCommand.call(PushCommand.java:161) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	... 25 common frames omitted
+Caused by: com.jcraft.jsch.JSchException: Auth fail
+	at com.jcraft.jsch.Session.connect(Session.java:512) ~[jsch-0.1.53.jar!/:na]
+	at org.eclipse.jgit.transport.JschConfigSessionFactory.getSession(JschConfigSessionFactory.java:117) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	... 31 common frames omitted</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To fix that just call</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># to run the agent
+$ eval `ssh-agent`
+# to store the pass in the agent
+$ ssh-add ~/.ssh/id_rsa</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>before running the app</p>
 </div>
 </div>
 </div>
