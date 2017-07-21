@@ -36,7 +36,8 @@ public class VersionsTests {
 		then(new Versions("1.2.3.RELEASE").projects)
 				.contains(
 						new Project("spring-boot", "1.2.3.RELEASE"),
-						new Project("spring-boot-starter-parent", "1.2.3.RELEASE")
+						new Project("spring-boot-starter-parent", "1.2.3.RELEASE"),
+						new Project("spring-boot-dependencies", "1.2.3.RELEASE")
 						);
 	}
 
@@ -96,11 +97,19 @@ public class VersionsTests {
 
 		then(versions.versionForProject("spring-boot")).isEqualTo("3.0.0");
 		then(versions.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-boot-dependencies")).isEqualTo("3.0.0");
 
 		versions = mixedVersions().setVersion("spring-boot-starter-parent", "3.0.0");
 
 		then(versions.versionForProject("spring-boot")).isEqualTo("3.0.0");
 		then(versions.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-boot-dependencies")).isEqualTo("3.0.0");
+
+		versions = mixedVersions().setVersion("spring-boot-dependencies", "3.0.0");
+
+		then(versions.versionForProject("spring-boot")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-boot-dependencies")).isEqualTo("3.0.0");
 	}
 
 	@Test

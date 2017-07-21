@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_STARTER_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BUILD_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
@@ -42,6 +43,7 @@ class Versions {
 		this.bootVersion = bootVersion;
 		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
 		this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, bootVersion));
+		this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion));
 	}
 
 	Versions(String scBuildVersion, Set<Project> projects) {
@@ -56,6 +58,7 @@ class Versions {
 		this.scBuildVersion = scBuildVersion;
 		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
 		this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, bootVersion));
+		this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion));
 		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
 		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
 		this.projects.addAll(projects);
@@ -114,11 +117,14 @@ class Versions {
 		switch (projectName) {
 			case SPRING_BOOT_PROJECT_NAME:
 			case BOOT_STARTER_ARTIFACT_ID:
+			case BOOT_DEPENDENCIES_ARTIFACT_ID:
 				this.bootVersion = version;
 				remove(SPRING_BOOT_PROJECT_NAME);
+				remove(BOOT_DEPENDENCIES_ARTIFACT_ID);
 				remove(BOOT_STARTER_ARTIFACT_ID);
 				this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, version));
 				this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, version));
+				this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, version));
 				break;
 			case BUILD_ARTIFACT_ID:
 			case CLOUD_DEPENDENCIES_ARTIFACT_ID:
