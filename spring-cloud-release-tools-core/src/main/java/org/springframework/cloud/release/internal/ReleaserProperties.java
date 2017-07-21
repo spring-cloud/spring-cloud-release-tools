@@ -100,7 +100,7 @@ public class ReleaserProperties {
 		private List<String> ignoredPomRegex = Arrays.asList(new String[] {
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
-				"^.*samples/standalone.*$"
+				"^.*samples/standalone/[a-z]+/.*$"
 		});
 
 		public String getBranch() {
