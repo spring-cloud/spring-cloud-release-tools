@@ -61,12 +61,14 @@ public class Releaser {
 		log.info("\nThe docs were published successfully");
 	}
 
-	public void rollbackReleaseVersion(File project, ProjectVersion originalVersion, ProjectVersion scReleaseVersion) {
+	public void rollbackReleaseVersion(File project, ProjectVersion scReleaseVersion) {
 		if (scReleaseVersion.isSnapshot()) {
 			log.info("\nWon't rollback a snapshot version");
 			return;
 		}
 		this.projectGitUpdater.revertChangesIfApplicable(project, scReleaseVersion);
+		ProjectVersion originalVersion = originalVersion(project);
+		log.info("Original project version is [{}]", originalVersion);
 		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
 			this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
 			this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
@@ -74,6 +76,10 @@ public class Releaser {
 		} else {
 			log.info("\nSuccessfully reverted the commit and came back to snapshot versions");
 		}
+	}
+
+	ProjectVersion originalVersion(File project) {
+		return new ProjectVersion(project);
 	}
 
 	public void pushCurrentBranch(File project) {

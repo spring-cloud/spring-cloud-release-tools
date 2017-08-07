@@ -50,7 +50,7 @@ public class SpringReleaser {
 					args -> args.releaser.publishDocs(args.versionFromScRelease)),
 			task("REVERTING CHANGES & BUMPING VERSION (RELEASE ONLY)",
 					"Go back to snapshots and bump originalVersion by patch",
-					args -> args.releaser.rollbackReleaseVersion(args.project, args.originalVersion, args.versionFromScRelease)),
+					args -> args.releaser.rollbackReleaseVersion(args.project, args.versionFromScRelease)),
 			task("PUSHING CHANGES",
 					"Push the commits",
 					args -> args.releaser.pushCurrentBranch(args.project)),

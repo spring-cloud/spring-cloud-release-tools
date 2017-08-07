@@ -3,6 +3,8 @@ package org.springframework.cloud.release.internal;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +33,6 @@ public class ReleaserTests {
 	@Mock ProjectBuilder projectBuilder;
 	@Mock ProjectGitUpdater projectGitUpdater;
 	@Mock TemplateGenerator templateGenerator;
-	@InjectMocks Releaser releaser;
 	File pom;
 
 	@Before
@@ -40,10 +41,24 @@ public class ReleaserTests {
 		this.pom = new File(pomUri);
 	}
 
+	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
+		return new Releaser(this.projectPomUpdater, this.projectBuilder,
+				this.projectGitUpdater, this.templateGenerator) {
+			@Override ProjectVersion originalVersion(File project) {
+				return originalVersionSupplier.get();
+			}
+		};
+	}
+
+	Releaser releaser() {
+		return new Releaser(this.projectPomUpdater, this.projectBuilder,
+				this.projectGitUpdater, this.templateGenerator);
+	}
+
 	@Test
 	public void should_not_bump_versions_for_original_release_project() throws Exception {
-		this.releaser.rollbackReleaseVersion(this.pom,
-				new ProjectVersion("original", "1.0.0.RELEASE"),
+		releaser(() -> new ProjectVersion("original", "1.0.0.RELEASE"))
+				.rollbackReleaseVersion(this.pom,
 				new ProjectVersion("changed", "1.0.0.RELEASE"));
 
 		then(this.projectBuilder).should(never()).bumpVersions(anyString());
@@ -51,8 +66,8 @@ public class ReleaserTests {
 
 	@Test
 	public void should_not_bump_versions_for_original_snapshot_project_and_current_snapshot() throws Exception {
-		this.releaser.rollbackReleaseVersion(this.pom,
-				new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"),
+		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
+				.rollbackReleaseVersion(this.pom,
 				new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(this.projectBuilder).should(never()).bumpVersions(anyString());
@@ -60,8 +75,8 @@ public class ReleaserTests {
 
 	@Test
 	public void should_bump_versions_for_original_snapshot_project() throws Exception {
-		this.releaser.rollbackReleaseVersion(this.pom,
-				new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"),
+		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
+				.rollbackReleaseVersion(this.pom,
 				new ProjectVersion("changed", "1.0.0.RELEASE"));
 
 		then(this.projectBuilder).should().bumpVersions(anyString());
@@ -69,28 +84,29 @@ public class ReleaserTests {
 
 	@Test
 	public void should_not_generate_email_for_snapshot_version() throws Exception {
-		this.releaser.createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+		releaser().createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(this.templateGenerator).should(never()).email();
 	}
 
 	@Test
 	public void should_generate_email_for_release_version() throws Exception {
-		this.releaser.createEmail(new ProjectVersion("original", "1.0.0.RELEASE"));
+		releaser().createEmail(new ProjectVersion("original", "1.0.0.RELEASE"));
 
 		then(this.templateGenerator).should().email();
 	}
 
 	@Test
 	public void should_not_close_milestone_for_snapshots() throws Exception {
-		this.releaser.closeMilestone(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+		releaser().closeMilestone(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(this.projectGitUpdater).should(never()).closeMilestone(any(ProjectVersion.class));
 	}
 
 	@Test
 	public void should_not_rollback_for_snapshots() throws Exception {
-		this.releaser.rollbackReleaseVersion(null, null, new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
+				.rollbackReleaseVersion(null, new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(this.projectGitUpdater).should(never()).revertChangesIfApplicable(any(File.class), any(ProjectVersion.class));
 	}
