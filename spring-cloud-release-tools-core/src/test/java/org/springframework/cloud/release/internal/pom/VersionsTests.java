@@ -77,21 +77,6 @@ public class VersionsTests {
 	}
 
 	@Test
-	public void should_return_true_when_all_versions_are_snapshot() {
-		then(new Versions("", snapshotProjects()).isSnapshot()).isTrue();
-	}
-
-	@Test
-	public void should_return_true_when_there_only_release_versions() {
-		then(new Versions("1.0.0.RELEASE", releaseProjects()).isSnapshot()).isFalse();
-	}
-
-	@Test
-	public void should_return_true_when_there_are_mixed_versions() {
-		then(new Versions("", mixedProjects()).isSnapshot()).isTrue();
-	}
-
-	@Test
 	public void should_update_projects_for_boot() {
 		Versions versions = mixedVersions().setVersion("spring-boot", "3.0.0");
 

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
 /**
  * @author Marcin Grzejszczak

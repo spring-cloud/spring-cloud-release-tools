@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -21,6 +22,7 @@ import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 
 /**
@@ -75,9 +77,9 @@ public class ReleaserTests {
 
 	@Test
 	public void should_bump_versions_for_original_snapshot_project() throws Exception {
+		ProjectVersion scReleaseVersion = new ProjectVersion("changed", "1.0.0.RELEASE");
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
-				.rollbackReleaseVersion(this.pom,
-				new ProjectVersion("changed", "1.0.0.RELEASE"));
+				.rollbackReleaseVersion(this.pom, scReleaseVersion);
 
 		then(this.projectBuilder).should().bumpVersions(anyString());
 	}

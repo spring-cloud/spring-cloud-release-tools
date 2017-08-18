@@ -35,7 +35,7 @@ public class SpringReleaser {
 	private final List<Task> TASKS = Stream.of(
 			task("UPDATING POMS",
 					"Update poms with versions from Spring Cloud Release",
-					args -> args.releaser.updateProjectFromScRelease(args.project, args.projects)),
+					args -> args.releaser.updateProjectFromScRelease(args.project, args.projects, args.versionFromScRelease)),
 			task("BUILD PROJECT",
 					"Build the project",
 					args -> args.releaser.buildProject()),

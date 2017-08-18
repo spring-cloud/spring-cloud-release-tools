@@ -109,10 +109,6 @@ class Versions {
 		return project.name.equals(withoutParent);
 	}
 
-	boolean isSnapshot() {
-		return this.projects.stream().anyMatch(project -> project.version.endsWith("BUILD-SNAPSHOT"));
-	}
-
 	Versions setVersion(String projectName, String version) {
 		switch (projectName) {
 			case SPRING_BOOT_PROJECT_NAME:

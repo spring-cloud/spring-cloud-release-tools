@@ -66,30 +66,33 @@ public class ProjectPomUpdater {
 	/**
 	 * For the given root folder (typically the working directory) performs the whole
 	 * flow of updating {@code pom.xml} with values from Spring Cloud Release project.
-	 *
-	 * @param projectRoot - root folder with project to update
+	 *  @param projectRoot - root folder with project to update
 	 * @param projects - versions of projects used to update poms
+	 * @param versionFromScRelease - version for the built project taken from Spring Cloud Release project
 	 */
-	public void updateProjectFromSCRelease(File projectRoot, Projects projects) {
+	public void updateProjectFromSCRelease(File projectRoot, Projects projects,
+			ProjectVersion versionFromScRelease) {
 		Versions versions = new Versions(projects);
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
 			log.info("Skipping project updating");
 			return;
 		}
-		updatePoms(projectRoot, versions);
+		updatePoms(projectRoot, versions, versionFromScRelease, Assertion.ASSERT_SNAPSHOTS);
 	}
 
-	private void updatePoms(File projectRoot, Versions versions) {
+	private void updatePoms(File projectRoot, Versions versions,
+			ProjectVersion versionFromScRelease, Assertion assertSnapshots) {
 		File rootPom = new File(projectRoot, "pom.xml");
 		ModelWrapper rootPomModel = this.pomUpdater.readModel(rootPom);
 		processAllPoms(projectRoot, new PomWalker(rootPomModel, versions, this.pomUpdater,
-				this.properties));
+				this.properties, versionFromScRelease, assertSnapshots));
 	}
 
 	public void updatePomsForRootVersion(File directory, String version) {
 		File pom = new File(directory, "pom.xml");
 		Versions versions = versions(version, pom);
-		updatePoms(directory, versions);
+		updatePoms(directory, versions, new ProjectVersion("fake", "1.0.0"),
+				Assertion.IGNORE_ASSERTION);
 	}
 
 	private Versions versions(String version, File pom) {
@@ -117,14 +120,19 @@ public class ProjectPomUpdater {
 		private final PomUpdater pomUpdater;
 		private final ReleaserProperties properties;
 		private final boolean snapshotVersion;
+		private final Assertion assertSnapshots;
 
 		private PomWalker(ModelWrapper rootPom, Versions versions, PomUpdater pomUpdater,
-				ReleaserProperties properties) {
+				ReleaserProperties properties, ProjectVersion versionFromScRelease,
+				Assertion assertSnapshots) {
 			this.rootPom = rootPom;
 			this.versions = versions;
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
-			this.snapshotVersion = versions.isSnapshot();
+			this.snapshotVersion =
+					assertSnapshots != Assertion.ASSERT_SNAPSHOTS || versionFromScRelease
+							.isSnapshot();
+			this.assertSnapshots = assertSnapshots;
 		}
 
 		@Override
@@ -137,7 +145,7 @@ public class ProjectPomUpdater {
 				}
 				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file, this.versions);
 				this.pomUpdater.overwritePomIfDirty(model, this.versions, file);
-				if (!this.snapshotVersion) {
+				if (this.assertSnapshots == Assertion.ASSERT_SNAPSHOTS && !this.snapshotVersion) {
 					log.debug("Update is a non-snapshot one. Checking if no snapshot versions remained in the pom");
 					Scanner scanner = new Scanner(asString(path));
 					int lineNumber = 0;
@@ -171,4 +179,10 @@ public class ProjectPomUpdater {
 		}
 	}
 
+
+	private enum Assertion {
+		ASSERT_SNAPSHOTS, IGNORE_ASSERTION
+	}
 }
+
+

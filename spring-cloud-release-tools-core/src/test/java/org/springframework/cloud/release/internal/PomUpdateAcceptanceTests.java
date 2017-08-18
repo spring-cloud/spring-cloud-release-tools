@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.HashSet;
 
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
@@ -12,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
@@ -41,9 +43,10 @@ public class PomUpdateAcceptanceTests {
 		releaserProperties.getFixedVersions().put("checkstyle", "100.0.0.RELEASE");
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
 
 		projectPomUpdater
-				.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth"), projects);
+				.updateProjectFromSCRelease(project, projects, projects.forFile(project));
 
 		then(this.temporaryFolder).exists();
 		Model rootPom = this.testPomReader.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
@@ -68,11 +71,27 @@ public class PomUpdateAcceptanceTests {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property");
 
 		BDDAssertions.thenThrownBy(() ->
 			projectPomUpdater
-					.updateProjectFromSCRelease(new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property"), projects)
+					.updateProjectFromSCRelease(project, projects, projects.forFile(project))
 		).hasMessageContaining("<spring-cloud-unmatched.version>0.6.0.BUILD-SNAPSHOT</spring-cloud-unmatched.version>");
+	}
+
+	@Test
+	public void should_update_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version_for_boot_snapshot_version() throws Exception {
+		ReleaserProperties releaserProperties = branchReleaserProperties();
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
+		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		projects.removeIf(projectVersion -> projectVersion.projectName.contains("spring-cloud-build"));
+		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.BUILD-SNAPSHOT"));
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
+
+		BDDAssertions.thenThrownBy(() ->
+			projectPomUpdater
+					.updateProjectFromSCRelease(project, projects, projects.forFile(project))
+		).hasMessageContaining("<version>1.4.2.BUILD-SNAPSHOT</version>");
 	}
 
 	@Test
@@ -81,8 +100,10 @@ public class PomUpdateAcceptanceTests {
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		File beforeProcessing = pom("/projects/project/");
 		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		File project = tmpFile("/project/");
 
-		projectPomUpdater.updateProjectFromSCRelease(tmpFile("/project/"), projects);
+		projectPomUpdater.updateProjectFromSCRelease(project, projects,
+				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(this.temporaryFolder).exists();
 		File afterProcessing = tmpFile("/project/pom.xml");

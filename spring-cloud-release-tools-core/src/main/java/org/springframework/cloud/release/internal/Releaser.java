@@ -35,8 +35,9 @@ public class Releaser {
 		return this.projectPomUpdater.retrieveVersionsFromSCRelease();
 	}
 
-	public void updateProjectFromScRelease(File project, Projects versions) {
-		this.projectPomUpdater.updateProjectFromSCRelease(project, versions);
+	public void updateProjectFromScRelease(File project, Projects versions,
+			ProjectVersion versionFromScRelease) {
+		this.projectPomUpdater.updateProjectFromSCRelease(project, versions, versionFromScRelease);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 	}
