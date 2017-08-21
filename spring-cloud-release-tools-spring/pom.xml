@@ -6,15 +6,13 @@
 
 	<groupId>org.springframework.cloud.internal</groupId>
 	<artifactId>spring-cloud-release-tools-spring</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<parent>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-build</artifactId>
-		<version>1.2.2.RELEASE</version>
-		<relativePath/>
-		<!-- lookup parent from repository -->
+		<groupId>org.springframework.cloud.internal</groupId>
+		<artifactId>spring-cloud-release-tools-parent</artifactId>
+		<version>1.0.0.BUILD-SNAPSHOT</version>
+		<relativePath>..</relativePath>
 	</parent>
 
 	<properties>
