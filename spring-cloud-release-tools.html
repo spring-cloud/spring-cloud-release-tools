@@ -591,7 +591,7 @@ clone the releaser locally and build the jar manually</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-release-tools.git
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-release-tools.git
 $ cd spring-cloud-release-tools
 $ ./mvnw clean install</code></pre>
 </div>
@@ -601,7 +601,7 @@ $ ./mvnw clean install</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
 $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser</code></pre>
@@ -628,7 +628,7 @@ It is important that you clone the repository you are going to release using SSH
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>=== WHAT DO YOU WANT TO DO? ===
+<pre class="prettyprint highlight"><code>=== WHAT DO YOU WANT TO DO? ===
 
 0) Perform a full release of this project without interruptions
 1) Perform a full release of this project in a verbose mode (you'll be asked about skipping steps)
@@ -693,6 +693,12 @@ Defaults to the standard Spring Cloud wget and execution of ghpages.</p>
 <p><code>releaser.maven.wait-time-in-minutes</code> - Max wait time in minutes for the process to finish. Defaults to <code>20</code></p>
 </li>
 <li>
+<p><code>releaser.gradle.gradle-props-substitution</code> - a map containing a <code>key</code> which is a property key inside <code>gradle.properties</code> and a <code>value</code> of
+a project name. E.g. in <code>gradle.properties</code> you have <code>foo=1.0.0.BUILD-SNAPSHOT</code> and you would like <code>spring-cloud-contract</code> version to
+be set there. Just provide a mapping for the <code>gradle-props-substition</code> looking like this <code>foo=spring-cloud-contract</code> and the result
+(e.g for sc-contract version <code>2.0.0.RELEASE</code>) will be an updated <code>gradle.properties</code> with entry <code>foo=2.0.0.RELEASE</code></p>
+</li>
+<li>
 <p><code>releaser.pom.branch</code> - Which branch of Spring Cloud Release should be checked out. Defaults to "master",</p>
 </li>
 <li>
@@ -729,7 +735,7 @@ folder and run your application like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</code></pre>
 </div>
 </div>
@@ -755,7 +761,7 @@ If you would like to use another branch you can specify it using the <code>relea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
 </div>
 </div>
 </div>
@@ -769,7 +775,7 @@ each release</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ export RELEASER_POM_BRANCH=Dalston.RELEASE
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ export RELEASER_POM_BRANCH=Dalston.RELEASE
 $ export RELEASER_GIT_OAUTH_TOKEN=...
 $ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root</code></pre>
@@ -786,7 +792,7 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.wor
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>Caused by: org.eclipse.jgit.errors.TransportException: git@github.com:spring-cloud/spring-cloud-sleuth.git: Auth fail
+<pre class="prettyprint highlight"><code>Caused by: org.eclipse.jgit.errors.TransportException: git@github.com:spring-cloud/spring-cloud-sleuth.git: Auth fail
 	at org.eclipse.jgit.transport.JschConfigSessionFactory.getSession(JschConfigSessionFactory.java:160) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
 	at org.eclipse.jgit.transport.SshTransport.getSession(SshTransport.java:137) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
 	at org.eclipse.jgit.transport.TransportGitSsh$SshPushConnection.&lt;init&gt;(TransportGitSsh.java:322) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
@@ -806,7 +812,7 @@ Caused by: com.jcraft.jsch.JSchException: Auth fail
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># to run the agent
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash"># to run the agent
 $ eval `ssh-agent`
 # to store the pass in the agent
 $ ssh-add ~/.ssh/id_rsa</code></pre>
@@ -820,5 +826,8 @@ $ ssh-add ~/.ssh/id_rsa</code></pre>
 </div>
 </div>
 </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>prettyPrint()</script>
 </body>
 </html>
