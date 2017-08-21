@@ -5,6 +5,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
@@ -22,13 +23,16 @@ public class Releaser {
 	private final ProjectBuilder projectBuilder;
 	private final ProjectGitUpdater projectGitUpdater;
 	private final TemplateGenerator templateGenerator;
+	private final GradleUpdater gradleUpdater;
 
 	public Releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
-			ProjectGitUpdater projectGitUpdater, TemplateGenerator templateGenerator) {
+			ProjectGitUpdater projectGitUpdater, TemplateGenerator templateGenerator,
+			GradleUpdater gradleUpdater) {
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectBuilder = projectBuilder;
 		this.projectGitUpdater = projectGitUpdater;
 		this.templateGenerator = templateGenerator;
+		this.gradleUpdater = gradleUpdater;
 	}
 
 	public Projects retrieveVersionsFromSCRelease() {
@@ -38,6 +42,7 @@ public class Releaser {
 	public void updateProjectFromScRelease(File project, Projects versions,
 			ProjectVersion versionFromScRelease) {
 		this.projectPomUpdater.updateProjectFromSCRelease(project, versions, versionFromScRelease);
+		this.gradleUpdater.updateProjectFromSCRelease(project, versions);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 	}

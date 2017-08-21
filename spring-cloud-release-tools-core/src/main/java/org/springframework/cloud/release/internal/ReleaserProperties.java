@@ -15,14 +15,14 @@
  */
 package org.springframework.cloud.release.internal;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * @author Marcin Grzejszczak
@@ -41,6 +41,8 @@ public class ReleaserProperties {
 	private Pom pom = new Pom();
 
 	private Maven maven = new Maven();
+
+	private Gradle gradle = new Gradle();
 
 	private Map<String, String> fixedVersions = new HashMap<>();
 
@@ -84,8 +86,8 @@ public class ReleaserProperties {
 		public void setOauthToken(String oauthToken) {
 			this.oauthToken = oauthToken;
 		}
-	}
 
+	}
 	public static class Pom {
 
 		/**
@@ -118,8 +120,8 @@ public class ReleaserProperties {
 		public void setIgnoredPomRegex(List<String> ignoredPomRegex) {
 			this.ignoredPomRegex = ignoredPomRegex;
 		}
-	}
 
+	}
 	public static class Maven {
 
 		/**
@@ -179,8 +181,51 @@ public class ReleaserProperties {
 		public void setPublishDocsCommands(String[] publishDocsCommands) {
 			this.publishDocsCommands = publishDocsCommands;
 		}
+
 	}
 
+	public static class Gradle {
+
+		/**
+		 * A mapping that should be applied to {@code gradle.properties} in order
+		 * to perform a substitution of properties. The mapping is from a property
+		 * inside {@code gradle.properties} to the projects name. Example
+		 *
+		 * In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You
+		 * want this property to get updated with the value of {@code spring-cloud-contract}
+		 * version. Then it's enough to do the mapping like this for this Releaser's property:
+		 * {@code verifierVersion=spring-cloud-contract}
+		 */
+		private Map<String, String> gradlePropsSubstitution = new HashMap<>();
+
+		/**
+		 * List of regular expressions of ignored gradle props.
+		 * Defaults to test projects and samples.
+		 */
+		@SuppressWarnings("unchecked")
+		private List<String> ignoredGradleRegex = Arrays.asList(new String[] {
+				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
+				"^.*spring-cloud-contract-maven-plugin/target/.*$",
+				"^.*samples/standalone/[a-z]+/.*$"
+		});
+
+		public Map<String, String> getGradlePropsSubstitution() {
+			return this.gradlePropsSubstitution;
+		}
+
+		public void setGradlePropsSubstitution(
+				Map<String, String> gradlePropsSubstitution) {
+			this.gradlePropsSubstitution = gradlePropsSubstitution;
+		}
+
+		public List<String> getIgnoredGradleRegex() {
+			return this.ignoredGradleRegex;
+		}
+
+		public void setIgnoredGradleRegex(List<String> ignoredGradleRegex) {
+			this.ignoredGradleRegex = ignoredGradleRegex;
+		}
+	}
 	public String getWorkingDir() {
 		return StringUtils.hasText(this.workingDir) ?
 				this.workingDir : System.getProperty("user.dir");
@@ -212,6 +257,14 @@ public class ReleaserProperties {
 
 	public void setMaven(Maven maven) {
 		this.maven = maven;
+	}
+
+	public Gradle getGradle() {
+		return this.gradle;
+	}
+
+	public void setGradle(Gradle gradle) {
+		this.gradle = gradle;
 	}
 
 	public Map<String, String> getFixedVersions() {

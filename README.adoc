@@ -105,6 +105,10 @@ the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in 
 - `releaser.maven.publish-docs-commands` - Command to be executed to deploy a built project. If present `{{version}}` will be replaced by the proper version.
 Defaults to the standard Spring Cloud wget and execution of ghpages.
 - `releaser.maven.wait-time-in-minutes` - Max wait time in minutes for the process to finish. Defaults to `20`
+- `releaser.gradle.gradle-props-substitution` - a map containing a `key` which is a property key inside `gradle.properties` and a `value` of
+a project name. E.g. in `gradle.properties` you have `foo=1.0.0.BUILD-SNAPSHOT` and you would like `spring-cloud-contract` version to
+be set there. Just provide a mapping for the `gradle-props-substition` looking like this `foo=spring-cloud-contract` and the result
+(e.g for sc-contract version `2.0.0.RELEASE`) will be an updated `gradle.properties` with entry `foo=2.0.0.RELEASE`
 - `releaser.pom.branch` - Which branch of Spring Cloud Release should be checked out. Defaults to "master",
 - `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.,
 - `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.

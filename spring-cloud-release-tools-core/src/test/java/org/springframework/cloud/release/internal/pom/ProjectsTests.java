@@ -27,12 +27,32 @@ public class ProjectsTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_project_is_not_present() {
+	public void should_find_a_project_by_name() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("spring-cloud-starter-build", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		then(projects.forName("spring-cloud-starter-build").version).isEqualTo("1.0.0");
+	}
+
+	@Test
+	public void should_throw_exception_when_project_is_not_present_when_searching_by_file() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
 		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
 		Projects projects = new Projects(projectVersions);
 
 		thenThrownBy(() -> projects.forFile(springCloudReleasePom))
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("Project with name [spring-cloud-starter-build] is not present");
+	}
+
+	@Test
+	public void should_throw_exception_when_project_is_not_present() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		thenThrownBy(() -> projects.forName("spring-cloud-starter-build"))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Project with name [spring-cloud-starter-build] is not present");
 	}

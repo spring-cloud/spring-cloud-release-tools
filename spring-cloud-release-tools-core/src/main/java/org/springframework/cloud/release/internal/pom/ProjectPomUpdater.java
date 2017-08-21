@@ -66,7 +66,7 @@ public class ProjectPomUpdater {
 	/**
 	 * For the given root folder (typically the working directory) performs the whole
 	 * flow of updating {@code pom.xml} with values from Spring Cloud Release project.
-	 *  @param projectRoot - root folder with project to update
+	 * @param projectRoot - root folder with project to update
 	 * @param projects - versions of projects used to update poms
 	 * @param versionFromScRelease - version for the built project taken from Spring Cloud Release project
 	 */
@@ -178,7 +178,6 @@ public class ProjectPomUpdater {
 			}
 		}
 	}
-
 
 	private enum Assertion {
 		ASSERT_SNAPSHOTS, IGNORE_ASSERTION

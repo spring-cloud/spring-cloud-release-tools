@@ -3,26 +3,23 @@ package org.springframework.cloud.release.internal;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
+import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 
 /**
@@ -35,6 +32,7 @@ public class ReleaserTests {
 	@Mock ProjectBuilder projectBuilder;
 	@Mock ProjectGitUpdater projectGitUpdater;
 	@Mock TemplateGenerator templateGenerator;
+	@Mock GradleUpdater gradleUpdater;
 	File pom;
 
 	@Before
@@ -45,7 +43,7 @@ public class ReleaserTests {
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitUpdater, this.templateGenerator) {
+				this.projectGitUpdater, this.templateGenerator, this.gradleUpdater) {
 			@Override ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
 			}
@@ -54,7 +52,7 @@ public class ReleaserTests {
 
 	Releaser releaser() {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitUpdater, this.templateGenerator);
+				this.projectGitUpdater, this.templateGenerator, this.gradleUpdater);
 	}
 
 	@Test

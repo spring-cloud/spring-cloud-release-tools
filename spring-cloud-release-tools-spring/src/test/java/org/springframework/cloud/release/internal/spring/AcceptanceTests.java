@@ -17,6 +17,7 @@ import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
+import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
@@ -216,8 +217,9 @@ public class AcceptanceTests {
 		TestProjectGitUpdater gitUpdater = new TestProjectGitUpdater(properties,
 				expectedVersion);
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties);
+		GradleUpdater gradleUpdater = new GradleUpdater(properties);
 		Releaser releaser = new Releaser(pomUpdater, projectBuilder, gitUpdater,
-				templateGenerator);
+				templateGenerator, gradleUpdater);
 		this.gitUpdater = gitUpdater;
 		return releaser;
 	}

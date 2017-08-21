@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal.spring;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
@@ -32,6 +33,7 @@ class ReleaserConfiguration {
 	@Bean SpringReleaser releaser(ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		return new SpringReleaser(new Releaser(pomUpdater, new ProjectBuilder(properties, pomUpdater),
-				new ProjectGitUpdater(properties), new TemplateGenerator(properties)), properties);
+				new ProjectGitUpdater(properties), new TemplateGenerator(properties),
+				new GradleUpdater(properties)), properties);
 	}
 }
