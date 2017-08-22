@@ -15,8 +15,7 @@
  */
 package org.springframework.cloud.release.internal;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,11 +98,11 @@ public class ReleaserProperties {
 		 * List of regular expressions of ignored poms. Defaults to test projects and samples.
 		 */
 		@SuppressWarnings("unchecked")
-		private List<String> ignoredPomRegex = Arrays.asList(new String[] {
+		private List<String> ignoredPomRegex = Arrays.asList(
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
 				"^.*samples/standalone/[a-z]+/.*$"
-		});
+		);
 
 		public String getBranch() {
 			return this.branch;
