@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.util.Iterator;
 
 import org.apache.maven.model.Model;
+import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Before;
@@ -45,6 +46,19 @@ public class AcceptanceTests {
 		this.springCloudConsulProject = new File(AcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
+	}
+
+	@Test
+	public void should_fail_to_perform_a_release_of_consul_when_sc_release_contains_snapshots() throws Exception {
+		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(), this.springCloudConsulProject);
+		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		pomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		File project = GitTestUtils.clonedProject(this.tmp.newFolder(), tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		SpringReleaser releaser = releaserWithSnapshotScRelease(project, "vCamden.SR5.BROKEN", "1.1.2.RELEASE");
+
+		BDDAssertions.thenThrownBy(releaser::release)
+				.hasMessageContaining("there is at least one SNAPSHOT library version in the Spring Cloud Release project");
 	}
 
 	@Test
@@ -193,12 +207,22 @@ public class AcceptanceTests {
 
 	private SpringReleaser releaser(File projectFile, String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
+		return releaserWithFullDeployment(expectedVersion, properties);
+	}
+
+	private SpringReleaser releaserWithFullDeployment(String expectedVersion,
+			ReleaserProperties properties) throws Exception {
 		Releaser releaser = defaultReleaser(expectedVersion, properties);
 		return new SpringReleaser(releaser, properties) {
 			@Override int chosenOption() {
 				return 0;
 			}
 		};
+	}
+
+	private SpringReleaser releaserWithSnapshotScRelease(File projectFile, String branch, String expectedVersion) throws Exception {
+		ReleaserProperties properties = snapshotScReleaseReleaserProperties(projectFile, branch);
+		return releaserWithFullDeployment(expectedVersion, properties);
 	}
 
 	private SpringReleaser templateOnlyReleaser(File projectFile, String branch, String expectedVersion) throws Exception {
@@ -232,6 +256,12 @@ public class AcceptanceTests {
 		releaserProperties.getMaven().setBuildCommand("touch build");
 		releaserProperties.getMaven().setDeployCommand("touch deploy");
 		releaserProperties.getMaven().setPublishDocsCommands(new String[] { "touch docs"} );
+		return releaserProperties;
+	}
+
+	private ReleaserProperties snapshotScReleaseReleaserProperties(File project, String branch) throws URISyntaxException {
+		ReleaserProperties releaserProperties = releaserProperties(project, branch);
+		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release-with-snapshot/").toURI().getPath());
 		return releaserProperties;
 	}
 

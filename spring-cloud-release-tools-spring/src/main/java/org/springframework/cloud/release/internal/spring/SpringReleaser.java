@@ -87,6 +87,7 @@ public class SpringReleaser {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects projects = this.releaser.retrieveVersionsFromSCRelease();
 		ProjectVersion versionFromScRelease = projects.forFile(project);
+		assertNoSnapshotsForANonSnapshotProject(projects, versionFromScRelease);
 		log.info(buildOptionsText().toString());
 		int chosenOption = chosenOption();
 		log.info("\n\n\nYou chose [{}]: [{}]\n\n\n", chosenOption, ALL_TASKS.get(chosenOption).description);
@@ -95,6 +96,15 @@ public class SpringReleaser {
 		Args args = new Args(this.releaser, project, projects, originalVersion, versionFromScRelease,
 				this.properties, verbose);
 		task.consumer.accept(args);
+	}
+
+	private void assertNoSnapshotsForANonSnapshotProject(Projects projects,
+			ProjectVersion versionFromScRelease) {
+		if (!versionFromScRelease.isSnapshot() && projects.containsSnapshots()) {
+			throw new IllegalStateException("You are trying to release a non snapshot "
+					+ "version [" + versionFromScRelease + "] of the project [" + versionFromScRelease.projectName + "] but "
+					+ "there is at least one SNAPSHOT library version in the Spring Cloud Release project");
+		}
 	}
 
 	private StringBuilder buildOptionsText() {

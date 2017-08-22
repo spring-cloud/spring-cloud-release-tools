@@ -36,6 +36,26 @@ public class ProjectsTests {
 	}
 
 	@Test
+	public void should_return_true_when_there_is_at_least_one_snapshot_project() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		projectVersions.add(new ProjectVersion("bar", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		then(projects.containsSnapshots()).isTrue();
+	}
+
+	@Test
+	public void should_return_false_when_there_are_no_snapshot_versions() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
+		projectVersions.add(new ProjectVersion("bar", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		then(projects.containsSnapshots()).isFalse();
+	}
+
+	@Test
 	public void should_throw_exception_when_project_is_not_present_when_searching_by_file() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
 		projectVersions.add(new ProjectVersion("foo", "1.0.0"));

@@ -34,4 +34,8 @@ public class Projects extends HashSet<ProjectVersion> {
 				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("Project with name [" + projectName + "] is not present"));
 	}
+
+	public boolean containsSnapshots() {
+		return this.stream().anyMatch(ProjectVersion::isSnapshot);
+	}
 }
