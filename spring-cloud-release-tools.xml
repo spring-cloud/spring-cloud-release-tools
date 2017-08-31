@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?asciidoc-toc maxdepth="8"?>
+<?asciidoc-numbered?>
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<info>
+<title>Spring Cloud Release Tools</title>
+<date>2017-08-22</date>
+</info>
+<chapter xml:id="_spring_cloud_release_tools">
+<title>Spring Cloud Release Tools</title>
+<simpara>Spring Cloud projects reuse the same pattern of building and deploying the applications. That&#8217;s
+why this tool makes it easy to automate the release / dependency update process of our applications.</simpara>
+<section xml:id="_what_does_it_do">
+<title>What does it do?</title>
+<itemizedlist>
+<listitem>
+<simpara>Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)</simpara>
+</listitem>
+<listitem>
+<simpara>Modifies the project versions with values from SC-Release</simpara>
+<itemizedlist>
+<listitem>
+<simpara>throws an exception when we bump versions to release and there&#8217;s a SNAPSHOT version referenced in the POM</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Performs the build and checks if the <literal>docs</literal> modules have properly created the documentation</simpara>
+<itemizedlist>
+<listitem>
+<simpara>throws an exception when in the <literal>docs</literal> module there&#8217;s an unresolved tag in any HTML file</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Commits changed poms (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>Creates a tag for the release / milestone (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>Runs the deployment of the artifacts</simpara>
+</listitem>
+<listitem>
+<simpara>Publishes the docs (to <literal>spring-cloud-static</literal> for non-snapshots, to <literal>gh-pages</literal> for snapshots)</simpara>
+</listitem>
+<listitem>
+<simpara>Reverts back to snapshots, bumps the version by a patch (<literal>1.0.1.RELEASE</literal> &#8594; <literal>1.0.2.BUILD-SNAPSHOT</literal>) (ONLY FOR RELEASE VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>Closes the milestone on Github (e.g. <literal>v1.0.1.RELEASE</literal>) (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>Generates an email template under <literal>target/email.txt</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>Generates a blog template under <literal>target/blog.md</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>Generates a tweet template under <literal>target/tweet.txt</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_how_to_run_it">
+<title>How to run it</title>
+<simpara>Members of the Spring Cloud Team typically use this tool as follows. They first
+clone the releaser locally and build the jar manually</simpara>
+<programlisting language="bash" linenumbering="unnumbered">$ git clone git@github.com:spring-cloud/spring-cloud-release-tools.git
+$ cd spring-cloud-release-tools
+$ ./mvnw clean install</programlisting>
+<simpara>Go to your project (e.g. Spring Cloud Sleuth)</simpara>
+<programlisting language="bash" linenumbering="unnumbered">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
+$ cd spring-cloud-sleuth
+$ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
+$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser</programlisting>
+<simpara>The application will start running from your working directory.</simpara>
+<tip>
+<simpara>It is important that you clone the repository you are going to release using SSH in order for the
+<literal>releaser</literal> to be able to push tags and commit changes automatically.</simpara>
+</tip>
+<simpara>You will see text similar to this one</simpara>
+<screen>=== WHAT DO YOU WANT TO DO? ===
+
+0) Perform a full release of this project without interruptions
+1) Perform a full release of this project in a verbose mode (you'll be asked about skipping steps)
+2) Update poms with versions from Spring Cloud Release
+3) Build the project
+4) Commit, tag and push the tag
+5) Deploy the artifacts to Artifactory
+6) Publish the docs
+7) Go back to snapshots and bump originalVersion by patch
+8) Push the commits
+9) Close the milestone at Github
+10) Create email / tweet etc. templates
+
+
+You can press 'q' to quit</screen>
+<simpara>Just pick a number and continue! Pick either a full release or single steps.</simpara>
+<tip>
+<simpara>Read before picking a number cause it might have changed between tool releases ;)</simpara>
+</tip>
+</section>
+<section xml:id="_project_options">
+<title>Project options</title>
+<itemizedlist>
+<listitem>
+<simpara><literal>releaser.fixed-versions</literal> - A String to String mapping of manually set versions. E.g. <literal>"spring-cloud-cli" &#8594; "1.0.0.RELEASE"</literal> will set
+the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</literal> regardless of what was set in <literal>spring-cloud-release</literal> project</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.clone-destination-dir</literal> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.spring-cloud-release-git-url</literal> - URL to Spring Cloud Release Git repository. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-release">https://github.com/spring-cloud/spring-cloud-release</link></literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.maven.build-command</literal> - Command to be executed to build the project. Defaults to <literal>./mvnw clean install -Pdocs</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.maven.deploy-command</literal> - Command to be executed to deploy a built project". Defaults to <literal>./mvnw deploy -DskipTests -Pfast</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.maven.publish-docs-commands</literal> - Command to be executed to deploy a built project. If present <literal>{{version}}</literal> will be replaced by the proper version.
+Defaults to the standard Spring Cloud wget and execution of ghpages.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.maven.wait-time-in-minutes</literal> - Max wait time in minutes for the process to finish. Defaults to <literal>20</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.gradle.gradle-props-substitution</literal> - a map containing a <literal>key</literal> which is a property key inside <literal>gradle.properties</literal> and a <literal>value</literal> of
+a project name. E.g. in <literal>gradle.properties</literal> you have <literal>foo=1.0.0.BUILD-SNAPSHOT</literal> and you would like <literal>spring-cloud-contract</literal> version to
+be set there. Just provide a mapping for the <literal>gradle-props-substition</literal> looking like this <literal>foo=spring-cloud-contract</literal> and the result
+(e.g for sc-contract version <literal>2.0.0.RELEASE</literal>) will be an updated <literal>gradle.properties</literal> with entry <literal>foo=2.0.0.RELEASE</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.pom.branch</literal> - Which branch of Spring Cloud Release should be checked out. Defaults to "master",</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.pom.ignored-pom-regex</literal> - List of regular expressions of ignored poms. Defaults to test projects and samples.,</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.working-dir</literal> - By default Releaser assumes running the program from the current working directory.</simpara>
+</listitem>
+</itemizedlist>
+<tip>
+<simpara>You can pass the options either via system properties or via application arguments.
+Example for system properties: <literal>java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</literal>
+Example for application argumemts: <literal>java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</literal></simpara>
+</tip>
+</section>
+<section xml:id="_examples">
+<title>Examples</title>
+<section xml:id="_keeping_configuration_in_the_project">
+<title>Keeping configuration in the project</title>
+<simpara>If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed
+to build the project and properly merge the docs) then you can put a file named e.g. <literal>releaser.yml</literal> under <literal>config</literal>
+folder and run your application like this:</simpara>
+<programlisting language="bash" linenumbering="unnumbered">$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</programlisting>
+<tip>
+<simpara>Notice that we&#8217;re downloading the jar to a parent folder, not to <literal>target</literal>. That&#8217;s because <literal>target</literal> get cleaned
+during the build process</simpara>
+</tip>
+</section>
+<section xml:id="_specifying_a_branch">
+<title>Specifying A Branch</title>
+<simpara>By deafult the releaser will default to using the <literal>master</literal> branch of <literal>spring-cloud-release</literal>.
+If you would like to use another branch you can specify it using the <literal>releaser.pom.branch</literal> property.</simpara>
+<programlisting language="bash" linenumbering="unnumbered">$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</programlisting>
+</section>
+<section xml:id="_using_environment_variables">
+<title>Using Environment Variables</title>
+<simpara>In some cases it might be easier to specify environment variables instead of passing parameters to
+<literal>releaser</literal>.  For example, you might want to use environment variables if you are going to be
+releasing multiple projects, this keeps you from having to specify the same parameters for
+each release</simpara>
+<programlisting language="bash" linenumbering="unnumbered">$ export RELEASER_POM_BRANCH=Dalston.RELEASE
+$ export RELEASER_GIT_OAUTH_TOKEN=...
+$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root</programlisting>
+</section>
+</section>
+<section xml:id="_faq">
+<title>FAQ</title>
+<section xml:id="_jschexception_auth_fail">
+<title>JSchException: Auth fail</title>
+<simpara>I got such an exception</simpara>
+<screen>Caused by: org.eclipse.jgit.errors.TransportException: git@github.com:spring-cloud/spring-cloud-sleuth.git: Auth fail
+	at org.eclipse.jgit.transport.JschConfigSessionFactory.getSession(JschConfigSessionFactory.java:160) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.SshTransport.getSession(SshTransport.java:137) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.TransportGitSsh$SshPushConnection.&lt;init&gt;(TransportGitSsh.java:322) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.TransportGitSsh.openPush(TransportGitSsh.java:167) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.PushProcess.execute(PushProcess.java:160) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.transport.Transport.push(Transport.java:1275) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	at org.eclipse.jgit.api.PushCommand.call(PushCommand.java:161) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	... 25 common frames omitted
+Caused by: com.jcraft.jsch.JSchException: Auth fail
+	at com.jcraft.jsch.Session.connect(Session.java:512) ~[jsch-0.1.53.jar!/:na]
+	at org.eclipse.jgit.transport.JschConfigSessionFactory.getSession(JschConfigSessionFactory.java:117) ~[org.eclipse.jgit-4.6.0.201612231935-r.jar!/:4.6.0.201612231935-r]
+	... 31 common frames omitted</screen>
+<simpara>To fix that just call</simpara>
+<programlisting language="bash" linenumbering="unnumbered"># to run the agent
+$ eval `ssh-agent`
+# to store the pass in the agent
+$ ssh-add ~/.ssh/id_rsa</programlisting>
+<simpara>before running the app</simpara>
+</section>
+</section>
+</chapter>
+</book>
