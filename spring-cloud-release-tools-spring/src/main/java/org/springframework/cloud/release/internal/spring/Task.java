@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 class Task {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	private static final String MSG = "'q' to quit and 's' to skip\n\n";
+	private static final String MSG = "\nPress 'q' to quit, 's' to skip, any key to continue\n\n";
 
 	final String name;
 	final String shortName;
 	final String header;
 	final String description;
-	final Consumer<Args> consumer;
+	private final Consumer<Args> consumer;
 
 	Task(String name, String shortName, String header, String description, Consumer<Args> consumer) {
 		this.name = name;
@@ -41,12 +41,12 @@ class Task {
 		}
 	}
 
-	private void printLog(boolean shouldSkip) {
-		log.info("\n\n\n=== {} ===\n\n{} {}\n\n", header, description, shouldSkip ? MSG : "");
+	private void printLog(boolean interactive) {
+		log.info("\n\n\n=== {} ===\n\n{} {}\n\n", header, description, interactive ? MSG : "");
 	}
 
 	boolean skipStep() {
-		String input = System.console().readLine();
+		String input = chosenOption();
 		switch (input.toLowerCase()) {
 		case "s":
 			return true;
@@ -56,6 +56,10 @@ class Task {
 		default:
 			return false;
 		}
+	}
+
+	String chosenOption() {
+		return System.console().readLine();
 	}
 
 }

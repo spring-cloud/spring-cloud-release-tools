@@ -71,7 +71,7 @@ class Tasks {
 			args -> DEFAULT_TASKS.forEach(task -> task.execute(args)));
 	static Task RELEASE_VERBOSE = Tasks.task("release-verbose", "r",
 			"FULL VERBOSE RELEASE",
-			"Perform a full release of this project in a verbose mode (you'll be asked about skipping steps)",
+			"Perform a full release of this project in interactive mode (you'll be asked about skipping steps)",
 			args -> DEFAULT_TASKS.forEach(task -> task.execute(args)));
 
 	static final List<Task> COMPOSITE_TASKS = Stream.of(

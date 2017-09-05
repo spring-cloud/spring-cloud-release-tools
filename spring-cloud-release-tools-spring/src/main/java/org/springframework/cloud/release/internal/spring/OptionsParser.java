@@ -23,6 +23,10 @@ class OptionsParser implements Parser {
 		OptionParser parser = new OptionParser();
 		parser.allowsUnrecognizedOptions();
 		try {
+			ArgumentAcceptingOptionSpec<Boolean> fullReleaseOpt = parser
+					.acceptsAll(Arrays.asList("f", "full-release"),
+							"Do you want to do the full release")
+					.withOptionalArg().ofType(Boolean.class).defaultsTo(false);
 			ArgumentAcceptingOptionSpec<Boolean> interactiveOpt = parser
 					.acceptsAll(Arrays.asList("i", "interactive"),
 							"Do you want to set the properties from the command line")
@@ -32,7 +36,7 @@ class OptionsParser implements Parser {
 							task.description)
 							.withOptionalArg());
 			ArgumentAcceptingOptionSpec<String> startFromOpt = parser
-					.acceptsAll(Arrays.asList("f", "start-from"),
+					.acceptsAll(Arrays.asList("a", "start-from"),
 							"Starts all release task starting from the given task. Requires passing the task name (either one letter or the full name)")
 					.withRequiredArg().ofType(String.class);
 			ArgumentAcceptingOptionSpec<String> rangeOpt = parser.acceptsAll(Arrays.asList("r", "range"),
@@ -46,12 +50,14 @@ class OptionsParser implements Parser {
 				System.exit(0);
 			}
 			Boolean interactive = options.valueOf(interactiveOpt);
+			Boolean fullRelease = options.has(fullReleaseOpt);
 			List<String> taskNames = Tasks.ALL_TASKS.stream()
 					.filter(task -> options.has(task.name)).map(task -> task.name)
 					.collect(Collectors.toList());
 			String startFrom = options.valueOf(startFromOpt);
 			String range = options.valueOf(rangeOpt);
 			return new OptionsBuilder()
+					.fullRelease(fullRelease)
 					.interactive(interactive)
 					.taskNames(taskNames)
 					.startFrom(startFrom)
@@ -94,11 +100,11 @@ class OptionsParser implements Parser {
 	private String examples() {
 		return "\nExamples of usage:\n\n"
 				+ "Run 'build' & 'commit' & 'deploy'\n"
-				+ "java -jar jar.jar -bcd\n\n"
+				+ "java -jar jar.jar -b -c -d\n\n"
 				+ "Start from 'push'\n"
-				+ "java -jar jar.jar -f push\n\n"
+				+ "java -jar jar.jar -a push\n\n"
 				+ "Range 'docs' -> 'push'\n"
-				+ "java -jar jar.jar -r d-p\n\n"
+				+ "java -jar jar.jar -r o-p\n\n"
 				+ "\n\n";
 	}
 }

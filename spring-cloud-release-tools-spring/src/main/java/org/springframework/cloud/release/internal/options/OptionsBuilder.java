@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OptionsBuilder {
+	private Boolean fullRelease = false;
 	private Boolean interactive = true;
 	private List<String> taskNames = new ArrayList<>();
 	private String startFrom = "";
 	private String range = "";
-	private String releaserBranch = "";
+
+	public OptionsBuilder fullRelease(Boolean fullRelease) {
+		this.fullRelease = fullRelease;
+		return this;
+	}
 
 	public OptionsBuilder interactive(Boolean interactive) {
 		this.interactive = interactive;
@@ -30,13 +35,8 @@ public class OptionsBuilder {
 		return this;
 	}
 
-	public OptionsBuilder releaserBranch(String releaserBranch) {
-		this.releaserBranch = releaserBranch;
-		return this;
-	}
-
 	public Options options() {
-		return new Options(this.interactive, this.taskNames, this.startFrom,
-				this.range, this.releaserBranch);
+		return new Options(this.fullRelease, this.interactive, this.taskNames, this.startFrom,
+				this.range);
 	}
 }

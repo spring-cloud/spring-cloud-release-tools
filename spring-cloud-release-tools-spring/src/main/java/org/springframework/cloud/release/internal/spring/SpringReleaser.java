@@ -13,7 +13,6 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.util.StringUtils;
 
 /**
  * Releaser that gets input from console
@@ -25,23 +24,24 @@ public class SpringReleaser {
 
 	private final Releaser releaser;
 	private final ReleaserProperties properties;
-	private final List<Task> allTasks;
+	private final OptionsProcessor optionsProcessor;
 
 	@Autowired
 	public SpringReleaser(Releaser releaser, ReleaserProperties properties) {
 		this.releaser = releaser;
 		this.properties = properties;
-		this.allTasks = Tasks.ALL_TASKS;
+		this.optionsProcessor = new OptionsProcessor(releaser, properties);
 	}
 
-	SpringReleaser(Releaser releaser, ReleaserProperties properties, List<Task> allTasks) {
+	SpringReleaser(Releaser releaser, ReleaserProperties properties,
+			OptionsProcessor optionsProcessor) {
 		this.releaser = releaser;
 		this.properties = properties;
-		this.allTasks = allTasks;
+		this.optionsProcessor = optionsProcessor;
 	}
 
 	/**
-	 * Current behaviour - interactive mode
+	 * Default behaviour - interactive mode
 	 */
 	public void release() {
 		release(new OptionsBuilder().options());
@@ -52,75 +52,17 @@ public class SpringReleaser {
 		String workingDir = this.properties.getWorkingDir();
 		File project = new File(workingDir);
 		ProjectVersion originalVersion = new ProjectVersion(project);
-		Projects projects = this.releaser.retrieveVersionsFromSCRelease();
-		ProjectVersion versionFromScRelease = projects.forFile(project);
-		assertNoSnapshotsForANonSnapshotProject(projects, versionFromScRelease);
-		final Args defaultArgs = new Args(this.releaser, project, projects, originalVersion, versionFromScRelease,
-				this.properties, options.interactive);
-		processOptions(options, defaultArgs);
+		Projects projectsFromScRelease = this.releaser.retrieveVersionsFromSCRelease();
+		ProjectVersion versionFromScRelease = projectsFromScRelease.forFile(project);
+		assertNoSnapshotsForANonSnapshotProject(projectsFromScRelease, versionFromScRelease);
+		final Args defaultArgs = new Args(this.releaser, project, projectsFromScRelease,
+				originalVersion, versionFromScRelease, this.properties, options.interactive);
+		this.optionsProcessor.processOptions(options, defaultArgs);
 	}
 
-	void processOptions(Options options, Args args) {
-		if (StringUtils.hasText(options.startFrom)) {
-			startFrom(options, args);
-		} else if (StringUtils.hasText(options.range)) {
-			range(options, args);
-		} else if (!options.taskNames.isEmpty()) {
-			tasks(options, args);
-		} else if (options.interactive) {
-			interactiveOnly(args);
-		} else {
-			throw new IllegalStateException("You haven't picked any recognizable option");
-		}
-	}
-
-	private void interactiveOnly(Args defaultArgs) {
-		log.info(buildOptionsText().toString());
-		int chosenOption = chosenOption();
-		log.info("\n\n\nYou chose [{}]: [{}]\n\n\n", chosenOption, this.allTasks.get(chosenOption).description);
-		boolean interactive = chosenOption == 1;
-		Task task = taskFromOption(chosenOption);
-		Args args = new Args(this.releaser, defaultArgs.project, defaultArgs.projects,
-				defaultArgs.originalVersion, defaultArgs.versionFromScRelease, this.properties, interactive);
-		task.consumer.accept(args);
-	}
-
-	private void tasks(Options options, Args defaultArgs) {
-		Tasks.forNames(this.allTasks, options.taskNames).forEach(task -> task.consumer.accept(defaultArgs));
-	}
-
-	private void range(Options options, Args defaultArgs) {
-		String[] splitRange = options.range.split("-");
-		String start = splitRange[0];
-		String stop = splitRange[1];
-		boolean started = false;
-		boolean sameRange = start.equals(stop);
-		for (Task task : this.allTasks) {
-			if (start.equals(task.name) || start.equals(task.shortName)) {
-				started = true;
-				task.consumer.accept(defaultArgs);
-				if (sameRange) {
-					break;
-				}
-			} else if (started) {
-				task.consumer.accept(defaultArgs);
-			} else if (started && (stop.equals(task.name) || stop.equals(task.shortName))) {
-				task.consumer.accept(defaultArgs);
-				break;
-			}
-		}
-	}
-
-	private void startFrom(Options options, Args defaultArgs) {
-		boolean started = false;
-		for (Task task : this.allTasks) {
-			if (options.startFrom.equals(task.name) || options.startFrom.equals(task.shortName)) {
-				started = true;
-				task.consumer.accept(defaultArgs);
-			} else if (started) {
-				task.consumer.accept(defaultArgs);
-			}
-		}
+	private void printVersionRetrieval() {
+		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone Spring Cloud Release"
+				+ " to retrieve all versions for the branch [{}]", this.properties.getPom().getBranch());
 	}
 
 	private void assertNoSnapshotsForANonSnapshotProject(Projects projects,
@@ -132,33 +74,6 @@ public class SpringReleaser {
 		}
 	}
 
-	private StringBuilder buildOptionsText() {
-		StringBuilder msg = new StringBuilder();
-		msg.append("\n\n\n=== WHAT DO YOU WANT TO DO? ===\n\n");
-		for (int i = 0; i < this.allTasks.size(); i++) {
-			msg.append(i).append(") ").append(this.allTasks.get(i).description).append("\n");
-		}
-		msg.append("\n\n").append("You can press 'q' to quit\n\n");
-		return msg;
-	}
 
-	private void printVersionRetrieval() {
-		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone Spring Cloud Release"
-				+ " to retrieve all versions for the branch [{}]", this.properties.getPom().getBranch());
-	}
-
-	private Task taskFromOption(int option) {
-		return this.allTasks.get(option);
-	}
-
-	int chosenOption() {
-		String input = System.console().readLine();
-		switch (input.toLowerCase()) {
-		case "q":
-			System.exit(0);
-		default:
-			return Integer.parseInt(input);
-		}
-	}
 }
 

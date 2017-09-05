@@ -236,11 +236,11 @@ public class AcceptanceTests {
 	private SpringReleaser releaserWithFullDeployment(String expectedVersion,
 			ReleaserProperties properties) throws Exception {
 		Releaser releaser = defaultReleaser(expectedVersion, properties);
-		return new SpringReleaser(releaser, properties) {
-			@Override int chosenOption() {
-				return 0;
+		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties) {
+			@Override String chosenOption() {
+				return "0";
 			}
-		};
+		});
 	}
 
 	private SpringReleaser releaserWithSnapshotScRelease(File projectFile, String branch, String expectedVersion) throws Exception {
@@ -251,11 +251,11 @@ public class AcceptanceTests {
 	private SpringReleaser templateOnlyReleaser(File projectFile, String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
 		Releaser releaser = defaultReleaser(expectedVersion, properties);
-		return new SpringReleaser(releaser, properties) {
-			@Override int chosenOption() {
-				return 10;
+		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties) {
+			@Override String chosenOption() {
+				return "10";
 			}
-		};
+		});
 	}
 
 	private Releaser defaultReleaser(String expectedVersion, ReleaserProperties properties) throws Exception {
