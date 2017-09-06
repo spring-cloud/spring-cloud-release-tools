@@ -19,12 +19,12 @@ import static org.mockito.Mockito.never;
  * @author Marcin Grzejszczak
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectGitUpdaterTests {
+public class ProjectGitHandlerTests {
 
 	@Mock GitRepo gitRepo;
-	ProjectGitUpdater updater = new ProjectGitUpdater(new ReleaserProperties()) {
+	ProjectGitHandler updater = new ProjectGitHandler(new ReleaserProperties()) {
 		@Override GitRepo gitRepo(File workingDir) {
-			return ProjectGitUpdaterTests.this.gitRepo;
+			return ProjectGitHandlerTests.this.gitRepo;
 		}
 	};
 	File file = new File("");

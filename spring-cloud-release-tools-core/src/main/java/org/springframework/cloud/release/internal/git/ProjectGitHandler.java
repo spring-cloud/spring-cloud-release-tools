@@ -11,11 +11,11 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
 /**
- * Contains business logic around Git operations
+ * Contains business logic around Git & Github operations
  *
  * @author Marcin Grzejszczak
  */
-public class ProjectGitUpdater {
+public class ProjectGitHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -25,11 +25,11 @@ public class ProjectGitUpdater {
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
 
 	private final ReleaserProperties properties;
-	private final MilestoneCloser milestoneCloser;
+	private final GithubMilestones githubMilestones;
 
-	public ProjectGitUpdater(ReleaserProperties properties) {
+	public ProjectGitHandler(ReleaserProperties properties) {
 		this.properties = properties;
-		this.milestoneCloser = new MilestoneCloser(properties);
+		this.githubMilestones = new GithubMilestones(properties);
 	}
 
 	public void commitAndTagIfApplicable(File project, ProjectVersion version) {
@@ -87,7 +87,11 @@ public class ProjectGitUpdater {
 	}
 
 	public void closeMilestone(ProjectVersion releaseVersion) {
-		this.milestoneCloser.closeMilestone(releaseVersion);
+		this.githubMilestones.closeMilestone(releaseVersion);
+	}
+
+	public String milestoneUrl(ProjectVersion releaseVersion) {
+		return this.githubMilestones.milestoneUrl(releaseVersion);
 	}
 
 	GitRepo gitRepo(File workingDir) {

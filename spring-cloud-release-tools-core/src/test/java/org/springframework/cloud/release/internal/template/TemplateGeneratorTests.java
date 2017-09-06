@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 import org.junit.Test;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 
@@ -17,52 +18,51 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public class TemplateGeneratorTests {
 
+	ReleaserProperties props = new ReleaserProperties();
+	ProjectGitHandler handler = new ProjectGitHandler(this.props);
+
 	@Test
 	public void should_generate_email_from_template_for_tag_with_v_prefix() {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("vDalston.RELEASE");
+		this.props.getPom().setBranch("vDalston.RELEASE");
 
-		File generatedMail = new TemplateGenerator(props).email();
+		File generatedMail = new TemplateGenerator(this.props, this.handler).email();
 
 		then(generatedMail).hasContent(expectedEmail());
 	}
 
 	@Test
 	public void should_generate_email_from_template_when_output_folder_is_missing() {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("vDalston.RELEASE");
+		this.props.getPom().setBranch("vDalston.RELEASE");
 
-		File generatedMail = new TemplateGenerator(props, new File("target/foo/bar/baz/template.txt")).email();
+		File generatedMail = new TemplateGenerator(this.props, new File("target/foo/bar/baz/template.txt"),
+				handler).email();
 
 		then(generatedMail).hasContent(expectedEmail());
 	}
 
 	@Test
 	public void should_generate_email_from_template_for_tag_without_v_prefix() {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("Dalston.RELEASE");
+		this.props.getPom().setBranch("Dalston.RELEASE");
 
-		File generatedMail = new TemplateGenerator(props).email();
+		File generatedMail = new TemplateGenerator(this.props, this.handler).email();
 
 		then(generatedMail).hasContent(expectedEmail());
 	}
 
 	@Test
 	public void should_generate_tweet_from_template_for_tag_with_v_prefix() {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("vDalston.RELEASE");
+		this.props.getPom().setBranch("vDalston.RELEASE");
 
-		File generatedTweet = new TemplateGenerator(props).tweet();
+		File generatedTweet = new TemplateGenerator(this.props, this.handler).tweet();
 
 		then(generatedTweet).hasContent(expectedTweet());
 	}
 
 	@Test
 	public void should_generate_tweet_from_template_for_tag_without_v_prefix() {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("Dalston.RELEASE");
+		this.props.getPom().setBranch("Dalston.RELEASE");
 
-		File generatedTweet = new TemplateGenerator(props).tweet();
+		File generatedTweet = new TemplateGenerator(this.props, this.handler).tweet();
 
 		then(generatedTweet).hasContent(expectedTweet());
 	}
@@ -70,8 +70,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_blog_from_template_for_tag_with_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("vDalston.RELEASE");
+		this.props.getPom().setBranch("vDalston.RELEASE");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 						add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RELEASE"));
@@ -79,7 +78,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("General Availability (RELEASE) of the [Spring Cloud Dalston]")
@@ -93,8 +92,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_blog_from_template_for_tag_without_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("Dalston.RELEASE");
+		this.props.getPom().setBranch("Dalston.RELEASE");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 						add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RELEASE"));
@@ -102,7 +100,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("General Availability (RELEASE) of the [Spring Cloud Dalston]")
@@ -116,8 +114,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_sr_blog_from_template_for_tag_with_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("vDalston.SR1");
+		this.props.getPom().setBranch("vDalston.SR1");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 						add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RELEASE"));
@@ -125,7 +122,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("Service Release 1 (SR1) of the [Spring Cloud Dalston]")
@@ -139,8 +136,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_sr_blog_from_template_for_tag_without_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("Dalston.SR1");
+		this.props.getPom().setBranch("Dalston.SR1");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 						add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RELEASE"));
@@ -148,7 +144,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("Service Release 1 (SR1) of the [Spring Cloud Dalston]")
@@ -162,8 +158,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_milestone_blog_from_template_for_tag_with_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("vDalston.M1");
+		this.props.getPom().setBranch("vDalston.M1");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 						add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.M1"));
@@ -171,7 +166,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("Milestone 1 (M1) of the [Spring Cloud Dalston]")
@@ -187,8 +182,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_milestone_blog_from_template_for_tag_without_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("Dalston.M1");
+		this.props.getPom().setBranch("Dalston.M1");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 					add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.M1"));
@@ -196,7 +190,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("Milestone 1 (M1) of the [Spring Cloud Dalston]")
@@ -212,8 +206,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_rc_blog_from_template_for_tag_with_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("vDalston.RC1");
+		this.props.getPom().setBranch("vDalston.RC1");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 						add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RC1"));
@@ -221,7 +214,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("Release Candidate 1 (RC1) of the [Spring Cloud Dalston]")
@@ -237,8 +230,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_rc_blog_from_template_for_tag_without_v_prefix_release()
 			throws IOException {
-		ReleaserProperties props = new ReleaserProperties();
-		props.getPom().setBranch("Dalston.RC1");
+		this.props.getPom().setBranch("Dalston.RC1");
 		Projects projects = new Projects(
 				new HashSet<ProjectVersion>() {{
 					add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RC1"));
@@ -246,7 +238,7 @@ public class TemplateGeneratorTests {
 				}}
 		);
 
-		File generatedBlog = new TemplateGenerator(props).blog(projects);
+		File generatedBlog = new TemplateGenerator(this.props, this.handler).blog(projects);
 
 		then(content(generatedBlog))
 				.contains("Release Candidate 1 (RC1) of the [Spring Cloud Dalston]")
@@ -257,6 +249,32 @@ public class TemplateGeneratorTests {
 				.contains("url 'http://repo.spring.io/milestone'")
 				.contains("<version>Dalston.RC1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RC1'");
+	}
+
+	@Test
+	public void should_generate_release_notes_template_when_url_exists()
+			throws IOException {
+		ProjectGitHandler handler = new ProjectGitHandler(this.props) {
+			@Override public String milestoneUrl(ProjectVersion releaseVersion) {
+				return "http://foo.bar.com";
+			}
+		};
+		this.props.getPom().setBranch("Dalston.RC1");
+		Projects projects = new Projects(
+				new HashSet<ProjectVersion>() {{
+					add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RC1"));
+					add(new ProjectVersion("spring-cloud-consul", "1.0.1.RC1"));
+					add(new ProjectVersion("spring-boot-dependencies", "1.0.1.RC1"));
+				}}
+		);
+
+		File generatedOutput = new TemplateGenerator(this.props, handler).releaseNotes(projects);
+
+		then(content(generatedOutput))
+				.contains("# Dalston.RC1")
+				.contains("Spring Cloud Sleuth `1.0.0.RC1` ([issues](http://foo.bar.com))")
+				.contains("Spring Cloud Consul `1.0.1.RC1` ([issues](http://foo.bar.com))")
+				.doesNotContain("Boot");
 	}
 
 	private String content(File file) throws IOException {

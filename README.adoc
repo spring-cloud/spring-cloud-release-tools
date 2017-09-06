@@ -39,6 +39,7 @@ why this tool makes it easy to automate the release / dependency update process 
 - Generates an email template under `target/email.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a blog template under `target/blog.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a tweet template under `target/tweet.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
+- Generates a release notes template under `target/notes.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 
 === How to run it
 
@@ -100,6 +101,8 @@ the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in 
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
 - `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
+- `releaser.git.number-of-checked-milestones` - In order not to iterate endlessly over milestones we introduce a threshold of milestones that
+we will go through to find the matching milestone. Defaults to `10`
 - `releaser.maven.build-command` - Command to be executed to build the project. Defaults to `./mvnw clean install -Pdocs`
 - `releaser.maven.deploy-command` - Command to be executed to deploy a built project". Defaults to `./mvnw deploy -DskipTests -Pfast`
 - `releaser.maven.publish-docs-commands` - Command to be executed to deploy a built project. If present `{{version}}` will be replaced by the proper version.

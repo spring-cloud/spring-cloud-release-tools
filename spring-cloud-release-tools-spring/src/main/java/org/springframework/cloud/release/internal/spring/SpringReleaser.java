@@ -63,6 +63,7 @@ public class SpringReleaser {
 						args.releaser.createEmail(args.versionFromScRelease);
 						args.releaser.createBlog(args.versionFromScRelease, args.projects);
 						args.releaser.createTweet(args.versionFromScRelease);
+						args.releaser.createReleaseNotes(args.versionFromScRelease, args.projects);
 					})
 	).collect(Collectors.toList());
 

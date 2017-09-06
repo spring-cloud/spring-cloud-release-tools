@@ -30,7 +30,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 
 /**
  * @author Marcin Grzejszczak
@@ -40,12 +40,12 @@ public class ProjectPomUpdater {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private final ReleaserProperties properties;
-	private final ProjectGitUpdater gitRepo;
+	private final ProjectGitHandler gitRepo;
 	private final PomUpdater pomUpdater = new PomUpdater();
 
 	public ProjectPomUpdater(ReleaserProperties properties) {
 		this.properties = properties;
-		this.gitRepo = new ProjectGitUpdater(properties);
+		this.gitRepo = new ProjectGitHandler(properties);
 	}
 
 	/**

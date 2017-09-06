@@ -17,7 +17,7 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
-import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -38,7 +38,7 @@ public class AcceptanceTests {
 	TestPomReader testPomReader = new TestPomReader();
 	File springCloudConsulProject;
 	File temporaryFolder;
-	TestProjectGitUpdater gitUpdater;
+	TestProjectGitHandler gitHandler;
 
 	@Before
 	public void setup() throws Exception {
@@ -80,7 +80,7 @@ public class AcceptanceTests {
 		commitIsPresent(iterator, "Update SNAPSHOT to 1.1.2.RELEASE");
 		pomVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
-		then(this.gitUpdater.executed).isTrue();
+		then(this.gitHandler.closedMilestones).isTrue();
 		then(emailTemplate()).exists();
 		then(emailTemplateContents())
 				.contains("Spring Cloud Camden.SR5 available")
@@ -88,6 +88,11 @@ public class AcceptanceTests {
 		then(blogTemplate()).exists();
 		then(blogTemplateContents())
 				.contains("I am pleased to announce that the Service Release 5 (SR5)");
+		then(releaseNotesTemplate()).exists();
+		then(releaseNotesTemplateContents())
+				.contains("Camden.SR5")
+				.contains("- Spring Cloud Config `1.2.2.RELEASE` ([issues](http://foo.bar.com/1.2.2.RELEASE))")
+				.contains("- Spring Cloud Aws `1.1.3.RELEASE` ([issues](http://foo.bar.com/1.1.3.RELEASE))");
 	}
 
 	@Test
@@ -109,7 +114,7 @@ public class AcceptanceTests {
 		commitIsPresent(iterator, "Update SNAPSHOT to 1.2.0.RC1");
 		pomVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
-		then(this.gitUpdater.executed).isTrue();
+		then(this.gitHandler.closedMilestones).isTrue();
 		then(emailTemplate()).exists();
 		then(emailTemplateContents())
 				.contains("Spring Cloud Dalston.RC1 available")
@@ -120,6 +125,11 @@ public class AcceptanceTests {
 		then(tweetTemplate()).exists();
 		then(tweetTemplateContents())
 				.contains("The Dalston.RC1 version of @springcloud has been released!");
+		then(releaseNotesTemplate()).exists();
+		then(releaseNotesTemplateContents())
+				.contains("Dalston.RC1")
+				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
+				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
 	}
 
 	@Test
@@ -133,7 +143,7 @@ public class AcceptanceTests {
 
 		releaser.release();
 
-		then(this.gitUpdater.executed).isFalse();
+		then(this.gitHandler.closedMilestones).isFalse();
 		then(emailTemplate()).exists();
 		then(emailTemplateContents())
 				.contains("Spring Cloud Dalston.RC1 available")
@@ -144,6 +154,11 @@ public class AcceptanceTests {
 		then(tweetTemplate()).exists();
 		then(tweetTemplateContents())
 				.contains("The Dalston.RC1 version of @springcloud has been released!");
+		then(releaseNotesTemplate()).exists();
+		then(releaseNotesTemplateContents())
+				.contains("Dalston.RC1")
+				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
+				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1)");
 	}
 
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -197,12 +212,20 @@ public class AcceptanceTests {
 		return new File("target/tweet.txt");
 	}
 
+	private File releaseNotesTemplate() throws URISyntaxException {
+		return new File("target/notes.md");
+	}
+
 	private String blogTemplateContents() throws URISyntaxException, IOException {
 		return new String(Files.readAllBytes(blogTemplate().toPath()));
 	}
 
 	private String tweetTemplateContents() throws URISyntaxException, IOException {
 		return new String(Files.readAllBytes(tweetTemplate().toPath()));
+	}
+
+	private String releaseNotesTemplateContents() throws URISyntaxException, IOException {
+		return new String(Files.readAllBytes(releaseNotesTemplate().toPath()));
 	}
 
 	private SpringReleaser releaser(File projectFile, String branch, String expectedVersion) throws Exception {
@@ -238,13 +261,13 @@ public class AcceptanceTests {
 	private Releaser defaultReleaser(String expectedVersion, ReleaserProperties properties) throws Exception {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
-		TestProjectGitUpdater gitUpdater = new TestProjectGitUpdater(properties,
+		TestProjectGitHandler handler = new TestProjectGitHandler(properties,
 				expectedVersion);
-		TemplateGenerator templateGenerator = new TemplateGenerator(properties);
+		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
-		Releaser releaser = new Releaser(pomUpdater, projectBuilder, gitUpdater,
+		Releaser releaser = new Releaser(pomUpdater, projectBuilder, handler,
 				templateGenerator, gradleUpdater);
-		this.gitUpdater = gitUpdater;
+		this.gitHandler = handler;
 		return releaser;
 	}
 
@@ -265,12 +288,12 @@ public class AcceptanceTests {
 		return releaserProperties;
 	}
 
-	class TestProjectGitUpdater extends ProjectGitUpdater {
+	class TestProjectGitHandler extends ProjectGitHandler {
 
-		boolean executed = false;
+		boolean closedMilestones = false;
 		final String expectedVersion;
 
-		public TestProjectGitUpdater(ReleaserProperties properties,
+		public TestProjectGitHandler(ReleaserProperties properties,
 				String expectedVersion) {
 			super(properties);
 			this.expectedVersion = expectedVersion;
@@ -279,7 +302,11 @@ public class AcceptanceTests {
 		@Override public void closeMilestone(ProjectVersion releaseVersion) {
 			then(releaseVersion.projectName).isEqualTo("spring-cloud-consul");
 			then(releaseVersion.version).isEqualTo(this.expectedVersion);
-			this.executed = true;
+			this.closedMilestones = true;
+		}
+
+		@Override public String milestoneUrl(ProjectVersion releaseVersion) {
+			return "http://foo.bar.com/" + releaseVersion.toString();
 		}
 	}
 

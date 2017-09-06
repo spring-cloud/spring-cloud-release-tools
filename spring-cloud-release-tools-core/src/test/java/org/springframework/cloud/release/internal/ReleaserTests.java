@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -30,7 +30,7 @@ public class ReleaserTests {
 
 	@Mock ProjectPomUpdater projectPomUpdater;
 	@Mock ProjectBuilder projectBuilder;
-	@Mock ProjectGitUpdater projectGitUpdater;
+	@Mock ProjectGitHandler projectGitHandler;
 	@Mock TemplateGenerator templateGenerator;
 	@Mock GradleUpdater gradleUpdater;
 	File pom;
@@ -43,7 +43,7 @@ public class ReleaserTests {
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitUpdater, this.templateGenerator, this.gradleUpdater) {
+				this.projectGitHandler, this.templateGenerator, this.gradleUpdater) {
 			@Override ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
 			}
@@ -52,7 +52,7 @@ public class ReleaserTests {
 
 	Releaser releaser() {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitUpdater, this.templateGenerator, this.gradleUpdater);
+				this.projectGitHandler, this.templateGenerator, this.gradleUpdater);
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class ReleaserTests {
 	public void should_not_close_milestone_for_snapshots() throws Exception {
 		releaser().closeMilestone(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(this.projectGitUpdater).should(never()).closeMilestone(any(ProjectVersion.class));
+		then(this.projectGitHandler).should(never()).closeMilestone(any(ProjectVersion.class));
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class ReleaserTests {
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
 				.rollbackReleaseVersion(null, new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(this.projectGitUpdater).should(never()).revertChangesIfApplicable(any(File.class), any(ProjectVersion.class));
+		then(this.projectGitHandler).should(never()).revertChangesIfApplicable(any(File.class), any(ProjectVersion.class));
 	}
 
 }

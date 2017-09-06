@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
-import org.springframework.cloud.release.internal.git.ProjectGitUpdater;
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
@@ -21,16 +21,16 @@ public class Releaser {
 
 	private final ProjectPomUpdater projectPomUpdater;
 	private final ProjectBuilder projectBuilder;
-	private final ProjectGitUpdater projectGitUpdater;
+	private final ProjectGitHandler projectGitHandler;
 	private final TemplateGenerator templateGenerator;
 	private final GradleUpdater gradleUpdater;
 
 	public Releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
-			ProjectGitUpdater projectGitUpdater, TemplateGenerator templateGenerator,
+			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
 			GradleUpdater gradleUpdater) {
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectBuilder = projectBuilder;
-		this.projectGitUpdater = projectGitUpdater;
+		this.projectGitHandler = projectGitHandler;
 		this.templateGenerator = templateGenerator;
 		this.gradleUpdater = gradleUpdater;
 	}
@@ -53,7 +53,7 @@ public class Releaser {
 	}
 
 	public void commitAndPushTags(File project, ProjectVersion changedVersion) {
-		this.projectGitUpdater.commitAndTagIfApplicable(project, changedVersion);
+		this.projectGitHandler.commitAndTagIfApplicable(project, changedVersion);
 		log.info("\nCommit was made and tag was pushed successfully");
 	}
 
@@ -72,12 +72,12 @@ public class Releaser {
 			log.info("\nWon't rollback a snapshot version");
 			return;
 		}
-		this.projectGitUpdater.revertChangesIfApplicable(project, scReleaseVersion);
+		this.projectGitHandler.revertChangesIfApplicable(project, scReleaseVersion);
 		ProjectVersion originalVersion = originalVersion(project);
 		log.info("Original project version is [{}]", originalVersion);
 		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
 			this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
-			this.projectGitUpdater.commitAfterBumpingVersions(project, originalVersion);
+			this.projectGitHandler.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 		} else {
 			log.info("\nSuccessfully reverted the commit and came back to snapshot versions");
@@ -89,7 +89,7 @@ public class Releaser {
 	}
 
 	public void pushCurrentBranch(File project) {
-		this.projectGitUpdater.pushCurrentBranch(project);
+		this.projectGitHandler.pushCurrentBranch(project);
 		log.info("\nSuccessfully pushed current branch");
 	}
 
@@ -98,7 +98,7 @@ public class Releaser {
 			log.info("\nWon't close a milestone for a SNAPSHOT version");
 			return;
 		}
-		this.projectGitUpdater.closeMilestone(releaseVersion);
+		this.projectGitHandler.closeMilestone(releaseVersion);
 		log.info("\nSuccessfully closed milestone");
 	}
 
@@ -127,5 +127,14 @@ public class Releaser {
 		}
 		File blog = this.templateGenerator.tweet();
 		log.info("\nSuccessfully created tweet template at location [{}]", blog);
+	}
+
+	public void createReleaseNotes(ProjectVersion releaseVersion, Projects projects) {
+		if (releaseVersion.isSnapshot()) {
+			log.info("\nWon't create release notes for a SNAPSHOT version");
+			return;
+		}
+		File output = this.templateGenerator.releaseNotes(projects);
+		log.info("\nSuccessfully created release notes at location [{}]", output);
 	}
 }

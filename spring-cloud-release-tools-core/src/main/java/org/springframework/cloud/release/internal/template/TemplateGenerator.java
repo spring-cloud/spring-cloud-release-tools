@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
 
 /**
@@ -19,23 +20,30 @@ public class TemplateGenerator {
 	private static final String EMAIL_TEMPLATE = "email";
 	private static final String BLOG_TEMPLATE = "blog";
 	private static final String TWITTER_TEMPLATE = "tweet";
+	private static final String RELEASE_NOTES_TEMPLATE = "notes";
 	private final File emailOutput;
 	private final File blogOutput;
 	private final File tweetOutput;
+	private final File releaseNotesOutput;
 	private final ReleaserProperties props;
+	private final ProjectGitHandler handler;
 
-	public TemplateGenerator(ReleaserProperties props) {
+	public TemplateGenerator(ReleaserProperties props, ProjectGitHandler handler) {
 		this.props = props;
+		this.handler = handler;
 		this.emailOutput = new File("target/email.txt");
 		this.blogOutput = new File("target/blog.md");
 		this.tweetOutput = new File("target/tweet.txt");
+		this.releaseNotesOutput = new File("target/notes.md");
 	}
 
-	TemplateGenerator(ReleaserProperties props, File output) {
+	TemplateGenerator(ReleaserProperties props, File output, ProjectGitHandler handler) {
 		this.props = props;
 		this.emailOutput = output;
 		this.blogOutput = output;
 		this.tweetOutput = output;
+		this.releaseNotesOutput = output;
+		this.handler = handler;
 	}
 
 	public File email() {
@@ -73,6 +81,14 @@ public class TemplateGenerator {
 		String releaseVersion = parsedVersion();
 		Template template = template(TWITTER_TEMPLATE);
 		return new TwitterTemplateGenerator(template, releaseVersion, output).tweet();
+	}
+
+	public File releaseNotes(Projects projects) {
+		File output = file(this.releaseNotesOutput);
+		String releaseVersion = parsedVersion();
+		Template template = template(RELEASE_NOTES_TEMPLATE);
+		return new ReleaseNotesTemplateGenerator(template, releaseVersion,
+				output, projects, this.handler).releseNotes();
 	}
 
 	private String parsedVersion() {

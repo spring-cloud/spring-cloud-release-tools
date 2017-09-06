@@ -1,5 +1,8 @@
 package org.springframework.cloud.release.internal.template;
 
+import com.github.jknack.handlebars.Template;
+import com.google.common.collect.ImmutableMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,9 +15,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.util.StringUtils;
-
-import com.github.jknack.handlebars.Template;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * @author Marcin Grzejszczak
@@ -68,13 +68,13 @@ class BlogTemplateGenerator {
 		}
 	}
 
-	private Set<Tuple> fromProjects() {
+	private Set<BlogTuple> fromProjects() {
 		return this.projects.stream().map(projectVersion -> {
 			String name = projectVersion.projectName;
 			String version = projectVersion.version;
 			String convertedName = Arrays.stream(name.split("-")).map(
 					StringUtils::capitalize).collect(Collectors.joining(" "));
-			return new Tuple(convertedName, version);
+			return new BlogTuple(convertedName, version);
 		}).collect(Collectors.toSet());
 	}
 
@@ -111,11 +111,11 @@ class BlogTemplateGenerator {
 	}
 }
 
-class Tuple {
+class BlogTuple {
 	private final String name;
 	private final String version;
 
-	Tuple(String name, String version) {
+	BlogTuple(String name, String version) {
 		this.name = name;
 		this.version = version;
 	}
@@ -133,10 +133,10 @@ class Tuple {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		Tuple tuple = (Tuple) o;
-		if (name != null ? !name.equals(tuple.name) : tuple.name != null)
+		BlogTuple blogTuple = (BlogTuple) o;
+		if (name != null ? !name.equals(blogTuple.name) : blogTuple.name != null)
 			return false;
-		return version != null ? version.equals(tuple.version) : tuple.version == null;
+		return version != null ? version.equals(blogTuple.version) : blogTuple.version == null;
 	}
 
 	@Override public int hashCode() {

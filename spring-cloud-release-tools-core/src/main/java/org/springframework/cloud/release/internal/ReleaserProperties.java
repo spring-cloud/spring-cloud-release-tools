@@ -62,6 +62,12 @@ public class ReleaserProperties {
 		 */
 		private String oauthToken;
 
+		/**
+		 * In order not to iterate endlessly over milestones we introduce a threshold of milestones
+		 * that we will go through to find the matching milestone
+		 */
+		private Integer numberOfCheckedMilestones = 10;
+
 		public String getSpringCloudReleaseGitUrl() {
 			return this.springCloudReleaseGitUrl;
 		}
@@ -86,6 +92,13 @@ public class ReleaserProperties {
 			this.oauthToken = oauthToken;
 		}
 
+		public Integer getNumberOfCheckedMilestones() {
+			return this.numberOfCheckedMilestones;
+		}
+
+		public void setNumberOfCheckedMilestones(Integer numberOfCheckedMilestones) {
+			this.numberOfCheckedMilestones = numberOfCheckedMilestones;
+		}
 	}
 	public static class Pom {
 
