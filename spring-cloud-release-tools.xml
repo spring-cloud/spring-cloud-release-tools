@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2017-08-31</date>
+<date>2017-09-06</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -58,6 +58,9 @@ why this tool makes it easy to automate the release / dependency update process 
 </listitem>
 <listitem>
 <simpara>Generates a tweet template under <literal>target/tweet.txt</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>Generates a release notes template under <literal>target/notes.md</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
 </listitem>
 </itemizedlist>
 </section>
@@ -115,6 +118,10 @@ the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</liter
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.number-of-checked-milestones</literal> - In order not to iterate endlessly over milestones we introduce a threshold of milestones that
+we will go through to find the matching milestone. Defaults to <literal>10</literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.maven.build-command</literal> - Command to be executed to build the project. Defaults to <literal>./mvnw clean install -Pdocs</literal></simpara>
