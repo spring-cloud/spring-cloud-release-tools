@@ -43,6 +43,8 @@ public class ReleaserProperties {
 
 	private Gradle gradle = new Gradle();
 
+	private Sagan sagan = new Sagan();
+
 	private Map<String, String> fixedVersions = new HashMap<>();
 
 	public static class Git {
@@ -257,11 +259,11 @@ public class ReleaserProperties {
 		 * Defaults to test projects and samples.
 		 */
 		@SuppressWarnings("unchecked")
-		private List<String> ignoredGradleRegex = Arrays.asList(new String[] {
+		private List<String> ignoredGradleRegex = Arrays.asList(
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
 				"^.*samples/standalone/[a-z]+/.*$"
-		});
+		);
 
 		public Map<String, String> getGradlePropsSubstitution() {
 			return this.gradlePropsSubstitution;
@@ -280,6 +282,22 @@ public class ReleaserProperties {
 			this.ignoredGradleRegex = ignoredGradleRegex;
 		}
 	}
+
+	public static class Sagan {
+		/**
+		 * URL to the Sagan API
+		 */
+		private String baseUrl;
+
+		public String getBaseUrl() {
+			return this.baseUrl;
+		}
+
+		public void setBaseUrl(String baseUrl) {
+			this.baseUrl = baseUrl;
+		}
+	}
+
 	public String getWorkingDir() {
 		return StringUtils.hasText(this.workingDir) ?
 				this.workingDir : System.getProperty("user.dir");
@@ -327,5 +345,13 @@ public class ReleaserProperties {
 
 	public void setFixedVersions(Map<String, String> fixedVersions) {
 		this.fixedVersions = fixedVersions;
+	}
+
+	public Sagan getSagan() {
+		return this.sagan;
+	}
+
+	public void setSagan(Sagan sagan) {
+		this.sagan = sagan;
 	}
 }

@@ -23,6 +23,22 @@
 		<module>spring-cloud-release-tools-spring</module>
 	</modules>
 
+	<properties>
+		<spring-cloud-bom.version>Edgware.BUILD-SNAPSHOT</spring-cloud-bom.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud-bom.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<repositories>
 		<repository>
 			<id>spring-snapshots</id>
