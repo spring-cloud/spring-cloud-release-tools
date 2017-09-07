@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2017-09-06</date>
+<date>2017-09-07</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -64,13 +64,16 @@ why this tool makes it easy to automate the release / dependency update process 
 </listitem>
 </itemizedlist>
 </section>
-<section xml:id="_how_to_run_it">
-<title>How to run it</title>
+<section xml:id="_what_should_i_do_first">
+<title>What should I do first?</title>
 <simpara>Members of the Spring Cloud Team typically use this tool as follows. They first
 clone the releaser locally and build the jar manually</simpara>
 <programlisting language="bash" linenumbering="unnumbered">$ git clone git@github.com:spring-cloud/spring-cloud-release-tools.git
 $ cd spring-cloud-release-tools
 $ ./mvnw clean install</programlisting>
+</section>
+<section xml:id="_how_to_run_it_interactive_mode">
+<title>How to run it (interactive mode)</title>
 <simpara>Go to your project (e.g. Spring Cloud Sleuth)</simpara>
 <programlisting language="bash" linenumbering="unnumbered">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
@@ -89,19 +92,120 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 2) Update poms with versions from Spring Cloud Release
 3) Build the project
 4) Commit, tag and push the tag
-5) Deploy the artifacts to Artifactory
+5) Deploy the artifacts
 6) Publish the docs
 7) Go back to snapshots and bump originalVersion by patch
 8) Push the commits
 9) Close the milestone at Github
-10) Create email / tweet etc. templates
+10) Create email / blog / tweet etc. templates
 
+You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]
+You can execute all tasks starting from a job by using a hyphen and providing only one number - e.g. '8-' will execute jobs [8,9,10]
+You can execute given tasks by providing a colon separated list of tasks - e.g. '3,7,8' will execute jobs [3,7,8]
 
 You can press 'q' to quit</screen>
-<simpara>Just pick a number and continue! Pick either a full release or single steps.</simpara>
+<simpara>Just pick a number and continue! Pick either a full release or single steps. You can also pick
+ranges or multiple steps. You can also provide the range only with the starting step
+- that you will execute all steps starting from the given one.</simpara>
 <tip>
 <simpara>Read before picking a number cause it might have changed between tool releases ;)</simpara>
 </tip>
+</section>
+<section xml:id="_how_to_run_it_automatic_mode">
+<title>How to run it (automatic mode)</title>
+<simpara>Go to your project (e.g. Spring Cloud Sleuth) and execute the application with <literal>-h</literal> or <literal>--help</literal>
+flag.</simpara>
+<programlisting language="bash" linenumbering="unnumbered">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
+$ cd spring-cloud-sleuth
+$ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
+$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -h</programlisting>
+<simpara>You will see a help screen looking like more or less like this</simpara>
+<programlisting language="bash" linenumbering="unnumbered">Here you can find the list of tasks in order
+
+[updatePoms,build,commit,deploy,docs,snapshots,push,closeMilestone,createTemplates]
+
+
+Option                          Description
+------                          -----------
+-a, --start-from &lt;String&gt;       Starts all release task starting from the given
+                                  task. Requires passing the task name (either
+                                  one letter or the full name)
+-b, --build [String]            Build the project
+-c, --commit [String]           Commit, tag and push the tag
+-d, --deploy [String]           Deploy the artifacts
+-f, --full-release [Boolean]    Do you want to do the full release (default:
+                                  false)
+-h, --help [String]
+-i, --interactive &lt;Boolean&gt;     Do you want to set the properties from the
+                                  command line (default: true)
+-m, --closeMilestone [String]   Close the milestone at Github
+-o, --docs [String]             Publish the docs
+-p, --push [String]             Push the commits
+-r, --range &lt;String&gt;            Runs release tasks from the given range.
+                                  Requires passing the task names with a
+                                  hyphen. The first task is inclusive, the
+                                  second inclusive. E.g. 's-m' would mean
+                                  running 'snapshot', 'push' and 'milestone'
+                                  tasks
+-s, --snapshots [String]        Go back to snapshots and bump originalVersion
+                                  by patch
+-t, --createTemplates [String]  Create email / blog / tweet etc. templates
+-u, --updatePoms [String]       Update poms with versions from Spring Cloud
+                                  Release
+
+Examples of usage:
+
+Run 'build' &amp; 'commit' &amp; 'deploy'
+java -jar releaser.jar -b -c -d
+
+Start from 'push'
+java -jar releaser.jar -a push
+
+Range 'docs' -&gt; 'push'
+java -jar releaser.jar -r o-p</programlisting>
+<simpara>The Releaser can use two sets of options. The configuration options like <literal>releaser.pom.branch</literal>
+and the task switches. For the tasks you can use either the full names or short switches. For example
+ providing range of tasks via switches <literal>o-p</literal> is equivalent to full name <literal>docs-push</literal>.</simpara>
+<simpara>A couple of examples:</simpara>
+<formalpara>
+<title>Doing the full release in interactive mode (asking for skipping steps)</title>
+<para>
+<programlisting language="bash" linenumbering="unnumbered">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
+$ cd spring-cloud-sleuth
+$ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
+$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Doing the full release in non interactive mode (automatic release)</title>
+<para>
+<programlisting language="bash" linenumbering="unnumbered">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release --interactive=false</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Updating pom, closing milestone &amp; createTemplates in interactive mode</title>
+<para>
+<programlisting language="bash" linenumbering="unnumbered">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -u -m -t</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Running all tasks starting from 'push' (automatic)</title>
+<para>
+<programlisting language="bash" linenumbering="unnumbered">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -a push -i=false</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Running tasks from 'docs' (inclusive) to 'push' (inclusive) (automatic)</title>
+<para>
+<programlisting language="bash" linenumbering="unnumbered">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -r d-p -i=false</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Running single task 'closeMilestone' (automatic)</title>
+<para>
+<programlisting language="bash" linenumbering="unnumbered">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --closeMilestone -i=false</programlisting>
+</para>
+</formalpara>
 </section>
 <section xml:id="_project_options">
 <title>Project options</title>
