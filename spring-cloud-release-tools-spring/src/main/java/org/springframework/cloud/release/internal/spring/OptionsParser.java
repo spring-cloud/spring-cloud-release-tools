@@ -102,9 +102,9 @@ class OptionsParser implements Parser {
 				+ "Run 'build' & 'commit' & 'deploy'\n"
 				+ "java -jar jar.jar -b -c -d\n\n"
 				+ "Start from 'push'\n"
-				+ "java -jar jar.jar -a push\n\n"
+				+ "java -jar releaser.jar -a push\n\n"
 				+ "Range 'docs' -> 'push'\n"
-				+ "java -jar jar.jar -r o-p\n\n"
+				+ "java -jar releaser.jar -r o-p\n\n"
 				+ "\n\n";
 	}
 }

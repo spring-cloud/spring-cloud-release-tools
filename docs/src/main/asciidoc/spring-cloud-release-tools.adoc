@@ -144,13 +144,13 @@ Option                          Description
 Examples of usage:
 
 Run 'build' & 'commit' & 'deploy'
-java -jar jar.jar -b -c -d
+java -jar releaser.jar -b -c -d
 
 Start from 'push'
-java -jar jar.jar -a push
+java -jar releaser.jar -a push
 
 Range 'docs' -> 'push'
-java -jar jar.jar -r o-p
+java -jar releaser.jar -r o-p
 ----
 
 The Releaser can use two sets of options. The configuration options like `releaser.pom.branch`
