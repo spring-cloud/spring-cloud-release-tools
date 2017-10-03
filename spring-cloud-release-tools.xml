@@ -224,6 +224,12 @@ the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</liter
 <simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
 </listitem>
 <listitem>
+<simpara><literal>releaser.git.username</literal> - Optional Git username. If not passed keys will be used for authentication.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.password</literal> - Optional Git password. If not passed keys will be used for authentication.</simpara>
+</listitem>
+<listitem>
 <simpara><literal>releaser.git.number-of-checked-milestones</literal> - In order not to iterate endlessly over milestones we introduce a threshold of milestones that
 we will go through to find the matching milestone. Defaults to <literal>10</literal></simpara>
 </listitem>
