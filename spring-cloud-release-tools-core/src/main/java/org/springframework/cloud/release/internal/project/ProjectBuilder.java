@@ -8,8 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -17,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -102,14 +109,39 @@ public class ProjectBuilder {
 		this.pomUpdater.updatePomsForRootVersion(dir, version);
 	}
 
+	/**
+	 * We need to insert the system properties as a list of -Dkey=value entries
+	 * instead of just pasting the String that contains these values
+	 */
 	private String[] substituteSystemProps(String... commands) {
-		return Arrays.stream(commands).map(s -> {
-			if (s.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
-				return s.replace(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER,
-						this.properties.getMaven().getSystemProperties());
+		boolean containsSystemProps = this.properties.getMaven().getSystemProperties().contains("-D");
+		String[] splitSystemProps = StringUtils.tokenizeToStringArray(this.properties.getMaven()
+				.getSystemProperties(), "-D");
+		String[] systemPropsWithPrefix = containsSystemProps ? Arrays.stream(splitSystemProps)
+				.map(s -> "-D" + s)
+				.collect(Collectors.toList())
+				.toArray(new String[splitSystemProps.length]) : splitSystemProps;
+		final AtomicInteger index = new AtomicInteger(-1);
+		for (int i = 0; i < commands.length; i++) {
+			if (commands[i].contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
+				index.set(i);
+				break;
 			}
-			return s;
-		}).collect(Collectors.toList()).toArray(new String[commands.length]);
+		}
+		List<String> commandsList = new ArrayList<>(Arrays.asList(commands));
+		List<String> systemPropsList = Arrays.asList(systemPropsWithPrefix);
+		if (index.get() != -1) {
+			commandsList.remove(index.get());
+			if (index.get() >= commandsList.size()) {
+				commandsList.addAll(systemPropsList);
+			} else {
+				// we need to reverse to set the objects in the same order as passed in the prop
+				List<String> reversedSystemProps = new ArrayList<>(systemPropsList);
+				Collections.reverse(reversedSystemProps);
+				reversedSystemProps.forEach(s -> commandsList.add(index.get(), s));
+			}
+		}
+		return commandsList.toArray(new String[commandsList.size()]);
 	}
 }
 
@@ -125,7 +157,7 @@ class ProcessExecutor {
 	void runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
 			String workingDir = this.properties.getWorkingDir();
-			log.info("Will run the build via {} and wait for result for [{}] minutes", commands, waitTimeInMinutes);
+			log.debug("Will run the build via {} and wait for result for [{}] minutes", commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
 			Process process = startProcess(builder);
 			boolean finished = process.waitFor(waitTimeInMinutes, TimeUnit.MINUTES);

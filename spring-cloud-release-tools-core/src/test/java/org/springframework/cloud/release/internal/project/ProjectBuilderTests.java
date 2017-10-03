@@ -58,14 +58,42 @@ public class ProjectBuilderTests {
 	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo {{systemProps}}");
-		properties.getMaven().setSystemProperties("hello world");
+		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		builder.build();
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("hello world");
+				.contains("-Dhello=world -Dfoo=bar");
+	}
+
+	@Test
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_without_system_props() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo {{systemProps}}");
+		properties.getMaven().setSystemProperties("hello=world foo=bar");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build();
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("hello=world foo=bar");
+	}
+
+	@Test
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_inside_command() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo {{systemProps}} bar");
+		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build();
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("-Dhello=world -Dfoo=bar bar");
 	}
 
 	@Test
@@ -145,8 +173,8 @@ public class ProjectBuilderTests {
 	@Test
 	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getMaven().setPublishDocsCommands(new String[] { "echo {{systemProps}}1", "echo {{systemProps}}2" });
-		properties.getMaven().setSystemProperties("hello world");
+		properties.getMaven().setPublishDocsCommands(new String[] { "echo {{systemProps}} 1", "echo {{systemProps}} 2" });
+		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestProcessExecutor executor = executor(properties);
 		ProjectBuilder builder = new ProjectBuilder(properties, executor);
@@ -154,10 +182,10 @@ public class ProjectBuilderTests {
 		builder.publishDocs("");
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("hello world2");
+				.contains("-Dhello=world -Dfoo=bar 2");
 		then(outputCapture.toString())
-				.contains("Will run the build via [echo, hello world1]")
-				.contains("Will run the build via [echo, hello world2]");
+				.contains("Will run the build via [echo, -Dhello=world, -Dfoo=bar, 1]")
+				.contains("Will run the build via [echo, -Dhello=world, -Dfoo=bar, 2]");
 		then(executor.counter).isEqualTo(2);
 	}
 
