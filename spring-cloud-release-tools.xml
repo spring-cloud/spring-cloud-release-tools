@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2017-09-07</date>
+<date>2017-10-03</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -236,6 +236,9 @@ we will go through to find the matching milestone. Defaults to <literal>10</lite
 <listitem>
 <simpara><literal>releaser.maven.publish-docs-commands</literal> - Command to be executed to deploy a built project. If present <literal>{{version}}</literal> will be replaced by the proper version.
 Defaults to the standard Spring Cloud wget and execution of ghpages.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.maven.system-properties</literal> - Additional system properties that should be passed to any commands. If present <literal>{{systemProps}}</literal> will be replaced by the contents of this property.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.maven.wait-time-in-minutes</literal> - Max wait time in minutes for the process to finish. Defaults to <literal>20</literal></simpara>
