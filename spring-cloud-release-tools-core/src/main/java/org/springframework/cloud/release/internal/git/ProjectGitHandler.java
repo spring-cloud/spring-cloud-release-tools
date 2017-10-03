@@ -95,6 +95,6 @@ public class ProjectGitHandler {
 	}
 
 	GitRepo gitRepo(File workingDir) {
-		return new GitRepo(workingDir);
+		return new GitRepo(workingDir, this.properties);
 	}
 }

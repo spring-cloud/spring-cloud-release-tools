@@ -330,6 +330,7 @@ class GitRepo {
 				log.info("Passed username and password - will set a custom credentials provider");
 				this.provider = credentialsProvider(releaserProperties);
 			} else {
+				log.info("No custom credentials provider will be set");
 				this.provider = null;
 			}
 		}
@@ -353,7 +354,9 @@ class GitRepo {
 		};
 
 		CloneCommand getCloneCommandByCloneRepository() {
-			return Git.cloneRepository().setTransportConfigCallback(this.callback);
+			return Git.cloneRepository()
+					.setCredentialsProvider(this.provider)
+					.setTransportConfigCallback(this.callback);
 		}
 
 		PushCommand push(Git git) {
