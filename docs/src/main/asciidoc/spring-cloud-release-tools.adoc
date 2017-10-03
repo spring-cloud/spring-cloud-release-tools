@@ -205,6 +205,8 @@ the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in 
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
 - `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
+- `releaser.git.username` - Optional Git username. If not passed keys will be used for authentication.
+- `releaser.git.password` - Optional Git password. If not passed keys will be used for authentication.
 - `releaser.git.number-of-checked-milestones` - In order not to iterate endlessly over milestones we introduce a threshold of milestones that
 we will go through to find the matching milestone. Defaults to `10`
 - `releaser.maven.build-command` - Command to be executed to build the project. Defaults to `./mvnw clean install -Pdocs`

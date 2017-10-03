@@ -63,6 +63,16 @@ public class ReleaserProperties {
 		private String oauthToken;
 
 		/**
+		 * Optional Git username. If not passed keys will be used for authentication
+		 */
+		private String username;
+
+		/**
+		 * Optional Git password. If not passed keys will be used for authentication
+		 */
+		private String password;
+
+		/**
 		 * In order not to iterate endlessly over milestones we introduce a threshold of milestones
 		 * that we will go through to find the matching milestone
 		 */
@@ -90,6 +100,22 @@ public class ReleaserProperties {
 
 		public void setOauthToken(String oauthToken) {
 			this.oauthToken = oauthToken;
+		}
+
+		public String getUsername() {
+			return this.username;
+		}
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+		public String getPassword() {
+			return this.password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
 		}
 
 		public Integer getNumberOfCheckedMilestones() {

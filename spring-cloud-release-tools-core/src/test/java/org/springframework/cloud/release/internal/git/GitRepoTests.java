@@ -7,16 +7,23 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.UnsupportedCredentialItem;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.CredentialItem;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.URIish;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 
 import static org.assertj.core.api.Assertions.fail;

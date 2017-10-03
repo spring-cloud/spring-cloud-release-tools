@@ -44,15 +44,19 @@ import org.eclipse.jgit.api.errors.EmtpyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.OpenSshConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Abstraction over a Git repo. Can cloned repo from a given location
@@ -68,11 +72,18 @@ class GitRepo {
 
 	private final File basedir;
 
+	GitRepo(File basedir, ReleaserProperties properties) {
+		this.basedir = basedir;
+		this.gitFactory = new GitRepo.JGitFactory(properties);
+	}
+
+	// for tests
 	GitRepo(File basedir) {
 		this.basedir = basedir;
 		this.gitFactory = new GitRepo.JGitFactory();
 	}
 
+	// for tests
 	GitRepo(File basedir, GitRepo.JGitFactory factory) {
 		this.basedir = basedir;
 		this.gitFactory = factory;
@@ -311,6 +322,27 @@ class GitRepo {
 			}
 		};
 
+		private final CredentialsProvider provider;
+
+		JGitFactory(ReleaserProperties releaserProperties) {
+			if (StringUtils.hasText(releaserProperties.getGit().getUsername())) {
+				this.provider = credentialsProvider(releaserProperties);
+			} else {
+				this.provider = null;
+			}
+		}
+
+		CredentialsProvider credentialsProvider(ReleaserProperties properties) {
+			return new UsernamePasswordCredentialsProvider(
+					properties.getGit().getUsername(),
+					properties.getGit().getPassword());
+		}
+
+		// for tests
+		JGitFactory() {
+			this.provider = null;
+		}
+
 		private final TransportConfigCallback callback = transport -> {
 			if (transport instanceof SshTransport) {
 				SshTransport sshTransport = (SshTransport) transport;
@@ -323,7 +355,9 @@ class GitRepo {
 		}
 
 		PushCommand push(Git git) {
-			return git.push().setTransportConfigCallback(this.callback);
+			return git.push()
+					.setCredentialsProvider(this.provider)
+					.setTransportConfigCallback(this.callback);
 		}
 
 		Git open(File file) {
