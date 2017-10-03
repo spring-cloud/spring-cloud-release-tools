@@ -307,6 +307,7 @@ class GitRepo {
 						USocketFactory usf = new JNAUSocketFactory();
 						connector = new SSHAgentConnector(usf);
 					}
+					log.info("Successfully connected to an agent");
 				} catch (AgentProxyException e) {
 					log.error("Exception occurred while trying to connect to agent. Will create"
 							+ "the default JSch connection", e);
@@ -314,7 +315,7 @@ class GitRepo {
 				}
 				final JSch jsch = super.createDefaultJSch(fs);
 				if (connector != null) {
-					JSch.setConfig("PreferredAuthentications", "publickey");
+					JSch.setConfig("PreferredAuthentications", "publickey,password");
 					IdentityRepository identityRepository = new RemoteIdentityRepository(connector);
 					jsch.setIdentityRepository(identityRepository);
 				}
@@ -326,6 +327,7 @@ class GitRepo {
 
 		JGitFactory(ReleaserProperties releaserProperties) {
 			if (StringUtils.hasText(releaserProperties.getGit().getUsername())) {
+				log.info("Passed username and password - will set a custom credentials provider");
 				this.provider = credentialsProvider(releaserProperties);
 			} else {
 				this.provider = null;
