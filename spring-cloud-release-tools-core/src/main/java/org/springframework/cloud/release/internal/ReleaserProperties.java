@@ -139,12 +139,12 @@ public class ReleaserProperties {
 		/**
 		 * Command to be executed to build the project
 		 */
-		private String buildCommand = "./mvnw clean install -Pdocs";
+		private String buildCommand = "./mvnw clean install -Pdocs {{systemProps}}";
 
 		/**
 		 * Command to be executed to deploy a built project
 		 */
-		private String deployCommand = "./mvnw deploy -DskipTests -Pfast";
+		private String deployCommand = "./mvnw deploy -DskipTests -Pfast {{systemProps}}";
 
 		/**
 		 * Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the
@@ -156,6 +156,14 @@ public class ReleaserProperties {
 				"chmod +x target/gh-pages.sh",
 				"./target/gh-pages.sh -v {{version}} -c"
 		};
+
+		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
+
+		/**
+		 * Additional system properties that should be passed to the build / deploy commands.
+		 * If present in other commands "{{systemProps}}" will be substituted with this property.
+		 */
+		private String systemProperties = "";
 
 		/**
 		 * Max wait time in minutes for the process to finish
@@ -194,6 +202,13 @@ public class ReleaserProperties {
 			this.publishDocsCommands = publishDocsCommands;
 		}
 
+		public String getSystemProperties() {
+			return this.systemProperties;
+		}
+
+		public void setSystemProperties(String systemProperties) {
+			this.systemProperties = systemProperties;
+		}
 	}
 
 	public static class Gradle {

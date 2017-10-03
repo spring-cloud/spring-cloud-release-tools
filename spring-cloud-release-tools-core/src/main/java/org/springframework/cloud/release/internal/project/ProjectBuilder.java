@@ -8,7 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +78,9 @@ public class ProjectBuilder {
 	}
 
 	private void runCommand(String[] commands) {
+		String[] substitutedCommands = substituteSystemProps(commands);
 		long waitTimeInMinutes = this.properties.getMaven().getWaitTimeInMinutes();
-		this.executor.runCommand(commands, waitTimeInMinutes);
+		this.executor.runCommand(substitutedCommands, waitTimeInMinutes);
 	}
 
 	public void publishDocs(String version) {
@@ -97,6 +100,16 @@ public class ProjectBuilder {
 		String workingDir = this.properties.getWorkingDir();
 		File dir = new File(workingDir);
 		this.pomUpdater.updatePomsForRootVersion(dir, version);
+	}
+
+	private String[] substituteSystemProps(String... commands) {
+		return Arrays.stream(commands).map(s -> {
+			if (s.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
+				return s.replace(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER,
+						this.properties.getMaven().getSystemProperties());
+			}
+			return s;
+		}).collect(Collectors.toList()).toArray(new String[commands.length]);
 	}
 }
 

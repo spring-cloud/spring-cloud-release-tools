@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -30,6 +31,7 @@ public class ProjectBuilderTests {
 	TestPomReader reader = new TestPomReader();
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	File temporaryFolder;
+	@Rule public OutputCapture outputCapture = new OutputCapture();
 
 	@Before
 	public void checkOs() throws Exception {
@@ -50,6 +52,20 @@ public class ProjectBuilderTests {
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
+	}
+
+	@Test
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo {{systemProps}}");
+		properties.getMaven().setSystemProperties("hello world");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build();
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("hello world");
 	}
 
 	@Test
@@ -87,6 +103,20 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
+	public void should_successfully_execute_a_deploy_command_with_sys_props_placeholder() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setDeployCommand("echo \"{{systemProps}}\"");
+		properties.getMaven().setSystemProperties("hello world");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.deploy();
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("hello world");
+	}
+
+	@Test
 	public void should_throw_exception_when_deploy_command_took_too_long_to_execute() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("sleep 1");
@@ -109,6 +139,25 @@ public class ProjectBuilderTests {
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
+		then(executor.counter).isEqualTo(2);
+	}
+
+	@Test
+	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setPublishDocsCommands(new String[] { "echo {{systemProps}}1", "echo {{systemProps}}2" });
+		properties.getMaven().setSystemProperties("hello world");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		TestProcessExecutor executor = executor(properties);
+		ProjectBuilder builder = new ProjectBuilder(properties, executor);
+
+		builder.publishDocs("");
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("hello world2");
+		then(outputCapture.toString())
+				.contains("Will run the build via [echo, hello world1]")
+				.contains("Will run the build via [echo, hello world2]");
 		then(executor.counter).isEqualTo(2);
 	}
 

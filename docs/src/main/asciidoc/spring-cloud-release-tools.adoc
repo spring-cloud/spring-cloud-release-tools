@@ -211,6 +211,7 @@ we will go through to find the matching milestone. Defaults to `10`
 - `releaser.maven.deploy-command` - Command to be executed to deploy a built project". Defaults to `./mvnw deploy -DskipTests -Pfast`
 - `releaser.maven.publish-docs-commands` - Command to be executed to deploy a built project. If present `{{version}}` will be replaced by the proper version.
 Defaults to the standard Spring Cloud wget and execution of ghpages.
+- `releaser.maven.system-properties` - Additional system properties that should be passed to any commands. If present `{{systemProps}}` will be replaced by the contents of this property.
 - `releaser.maven.wait-time-in-minutes` - Max wait time in minutes for the process to finish. Defaults to `20`
 - `releaser.gradle.gradle-props-substitution` - a map containing a `key` which is a property key inside `gradle.properties` and a `value` of
 a project name. E.g. in `gradle.properties` you have `foo=1.0.0.BUILD-SNAPSHOT` and you would like `spring-cloud-contract` version to
