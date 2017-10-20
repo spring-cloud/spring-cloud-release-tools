@@ -115,7 +115,7 @@ class OptionsProcessor {
 		}
 		msg.append("\n").append("You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]\n");
 		msg.append("You can execute all tasks starting from a job by using a hyphen and providing only one number - e.g. '8-' will execute jobs [8,9,10]\n");
-		msg.append("You can execute given tasks by providing a colon separated list of tasks - e.g. '3,7,8' will execute jobs [3,7,8]\n");
+		msg.append("You can execute given tasks by providing a comma separated list of tasks - e.g. '3,7,8' will execute jobs [3,7,8]\n");
 		msg.append("\n").append("You can press 'q' to quit\n\n");
 		return msg;
 	}
