@@ -80,7 +80,7 @@ You will see text similar to this one
 
 You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]
 You can execute all tasks starting from a job by using a hyphen and providing only one number - e.g. '8-' will execute jobs [8,9,10]
-You can execute given tasks by providing a colon separated list of tasks - e.g. '3,7,8' will execute jobs [3,7,8]
+You can execute given tasks by providing a comma separated list of tasks - e.g. '3,7,8' will execute jobs [3,7,8]
 
 You can press 'q' to quit
 ----
