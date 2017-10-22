@@ -4,7 +4,6 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.springframework.cloud.internal</groupId>
 	<artifactId>spring-cloud-release-tools-spring</artifactId>
 	<packaging>jar</packaging>
 
@@ -25,6 +24,11 @@
 			<groupId>org.springframework.cloud.internal</groupId>
 			<artifactId>spring-cloud-release-tools-core</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+			<version>4.6.0.201612231935-r</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jopt-simple</groupId>
