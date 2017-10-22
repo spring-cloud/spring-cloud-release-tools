@@ -62,7 +62,7 @@ public class ReleaserProperties {
 		/**
 		 * GitHub OAuth token to be used to interact with GitHub repo
 		 */
-		private String oauthToken;
+		private String oauthToken = "";
 
 		/**
 		 * Optional Git username. If not passed keys will be used for authentication
