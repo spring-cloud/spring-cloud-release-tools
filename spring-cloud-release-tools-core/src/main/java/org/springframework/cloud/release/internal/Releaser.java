@@ -137,4 +137,9 @@ public class Releaser {
 		File output = this.templateGenerator.releaseNotes(projects);
 		log.info("\nSuccessfully created release notes at location [{}]", output);
 	}
+
+	public void updateSagan(ProjectVersion releaseVersion) {
+		//File output = this.templateGenerator.releaseNotes(projects);
+		//log.info("\nSuccessfully created release notes at location [{}]", output);
+	}
 }

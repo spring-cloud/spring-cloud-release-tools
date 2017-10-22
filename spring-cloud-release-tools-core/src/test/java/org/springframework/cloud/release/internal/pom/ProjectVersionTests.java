@@ -1,5 +1,8 @@
 package org.springframework.cloud.release.internal.pom;
 
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,9 +10,6 @@ import java.net.URISyntaxException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.cloud.release.internal.git.GitRepoTests;
-
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -57,6 +57,13 @@ public class ProjectVersionTests {
 
 		then(projectVersion.version).isEqualTo("1.1.0.BUILD-SNAPSHOT");
 		then(projectVersion.projectName).isEqualTo("spring-cloud-contract");
+	}
+
+	@Test
+	public void should_return_group_id_when_it_is_present() {
+		ProjectVersion projectVersion = new ProjectVersion(this.springCloudContract);
+
+		then(projectVersion.groupId()).isEqualTo("org.springframework.cloud");
 	}
 
 	@Test
@@ -143,6 +150,13 @@ public class ProjectVersionTests {
 		String version = "1.0.1.M1";
 
 		then(projectVersion(version).isRc()).isFalse();
+	}
+
+	@Test
+	public void should_return_empty_group_id_when_it_is_missing() {
+		ProjectVersion projectVersion = projectVersion("1.0.0.RC1");
+
+		then(projectVersion.groupId()).isEmpty();
 	}
 
 	private ProjectVersion projectVersion(String version) {

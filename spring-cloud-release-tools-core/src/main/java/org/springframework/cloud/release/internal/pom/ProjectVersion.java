@@ -3,6 +3,7 @@ package org.springframework.cloud.release.internal.pom;
 import java.io.File;
 
 import org.apache.maven.model.Model;
+import org.springframework.util.StringUtils;
 
 /**
  * Object representing a root project's version.
@@ -15,16 +16,19 @@ public class ProjectVersion {
 	public final String projectName;
 	public final String version;
 	private final PomReader pomReader = new PomReader();
+	private final Model model;
 
 	public ProjectVersion(String projectName, String version) {
 		this.projectName = nameWithoutParent(projectName);
 		this.version = version;
+		this.model = null;
 	}
 
 	public ProjectVersion(File project) {
 		Model model = this.pomReader.readPom(project);
 		this.projectName = nameWithoutParent(model.getArtifactId());
 		this.version = model.getVersion();
+		this.model = model;
 	}
 
 	private String nameWithoutParent(String projectName) {
@@ -43,6 +47,18 @@ public class ProjectVersion {
 		}
 		Integer incrementedPatch = Integer.valueOf(splitVersion[2]) + 1;
 		return String.format("%s.%s.%s.%s", splitVersion[0], splitVersion[1], incrementedPatch, splitVersion[3]);
+	}
+
+	public String groupId() {
+		if (this.model != null) {
+			if (StringUtils.hasText(this.model.getGroupId())) {
+				return this.model.getGroupId();
+			}
+			if (this.model.getParent() != null && StringUtils.hasText(this.model.getParent().getGroupId())) {
+				return this.model.getParent().getGroupId();
+			}
+		}
+		return "";
 	}
 
 	public boolean isSnapshot() {
