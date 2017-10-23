@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2017-10-22</date>
+<date>2017-10-23</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -62,7 +62,14 @@ why this tool makes it easy to automate the release / dependency update process 
 <listitem>
 <simpara>Generates a release notes template under <literal>target/notes.md</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
 </listitem>
+<listitem>
+<simpara>Updates project information in Sagan (<link xl:href="http://spring.io">http://spring.io</link>) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)</simpara>
+</listitem>
 </itemizedlist>
+<important>
+<simpara>Starting with version that does Sagan integration, you MUST pass the OAuth token,
+otherwise the application will fail to start</simpara>
+</important>
 </section>
 <section xml:id="_what_should_i_do_first">
 <title>What should I do first?</title>
