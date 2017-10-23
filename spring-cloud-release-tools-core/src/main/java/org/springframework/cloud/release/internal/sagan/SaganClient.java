@@ -1,5 +1,7 @@
 package org.springframework.cloud.release.internal.sagan;
 
+import java.util.List;
+
 /**
  * @author Marcin Grzejszczak
  */
@@ -8,5 +10,5 @@ public interface SaganClient {
 
 	Release getRelease(String projectName, String releaseVersion);
 
-	Release createOrUpdateRelease(String projectName, ReleaseUpdate releaseUpdate);
+	Project updateRelease(String projectName, List<ReleaseUpdate> releaseUpdate);
 }

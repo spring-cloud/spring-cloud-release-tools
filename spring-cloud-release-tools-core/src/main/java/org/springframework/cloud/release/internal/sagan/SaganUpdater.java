@@ -1,5 +1,6 @@
 package org.springframework.cloud.release.internal.sagan;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -30,7 +31,7 @@ public class SaganUpdater {
 		update.apiDocUrl = referenceUrl(branch, version);
 		update.refDocUrl = referenceUrl(branch, version);
 		log.info("Updating Sagan with \n\n{}", update);
-		this.saganClient.createOrUpdateRelease(version.projectName, update);
+		this.saganClient.updateRelease(version.projectName, Collections.singletonList(update));
 	}
 
 	private String referenceUrl(String branch, ProjectVersion version) {

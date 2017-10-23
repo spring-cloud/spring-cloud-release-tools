@@ -1,8 +1,12 @@
 package org.springframework.cloud.release.internal.sagan;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
  * @author Marcin Grzejszczak
  */
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class Release {
 	public String releaseStatus = "";
 	public String refDocUrl = "";

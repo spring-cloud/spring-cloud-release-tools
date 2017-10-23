@@ -3,9 +3,13 @@ package org.springframework.cloud.release.internal.sagan;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
  * @author Marcin Grzejszczak
  */
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class Project {
 	public String id = "";
 	public String name = "";
@@ -15,7 +19,7 @@ public class Project {
 	public String stackOverflowTags;
 	public List<Release> projectReleases = new ArrayList<>();
 	public List<String> stackOverflowTagList = new ArrayList<>();
-	public boolean aggregator;
+	public Boolean aggregator;
 
 	@Override public String toString() {
 		return "Project{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", repoUrl='"

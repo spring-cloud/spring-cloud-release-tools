@@ -1,7 +1,11 @@
 package org.springframework.cloud.release.internal.sagan;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.BDDAssertions.then;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,31 +92,93 @@ public class RestTemplateSaganClientTests {
 
 	@Test
 	public void should_update_a_release() {
-		ReleaseUpdate releaseUpdate = new ReleaseUpdate();
-		releaseUpdate.groupId = "org.springframework";
-		releaseUpdate.artifactId = "spring-context";
-		releaseUpdate.version = "1.2.8.RELEASE";
-		releaseUpdate.releaseStatus = "PRERELEASE";
-		releaseUpdate.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
-		releaseUpdate.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		Repository snapshots = snapshots();
+		Repository milestone = milestone();
 
+		List<ReleaseUpdate> updates = new ArrayList<>();
 
-		\n  \"repository\" : {\n    \"id\" : \"spring-milestones\",\n    \"name\" : \"Spring Milestones\",\n    \"url\" : \"https://repo.spring.io/libs-milestone\",\n    \"snapshotsEnabled\" : false\n  }\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"5.0.0.BUILD-SNAPSHOT\",\n  \"releaseStatus\" : \"SNAPSHOT\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\",\n  \"repository\" : {\n    \"id\" : \"spring-snapshots\",\n    \"name\" : \"Spring Snapshots\",\n    \"url\" : \"https://repo.spring.io/libs-snapshot\",\n    \"snapshotsEnabled\" : true\n  }\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"4.3.12.BUILD-SNAPSHOT\",\n  \"releaseStatus\" : \"SNAPSHOT\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\",\n  \"repository\" : {\n    \"id\" : \"spring-snapshots\",\n    \"name\" : \"Spring Snapshots\",\n    \"url\" : \"https://repo.spring.io/libs-snapshot\",\n    \"snapshotsEnabled\" : true\n  }\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"4.3.11.RELEASE\",\n  \"releaseStatus\" : \"GENERAL_AVAILABILITY\",\n  \"current\" : true,\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/current/javadoc-api/\"\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"4.2.9.RELEASE\",\n  \"releaseStatus\" : \"GENERAL_AVAILABILITY\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\"\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"3.2.18.RELEASE\",\n  \"releaseStatus\" : \"GENERAL_AVAILABILITY\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\"\n} ]"
+		ReleaseUpdate firstRelease = new ReleaseUpdate();
+		firstRelease.groupId = "org.springframework";
+		firstRelease.artifactId = "spring-context";
+		firstRelease.version = "1.2.8.RELEASE";
+		firstRelease.releaseStatus = "PRERELEASE";
+		firstRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
+		firstRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		firstRelease.repository = milestone;
 
+		ReleaseUpdate secondRelease = new ReleaseUpdate();
+		secondRelease.groupId = "org.springframework";
+		secondRelease.artifactId = "spring-context";
+		secondRelease.version = "5.0.0.BUILD-SNAPSHOT";
+		secondRelease.releaseStatus = "SNAPSHOT";
+		secondRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
+		secondRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		secondRelease.repository = snapshots;
 
-		Release release = this.client.createOrUpdateRelease("spring-framework", releaseUpdate);
+		ReleaseUpdate thirdRelease = new ReleaseUpdate();
+		thirdRelease.groupId = "org.springframework";
+		thirdRelease.artifactId = "spring-context";
+		thirdRelease.version = "4.3.12.BUILD-SNAPSHOT";
+		thirdRelease.releaseStatus = "SNAPSHOT";
+		thirdRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
+		thirdRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		thirdRelease.repository = snapshots;
 
-		then(release.releaseStatus).isEqualTo("GENERAL_AVAILABILITY");
-		then(release.refDocUrl).isEqualTo("http://docs.spring.io/spring/docs/1.2.3.RELEASE/spring-framework-reference/");
-		then(release.apiDocUrl).isEqualTo("http://docs.spring.io/spring/docs/1.2.3.RELEASE/javadoc-api/");
-		then(release.groupId).isEqualTo("org.springframework");
-		then(release.artifactId).isEqualTo("spring-context");
-		then(release.version).isEqualTo("1.2.3.RELEASE");
-		then(release.current).isFalse();
-		then(release.generalAvailability).isTrue();
-		then(release.preRelease).isFalse();
-		then(release.versionDisplayName).isEqualTo("1.2.3");
-		then(release.snapshot).isFalse();
+		ReleaseUpdate fourthRelease = new ReleaseUpdate();
+		fourthRelease.groupId = "org.springframework";
+		fourthRelease.artifactId = "spring-context";
+		fourthRelease.version = "4.3.11.RELEASE";
+		fourthRelease.releaseStatus = "GENERAL_AVAILABILITY";
+		fourthRelease.current = true;
+		fourthRelease.refDocUrl = "http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/";
+		fourthRelease.apiDocUrl = "http://docs.spring.io/spring/docs/current/javadoc-api/";
+
+		ReleaseUpdate fithRelease = new ReleaseUpdate();
+		fithRelease.groupId = "org.springframework";
+		fithRelease.artifactId = "spring-context";
+		fithRelease.version = "4.2.9.RELEASE";
+		fithRelease.releaseStatus = "GENERAL_AVAILABILITY";
+		fithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
+		fithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+
+		ReleaseUpdate sithRelease = new ReleaseUpdate();
+		sithRelease.groupId = "org.springframework";
+		sithRelease.artifactId = "spring-context";
+		sithRelease.version = "3.2.18.RELEASE";
+		sithRelease.releaseStatus = "GENERAL_AVAILABILITY";
+		sithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
+		sithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+
+		updates.add(firstRelease);
+		updates.add(secondRelease);
+		updates.add(thirdRelease);
+		updates.add(fourthRelease);
+		updates.add(fithRelease);
+		updates.add(sithRelease);
+
+		Project project = this.client.updateRelease("spring-framework", updates);
+
+		then(project.id).isEqualTo("spring-framework");
+		then(project.name).isEqualTo("Spring Framework");
+		then(project.projectReleases).hasSize(7);
+	}
+
+	private Repository milestone() {
+		Repository milestone = new Repository();
+		milestone.id = "spring-milestones";
+		milestone.name = "Spring Milestones";
+		milestone.url = "https://repo.spring.io/libs-milestone";
+		milestone.snapshotsEnabled = false;
+		return milestone;
+	}
+
+	private Repository snapshots() {
+		Repository snapshots = new Repository();
+		snapshots.id = "spring-snapshots";
+		snapshots.name = "Spring Snapshots";
+		snapshots.url = "https://repo.spring.io/libs-snapshot";
+		snapshots.snapshotsEnabled = true;
+		return snapshots;
 	}
 
 	private SaganClient saganClient(ReleaserProperties properties) {

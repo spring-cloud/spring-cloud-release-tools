@@ -1,5 +1,7 @@
 package org.springframework.cloud.release.internal.sagan;
 
+import java.util.List;
+
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
@@ -23,12 +25,12 @@ public class SaganUpdaterTest {
 		this.saganUpdater.updateSagan("master", version("1.0.0.M1"), version("1.0.0.M1"));
 
 		BDDMockito.then(this.saganClient).should(BDDMockito.never())
-				.createOrUpdateRelease(BDDMockito.anyString(), BDDMockito.any(ReleaseUpdate.class));
+				.updateRelease(BDDMockito.anyString(), BDDMockito.anyList());
 
 		this.saganUpdater.updateSagan("master", version("1.0.0.RC1"), version("1.0.0.RC1"));
 
 		BDDMockito.then(this.saganClient).should(BDDMockito.never())
-				.createOrUpdateRelease(BDDMockito.anyString(), BDDMockito.any(ReleaseUpdate.class));
+				.updateRelease(BDDMockito.anyString(), BDDMockito.anyList());
 	}
 
 	private ProjectVersion version(String version) {
@@ -40,7 +42,7 @@ public class SaganUpdaterTest {
 
 		this.saganUpdater.updateSagan("master", projectVersion, projectVersion);
 
-		BDDMockito.then(this.saganClient).should().createOrUpdateRelease(BDDMockito.eq("foo"),
+		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.BUILD-SNAPSHOT", "http://cloud.spring.io/foo/foo.html")));
 	}
 
@@ -49,7 +51,7 @@ public class SaganUpdaterTest {
 
 		this.saganUpdater.updateSagan("master", projectVersion, projectVersion);
 
-		BDDMockito.then(this.saganClient).should().createOrUpdateRelease(BDDMockito.eq("foo"),
+		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RELEASE", "http://cloud.spring.io/spring-cloud-static/foo/{version}/")));
 	}
 
@@ -58,13 +60,14 @@ public class SaganUpdaterTest {
 
 		this.saganUpdater.updateSagan("1.1.x", projectVersion, projectVersion);
 
-		BDDMockito.then(this.saganClient).should().createOrUpdateRelease(BDDMockito.eq("foo"),
+		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.1.0.BUILD-SNAPSHOT", "http://cloud.spring.io/foo/1.1.x/")));
 	}
 
-	private TypeSafeMatcher<ReleaseUpdate> withReleaseUpdate(final String version, final String refDocUrl) {
-		return new TypeSafeMatcher<ReleaseUpdate>() {
-			@Override protected boolean matchesSafely(ReleaseUpdate item) {
+	private TypeSafeMatcher<List<ReleaseUpdate>> withReleaseUpdate(final String version, final String refDocUrl) {
+		return new TypeSafeMatcher<List<ReleaseUpdate>>() {
+			@Override protected boolean matchesSafely(List<ReleaseUpdate> items) {
+				ReleaseUpdate item = items.get(0);
 				return "foo".equals(item.artifactId) &&
 						version.equals(item.version) &&
 						refDocUrl.equals(item.apiDocUrl) &&
