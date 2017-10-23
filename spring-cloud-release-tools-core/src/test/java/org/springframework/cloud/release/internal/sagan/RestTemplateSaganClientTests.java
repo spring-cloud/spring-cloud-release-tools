@@ -1,11 +1,11 @@
 package org.springframework.cloud.release.internal.sagan;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -95,8 +95,6 @@ public class RestTemplateSaganClientTests {
 		Repository snapshots = snapshots();
 		Repository milestone = milestone();
 
-		List<ReleaseUpdate> updates = new ArrayList<>();
-
 		ReleaseUpdate firstRelease = new ReleaseUpdate();
 		firstRelease.groupId = "org.springframework";
 		firstRelease.artifactId = "spring-context";
@@ -149,12 +147,7 @@ public class RestTemplateSaganClientTests {
 		sithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
 		sithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
 
-		updates.add(firstRelease);
-		updates.add(secondRelease);
-		updates.add(thirdRelease);
-		updates.add(fourthRelease);
-		updates.add(fithRelease);
-		updates.add(sithRelease);
+		List<ReleaseUpdate> updates = Arrays.asList(firstRelease, secondRelease, thirdRelease, fourthRelease ,fithRelease, sithRelease);
 
 		Project project = this.client.updateRelease("spring-framework", updates);
 
