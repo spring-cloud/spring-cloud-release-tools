@@ -135,10 +135,21 @@ class GitRepo {
 		try(Git git = this.gitFactory.open(file(project))) {
 			git.add().addFilepattern(".").call();
 			git.commit().setAllowEmpty(false).setMessage(message).call();
+			printLog(git);
 		} catch (EmtpyCommitException e) {
 			log.info("There were no changes detected. Will not commit an empty commit");
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
+		}
+	}
+
+	private void printLog(Git git) throws GitAPIException, IOException {
+		int maxCount = 5;
+		String currentBranch = git.getRepository().getBranch();
+		log.info("Printing [{}] last commits for branch [{}]", maxCount, currentBranch);
+		Iterable<RevCommit> commits = git.log().setMaxCount(maxCount).call();
+		for (RevCommit commit : commits) {
+			log.info("Name [{}], msg [{}]", commit.getId().name(), commit.getShortMessage());
 		}
 	}
 
@@ -210,6 +221,7 @@ class GitRepo {
 			log.debug("The commit to be reverted is [{}]", commit);
 			git.revert().include(commit).call();
 			git.commit().setAmend(true).setMessage(message).call();
+			printLog(git);
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
