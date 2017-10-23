@@ -200,6 +200,13 @@ class GitRepo {
 	void revert(File project, String message) {
 		try(Git git = this.gitFactory.open(file(project))) {
 			RevCommit commit = git.log().setMaxCount(1).call().iterator().next();
+			String shortMessage = commit.getShortMessage();
+			String id = commit.getId().getName();
+			if (!shortMessage.contains("Update SNAPSHOT to ")) {
+				throw new IllegalStateException("Won't revert the commit with id [" + id + "] "
+						+ "and message [" + shortMessage + "]. Only commit that updated "
+						+ "snapshot to another version can be reverted");
+			}
 			log.debug("The commit to be reverted is [{}]", commit);
 			git.revert().include(commit).call();
 			git.commit().setAmend(true).setMessage(message).call();

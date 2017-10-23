@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 
+import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -225,13 +226,25 @@ public class GitRepoTests {
 	@Test
 	public void should_revert_changes() throws Exception {
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File foo = new File(project, "foo");
+		foo.createNewFile();
+		this.gitRepo.commit(project, "Update SNAPSHOT to 1.0.0.RC1");
 
-		this.gitRepo.revert(project, "some message");
+		this.gitRepo.revert(project, "Reverting the commit");
 
 		try(Git git = openGitProject(project)) {
 			RevCommit revCommit = git.log().call().iterator().next();
-			then(revCommit.getShortMessage()).isEqualTo("some message");
+			then(revCommit.getShortMessage()).isEqualTo("Reverting the commit");
 		}
+	}
+
+	@Test
+	public void should_not_revert_changes_when_commit_message_is_not_related_to_updating_snapshots() throws Exception {
+		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+
+		BDDAssertions.thenThrownBy(
+				() -> this.gitRepo.revert(project, "some message"))
+						.hasMessageContaining("Won't revert the commit with id");
 	}
 
 }
