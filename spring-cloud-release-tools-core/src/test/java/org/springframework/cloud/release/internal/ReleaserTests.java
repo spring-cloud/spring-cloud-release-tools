@@ -1,5 +1,10 @@
 package org.springframework.cloud.release.internal;
 
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,12 +20,8 @@ import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
-
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
 
 /**
  * @author Marcin Grzejszczak
@@ -33,6 +34,7 @@ public class ReleaserTests {
 	@Mock ProjectGitHandler projectGitHandler;
 	@Mock TemplateGenerator templateGenerator;
 	@Mock GradleUpdater gradleUpdater;
+	@Mock SaganUpdater saganUpdater;
 	File pom;
 
 	@Before
@@ -43,7 +45,8 @@ public class ReleaserTests {
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitHandler, this.templateGenerator, this.gradleUpdater) {
+				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
+				this.saganUpdater) {
 			@Override ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
 			}
@@ -52,7 +55,8 @@ public class ReleaserTests {
 
 	Releaser releaser() {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitHandler, this.templateGenerator, this.gradleUpdater);
+				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
+				this.saganUpdater);
 	}
 
 	@Test

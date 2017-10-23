@@ -15,17 +15,6 @@
  */
 package org.springframework.cloud.release.internal.git;
 
-import com.jcraft.jsch.IdentityRepository;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.agentproxy.AgentProxyException;
-import com.jcraft.jsch.agentproxy.Connector;
-import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
-import com.jcraft.jsch.agentproxy.USocketFactory;
-import com.jcraft.jsch.agentproxy.connector.SSHAgentConnector;
-import com.jcraft.jsch.agentproxy.usocket.JNAUSocketFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,6 +46,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
+
+import com.jcraft.jsch.IdentityRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.agentproxy.AgentProxyException;
+import com.jcraft.jsch.agentproxy.Connector;
+import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
+import com.jcraft.jsch.agentproxy.USocketFactory;
+import com.jcraft.jsch.agentproxy.connector.SSHAgentConnector;
+import com.jcraft.jsch.agentproxy.usocket.JNAUSocketFactory;
 
 /**
  * Abstraction over a Git repo. Can cloned repo from a given location
@@ -203,6 +203,14 @@ class GitRepo {
 			log.debug("The commit to be reverted is [{}]", commit);
 			git.revert().include(commit).call();
 			git.commit().setAmend(true).setMessage(message).call();
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	String currentBranch(File project) {
+		try(Git git = this.gitFactory.open(file(project))) {
+			return git.getRepository().getBranch();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}

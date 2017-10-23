@@ -94,6 +94,10 @@ public class ProjectGitHandler {
 		return this.githubMilestones.milestoneUrl(releaseVersion);
 	}
 
+	public String currentBranch(File project) {
+		return gitRepo(project).currentBranch(project);
+	}
+
 	GitRepo gitRepo(File workingDir) {
 		return new GitRepo(workingDir, this.properties);
 	}

@@ -20,6 +20,8 @@ import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.options.Parser;
+import org.springframework.cloud.release.internal.sagan.SaganClient;
+import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
@@ -31,12 +33,13 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(ReleaserProperties.class)
 class ReleaserConfiguration {
 
-	@Bean SpringReleaser releaser(ReleaserProperties properties) {
+	@Bean SpringReleaser releaser(ReleaserProperties properties, SaganClient saganClient) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectGitHandler handler = new ProjectGitHandler(properties);
+		SaganUpdater saganUpdater = new SaganUpdater(saganClient);
 		return new SpringReleaser(new Releaser(pomUpdater, new ProjectBuilder(properties, pomUpdater),
 				handler, new TemplateGenerator(properties, handler),
-				new GradleUpdater(properties)), properties);
+				new GradleUpdater(properties), saganUpdater), properties);
 	}
 
 	@Bean Parser optionsParser() {

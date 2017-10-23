@@ -6,6 +6,7 @@ import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
+import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
@@ -24,15 +25,17 @@ public class Releaser {
 	private final ProjectGitHandler projectGitHandler;
 	private final TemplateGenerator templateGenerator;
 	private final GradleUpdater gradleUpdater;
+	private final SaganUpdater saganUpdater;
 
 	public Releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
 			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
-			GradleUpdater gradleUpdater) {
+			GradleUpdater gradleUpdater, SaganUpdater saganUpdater) {
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectBuilder = projectBuilder;
 		this.projectGitHandler = projectGitHandler;
 		this.templateGenerator = templateGenerator;
 		this.gradleUpdater = gradleUpdater;
+		this.saganUpdater = saganUpdater;
 	}
 
 	public Projects retrieveVersionsFromSCRelease() {
@@ -138,8 +141,9 @@ public class Releaser {
 		log.info("\nSuccessfully created release notes at location [{}]", output);
 	}
 
-	public void updateSagan(ProjectVersion releaseVersion) {
-		//File output = this.templateGenerator.releaseNotes(projects);
-		//log.info("\nSuccessfully created release notes at location [{}]", output);
+	public void updateSagan(File project, ProjectVersion releaseVersion) {
+		String currentBranch = this.projectGitHandler.currentBranch(project);
+		this.saganUpdater.updateSagan(currentBranch, releaseVersion);
+		log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 	}
 }

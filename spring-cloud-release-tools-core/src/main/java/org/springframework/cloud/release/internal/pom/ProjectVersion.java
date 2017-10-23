@@ -50,13 +50,14 @@ public class ProjectVersion {
 	}
 
 	public String groupId() {
-		if (this.model != null) {
-			if (StringUtils.hasText(this.model.getGroupId())) {
-				return this.model.getGroupId();
-			}
-			if (this.model.getParent() != null && StringUtils.hasText(this.model.getParent().getGroupId())) {
-				return this.model.getParent().getGroupId();
-			}
+		if (this.model == null) {
+			return "";
+		}
+		if (StringUtils.hasText(this.model.getGroupId())) {
+			return this.model.getGroupId();
+		}
+		if (this.model.getParent() != null && StringUtils.hasText(this.model.getParent().getGroupId())) {
+			return this.model.getParent().getGroupId();
 		}
 		return "";
 	}

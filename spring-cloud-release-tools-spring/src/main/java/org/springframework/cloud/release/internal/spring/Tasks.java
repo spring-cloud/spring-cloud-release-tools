@@ -52,6 +52,12 @@ class Tasks {
 				args.releaser.createTweet(args.versionFromScRelease);
 				args.releaser.createReleaseNotes(args.versionFromScRelease, args.projects);
 	});
+	static Task UPDATING_SAGAN = task("updatingSagan", "g",
+			"UPDATING SAGAN",
+			"Updating Sagan with release info",
+			args -> {
+				args.releaser.updateSagan(args.project, args.versionFromScRelease);
+	});
 
 	static final List<Task> DEFAULT_TASKS = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -62,7 +68,8 @@ class Tasks {
 			Tasks.SNAPSHOTS,
 			Tasks.PUSH,
 			Tasks.CLOSE_MILESTONE,
-			Tasks.CREATE_TEMPLATES
+			Tasks.CREATE_TEMPLATES,
+			Tasks.UPDATING_SAGAN
 	).collect(Collectors.toList());
 
 	static Task RELEASE = Tasks.task("release", "r",

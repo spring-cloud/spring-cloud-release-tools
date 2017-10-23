@@ -1,5 +1,7 @@
 package org.springframework.cloud.release.internal.spring;
 
+import static org.assertj.core.api.BDDAssertions.then;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -14,6 +16,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
@@ -24,10 +28,11 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.sagan.ReleaseUpdate;
+import org.springframework.cloud.release.internal.sagan.SaganClient;
+import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.FileSystemUtils;
-
-import static org.assertj.core.api.BDDAssertions.then;
 
 /**
  * @author Marcin Grzejszczak
@@ -39,6 +44,7 @@ public class AcceptanceTests {
 	File springCloudConsulProject;
 	File temporaryFolder;
 	TestProjectGitHandler gitHandler;
+	SaganClient saganClient = Mockito.mock(SaganClient.class);
 
 	@Before
 	public void setup() throws Exception {
@@ -93,6 +99,8 @@ public class AcceptanceTests {
 				.contains("Camden.SR5")
 				.contains("- Spring Cloud Config `1.2.2.RELEASE` ([issues](http://foo.bar.com/1.2.2.RELEASE))")
 				.contains("- Spring Cloud Aws `1.1.3.RELEASE` ([issues](http://foo.bar.com/1.1.3.RELEASE))");
+		BDDMockito.then(this.saganClient).should().createOrUpdateRelease(BDDMockito.eq("spring-cloud-consul"),
+				BDDMockito.any(ReleaseUpdate.class));
 	}
 
 	@Test
@@ -130,6 +138,8 @@ public class AcceptanceTests {
 				.contains("Dalston.RC1")
 				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
+		BDDMockito.then(this.saganClient).should(BDDMockito.never()).createOrUpdateRelease(
+				BDDMockito.anyString(), BDDMockito.any(ReleaseUpdate.class));
 	}
 
 	@Test
@@ -159,6 +169,8 @@ public class AcceptanceTests {
 				.contains("Dalston.RC1")
 				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1)");
+		BDDMockito.then(this.saganClient).should(BDDMockito.never()).createOrUpdateRelease(
+				BDDMockito.anyString(), BDDMockito.any(ReleaseUpdate.class));
 	}
 
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -265,8 +277,9 @@ public class AcceptanceTests {
 				expectedVersion);
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
+		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient);
 		Releaser releaser = new Releaser(pomUpdater, projectBuilder, handler,
-				templateGenerator, gradleUpdater);
+				templateGenerator, gradleUpdater, saganUpdater);
 		this.gitHandler = handler;
 		return releaser;
 	}
