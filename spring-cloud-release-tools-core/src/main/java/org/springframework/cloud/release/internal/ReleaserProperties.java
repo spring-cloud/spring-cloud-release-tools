@@ -287,7 +287,7 @@ public class ReleaserProperties {
 		/**
 		 * URL to the Sagan API
 		 */
-		private String baseUrl = "http://spring.io";
+		private String baseUrl = "https://spring.io";
 
 		public String getBaseUrl() {
 			return this.baseUrl;

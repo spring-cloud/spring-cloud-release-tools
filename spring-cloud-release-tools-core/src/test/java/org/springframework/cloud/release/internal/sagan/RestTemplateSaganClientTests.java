@@ -7,6 +7,7 @@ import java.util.List;
 import static org.assertj.core.api.BDDAssertions.then;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +40,7 @@ public class RestTemplateSaganClientTests {
 	}
 
 	@Test
+	@Ignore("2 stubs point to the same endpoint")
 	public void should_get_a_project() {
 		Project project = this.client.getProject("spring-framework");
 
