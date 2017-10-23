@@ -1,5 +1,8 @@
 package org.springframework.cloud.release.internal.project;
 
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,13 +18,9 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.util.FileSystemUtils;
-
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -183,9 +182,6 @@ public class ProjectBuilderTests {
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=world -Dfoo=bar 2");
-		then(outputCapture.toString())
-				.contains("Will run the build via [echo, -Dhello=world, -Dfoo=bar, 1]")
-				.contains("Will run the build via [echo, -Dhello=world, -Dfoo=bar, 2]");
 		then(executor.counter).isEqualTo(2);
 	}
 
