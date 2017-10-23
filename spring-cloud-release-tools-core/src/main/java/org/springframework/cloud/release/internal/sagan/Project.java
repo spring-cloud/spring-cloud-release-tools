@@ -16,4 +16,12 @@ public class Project {
 	public List<Release> projectReleases = new ArrayList<>();
 	public List<String> stackOverflowTagList = new ArrayList<>();
 	public boolean aggregator;
+
+	@Override public String toString() {
+		return "Project{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", repoUrl='"
+				+ repoUrl + '\'' + ", siteUrl='" + siteUrl + '\'' + ", category='"
+				+ category + '\'' + ", stackOverflowTags='" + stackOverflowTags + '\''
+				+ ", projectReleases=" + projectReleases + ", stackOverflowTagList="
+				+ stackOverflowTagList + ", aggregator=" + aggregator + '}';
+	}
 }

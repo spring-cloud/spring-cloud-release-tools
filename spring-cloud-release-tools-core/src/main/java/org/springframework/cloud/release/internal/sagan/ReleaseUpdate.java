@@ -10,11 +10,12 @@ public class ReleaseUpdate {
 	public String releaseStatus = "";
 	public String refDocUrl = "";
 	public String apiDocUrl = "";
+	public Repository repository;
 
 	@Override public String toString() {
 		return "ReleaseUpdate{" + "groupId='" + groupId + '\'' + ", artifactId='"
 				+ artifactId + '\'' + ", version='" + version + '\'' + ", releaseStatus='"
 				+ releaseStatus + '\'' + ", refDocUrl='" + refDocUrl + '\''
-				+ ", apiDocUrl='" + apiDocUrl + '\'' + '}';
+				+ ", apiDocUrl='" + apiDocUrl + '\'' + ", repository=" + repository + '}';
 	}
 }

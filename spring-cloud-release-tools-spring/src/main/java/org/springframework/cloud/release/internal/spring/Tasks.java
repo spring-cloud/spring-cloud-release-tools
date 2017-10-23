@@ -52,8 +52,8 @@ class Tasks {
 				args.releaser.createTweet(args.versionFromScRelease);
 				args.releaser.createReleaseNotes(args.versionFromScRelease, args.projects);
 	});
-	static Task UPDATING_SAGAN = task("updatingSagan", "g",
-			"UPDATING SAGAN",
+	static Task UPDATE_SAGAN = task("updateSagan", "g",
+			"UPDATE SAGAN",
 			"Updating Sagan with release info",
 			args -> {
 				args.releaser.updateSagan(args.project, args.versionFromScRelease);
@@ -69,7 +69,7 @@ class Tasks {
 			Tasks.PUSH,
 			Tasks.CLOSE_MILESTONE,
 			Tasks.CREATE_TEMPLATES,
-			Tasks.UPDATING_SAGAN
+			Tasks.UPDATE_SAGAN
 	).collect(Collectors.toList());
 
 	static Task RELEASE = Tasks.task("release", "r",

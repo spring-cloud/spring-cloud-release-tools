@@ -91,10 +91,14 @@ public class RestTemplateSaganClientTests {
 		ReleaseUpdate releaseUpdate = new ReleaseUpdate();
 		releaseUpdate.groupId = "org.springframework";
 		releaseUpdate.artifactId = "spring-context";
-		releaseUpdate.version = "1.2.3.RELEASE";
-		releaseUpdate.releaseStatus = "GENERAL_AVAILABILITY";
+		releaseUpdate.version = "1.2.8.RELEASE";
+		releaseUpdate.releaseStatus = "PRERELEASE";
 		releaseUpdate.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
 		releaseUpdate.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+
+
+		\n  \"repository\" : {\n    \"id\" : \"spring-milestones\",\n    \"name\" : \"Spring Milestones\",\n    \"url\" : \"https://repo.spring.io/libs-milestone\",\n    \"snapshotsEnabled\" : false\n  }\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"5.0.0.BUILD-SNAPSHOT\",\n  \"releaseStatus\" : \"SNAPSHOT\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\",\n  \"repository\" : {\n    \"id\" : \"spring-snapshots\",\n    \"name\" : \"Spring Snapshots\",\n    \"url\" : \"https://repo.spring.io/libs-snapshot\",\n    \"snapshotsEnabled\" : true\n  }\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"4.3.12.BUILD-SNAPSHOT\",\n  \"releaseStatus\" : \"SNAPSHOT\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\",\n  \"repository\" : {\n    \"id\" : \"spring-snapshots\",\n    \"name\" : \"Spring Snapshots\",\n    \"url\" : \"https://repo.spring.io/libs-snapshot\",\n    \"snapshotsEnabled\" : true\n  }\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"4.3.11.RELEASE\",\n  \"releaseStatus\" : \"GENERAL_AVAILABILITY\",\n  \"current\" : true,\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/current/javadoc-api/\"\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"4.2.9.RELEASE\",\n  \"releaseStatus\" : \"GENERAL_AVAILABILITY\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\"\n}, {\n  \"groupId\" : \"org.springframework\",\n  \"artifactId\" : \"spring-context\",\n  \"version\" : \"3.2.18.RELEASE\",\n  \"releaseStatus\" : \"GENERAL_AVAILABILITY\",\n  \"refDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/\",\n  \"apiDocUrl\" : \"http://docs.spring.io/spring/docs/{version}/javadoc-api/\"\n} ]"
+
 
 		Release release = this.client.createOrUpdateRelease("spring-framework", releaseUpdate);
 

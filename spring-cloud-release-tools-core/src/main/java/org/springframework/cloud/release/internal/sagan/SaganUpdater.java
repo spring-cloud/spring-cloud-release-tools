@@ -17,16 +17,17 @@ public class SaganUpdater {
 		this.saganClient = saganClient;
 	}
 
-	public void updateSagan(String branch, ProjectVersion version) {
+	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
 		if (version.isMilestone() || version.isRc()) {
 			log.info("Won't update Sagan about milestones / rc");
 			return;
 		}
 		ReleaseUpdate update = new ReleaseUpdate();
-		update.groupId = version.groupId();
+		update.groupId = originalVersion.groupId();
 		update.artifactId = version.projectName;
 		update.version = version.version;
-		update.apiDocUrl = "http://github.com/spring-cloud/" + version.projectName;
+		update.releaseStatus = version.isSnapshot() ? "SNAPSHOT" : "GENERAL_AVAILABILITY";
+		update.apiDocUrl = referenceUrl(branch, version);
 		update.refDocUrl = referenceUrl(branch, version);
 		log.info("Updating Sagan with \n\n{}", update);
 		this.saganClient.createOrUpdateRelease(version.projectName, update);

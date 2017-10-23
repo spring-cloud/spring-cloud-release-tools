@@ -16,4 +16,14 @@ public class Release {
 	public boolean preRelease;
 	public String versionDisplayName = "";
 	public boolean snapshot;
+
+	@Override public String toString() {
+		return "Release{" + "releaseStatus='" + releaseStatus + '\'' + ", refDocUrl='"
+				+ refDocUrl + '\'' + ", apiDocUrl='" + apiDocUrl + '\'' + ", groupId='"
+				+ groupId + '\'' + ", artifactId='" + artifactId + '\'' + ", repository="
+				+ repository + ", version='" + version + '\'' + ", current=" + current
+				+ ", generalAvailability=" + generalAvailability + ", preRelease="
+				+ preRelease + ", versionDisplayName='" + versionDisplayName + '\''
+				+ ", snapshot=" + snapshot + '}';
+	}
 }

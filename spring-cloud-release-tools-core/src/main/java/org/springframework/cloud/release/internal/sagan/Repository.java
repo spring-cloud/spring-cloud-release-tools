@@ -8,4 +8,9 @@ public class Repository {
 	public String name;
 	public String url;
 	public boolean snapshotsEnabled;
+
+	@Override public String toString() {
+		return "Repository{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", url='"
+				+ url + '\'' + ", snapshotsEnabled=" + snapshotsEnabled + '}';
+	}
 }

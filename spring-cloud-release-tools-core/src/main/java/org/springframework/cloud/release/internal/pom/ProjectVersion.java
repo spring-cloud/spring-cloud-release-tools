@@ -15,7 +15,6 @@ public class ProjectVersion {
 
 	public final String projectName;
 	public final String version;
-	private final PomReader pomReader = new PomReader();
 	private final Model model;
 
 	public ProjectVersion(String projectName, String version) {
@@ -25,7 +24,8 @@ public class ProjectVersion {
 	}
 
 	public ProjectVersion(File project) {
-		Model model = this.pomReader.readPom(project);
+		PomReader pomReader = new PomReader();
+		Model model = pomReader.readPom(project);
 		this.projectName = nameWithoutParent(model.getArtifactId());
 		this.version = model.getVersion();
 		this.model = model;
