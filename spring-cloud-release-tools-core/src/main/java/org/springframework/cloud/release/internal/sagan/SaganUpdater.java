@@ -43,7 +43,7 @@ public class SaganUpdater {
 	}
 
 	private String referenceUrl(String branch, ProjectVersion version) {
-		if (version.isRelease()) {
+		if (!version.isSnapshot()) {
 			// static/sleuth/{version}/
 			return "http://cloud.spring.io/spring-cloud-static/" + version.projectName + "/{version}/";
 		}
