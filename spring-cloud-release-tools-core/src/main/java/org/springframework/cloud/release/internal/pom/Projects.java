@@ -1,8 +1,7 @@
 package org.springframework.cloud.release.internal.pom;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +18,12 @@ public class Projects extends HashSet<ProjectVersion> {
 
 	@SuppressWarnings("unchecked")
 	public Projects(ProjectVersion... versions) {
-		addAll(new HashSet<ProjectVersion>(Arrays.asList(versions)));
+		addAll(new HashSet<>(Arrays.asList(versions)));
+	}
+
+	public void remove(String projectName) {
+		ProjectVersion projectVersion = forName(projectName);
+		remove(projectVersion);
 	}
 
 	public ProjectVersion forFile(File projectRoot) {

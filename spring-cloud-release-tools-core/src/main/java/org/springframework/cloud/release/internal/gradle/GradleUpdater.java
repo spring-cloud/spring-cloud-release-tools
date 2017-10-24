@@ -39,14 +39,17 @@ public class GradleUpdater {
 	 * the project name via {@link ReleaserProperties.Gradle#gradlePropsSubstitution}
 	 * @param projectRoot - root folder with project to update
 	 * @param projects - versions of projects used to update poms
+	 * @param versionFromScRelease - version for the project from Spring Cloud Release
 	 */
-	public void updateProjectFromSCRelease(File projectRoot, Projects projects) {
-		processAllGradleProps(projectRoot, projects);
+	public void updateProjectFromSCRelease(File projectRoot, Projects projects,
+			ProjectVersion versionFromScRelease) {
+		processAllGradleProps(projectRoot, projects, versionFromScRelease);
 	}
 
-	private void processAllGradleProps(File projectRoot, Projects projects) {
+	private void processAllGradleProps(File projectRoot, Projects projects,
+			ProjectVersion versionFromScRelease) {
 		try {
-			Files.walkFileTree(projectRoot.toPath(), new GradlePropertiesWalker(this.properties, projects));
+			Files.walkFileTree(projectRoot.toPath(), new GradlePropertiesWalker(this.properties, projects, versionFromScRelease));
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);
@@ -59,10 +62,13 @@ public class GradleUpdater {
 
 		private final ReleaserProperties properties;
 		private final Projects projects;
+		private final ProjectVersion versionFromScRelease;
 
-		private GradlePropertiesWalker(ReleaserProperties properties, Projects projects) {
+		private GradlePropertiesWalker(ReleaserProperties properties, Projects projects,
+				ProjectVersion versionFromScRelease) {
 			this.properties = properties;
 			this.projects = projects;
+			this.versionFromScRelease = versionFromScRelease;
 		}
 
 		@Override
@@ -106,7 +112,14 @@ public class GradleUpdater {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.properties.getGradle().getIgnoredGradleRegex().stream().anyMatch(path::matches);
+			return bumpingToRelease() &&
+					this.properties.getGradle().getIgnoredGradleRegex().stream().anyMatch(path::matches);
+		}
+
+		private boolean bumpingToRelease() {
+			ProjectVersion version = this.projects
+					.forName(this.versionFromScRelease.projectName);
+			return version.isRelease() || version.isServiceRelease();
 		}
 
 		private String asString(Path path) {

@@ -34,7 +34,7 @@ class Tasks {
 	static Task SNAPSHOTS = task("snapshots", "s",
 			"REVERTING CHANGES & BUMPING VERSION (RELEASE ONLY)",
 			"Go back to snapshots and bump originalVersion by patch",
-			args -> args.releaser.rollbackReleaseVersion(args.project, args.versionFromScRelease));
+			args -> args.releaser.rollbackReleaseVersion(args.project, args.projects, args.versionFromScRelease));
 	static Task PUSH = task("push", "p",
 			"PUSHING CHANGES",
 			"Push the commits",

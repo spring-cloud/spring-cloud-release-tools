@@ -224,22 +224,6 @@ public class ProjectBuilderTests {
 		thenThrownBy(builder::build).hasMessageContaining("The process has exited with exit code [1]");
 	}
 
-	@Test
-	public void should_successfully_execute_a_bump_versions_command() throws Exception {
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.setWorkingDir(tmpFile("/spring-cloud-contract").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
-
-		builder.bumpVersions("2.3.4.BUILD-SNAPSHOT");
-
-		File rootPom = tmpFile("/spring-cloud-contract/pom.xml");
-		File tools = tmpFile("/spring-cloud-contract/spring-cloud-contract-tools/pom.xml");
-		File converters = tmpFile("/spring-cloud-contract/spring-cloud-contract-tools/spring-cloud-contract-converters/pom.xml");
-		then(this.reader.readPom(rootPom).getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
-		then(this.reader.readPom(tools).getParent().getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
-		then(this.reader.readPom(converters).getParent().getVersion()).isEqualTo("2.3.4.BUILD-SNAPSHOT");
-	}
-
 	private Process processWithInvalidExitCode() {
 		return new Process() {
 			@Override public OutputStream getOutputStream() {

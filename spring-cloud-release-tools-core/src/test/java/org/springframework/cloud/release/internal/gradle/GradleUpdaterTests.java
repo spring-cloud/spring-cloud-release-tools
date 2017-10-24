@@ -1,5 +1,7 @@
 package org.springframework.cloud.release.internal.gradle;
 
+import static org.assertj.core.api.BDDAssertions.then;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,8 +17,6 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.util.FileSystemUtils;
-
-import static org.assertj.core.api.BDDAssertions.then;
 
 /**
  * @author Marcin Grzejszczak
@@ -45,7 +45,8 @@ public class GradleUpdaterTests {
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0")
 		);
 
-		new GradleUpdater(properties).updateProjectFromSCRelease(projectRoot, projects);
+		new GradleUpdater(properties).updateProjectFromSCRelease(projectRoot,
+				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"));
 
 		then(asString(tmpFile("gradleproject/gradle.properties")))
 				.contains("foo=1.0.0");

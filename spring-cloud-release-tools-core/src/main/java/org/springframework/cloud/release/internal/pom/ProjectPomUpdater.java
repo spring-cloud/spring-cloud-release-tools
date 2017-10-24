@@ -23,9 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,29 +75,15 @@ public class ProjectPomUpdater {
 			log.info("Skipping project updating");
 			return;
 		}
-		updatePoms(projectRoot, versions, versionFromScRelease, Assertion.ASSERT_SNAPSHOTS);
+		updatePoms(projectRoot, projects, versionFromScRelease, Assertion.ASSERT_SNAPSHOTS);
 	}
 
-	private void updatePoms(File projectRoot, Versions versions,
+	private void updatePoms(File projectRoot, Projects projects,
 			ProjectVersion versionFromScRelease, Assertion assertSnapshots) {
 		File rootPom = new File(projectRoot, "pom.xml");
 		ModelWrapper rootPomModel = this.pomUpdater.readModel(rootPom);
-		processAllPoms(projectRoot, new PomWalker(rootPomModel, versions, this.pomUpdater,
+		processAllPoms(projectRoot, new PomWalker(rootPomModel, projects, this.pomUpdater,
 				this.properties, versionFromScRelease, assertSnapshots));
-	}
-
-	public void updatePomsForRootVersion(File directory, String version) {
-		File pom = new File(directory, "pom.xml");
-		Versions versions = versions(version, pom);
-		updatePoms(directory, versions, new ProjectVersion("fake", "1.0.0"),
-				Assertion.IGNORE_ASSERTION);
-	}
-
-	private Versions versions(String version, File pom) {
-		ModelWrapper model = this.pomUpdater.readModel(pom);
-		Set<Project> projects = new HashSet<>();
-		projects.add(new Project(model.projectName(), version));
-		return new Versions("", "", projects);
 	}
 
 	private void processAllPoms(File projectRoot, PomWalker pomWalker) {
@@ -121,18 +105,22 @@ public class ProjectPomUpdater {
 		private final ReleaserProperties properties;
 		private final boolean snapshotVersion;
 		private final Assertion assertSnapshots;
+		private final ProjectVersion versionFromScRelease;
+		private final Projects projects;
 
-		private PomWalker(ModelWrapper rootPom, Versions versions, PomUpdater pomUpdater,
+		private PomWalker(ModelWrapper rootPom, Projects projects, PomUpdater pomUpdater,
 				ReleaserProperties properties, ProjectVersion versionFromScRelease,
 				Assertion assertSnapshots) {
 			this.rootPom = rootPom;
-			this.versions = versions;
+			this.versions = new Versions(projects);
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
 			this.snapshotVersion =
 					assertSnapshots != Assertion.ASSERT_SNAPSHOTS || versionFromScRelease
 							.isSnapshot();
 			this.assertSnapshots = assertSnapshots;
+			this.versionFromScRelease = versionFromScRelease;
+			this.projects = projects;
 		}
 
 		@Override
@@ -166,7 +154,14 @@ public class ProjectPomUpdater {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.properties.getPom().getIgnoredPomRegex().stream().anyMatch(path::matches);
+			return bumpingToRelease() &&
+					this.properties.getPom().getIgnoredPomRegex().stream().anyMatch(path::matches);
+		}
+
+		private boolean bumpingToRelease() {
+			ProjectVersion version = this.projects
+					.forName(this.versionFromScRelease.projectName);
+			return version.isRelease() || version.isServiceRelease();
 		}
 
 		private String asString(Path path) {

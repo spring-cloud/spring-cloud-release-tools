@@ -11,9 +11,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -22,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.util.StringUtils;
 
 /**
@@ -101,12 +98,6 @@ public class ProjectBuilder {
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-	public void bumpVersions(String version) {
-		String workingDir = this.properties.getWorkingDir();
-		File dir = new File(workingDir);
-		this.pomUpdater.updatePomsForRootVersion(dir, version);
 	}
 
 	/**

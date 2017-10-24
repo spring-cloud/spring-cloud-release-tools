@@ -1,14 +1,14 @@
 package org.springframework.cloud.release.internal.pom;
 
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -33,6 +33,17 @@ public class ProjectsTests {
 		Projects projects = new Projects(projectVersions);
 
 		then(projects.forName("spring-cloud-starter-build").version).isEqualTo("1.0.0");
+	}
+
+	@Test
+	public void should_remove_a_project_by_name() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("spring-cloud-starter-build", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		projects.remove("spring-cloud-starter-build");
+
+		then(projects).isEmpty();
 	}
 
 	@Test

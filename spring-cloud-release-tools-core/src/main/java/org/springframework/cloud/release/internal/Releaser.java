@@ -45,7 +45,7 @@ public class Releaser {
 	public void updateProjectFromScRelease(File project, Projects versions,
 			ProjectVersion versionFromScRelease) {
 		this.projectPomUpdater.updateProjectFromSCRelease(project, versions, versionFromScRelease);
-		this.gradleUpdater.updateProjectFromSCRelease(project, versions);
+		this.gradleUpdater.updateProjectFromSCRelease(project, versions, versionFromScRelease);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 	}
@@ -70,7 +70,7 @@ public class Releaser {
 		log.info("\nThe docs were published successfully");
 	}
 
-	public void rollbackReleaseVersion(File project, ProjectVersion scReleaseVersion) {
+	public void rollbackReleaseVersion(File project, Projects projects, ProjectVersion scReleaseVersion) {
 		if (scReleaseVersion.isSnapshot()) {
 			log.info("\nWon't rollback a snapshot version");
 			return;
@@ -79,7 +79,10 @@ public class Releaser {
 		ProjectVersion originalVersion = originalVersion(project);
 		log.info("Original project version is [{}]", originalVersion);
 		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
-			this.projectBuilder.bumpVersions(originalVersion.bumpedVersion());
+			Projects newProjects = new Projects(projects);
+			newProjects.remove(scReleaseVersion.projectName);
+			newProjects.add(new ProjectVersion(originalVersion.projectName, originalVersion.bumpedVersion()));
+			updateProjectFromScRelease(project, newProjects, originalVersion);
 			this.projectGitHandler.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 		} else {
