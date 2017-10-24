@@ -28,7 +28,6 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
-import org.springframework.cloud.release.internal.sagan.ReleaseUpdate;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
@@ -138,8 +137,8 @@ public class AcceptanceTests {
 				.contains("Dalston.RC1")
 				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
-		BDDMockito.then(this.saganClient).should(BDDMockito.never()).updateRelease(
-				BDDMockito.anyString(), BDDMockito.anyList());
+		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
+				BDDMockito.anyList());
 	}
 
 	@Test

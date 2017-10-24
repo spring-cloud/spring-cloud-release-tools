@@ -1,9 +1,10 @@
 package org.springframework.cloud.release.internal.sagan;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * @author Marcin Grzejszczak
@@ -19,19 +20,26 @@ public class SaganUpdater {
 	}
 
 	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
-		if (version.isMilestone() || version.isRc()) {
-			log.info("Won't update Sagan about milestones / rc");
-			return;
-		}
 		ReleaseUpdate update = new ReleaseUpdate();
 		update.groupId = originalVersion.groupId();
 		update.artifactId = version.projectName;
 		update.version = version.version;
-		update.releaseStatus = version.isSnapshot() ? "SNAPSHOT" : "GENERAL_AVAILABILITY";
+		update.releaseStatus = version(version);
 		update.apiDocUrl = referenceUrl(branch, version);
 		update.refDocUrl = referenceUrl(branch, version);
 		log.info("Updating Sagan with \n\n{}", update);
 		this.saganClient.updateRelease(version.projectName, Collections.singletonList(update));
+	}
+
+	private String version(ProjectVersion version) {
+		if (version.isSnapshot()) {
+			return "SNAPSHOT";
+		} else if (version.isMilestone() || version.isRc()) {
+			return "PRERELEASE";
+		} else if (version.isRelease() || version.isServiceRelease()) {
+			return "GENERAL_AVAILABILITY";
+		}
+		return "";
 	}
 
 	private String referenceUrl(String branch, ProjectVersion version) {
