@@ -20,6 +20,9 @@ import org.springframework.cloud.release.internal.project.ProjectBuilder;
 public class Releaser {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+	private static boolean ASSERT_SNAPSHOTS = true;
+	private static boolean SKIP_SNAPSHOT_ASSERTION = false;
+
 	private final ProjectPomUpdater projectPomUpdater;
 	private final ProjectBuilder projectBuilder;
 	private final ProjectGitHandler projectGitHandler;
@@ -44,8 +47,15 @@ public class Releaser {
 
 	public void updateProjectFromScRelease(File project, Projects versions,
 			ProjectVersion versionFromScRelease) {
-		this.projectPomUpdater.updateProjectFromSCRelease(project, versions, versionFromScRelease);
-		this.gradleUpdater.updateProjectFromSCRelease(project, versions, versionFromScRelease);
+		updateProjectFromScRelease(project, versions, versionFromScRelease, ASSERT_SNAPSHOTS);
+	}
+
+	private void updateProjectFromScRelease(File project, Projects versions,
+			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+		this.projectPomUpdater.updateProjectFromSCRelease(project, versions,
+				versionFromScRelease, assertSnapshots);
+		this.gradleUpdater.updateProjectFromSCRelease(project, versions,
+				versionFromScRelease, assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 	}
@@ -82,7 +92,7 @@ public class Releaser {
 			Projects newProjects = new Projects(projects);
 			newProjects.remove(scReleaseVersion.projectName);
 			newProjects.add(new ProjectVersion(originalVersion.projectName, originalVersion.bumpedVersion()));
-			updateProjectFromScRelease(project, newProjects, originalVersion);
+			updateProjectFromScRelease(project, newProjects, originalVersion, SKIP_SNAPSHOT_ASSERTION);
 			this.projectGitHandler.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 		} else {

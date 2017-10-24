@@ -46,7 +46,7 @@ public class PomUpdateAcceptanceTests {
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
 
 		projectPomUpdater
-				.updateProjectFromSCRelease(project, projects, projects.forFile(project));
+				.updateProjectFromSCRelease(project, projects, projects.forFile(project), true);
 
 		then(this.temporaryFolder).exists();
 		Model rootPom = this.testPomReader.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
@@ -75,7 +75,7 @@ public class PomUpdateAcceptanceTests {
 
 		BDDAssertions.thenThrownBy(() ->
 			projectPomUpdater
-					.updateProjectFromSCRelease(project, projects, projects.forFile(project))
+					.updateProjectFromSCRelease(project, projects, projects.forFile(project), true)
 		).hasMessageContaining("<spring-cloud-unmatched.version>0.6.0.BUILD-SNAPSHOT</spring-cloud-unmatched.version>");
 	}
 
@@ -90,7 +90,7 @@ public class PomUpdateAcceptanceTests {
 
 		BDDAssertions.thenThrownBy(() ->
 			projectPomUpdater
-					.updateProjectFromSCRelease(project, projects, projects.forFile(project))
+					.updateProjectFromSCRelease(project, projects, projects.forFile(project), true)
 		).hasMessageContaining("<version>1.4.2.BUILD-SNAPSHOT</version>");
 	}
 
@@ -103,7 +103,7 @@ public class PomUpdateAcceptanceTests {
 		File project = tmpFile("/project/");
 
 		projectPomUpdater.updateProjectFromSCRelease(project, projects,
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"), true);
 
 		then(this.temporaryFolder).exists();
 		File afterProcessing = tmpFile("/project/pom.xml");

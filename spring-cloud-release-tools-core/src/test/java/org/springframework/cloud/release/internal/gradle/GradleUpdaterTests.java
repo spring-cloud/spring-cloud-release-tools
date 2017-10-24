@@ -1,6 +1,7 @@
 package org.springframework.cloud.release.internal.gradle;
 
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +47,31 @@ public class GradleUpdaterTests {
 		);
 
 		new GradleUpdater(properties).updateProjectFromSCRelease(projectRoot,
-				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"));
+				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
 
 		then(asString(tmpFile("gradleproject/gradle.properties")))
 				.contains("foo=1.0.0");
 		then(asString(tmpFile("gradleproject/child/gradle.properties")))
 				.contains("bar=2.0.0");
+	}
+
+	@Test
+	public void should_throw_exception_if_snapshots_remain() throws IOException {
+		File projectRoot = tmpFile("gradleproject");
+		ReleaserProperties properties = new ReleaserProperties();
+		Map<String, String> props = new HashMap<String, String>() {{
+			put("foo", "spring-cloud-contract");
+			put("bar", "spring-cloud-sleuth");
+		}};
+		properties.getGradle().setGradlePropsSubstitution(props);
+		Projects projects = new Projects(
+				new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
+				new ProjectVersion("spring-cloud-sleuth", "2.0.0")
+		);
+
+		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromSCRelease(projectRoot,
+				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true))
+		.hasMessageContaining("contains a BUILD-SNAPSHOT version for a non snapshot release in line number");
 	}
 
 	private File file(String relativePath) throws URISyntaxException {

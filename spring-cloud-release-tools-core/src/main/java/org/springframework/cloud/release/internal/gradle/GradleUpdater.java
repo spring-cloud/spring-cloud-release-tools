@@ -11,6 +11,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -40,16 +41,18 @@ public class GradleUpdater {
 	 * @param projectRoot - root folder with project to update
 	 * @param projects - versions of projects used to update poms
 	 * @param versionFromScRelease - version for the project from Spring Cloud Release
+	 * @param assertSnapshots - should snapshots presence be asserted
 	 */
 	public void updateProjectFromSCRelease(File projectRoot, Projects projects,
-			ProjectVersion versionFromScRelease) {
-		processAllGradleProps(projectRoot, projects, versionFromScRelease);
+			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+		processAllGradleProps(projectRoot, projects, versionFromScRelease, assertSnapshots);
 	}
 
 	private void processAllGradleProps(File projectRoot, Projects projects,
-			ProjectVersion versionFromScRelease) {
+			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
 		try {
-			Files.walkFileTree(projectRoot.toPath(), new GradlePropertiesWalker(this.properties, projects, versionFromScRelease));
+			Files.walkFileTree(projectRoot.toPath(),
+					new GradlePropertiesWalker(this.properties, projects, versionFromScRelease, assertSnapshots));
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);
@@ -63,12 +66,16 @@ public class GradleUpdater {
 		private final ReleaserProperties properties;
 		private final Projects projects;
 		private final ProjectVersion versionFromScRelease;
+		private final boolean snapshotVersion;
+		private final boolean assertSnapshots;
 
 		private GradlePropertiesWalker(ReleaserProperties properties, Projects projects,
-				ProjectVersion versionFromScRelease) {
+				ProjectVersion versionFromScRelease, boolean assertSnapshots) {
 			this.properties = properties;
 			this.projects = projects;
 			this.versionFromScRelease = versionFromScRelease;
+			this.snapshotVersion = !assertSnapshots || versionFromScRelease.isSnapshot();
+			this.assertSnapshots = assertSnapshots;
 		}
 
 		@Override
@@ -95,8 +102,27 @@ public class GradleUpdater {
 					}
 				});
 				storeString(path, changedString.get());
+				assertNoSnapshotsArePresent(path);
 			}
 			return FileVisitResult.CONTINUE;
+		}
+
+		private void assertNoSnapshotsArePresent(Path path) {
+			if (this.assertSnapshots && !this.snapshotVersion) {
+				log.debug("Update is a non-snapshot one. Checking if no snapshot versions remained in the gradle prop");
+				Scanner scanner = new Scanner(asString(path));
+				int lineNumber = 0;
+				while (scanner.hasNextLine()) {
+					String line = scanner.nextLine();
+					lineNumber++;
+					boolean containsSnapshot = line.contains("BUILD-SNAPSHOT");
+					if (containsSnapshot) {
+						throw new IllegalStateException("The file [" + path + "] contains a BUILD-SNAPSHOT "
+								+ "version for a non snapshot release in line number [" + lineNumber + "]\n\n" + line);
+					}
+				}
+				log.info("No snapshot versions remained in the pom");
+			}
 		}
 
 		private Properties loadProps(File file) {
