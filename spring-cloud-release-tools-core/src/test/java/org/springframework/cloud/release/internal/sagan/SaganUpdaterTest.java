@@ -26,7 +26,7 @@ public class SaganUpdaterTest {
 
 		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.M1",
-						"http://cloud.spring.io/foo/foo.html", "PRERELEASE")));
+						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
 
 	@Test public void should_update_sagan_for_rc() throws Exception {
@@ -34,7 +34,7 @@ public class SaganUpdaterTest {
 
 		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RC1",
-						"http://cloud.spring.io/foo/foo.html", "PRERELEASE")));
+						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
 
 	private ProjectVersion version(String version) {
