@@ -96,7 +96,7 @@ class GithubMilestones {
 			try {
 				URL url = foundMilestoneUrl(foundMilestone);
 				log.info("Found a matching milestone with issues URL [{}]", url);
-				return url.toString();
+				return url.toString().replace("https://api.github.com/repos", "https://github.com") + "?closed=1";
 			}
 			catch (IOException e) {
 				throw new IllegalStateException(e);

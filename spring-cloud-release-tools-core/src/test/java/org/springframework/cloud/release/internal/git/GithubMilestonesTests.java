@@ -111,14 +111,14 @@ public class GithubMilestonesTests {
 
 			@Override URL foundMilestoneUrl(Milestone.Smart milestone)
 					throws IOException {
-				return new URL("http://foo.com/bar");
+				return new URL("https://api.github.com/repos/spring-cloud/spring-cloud-sleuth/milestones/33");
 			}
 		};
 		repo.milestones().create("0.2.0.RELEASE");
 
 		String url = milestones.milestoneUrl(gaSleuthProject());
 
-		then(url).isEqualTo("http://foo.com/bar");
+		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestones/33?closed=1");
 	}
 
 	@Test
