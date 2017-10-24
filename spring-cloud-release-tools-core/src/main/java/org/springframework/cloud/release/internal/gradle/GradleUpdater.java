@@ -138,14 +138,8 @@ public class GradleUpdater {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return bumpingToRelease() &&
+			return assertSnapshots &&
 					this.properties.getGradle().getIgnoredGradleRegex().stream().anyMatch(path::matches);
-		}
-
-		private boolean bumpingToRelease() {
-			ProjectVersion version = this.projects
-					.forName(this.versionFromScRelease.projectName);
-			return version.isRelease() || version.isServiceRelease();
 		}
 
 		private String asString(Path path) {

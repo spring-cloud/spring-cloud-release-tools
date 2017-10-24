@@ -149,7 +149,7 @@ public class ProjectPomUpdater {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.snapshotVersion &&
+			return this.assertSnapshots &&
 					this.properties.getPom().getIgnoredPomRegex().stream().anyMatch(path::matches);
 		}
 
