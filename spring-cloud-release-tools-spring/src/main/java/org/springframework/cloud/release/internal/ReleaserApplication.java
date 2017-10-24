@@ -27,7 +27,9 @@ import org.springframework.cloud.release.internal.spring.SpringReleaser;
 public class ReleaserApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ReleaserApplication.class, args);
+		SpringApplication application = new SpringApplication(ReleaserApplication.class);
+		application.setWebEnvironment(false);
+		application.run(args);
 	}
 
 	@Autowired SpringReleaser releaser;
