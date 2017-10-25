@@ -118,7 +118,7 @@ public class GithubMilestonesTests {
 
 		String url = milestones.milestoneUrl(gaSleuthProject());
 
-		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestones/33?closed=1");
+		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
 	}
 
 	@Test

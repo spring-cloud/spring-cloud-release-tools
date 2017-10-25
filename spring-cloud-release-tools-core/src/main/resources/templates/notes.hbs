@@ -2,5 +2,5 @@
 
 {{ date }}
 
-{{#each projects}} - {{name}} `{{version}}` ([issues]({{ closedMilestoneUrl }}))
+{{#each projects}} - {{name}} `{{version}}` {{#if closedMilestoneUrl}}([issues]({{ closedMilestoneUrl }})){{/if}}
 {{/each}}
