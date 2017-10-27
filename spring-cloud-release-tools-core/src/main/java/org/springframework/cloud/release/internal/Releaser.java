@@ -156,8 +156,10 @@ public class Releaser {
 
 	public void updateSagan(File project, ProjectVersion releaseVersion) {
 		String currentBranch = this.projectGitHandler.currentBranch(project);
-		ProjectVersion originalVersion = new ProjectVersion(project);
+		// TODO: restore sagan update
+		/*ProjectVersion originalVersion = new ProjectVersion(project);
 		this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
-		log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
+		log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);*/
+		log.warn("\nSkipping Sagan update for branch [{}]", currentBranch);
 	}
 }
