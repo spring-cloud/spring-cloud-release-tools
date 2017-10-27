@@ -258,9 +258,6 @@ public class PomUpdaterTests {
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isEqualTo(asString(originalPom));
-		BDDAssertions.then(this.capture.toString())
-				.contains("Won't update the version of parent")
-				.contains("Won't update the version of module");
 	}
 
 	Set<Project> projects() {
