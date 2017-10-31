@@ -256,7 +256,7 @@ public class TemplateGeneratorTests {
 			throws IOException {
 		ProjectGitHandler handler = new ProjectGitHandler(this.props) {
 			@Override public String milestoneUrl(ProjectVersion releaseVersion) {
-				return "http://foo.bar.com";
+				return "http://foo.bar.com?closed=1";
 			}
 		};
 		this.props.getPom().setBranch("Dalston.RC1");
@@ -272,8 +272,8 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedOutput))
 				.contains("# Dalston.RC1")
-				.contains("Spring Cloud Sleuth `1.0.0.RC1` ([issues](http://foo.bar.com))")
-				.contains("Spring Cloud Consul `1.0.1.RC1` ([issues](http://foo.bar.com))")
+				.contains("Spring Cloud Sleuth `1.0.0.RC1` ([issues](http://foo.bar.com?closed=1))")
+				.contains("Spring Cloud Consul `1.0.1.RC1` ([issues](http://foo.bar.com?closed=1))")
 				.doesNotContain("Boot");
 	}
 
