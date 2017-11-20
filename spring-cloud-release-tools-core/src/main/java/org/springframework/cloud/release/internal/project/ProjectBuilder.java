@@ -106,10 +106,16 @@ public class ProjectBuilder {
 	 */
 	private String[] substituteSystemProps(String... commands) {
 		boolean containsSystemProps = this.properties.getMaven().getSystemProperties().contains("-D");
-		String[] splitSystemProps = StringUtils.tokenizeToStringArray(this.properties.getMaven()
+		String[] splitSystemProps = StringUtils.delimitedListToStringArray(this.properties.getMaven()
 				.getSystemProperties(), "-D");
+		// first element might be empty even though the second one contains values
+		if (splitSystemProps.length > 1) {
+			splitSystemProps = StringUtils.isEmpty(splitSystemProps[0]) ?
+					Arrays.copyOfRange(splitSystemProps, 1, splitSystemProps.length) :
+					splitSystemProps;
+		}
 		String[] systemPropsWithPrefix = containsSystemProps ? Arrays.stream(splitSystemProps)
-				.map(s -> "-D" + s)
+				.map(s -> "-D" + s.trim())
 				.collect(Collectors.toList())
 				.toArray(new String[splitSystemProps.length]) : splitSystemProps;
 		final AtomicInteger index = new AtomicInteger(-1);

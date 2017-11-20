@@ -133,14 +133,14 @@ public class ProjectBuilderTests {
 	public void should_successfully_execute_a_deploy_command_with_sys_props_placeholder() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo \"{{systemProps}}\"");
-		properties.getMaven().setSystemProperties("hello world");
+		properties.getMaven().setSystemProperties("-Dhello=hello-world");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
 		builder.deploy();
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("hello world");
+				.contains("-Dhello=hello-world");
 	}
 
 	@Test
