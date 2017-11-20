@@ -98,8 +98,8 @@ public class AcceptanceTests {
 				.contains("Camden.SR5")
 				.contains("- Spring Cloud Config `1.2.2.RELEASE` ([issues](http://foo.bar.com/1.2.2.RELEASE))")
 				.contains("- Spring Cloud Aws `1.1.3.RELEASE` ([issues](http://foo.bar.com/1.1.3.RELEASE))");
-		/*TODO: restore BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
-				BDDMockito.anyList());*/
+		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
+				BDDMockito.anyList());
 	}
 
 	@Test
@@ -137,8 +137,8 @@ public class AcceptanceTests {
 				.contains("Dalston.RC1")
 				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
-		/*TODO: restore BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
-				BDDMockito.anyList());*/
+		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
+				BDDMockito.anyList());
 	}
 
 	@Test
