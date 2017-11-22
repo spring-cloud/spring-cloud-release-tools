@@ -127,18 +127,6 @@ public class VersionsTests {
 		return projects;
 	}
 
-	Set<Project> snapshotProjects() {
-		Set<Project> projects = new HashSet<>();
-		projects.add(new Project("foo", "1.0.0.BUILD-SNAPSHOT"));
-		return projects;
-	}
-
-	Set<Project> releaseProjects() {
-		Set<Project> projects = new HashSet<>();
-		projects.add(new Project("foo", "1.0.0.RELEASE"));
-		return projects;
-	}
-
 	Set<Project> mixedProjects() {
 		Set<Project> projects = new HashSet<>();
 		projects.add(new Project("foo", "1.0.0.BUILD-SNAPSHOT"));

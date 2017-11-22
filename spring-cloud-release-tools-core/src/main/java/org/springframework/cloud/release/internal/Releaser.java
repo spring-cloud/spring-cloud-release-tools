@@ -89,8 +89,7 @@ public class Releaser {
 		ProjectVersion originalVersion = originalVersion(project);
 		log.info("Original project version is [{}]", originalVersion);
 		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
-			Projects newProjects = new Projects(projects);
-			newProjects.remove(scReleaseVersion.projectName);
+			Projects newProjects = new Projects();
 			newProjects.add(new ProjectVersion(originalVersion.projectName, originalVersion.bumpedVersion()));
 			updateProjectFromScRelease(project, newProjects, originalVersion, SKIP_SNAPSHOT_ASSERTION);
 			this.projectGitHandler.commitAfterBumpingVersions(project, originalVersion);

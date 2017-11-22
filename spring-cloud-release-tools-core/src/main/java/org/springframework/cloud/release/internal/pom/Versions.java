@@ -66,9 +66,9 @@ class Versions {
 
 	Versions(Set<ProjectVersion> versions) {
 		this.bootVersion = versions.stream().filter(projectVersion -> SPRING_BOOT_PROJECT_NAME.equals(projectVersion.projectName))
-				.findFirst().orElseThrow(() -> new IllegalStateException("Boot Version is Missing")).version;
+				.findFirst().orElse(new ProjectVersion(SPRING_BOOT_PROJECT_NAME, "")).version;
 		this.scBuildVersion = versions.stream().filter(projectVersion -> BUILD_ARTIFACT_ID.equals(projectVersion.projectName))
-				.findFirst().orElseThrow(() -> new IllegalStateException("Spring Cloud Build Version is Missing")).version;
+				.findFirst().orElse(new ProjectVersion(BUILD_ARTIFACT_ID, "")).version;
 		this.projects = versions.stream()
 				.map(projectVersion -> new Project(projectVersion.projectName, projectVersion.version))
 				.collect(Collectors.toSet());
