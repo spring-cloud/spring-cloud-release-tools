@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2017-11-21</date>
+<date>2017-11-22</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -277,6 +277,13 @@ be set there. Just provide a mapping for the <literal>gradle-props-substition</l
 Example for system properties: <literal>java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</literal>
 Example for application argumemts: <literal>java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</literal></simpara>
 </tip>
+<important>
+<simpara>For the GA release to be successful, it&#8217;s important that if the <literal>build</literal> / <literal>deploy</literal> command
+ run a script (e.g. <literal>scripts/foo.sh</literal>) then inside <literal>foo.sh</literal> if you call a Maven build <literal>./mvnw clean install</literal>
+ then <emphasis role="strong">remember to pass all arguments of the script there too</emphasis>. E.g. <literal>./mvnw clean install ${@}</literal>. That&#8217;s because
+ the releaser will pass any system properties to the <literal>build</literal> / <literal>deploy</literal> command, such as system properties
+ with keys and we need them to be passed inside the command executed by the releaser.</simpara>
+</important>
 </section>
 <section xml:id="_examples">
 <title>Examples</title>
