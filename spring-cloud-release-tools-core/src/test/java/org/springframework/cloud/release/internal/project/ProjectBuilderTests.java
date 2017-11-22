@@ -96,6 +96,20 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
+	public void should_successfully_pass_system_props_when_build_gets_executed_without_explicit_system_props() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo bar");
+		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build();
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("bar -Dhello=world -Dfoo=bar");
+	}
+
+	@Test
 	public void should_throw_exception_when_after_running_there_is_an_html_file_with_unresolved_tag() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
@@ -133,6 +147,20 @@ public class ProjectBuilderTests {
 	public void should_successfully_execute_a_deploy_command_with_sys_props_placeholder() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo \"{{systemProps}}\"");
+		properties.getMaven().setSystemProperties("-Dhello=hello-world");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.deploy();
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("-Dhello=hello-world");
+	}
+
+	@Test
+	public void should_successfully_pass_system_props_when_deploy_gets_executed_without_explicit_system_props() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setDeployCommand("echo ");
 		properties.getMaven().setSystemProperties("-Dhello=hello-world");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));

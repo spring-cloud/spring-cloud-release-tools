@@ -168,12 +168,12 @@ public class ReleaserProperties {
 		/**
 		 * Command to be executed to build the project
 		 */
-		private String buildCommand = "./mvnw clean install -B -Pdocs {{systemProps}}";
+		private String buildCommand = "./mvnw clean install -B -Pdocs";
 
 		/**
 		 * Command to be executed to deploy a built project
 		 */
-		private String deployCommand = "./mvnw deploy -DskipTests -B -Pfast {{systemProps}}";
+		private String deployCommand = "./mvnw deploy -DskipTests -B -Pfast";
 
 		/**
 		 * Command to be executed to publish documentation. If present "{{version}}" will be replaced by the

@@ -37,7 +37,7 @@ class ReleaserConfiguration {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectGitHandler handler = new ProjectGitHandler(properties);
 		SaganUpdater saganUpdater = new SaganUpdater(saganClient);
-		return new SpringReleaser(new Releaser(pomUpdater, new ProjectBuilder(properties, pomUpdater),
+		return new SpringReleaser(new Releaser(pomUpdater, new ProjectBuilder(properties),
 				handler, new TemplateGenerator(properties, handler),
 				new GradleUpdater(properties), saganUpdater), properties);
 	}

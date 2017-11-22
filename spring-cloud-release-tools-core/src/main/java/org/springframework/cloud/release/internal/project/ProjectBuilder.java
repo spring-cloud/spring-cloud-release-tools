@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.util.StringUtils;
 
 /**
@@ -32,29 +31,34 @@ public class ProjectBuilder {
 
 	private final ReleaserProperties properties;
 	private final ProcessExecutor executor;
-	private final ProjectPomUpdater pomUpdater;
 
-	public ProjectBuilder(ReleaserProperties properties, ProjectPomUpdater pomUpdater) {
+	public ProjectBuilder(ReleaserProperties properties) {
 		this.properties = properties;
 		this.executor = new ProcessExecutor(properties);
-		this.pomUpdater = pomUpdater;
 	}
 
 	ProjectBuilder(ReleaserProperties properties, ProcessExecutor executor) {
 		this.properties = properties;
 		this.executor = executor;
-		this.pomUpdater = new ProjectPomUpdater(properties);
 	}
 
 	public void build() {
 		try {
-			String[] commands = this.properties.getMaven().getBuildCommand().split(" ");
+			String[] commands = commandWithSystemProps(this.properties.getMaven().getBuildCommand())
+					.split(" ");
 			runCommand(commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags();
 			log.info("No HTML files from docs contain unresolved tags");
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	private String commandWithSystemProps(String command) {
+		if (command.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
+			return command;
+		}
+		return command.trim() + " " + ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
 	}
 
 	private void assertNoHtmlFilesInDocsContainUnresolvedTags() {
@@ -73,7 +77,8 @@ public class ProjectBuilder {
 
 	public void deploy() {
 		try {
-			String[] commands = this.properties.getMaven().getDeployCommand().split(" ");
+			String[] commands = commandWithSystemProps(this.properties.getMaven().getDeployCommand())
+					.split(" ");
 			runCommand(commands);
 			log.info("The project has successfully been deployed");
 		} catch (Exception e) {

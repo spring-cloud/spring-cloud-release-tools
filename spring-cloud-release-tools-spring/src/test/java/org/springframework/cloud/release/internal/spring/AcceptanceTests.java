@@ -271,7 +271,7 @@ public class AcceptanceTests {
 
 	private Releaser defaultReleaser(String expectedVersion, ReleaserProperties properties) throws Exception {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties, pomUpdater);
+		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
 		TestProjectGitHandler handler = new TestProjectGitHandler(properties,
 				expectedVersion);
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
