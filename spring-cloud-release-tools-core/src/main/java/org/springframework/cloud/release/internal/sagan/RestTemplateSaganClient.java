@@ -10,6 +10,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,14 @@ class RestTemplateSaganClient implements SaganClient {
 
 	@Override public Release getRelease(String projectName, String releaseVersion) {
 		return this.restTemplate.getForObject(this.baseUrl + "/project_metadata/{projectName}/releases/{releaseVersion}", Release.class, projectName, releaseVersion);
+	}
+
+	@Override public Release deleteRelease(String projectName, String releaseVersion) {
+		ResponseEntity<Release> entity = this.restTemplate.exchange(this.baseUrl + "/project_metadata/{projectName}/releases/{releaseVersion}",
+				HttpMethod.DELETE, new HttpEntity<>(""), Release.class, projectName, releaseVersion);
+		Release release = entity.getBody();
+		log.info("Response from Sagan\n\n[{}] \n with body [{}]", entity, release);
+		return release;
 	}
 
 	@Override

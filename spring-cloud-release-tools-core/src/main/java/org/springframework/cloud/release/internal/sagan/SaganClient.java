@@ -10,5 +10,7 @@ public interface SaganClient {
 
 	Release getRelease(String projectName, String releaseVersion);
 
+	Release deleteRelease(String projectName, String releaseVersion);
+
 	Project updateRelease(String projectName, List<ReleaseUpdate> releaseUpdate);
 }

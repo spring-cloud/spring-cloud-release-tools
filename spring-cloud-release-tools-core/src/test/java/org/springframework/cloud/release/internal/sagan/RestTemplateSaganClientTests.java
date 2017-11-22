@@ -93,6 +93,14 @@ public class RestTemplateSaganClientTests {
 	}
 
 	@Test
+	public void should_delete_a_release() {
+		Release release = this.client.deleteRelease("spring-framework", "5.0.0.RC4");
+
+		then(release).isNotNull();
+		then(release.releaseStatus).isEqualTo("PRERELEASE");
+	}
+
+	@Test
 	public void should_update_a_release() {
 		Repository snapshots = snapshots();
 		Repository milestone = milestone();

@@ -59,6 +59,10 @@ public class SaganUpdaterTest {
 		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RELEASE",
 						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "GENERAL_AVAILABILITY")));
+		BDDMockito.then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
+		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
+				BDDMockito.argThat(withReleaseUpdate("1.0.1.BUILD-SNAPSHOT",
+						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
 	@Test public void should_update_sagan_from_non_master() throws Exception {

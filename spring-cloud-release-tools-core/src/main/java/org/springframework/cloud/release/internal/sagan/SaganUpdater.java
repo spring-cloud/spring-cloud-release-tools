@@ -20,6 +20,24 @@ public class SaganUpdater {
 	}
 
 	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
+		ReleaseUpdate update = releaseUpdate(branch, originalVersion, version);
+		log.info("Updating Sagan with \n\n{}", update);
+		this.saganClient.updateRelease(version.projectName, Collections.singletonList(update));
+		if (version.isRelease() || version.isServiceRelease()) {
+			log.info("Version is GA [{}]. Will remove old snapshot and add a new one", version);
+			String snapshot = toSnapshot(version.version);
+			String bumpedSnapshot = toSnapshot(version.bumpedVersion());
+			log.info("Removing [{}/{}] from Sagan", version.projectName, snapshot);
+			this.saganClient.deleteRelease(version.projectName, snapshot);
+			ReleaseUpdate snapshotUpdate =
+					releaseUpdate(branch, originalVersion, new ProjectVersion(version.projectName, bumpedSnapshot));
+			log.info("Updating Sagan with \n\n[{}]", snapshotUpdate);
+			this.saganClient.updateRelease(version.projectName, Collections.singletonList(snapshotUpdate));
+		}
+	}
+
+	private ReleaseUpdate releaseUpdate(String branch, ProjectVersion originalVersion,
+			ProjectVersion version) {
 		ReleaseUpdate update = new ReleaseUpdate();
 		update.groupId = originalVersion.groupId();
 		update.artifactId = version.projectName;
@@ -27,8 +45,16 @@ public class SaganUpdater {
 		update.releaseStatus = version(version);
 		update.apiDocUrl = referenceUrl(branch, version);
 		update.refDocUrl = referenceUrl(branch, version);
-		log.info("Updating Sagan with \n\n{}", update);
-		this.saganClient.updateRelease(version.projectName, Collections.singletonList(update));
+		return update;
+	}
+
+	private String toSnapshot(String version) {
+		if (version.contains("RELEASE")) {
+			return version.replace("RELEASE", "BUILD-SNAPSHOT");
+		} else if (version.matches(".*SR[0-9]+")) {
+			return version.substring(0, version.lastIndexOf(".")) + ".BUILD-SNAPSHOT";
+		}
+		return version;
 	}
 
 	private String version(ProjectVersion version) {

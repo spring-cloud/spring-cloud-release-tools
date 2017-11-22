@@ -98,8 +98,11 @@ public class AcceptanceTests {
 				.contains("Camden.SR5")
 				.contains("- Spring Cloud Config `1.2.2.RELEASE` ([issues](http://foo.bar.com/1.2.2.RELEASE))")
 				.contains("- Spring Cloud Aws `1.1.3.RELEASE` ([issues](http://foo.bar.com/1.1.3.RELEASE))");
-		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
+		// once for updating GA
+		// second time to update SNAPSHOT
+		BDDMockito.then(this.saganClient).should(BDDMockito.times(2)).updateRelease(BDDMockito.eq("spring-cloud-consul"),
 				BDDMockito.anyList());
+		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
 	}
 
 	@Test
