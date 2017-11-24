@@ -173,6 +173,36 @@ public class PomUpdaterTests {
 	}
 
 	@Test
+	public void should_only_update_the_props_when_group_ids_dont_match() throws Exception {
+		File originalPom = pom("/projects/project/children", "pom_different_group.xml");
+		File pomInTemp = tmpFile("/project/children/pom_different_group.xml");
+		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
+		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
+
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
+
+		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
+		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		BDDAssertions.then(overriddenPomModel.getVersion()).isEqualTo("1.2.2.BUILD-SNAPSHOT");
+		BDDAssertions.then(overriddenPomModel.getParent().getVersion()).isEqualTo("1.5.8.RELEASE");
+		// the rest is the same
+		BDDAssertions.then(overriddenPomModel.getProperties())
+				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_not_update_the_project_if_group_doesnt_match() throws Exception {
+		File originalPom = pom("/projects/project/children", "pom_case_from_contract.xml");
+		File pomInTemp = tmpFile("/project/children/pom_case_from_contract.xml");
+		ModelWrapper rootPom = model("spring-cloud-contract", "org.springframework.cloud");
+		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
+
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
+
+		BDDAssertions.then(asString(storedPom)).isEqualTo(asString(originalPom));
+	}
+
+	@Test
 	public void should_update_the_child_pom_if_parent_is_matched_via_sc_dependencies_parent() throws Exception {
 		File originalPom = pom("/projects/project/children", "pom_matching_parent.xml");
 		File pomInTemp = tmpFile("/project/children/pom_matching_parent.xml");
@@ -271,6 +301,13 @@ public class PomUpdaterTests {
 	private ModelWrapper model(String projectName) {
 		Model parent = new Model();
 		parent.setArtifactId(projectName);
+		return new ModelWrapper(parent);
+	}
+
+	private ModelWrapper model(String projectName, String groupId) {
+		Model parent = new Model();
+		parent.setArtifactId(projectName);
+		parent.setGroupId(groupId);
 		return new ModelWrapper(parent);
 	}
 

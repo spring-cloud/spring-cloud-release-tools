@@ -124,9 +124,15 @@ class PomUpdater {
 	private List<VersionChange> updateParentIfPossible(ModelWrapper wrapper, Versions versions,
 			Model model, List<VersionChange> sourceChanges) {
 		String rootProjectName = wrapper.projectName();
+		String rootProjectGroupId = wrapper.groupId();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		if (model.getParent() == null || isEmpty(model.getParent().getVersion())) {
 			log.debug("Can't set the value for parent... Will return {}", sourceChanges);
+			return changes;
+		}
+		if (model.getGroupId() != null && !model.getGroupId().equals(rootProjectGroupId)) {
+			log.info("Will not update the project's [{}] parent [{}] since its group id [{}] is not equal the parent group id [{}]",
+					model.getArtifactId(), model.getParent().getArtifactId(), model.getGroupId(), rootProjectGroupId);
 			return changes;
 		}
 		String parentGroupId = model.getParent().getGroupId();
@@ -158,9 +164,14 @@ class PomUpdater {
 	private List<VersionChange> updateVersionIfPossible(ModelWrapper wrapper, Versions versions,
 			Model model, List<VersionChange> sourceChanges) {
 		String rootProjectName = wrapper.projectName();
+		String rootProjectGroupId = wrapper.groupId();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		String groupId = groupId(model);
 		String artifactId = model.getArtifactId();
+		if (model.getGroupId() != null && !model.getGroupId().equals(rootProjectGroupId)) {
+			log.info("Will not update project [{}] since its group id [{}] is not equal the parent group id [{}]", model.getArtifactId(), model.getGroupId(), rootProjectGroupId);
+			return changes;
+		}
 		log.debug("Searching for a version [{}:{}]", groupId, artifactId);
 		String oldVersion = model.getVersion();
 		String version = versions.versionForProject(rootProjectName);
@@ -207,6 +218,14 @@ class ModelWrapper {
 
 	String projectName() {
 		return this.model.getArtifactId();
+	}
+
+	String groupId() {
+		if (this.model.getGroupId() != null) {
+			return this.model.getGroupId();
+		}
+		return this.model.getParent() != null ?
+				this.model.getParent().getGroupId() : "";
 	}
 
 	boolean isDirty() {

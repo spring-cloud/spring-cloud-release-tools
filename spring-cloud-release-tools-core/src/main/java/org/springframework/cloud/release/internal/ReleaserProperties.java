@@ -128,6 +128,7 @@ public class ReleaserProperties {
 			this.numberOfCheckedMilestones = numberOfCheckedMilestones;
 		}
 	}
+
 	public static class Pom {
 
 		/**
@@ -163,6 +164,7 @@ public class ReleaserProperties {
 		}
 
 	}
+
 	public static class Maven {
 
 		/**
