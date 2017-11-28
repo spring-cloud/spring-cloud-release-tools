@@ -231,7 +231,8 @@ a project name. E.g. in `gradle.properties` you have `foo=1.0.0.BUILD-SNAPSHOT` 
 be set there. Just provide a mapping for the `gradle-props-substition` looking like this `foo=spring-cloud-contract` and the result
 (e.g for sc-contract version `2.0.0.RELEASE`) will be an updated `gradle.properties` with entry `foo=2.0.0.RELEASE`
 - `releaser.pom.branch` - Which branch of Spring Cloud Release should be checked out. Defaults to "master",
-- `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.,
+- `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.
+The defaults are `"--releaser.pom.ignored-pom-regex="^.*\\.git/.*$,^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$,^.*spring-cloud-contract-maven-plugin/target/.*$,^.*samples/standalone/[a-z]+/.*$"`
 - `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.
 
 TIP: You can pass the options either via system properties or via application arguments.
