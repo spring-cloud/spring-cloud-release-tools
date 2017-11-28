@@ -275,7 +275,7 @@ be set there. Just provide a mapping for the <literal>gradle-props-substition</l
 </listitem>
 <listitem>
 <simpara><literal>releaser.pom.ignored-pom-regex</literal> - List of regular expressions of ignored poms. Defaults to test projects and samples.
-The defaults are <literal>"--releaser.pom.ignored-pom-regex="^.<emphasis role="strong">\\.git/.</emphasis>$,^.<emphasis role="strong">spring-cloud-contract-maven-plugin/src/test/projects/.</emphasis>$,^.<emphasis role="strong">spring-cloud-contract-maven-plugin/target/.</emphasis>$,^.<emphasis role="strong">samples/standalone/[a-z]+/.</emphasis>$"</literal></simpara>
+Example: <literal>"--releaser.pom.ignored-pom-regex=".*\\.git/.*$,.{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.*$,.*spring-cloud-contract-maven-plugin/target/.*$,.*samples/standalone/[a-z]+/.*$"</literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.working-dir</literal> - By default Releaser assumes running the program from the current working directory.</simpara>
