@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2017-11-24</date>
+<date>2017-11-28</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -78,6 +78,11 @@ clone the releaser locally and build the jar manually</simpara>
 <programlisting language="bash" linenumbering="unnumbered">$ git clone git@github.com:spring-cloud/spring-cloud-release-tools.git
 $ cd spring-cloud-release-tools
 $ ./mvnw clean install</programlisting>
+<important>
+<simpara>You must set the value of the OAuth token. You can do it either via
+the command line <literal>--releaser.git.oauth-token=&#8230;&#8203;</literal> or put it as an env variable in <literal>.bashrc</literal>
+or <literal>.zshrc</literal> e.g. <literal>export RELEASER_GIT_OAUTH_TOKEN=&#8230;&#8203;</literal></simpara>
+</important>
 </section>
 <section xml:id="_how_to_run_it_interactive_mode">
 <title>How to run it (interactive mode)</title>
@@ -86,7 +91,10 @@ $ ./mvnw clean install</programlisting>
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
 $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser</programlisting>
-<simpara>The application will start running from your working directory.</simpara>
+<simpara>The application will start running from your working directory. Running this code
+follows the convention that you have the OAuth token environment variable set. It also assumes
+that you might have some custom configuration in <literal>config/releaser.yml</literal> file. This setting is optional - if
+you don&#8217;t have that file, nothing will happen.</simpara>
 <tip>
 <simpara>It is important that you clone the repository you are going to release using SSH in order for the
 <literal>releaser</literal> to be able to push tags and commit changes automatically.</simpara>
@@ -219,7 +227,7 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 <itemizedlist>
 <listitem>
 <simpara><literal>releaser.fixed-versions</literal> - A String to String mapping of manually set versions. E.g. <literal>"spring-cloud-cli" &#8594; "1.0.0.RELEASE"</literal> will set
-the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</literal> regardless of what was set in <literal>spring-cloud-release</literal> project</simpara>
+the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</literal> regardless of what was set in <literal>spring-cloud-release</literal> project. Example <literal>--releaser.fixed-versions[spring-cloud-cli]=1.0.0.RELEASE</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.clone-destination-dir</literal> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory</simpara>
