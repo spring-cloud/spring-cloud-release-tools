@@ -30,13 +30,18 @@ public class Projects extends HashSet<ProjectVersion> {
 		final ProjectVersion thisProject = new ProjectVersion(projectRoot);
 		return this.stream().filter(projectVersion -> projectVersion.projectName.equals(thisProject.projectName))
 				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("Project with name [" + thisProject.projectName + "] is not present"));
+				.orElseThrow(() -> exception(thisProject.projectName));
+	}
+
+	private static IllegalStateException exception(String projectName) {
+		return new IllegalStateException("Project with name [" + projectName + "] is not present. "
+				+ "Either put it in the Spring Cloud Release project or set it via the [--releaser.fixed-versions[" + projectName + "]=1.0.0.RELEASE] property");
 	}
 
 	public ProjectVersion forName(String projectName) {
 		return this.stream().filter(projectVersion -> projectVersion.projectName.equals(projectName))
 				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("Project with name [" + projectName + "] is not present"));
+				.orElseThrow(() -> exception(projectName));
 	}
 
 	public boolean containsSnapshots() {

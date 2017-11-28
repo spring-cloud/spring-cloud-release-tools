@@ -20,7 +20,8 @@ class SaganConfiguration {
 	}
 
 	private RestTemplate restTemplate(ReleaserProperties properties) {
-		Assert.hasText(properties.getGit().getOauthToken(), "In order to connect to Sagan you need to pass the Github OAuth token");
+		Assert.hasText(properties.getGit().getOauthToken(), "In order to connect to Sagan you need to pass the Github OAuth token. "
+				+ "You can do it via the [--releaser.git.oauth-token=...] command line argument or an env variable [export RELEASER_GIT_OAUTH_TOKEN=...].");
 		return new RestTemplateBuilder()
 				.basicAuthorization(properties.getGit().getOauthToken(), "")
 				.build();
