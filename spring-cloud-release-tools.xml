@@ -284,7 +284,7 @@ Example: <literal>"--releaser.pom.ignored-pom-regex=".*\\.git/.*$,.{asterisk}spr
 <tip>
 <simpara>You can pass the options either via system properties or via application arguments.
 Example for system properties: <literal>java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</literal>
-Example for application argumemts: <literal>java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</literal></simpara>
+Example for application arguments: <literal>java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</literal></simpara>
 </tip>
 <important>
 <simpara>For the GA release to be successful, it&#8217;s important that if the <literal>build</literal> / <literal>deploy</literal> command
