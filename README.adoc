@@ -57,6 +57,10 @@ $ cd spring-cloud-release-tools
 $ ./mvnw clean install
 ----
 
+IMPORTANT: You must set the value of the OAuth token. You can do it either via
+the command line `--releaser.git.oauth-token=...` or put it as an env variable in `.bashrc`
+or `.zshrc` e.g. `export RELEASER_GIT_OAUTH_TOKEN=...`
+
 === How to run it (interactive mode)
 
 Go to your project (e.g. Spring Cloud Sleuth)
@@ -69,7 +73,10 @@ $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAP
 $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
 ----
 
-The application will start running from your working directory.
+The application will start running from your working directory. Running this code
+follows the convention that you have the OAuth token environment variable set. It also assumes
+that you might have some custom configuration in `config/releaser.yml` file. This setting is optional - if
+you don't have that file, nothing will happen.
 
 TIP:  It is important that you clone the repository you are going to release using SSH in order for the
 `releaser` to be able to push tags and commit changes automatically.
@@ -215,7 +222,7 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 === Project options
 
 - `releaser.fixed-versions` - A String to String mapping of manually set versions. E.g. `"spring-cloud-cli" -> "1.0.0.RELEASE"` will set
-the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in `spring-cloud-release` project
+the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in `spring-cloud-release` project. Example `--releaser.fixed-versions[spring-cloud-cli]=1.0.0.RELEASE`.
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
 - `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
@@ -234,7 +241,8 @@ a project name. E.g. in `gradle.properties` you have `foo=1.0.0.BUILD-SNAPSHOT` 
 be set there. Just provide a mapping for the `gradle-props-substition` looking like this `foo=spring-cloud-contract` and the result
 (e.g for sc-contract version `2.0.0.RELEASE`) will be an updated `gradle.properties` with entry `foo=2.0.0.RELEASE`
 - `releaser.pom.branch` - Which branch of Spring Cloud Release should be checked out. Defaults to "master",
-- `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.,
+- `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.
+The defaults are `"--releaser.pom.ignored-pom-regex="^.*\\.git/.*$,^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$,^.*spring-cloud-contract-maven-plugin/target/.*$,^.*samples/standalone/[a-z]+/.*$"`
 - `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.
 
 TIP: You can pass the options either via system properties or via application arguments.
