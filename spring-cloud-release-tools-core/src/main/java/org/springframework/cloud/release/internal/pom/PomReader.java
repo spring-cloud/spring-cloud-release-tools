@@ -42,7 +42,7 @@ class PomReader {
 			return xpp3Reader.read(reader);
 		}
 		catch (XmlPullParserException | IOException e) {
-			throw new IllegalStateException("Failed to read file", e);
+			throw new IllegalStateException("Failed to read file: "+pom.getAbsolutePath(), e);
 		}
 	}
 }
