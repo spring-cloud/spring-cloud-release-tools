@@ -47,7 +47,7 @@ To get started with Maven with a BOM (dependency management only):
     </dependency>
     <dependency>
         <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-eureka</artifactId>
+        <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
     </dependency>
     ...
 </dependencies>
@@ -78,7 +78,7 @@ dependencyManagement {
 
 dependencies {
     compile 'org.springframework.cloud:spring-cloud-starter-config'
-    compile 'org.springframework.cloud:spring-cloud-starter-eureka'
+    compile 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     ...
 }
 ```
