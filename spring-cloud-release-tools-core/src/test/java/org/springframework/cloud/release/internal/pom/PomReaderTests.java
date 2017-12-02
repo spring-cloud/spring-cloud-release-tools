@@ -67,14 +67,14 @@ public class PomReaderTests {
 	@Test
 	public void should_throw_exception_when_file_is_missing() {
 		thenThrownBy(() -> this.pomReader.readPom(new File("foo/bar")))
-				.hasMessage("Failed to read file")
+				.hasMessageStartingWith("Failed to read file: ")
 				.hasCauseInstanceOf(IOException.class);
 	}
 
 	@Test
 	public void should_throw_exception_when_file_is_invalid() {
 		thenThrownBy(() -> this.pomReader.readPom(this.licenseFile))
-				.hasMessage("Failed to read file")
+				.hasMessageStartingWith("Failed to read file: ")
 				.hasCauseInstanceOf(XmlPullParserException.class);
 	}
 }
