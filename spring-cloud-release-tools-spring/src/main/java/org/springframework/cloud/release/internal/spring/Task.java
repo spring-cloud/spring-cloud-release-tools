@@ -29,15 +29,21 @@ class Task {
 	}
 
 	void execute(Args args) {
-		boolean interactive = args.interactive;
-		printLog(interactive);
-		if (interactive) {
-			boolean skipStep = skipStep();
-			if (!skipStep) {
+		try {
+			boolean interactive = args.interactive;
+			printLog(interactive);
+			if (interactive) {
+				boolean skipStep = skipStep();
+				if (!skipStep) {
+					consumer.accept(args);
+				}
+			} else {
 				consumer.accept(args);
 			}
-		} else {
-			consumer.accept(args);
+		} catch (Exception e) {
+			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for task <" +
+					this.name + "> \n\nwith description <" + this.description + ">\n\n", e);
+			throw e;
 		}
 	}
 
