@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.release.internal.pom;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -38,6 +39,7 @@ public class PomReaderTests {
 	PomReader pomReader = new PomReader();
 	File springCloudReleaseProjectPom;
 	File springCloudReleaseProject;
+	File empty;
 	File licenseFile;
 
 	@Before
@@ -45,6 +47,7 @@ public class PomReaderTests {
 		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
 		this.springCloudReleaseProject = new File(scRelease);
 		this.springCloudReleaseProjectPom = new File(scRelease.getPath(), "pom.xml");
+		this.empty = new File(GitRepoTests.class.getResource("/projects/project/empty.xml").toURI());
 		this.licenseFile = new File(scRelease.getPath(), "LICENSE.txt");
 	}
 
@@ -76,5 +79,13 @@ public class PomReaderTests {
 		thenThrownBy(() -> this.pomReader.readPom(this.licenseFile))
 				.hasMessageStartingWith("Failed to read file: ")
 				.hasCauseInstanceOf(XmlPullParserException.class);
+	}
+
+	@Test
+	public void should_throw_exception_when_file_is_empty() {
+		thenThrownBy(() -> this.pomReader.readPom(this.empty))
+				.hasMessageStartingWith("File [")
+				.hasMessageContaining("] is empty")
+				.hasCauseInstanceOf(EOFException.class);
 	}
 }
