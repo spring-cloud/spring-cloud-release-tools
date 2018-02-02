@@ -71,6 +71,25 @@ public class PomUpdateAcceptanceTests {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		projects.add(new ProjectVersion("spring-cloud-sleuth-samples", "0.0.5.RELEASE"));
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property/spring-cloud-sleuth-samples");
+		addBuildSnapshotToChildPom(project);
+
+		projectPomUpdater
+					.updateProjectFromSCRelease(project, projects, projects.forFile(project), true);
+	}
+
+	private void addBuildSnapshotToChildPom(File project) throws IOException {
+		File childPom = new File(project, "pom.xml");
+		String text = new String(Files.readAllBytes(childPom.toPath()));
+		Files.write(childPom.toPath(), text.replaceAll("1.19.2", "1.19.2.BUILD-SNAPSHOT").getBytes());
+	}
+
+	@Test
+	public void should_not_fail_update_when_after_updating_a_release_version_there_still_is_a_snapshot_version_in_a_non_deployable_module() throws Exception {
+		ReleaserProperties releaserProperties = branchReleaserProperties();
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
+		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property");
 
 		BDDAssertions.thenThrownBy(() ->

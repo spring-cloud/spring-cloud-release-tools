@@ -23,8 +23,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 import java.util.Scanner;
 
+import org.apache.maven.model.Model;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
@@ -128,7 +131,7 @@ public class ProjectPomUpdater {
 				}
 				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file, this.versions);
 				this.pomUpdater.overwritePomIfDirty(model, this.versions, file);
-				if (this.assertSnapshots && !this.snapshotVersion) {
+				if (this.assertSnapshots && !this.snapshotVersion && !this.pomUpdater.hasSkipDeployment(model.model)) {
 					log.debug("Update is a non-snapshot one. Checking if no snapshot versions remained in the pom");
 					Scanner scanner = new Scanner(asString(path));
 					int lineNumber = 0;

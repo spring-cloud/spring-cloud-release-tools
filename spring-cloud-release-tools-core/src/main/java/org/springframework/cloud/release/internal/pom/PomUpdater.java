@@ -21,11 +21,13 @@ import java.io.FileWriter;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.versions.api.PomHelper;
 import org.codehaus.mojo.versions.change.AbstractVersionChanger;
@@ -33,6 +35,7 @@ import org.codehaus.mojo.versions.change.VersionChange;
 import org.codehaus.mojo.versions.change.VersionChanger;
 import org.codehaus.mojo.versions.change.VersionChangerFactory;
 import org.codehaus.mojo.versions.rewriting.ModifiedPomXMLEventReader;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +72,49 @@ class PomUpdater {
 		}
 		log.info("Project [{}] will have its dependencies updated", model.getArtifactId());
 		return true;
+	}
+
+	boolean hasSkipDeployment(Model model) {
+		String property = model.getProperties()
+				.getProperty("maven.deploy.skip");
+		boolean hasSkipDeploymentProperty = Boolean.parseBoolean(property);
+		if (hasSkipDeploymentProperty) {
+			return true;
+		}
+		if (model.getBuild() == null) {
+			return false;
+		}
+		boolean plugins = model.getBuild()
+				.getPlugins()
+				.stream()
+				.filter(plugin -> "maven-deploy-plugin".equalsIgnoreCase(plugin.getArtifactId()))
+				.map(this::skipFromConfiguration)
+				.findFirst()
+				.orElse(false);
+		if (plugins) {
+			return true;
+		}
+		if (model.getBuild()
+				.getPluginManagement() == null) {
+			return false;
+		}
+		return model.getBuild()
+				.getPluginManagement()
+				.getPlugins()
+				.stream()
+				.filter(plugin -> "maven-deploy-plugin".equalsIgnoreCase(plugin.getArtifactId()))
+				.map(this::skipFromConfiguration)
+				.findFirst()
+				.orElse(false);
+	}
+
+	private Boolean skipFromConfiguration(Plugin plugin) {
+		if (!(plugin.getConfiguration() instanceof Xpp3Dom)) {
+			return false;
+		}
+		Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
+		Xpp3Dom skip = configuration.getChild("skip");
+		return skip != null && Boolean.parseBoolean(skip.getValue());
 	}
 
 	private File rootPom(File rootFolder) {
@@ -130,7 +176,8 @@ class PomUpdater {
 			log.debug("Can't set the value for parent... Will return {}", sourceChanges);
 			return changes;
 		}
-		if (model.getGroupId() != null && !model.getGroupId().equals(rootProjectGroupId)) {
+		boolean skipDeployment = hasSkipDeployment(model);
+		if (!skipDeployment && model.getGroupId() != null && !model.getGroupId().equals(rootProjectGroupId)) {
 			log.info("Will not update the project's [{}] parent [{}] since its group id [{}] is not equal the parent group id [{}]",
 					model.getArtifactId(), model.getParent().getArtifactId(), model.getGroupId(), rootProjectGroupId);
 			return changes;

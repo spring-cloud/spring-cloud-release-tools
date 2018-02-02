@@ -27,7 +27,6 @@ import org.springframework.util.FileSystemUtils;
  */
 public class ProjectBuilderTests {
 
-	TestPomReader reader = new TestPomReader();
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	File temporaryFolder;
 	@Rule public OutputCapture outputCapture = new OutputCapture();

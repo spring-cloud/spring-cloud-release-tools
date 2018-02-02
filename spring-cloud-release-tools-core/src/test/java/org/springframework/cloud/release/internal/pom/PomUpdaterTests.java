@@ -173,7 +173,7 @@ public class PomUpdaterTests {
 	}
 
 	@Test
-	public void should_only_update_the_props_when_group_ids_dont_match() throws Exception {
+	public void should_only_update_the_properties_section_when_group_ids_dont_match_and_there_is_no_skip_deployment() throws Exception {
 		File originalPom = pom("/projects/project/children", "pom_different_group.xml");
 		File pomInTemp = tmpFile("/project/children/pom_different_group.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
@@ -185,6 +185,60 @@ public class PomUpdaterTests {
 		Model overriddenPomModel = this.pomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion()).isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion()).isEqualTo("1.5.8.RELEASE");
+		// the rest is the same
+		BDDAssertions.then(overriddenPomModel.getProperties())
+				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_update_everything_when_group_ids_dont_match_and_there_is_skip_deployment_property() throws Exception {
+		File originalPom = pom("/projects/project/children", "pom_different_group_skip_deployment_prop.xml");
+		File pomInTemp = tmpFile("/project/children/pom_different_group_skip_deployment_prop.xml");
+		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
+		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
+
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
+
+		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
+		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		BDDAssertions.then(overriddenPomModel.getVersion()).isEqualTo("1.2.2.BUILD-SNAPSHOT");
+		BDDAssertions.then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.1");
+		// the rest is the same
+		BDDAssertions.then(overriddenPomModel.getProperties())
+				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_update_everything_when_group_ids_dont_match_and_there_is_skip_in_deployment_plugin() throws Exception {
+		File originalPom = pom("/projects/project/children", "pom_different_group_skip_deployment_plugin.xml");
+		File pomInTemp = tmpFile("/project/children/pom_different_group_skip_deployment_plugin.xml");
+		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
+		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
+
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
+
+		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
+		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		BDDAssertions.then(overriddenPomModel.getVersion()).isEqualTo("1.2.2.BUILD-SNAPSHOT");
+		BDDAssertions.then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.1");
+		// the rest is the same
+		BDDAssertions.then(overriddenPomModel.getProperties())
+				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_update_everything_when_group_ids_dont_match_and_there_is_skip_in_deployment_plugin_management() throws Exception {
+		File originalPom = pom("/projects/project/children", "pom_different_group_skip_deployment_plugin_mngmnt.xml");
+		File pomInTemp = tmpFile("/project/children/pom_different_group_skip_deployment_plugin_mngmnt.xml");
+		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
+		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
+
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
+
+		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
+		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		BDDAssertions.then(overriddenPomModel.getVersion()).isEqualTo("1.2.2.BUILD-SNAPSHOT");
+		BDDAssertions.then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.1");
 		// the rest is the same
 		BDDAssertions.then(overriddenPomModel.getProperties())
 				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
