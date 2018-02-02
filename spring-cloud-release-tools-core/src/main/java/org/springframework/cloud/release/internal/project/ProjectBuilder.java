@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.util.StringUtils;
 
 /**
@@ -42,10 +43,10 @@ public class ProjectBuilder {
 		this.executor = executor;
 	}
 
-	public void build() {
+	public void build(ProjectVersion versionFromScRelease) {
 		try {
-			String[] commands = commandWithSystemProps(this.properties.getMaven().getBuildCommand())
-					.split(" ");
+			String[] commands = commandWithSystemProps(this.properties.getMaven().getBuildCommand(),
+					versionFromScRelease).split(" ");
 			runCommand(commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags();
 			log.info("No HTML files from docs contain unresolved tags");
@@ -54,11 +55,26 @@ public class ProjectBuilder {
 		}
 	}
 
-	private String commandWithSystemProps(String command) {
+	private String commandWithSystemProps(String command,
+			ProjectVersion version) {
 		if (command.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
-			return command;
+			return appendProfile(command, version);
 		}
-		return command.trim() + " " + ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
+		return appendProfile(command, version) + " " + ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
+	}
+
+	private String appendProfile(String command, ProjectVersion version) {
+		String trimmedCommand = command.trim();
+		if (version.isMilestone() || version.isRc()) {
+			log.info("Adding the milestone profile to the Maven build");
+			return trimmedCommand + " -Pmilestone";
+		} else if (version.isRelease() || version.isServiceRelease()) {
+			log.info("Adding the central profile to the Maven build");
+			return trimmedCommand + " -Pcentral";
+		} else {
+			log.info("The build is a snapshot one - will not add any profiles");
+		}
+		return trimmedCommand;
 	}
 
 	private void assertNoHtmlFilesInDocsContainUnresolvedTags() {
@@ -75,10 +91,10 @@ public class ProjectBuilder {
 		}
 	}
 
-	public void deploy() {
+	public void deploy(ProjectVersion version) {
 		try {
-			String[] commands = commandWithSystemProps(this.properties.getMaven().getDeployCommand())
-					.split(" ");
+			String[] commands = commandWithSystemProps(this.properties.getMaven().getDeployCommand(),
+					version).split(" ");
 			runCommand(commands);
 			log.info("The project has successfully been deployed");
 		} catch (Exception e) {

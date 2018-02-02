@@ -60,8 +60,8 @@ public class Releaser {
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 	}
 
-	public void buildProject() {
-		this.projectBuilder.build();
+	public void buildProject(ProjectVersion versionFromScRelease) {
+		this.projectBuilder.build(versionFromScRelease);
 		log.info("\nProject was successfully built");
 	}
 
@@ -70,8 +70,8 @@ public class Releaser {
 		log.info("\nCommit was made and tag was pushed successfully");
 	}
 
-	public void deploy() {
-		this.projectBuilder.deploy();
+	public void deploy(ProjectVersion versionFromScRelease) {
+		this.projectBuilder.deploy(versionFromScRelease);
 		log.info("\nThe artifact was deployed successfully");
 	}
 

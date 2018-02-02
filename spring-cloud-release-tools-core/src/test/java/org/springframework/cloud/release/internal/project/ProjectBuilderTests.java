@@ -18,6 +18,7 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.util.FileSystemUtils;
@@ -46,10 +47,62 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.build();
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
+	}
+
+	@Test
+	public void should_successfully_execute_a_build_command_for_milestone_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build(new ProjectVersion("foo", "1.0.0.M1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pmilestone");
+	}
+
+	@Test
+	public void should_successfully_execute_a_build_command_for_rc_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build(new ProjectVersion("foo", "1.0.0.RC1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pmilestone");
+	}
+
+	@Test
+	public void should_successfully_execute_a_build_command_for_release_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build(new ProjectVersion("foo", "1.0.0.RELEASE"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pcentral");
+	}
+
+	@Test
+	public void should_successfully_execute_a_build_command_for_sr_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build(new ProjectVersion("foo", "1.0.0.SR1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pcentral");
 	}
 
 	@Test
@@ -60,7 +113,7 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.build();
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=world -Dfoo=bar");
@@ -74,7 +127,7 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.build();
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("hello=world foo=bar");
@@ -88,7 +141,7 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.build();
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=world -Dfoo=bar bar");
@@ -102,7 +155,7 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.build();
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("bar -Dhello=world -Dfoo=bar");
@@ -115,7 +168,8 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		thenThrownBy(builder::build).hasMessageContaining("contains a tag that wasn't resolved properly");
+		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasMessageContaining("contains a tag that wasn't resolved properly");
 	}
 
 	@Test
@@ -126,7 +180,8 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		thenThrownBy(builder::build).hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -136,10 +191,62 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.deploy();
+		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
+	}
+
+	@Test
+	public void should_successfully_execute_a_deploy_command_for_milestone_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setDeployCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.deploy(new ProjectVersion("foo", "1.0.0.M1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pmilestone");
+	}
+
+	@Test
+	public void should_successfully_execute_a_deploy_command_for_rc_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setDeployCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.deploy(new ProjectVersion("foo", "1.0.0.RC1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pmilestone");
+	}
+
+	@Test
+	public void should_successfully_execute_a_deploy_command_for_release_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setDeployCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.deploy(new ProjectVersion("foo", "1.0.0.RELEASE"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pcentral");
+	}
+
+	@Test
+	public void should_successfully_execute_a_deploy_command_for_sr_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setDeployCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.deploy(new ProjectVersion("foo", "1.0.0.SR1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo -Pcentral");
 	}
 
 	@Test
@@ -150,7 +257,7 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.deploy();
+		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=hello-world");
@@ -164,7 +271,7 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		builder.deploy();
+		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=hello-world");
@@ -178,7 +285,8 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
 
-		thenThrownBy(builder::deploy).hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -248,7 +356,8 @@ public class ProjectBuilderTests {
 			}
 		});
 
-		thenThrownBy(builder::build).hasMessageContaining("The process has exited with exit code [1]");
+		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasMessageContaining("The process has exited with exit code [1]");
 	}
 
 	private Process processWithInvalidExitCode() {

@@ -18,7 +18,7 @@ class Tasks {
 	static Task BUILD_PROJECT = task("build", "b",
 			"BUILD PROJECT",
 			"Build the project",
-			args -> args.releaser.buildProject());
+			args -> args.releaser.buildProject(args.versionFromScRelease));
 	static Task COMMIT = task("commit", "c",
 			"COMMITTING (ALL) AND PUSHING TAGS (NON-SNAPSHOTS)",
 			"Commit, tag and push the tag",
@@ -26,7 +26,7 @@ class Tasks {
 	static Task DEPLOY = task("deploy", "d",
 			"ARTIFACT DEPLOYMENT",
 			"Deploy the artifacts",
-			args -> args.releaser.deploy());
+			args -> args.releaser.deploy(args.versionFromScRelease));
 	static Task PUBLISH_DOCS = task("docs", "o",
 			"PUBLISHING DOCS",
 			"Publish the docs",
