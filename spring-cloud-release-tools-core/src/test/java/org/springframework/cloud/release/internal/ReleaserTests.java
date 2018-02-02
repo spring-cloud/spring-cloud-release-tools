@@ -90,7 +90,9 @@ public class ReleaserTests {
 		ProjectVersion scReleaseVersion = new ProjectVersion("changed", "1.0.0.RELEASE");
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
 				.rollbackReleaseVersion(this.pom,
-						new Projects(new ProjectVersion("changed", "1.0.0.RELEASE")),
+						new Projects(new ProjectVersion("changed", "1.0.0.RELEASE"),
+								new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE"),
+								new ProjectVersion("spring-boot-starter", "3.0.0.RELEASE")),
 						scReleaseVersion);
 
 		BDDAssertions.then(this.outputCapture.toString())

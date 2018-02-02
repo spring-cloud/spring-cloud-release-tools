@@ -28,8 +28,8 @@
 	<description>Spring Cloud Contract Verifier Http Server Sample</description>
 
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
+		<groupId>org.foo.bar</groupId>
+		<artifactId>foo-bar</artifactId>
 		<version>1.5.8.RELEASE</version>
 		<relativePath />
 	</parent>

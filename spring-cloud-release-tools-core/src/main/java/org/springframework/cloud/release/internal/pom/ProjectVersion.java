@@ -1,6 +1,7 @@
 package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
+import java.util.Objects;
 
 import org.apache.maven.model.Model;
 import org.springframework.util.StringUtils;
@@ -84,5 +85,18 @@ public class ProjectVersion {
 
 	@Override public String toString() {
 		return this.version;
+	}
+
+	@Override public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		ProjectVersion that = (ProjectVersion) o;
+		return Objects.equals(this.projectName, that.projectName);
+	}
+
+	@Override public int hashCode() {
+		return Objects.hash(this.projectName);
 	}
 }

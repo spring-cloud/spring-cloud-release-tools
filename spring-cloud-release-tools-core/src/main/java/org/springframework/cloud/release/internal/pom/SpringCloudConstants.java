@@ -20,7 +20,9 @@ package org.springframework.cloud.release.internal.pom;
  * @author Marcin Grzejszczak
  */
 final class SpringCloudConstants {
-	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter-parent";
+	static final String SPRING_BOOT = "spring-boot";
+	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter";
+	static final String BOOT_STARTER_PARENT_ARTIFACT_ID = BOOT_STARTER_ARTIFACT_ID + "-parent";
 	static final String BOOT_DEPENDENCIES_ARTIFACT_ID = "spring-boot-dependencies";
 	static final String CLOUD_DEPENDENCIES_ARTIFACT_ID = "spring-cloud-dependencies-parent";
 	static final String BUILD_ARTIFACT_ID = "spring-cloud-build";

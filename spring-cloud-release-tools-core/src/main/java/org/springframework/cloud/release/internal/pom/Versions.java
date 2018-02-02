@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_STARTER_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BUILD_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
 
@@ -42,7 +42,7 @@ class Versions {
 	Versions(String bootVersion) {
 		this.bootVersion = bootVersion;
 		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
-		this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, bootVersion));
+		this.projects.add(new Project(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion));
 		this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion));
 	}
 
@@ -57,7 +57,7 @@ class Versions {
 		this.bootVersion = bootVersion;
 		this.scBuildVersion = scBuildVersion;
 		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
-		this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, bootVersion));
+		this.projects.add(new Project(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion));
 		this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion));
 		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
 		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
@@ -101,25 +101,30 @@ class Versions {
 		if (project.name.equals(projectName)) {
 			return true;
 		}
-		boolean containsParent = projectName.endsWith("-parent");
-		if (!containsParent) {
+		boolean parent = nameWithSuffix(projectName, "-parent", project);
+		return parent || nameWithSuffix(projectName, "-dependencies", project);
+	}
+
+	private boolean nameWithSuffix(String projectName, String suffix, Project project) {
+		boolean containsSuffix = projectName.endsWith(suffix);
+		if (!containsSuffix) {
 			return false;
 		}
-		String withoutParent = projectName.substring(0, projectName.indexOf("-parent"));
-		return project.name.equals(withoutParent);
+		String withoutSuffix = projectName.substring(0, projectName.indexOf(suffix));
+		return project.name.equals(withoutSuffix);
 	}
 
 	Versions setVersion(String projectName, String version) {
 		switch (projectName) {
 			case SPRING_BOOT_PROJECT_NAME:
-			case BOOT_STARTER_ARTIFACT_ID:
+			case BOOT_STARTER_PARENT_ARTIFACT_ID:
 			case BOOT_DEPENDENCIES_ARTIFACT_ID:
 				this.bootVersion = version;
 				remove(SPRING_BOOT_PROJECT_NAME);
 				remove(BOOT_DEPENDENCIES_ARTIFACT_ID);
-				remove(BOOT_STARTER_ARTIFACT_ID);
+				remove(BOOT_STARTER_PARENT_ARTIFACT_ID);
 				this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, version));
-				this.projects.add(new Project(BOOT_STARTER_ARTIFACT_ID, version));
+				this.projects.add(new Project(BOOT_STARTER_PARENT_ARTIFACT_ID, version));
 				this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, version));
 				break;
 			case BUILD_ARTIFACT_ID:

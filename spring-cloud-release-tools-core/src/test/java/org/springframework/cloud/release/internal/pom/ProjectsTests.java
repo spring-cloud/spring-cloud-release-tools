@@ -36,6 +36,36 @@ public class ProjectsTests {
 	}
 
 	@Test
+	public void should_find_projects_starting_with_name() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("spring-boot-starter-build", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		then(projects.forNameStartingWith("spring-boot").get(0).version).isEqualTo("1.0.0");
+	}
+
+	@Test
+	public void should_create_project_with_bumped_original_version_and_original_parent_versions() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		ProjectVersion build = new ProjectVersion("spring-cloud-build", "1.0.0");
+		projectVersions.add(build);
+		ProjectVersion boot = new ProjectVersion("spring-boot-starter", "2.0.0");
+		projectVersions.add(boot);
+		ProjectVersion bootDeps = new ProjectVersion("spring-boot-dependencies", "2.0.0");
+		projectVersions.add(bootDeps);
+		ProjectVersion original = new ProjectVersion("spring-cloud-starter-foo", "3.0.0.BUILD-SNAPSHOT");
+		projectVersions.add(original);
+		Projects projects = new Projects(projectVersions);
+
+		Projects forRollback = Projects.forRollback(projects, original);
+
+		then(forRollback.forName("spring-cloud-build").version).isEqualTo("1.0.0");
+		then(forRollback.forName("spring-boot-starter").version).isEqualTo("2.0.0");
+		then(forRollback.forName("spring-boot-dependencies").version).isEqualTo("2.0.0");
+		then(forRollback.forName("spring-cloud-starter-foo").version).isEqualTo("3.0.1.BUILD-SNAPSHOT");
+	}
+
+	@Test
 	public void should_remove_a_project_by_name() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
 		projectVersions.add(new ProjectVersion("spring-cloud-starter-build", "1.0.0"));
@@ -86,6 +116,15 @@ public class ProjectsTests {
 		thenThrownBy(() -> projects.forName("spring-cloud-starter-build"))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Project with name [spring-cloud-starter-build] is not present");
+	}
+
+	@Test
+	public void should_return_empty_list_when_project_is_not_present_when_searching_by_starting_with_name() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("foo-bar-baz", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		then(projects.forNameStartingWith("asd")).isEmpty();
 	}
 
 	private File file(String relativePath) {

@@ -38,7 +38,7 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
  */
 public class ProjectPomUpdater {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(ProjectPomUpdater.class);
 
 	private final ReleaserProperties properties;
 	private final ProjectGitHandler gitRepo;

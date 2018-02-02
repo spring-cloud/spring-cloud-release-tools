@@ -1,0 +1,1093 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.cloud</groupId>
+	<artifactId>spring-cloud-build</artifactId>
+	<version>1.3.7.BUILD-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Spring Cloud Parent</name>
+	<description>Spring Cloud parent pom, managing plugins and dependencies for Spring Cloud projects</description>
+	<modules>
+		<module>docs</module>
+		<module>spring-cloud-build-dependencies</module>
+		<module>spring-cloud-dependencies-parent</module>
+		<module>spring-cloud-build-tools</module>
+	</modules>
+	<url>https://spring.io/spring-cloud</url>
+	<properties>
+		<java.version>1.7</java.version>
+		<resource.delimiter>@</resource.delimiter> <!-- delimiter that doesn't clash with Spring ${} placeholders -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<checkstyle.version>2.17</checkstyle.version>
+		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+		<maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<main.basedir>${basedir}</main.basedir>
+		<docs.main>${project.artifactId}</docs.main>
+		<spring-boot.version>1.5.9.RELEASE</spring-boot.version>
+		<spring-cloud-build.version>1.3.7.BUILD-SNAPSHOT</spring-cloud-build.version>
+		<docs.resources.dir>${project.build.directory}/build-docs</docs.resources.dir>
+
+		<!-- Sonar -->
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.language>java</sonar.language>
+	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-build-dependencies</artifactId>
+				<version>${spring-cloud-build.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<organization>
+		<name>Pivotal Software, Inc.</name>
+		<url>https://www.spring.io</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+			<comments>
+Copyright 2014-2015 the original author or authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied.
+
+See the License for the specific language governing permissions and
+limitations under the License.
+			</comments>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://github.com/spring-cloud/spring-cloud-build</url>
+		<connection>scm:git:git://github.com/spring-cloud/spring-cloud-build.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/spring-cloud/spring-cloud-build.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+	<developers>
+		<developer>
+			<id>dsyer</id>
+			<name>Dave Syer</name>
+			<email>dsyer at pivotal.io</email>
+			<organization>Pivotal Software, Inc.</organization>
+			<organizationUrl>http://www.spring.io</organizationUrl>
+			<roles>
+				<role>lead</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>sgibb</id>
+			<name>Spencer Gibb</name>
+			<email>sgibb at pivotal.io</email>
+			<organization>Pivotal Software, Inc.</organization>
+			<organizationUrl>http://www.spring.io</organizationUrl>
+			<roles>
+				<role>lead</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>mgrzejszczak</id>
+			<name>Marcin Grzejszczak</name>
+			<email>mgrzejszczak at pivotal.io</email>
+			<organization>Pivotal Software, Inc.</organization>
+			<organizationUrl>http://www.spring.io</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>rbaxter</id>
+			<name>Ryan Baxter</name>
+			<email>rbaxter at pivotal.io</email>
+			<organization>Pivotal Software, Inc.</organization>
+			<organizationUrl>http://www.spring.io</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+	<prerequisites>
+		<maven>3.0.0</maven>
+	</prerequisites>
+	<build>
+		<!-- Turn on filtering by default for application properties -->
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/application*.yml</include>
+					<include>**/application*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<excludes>
+					<exclude>**/application*.yml</exclude>
+					<exclude>**/application*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<executions>
+					<execution>
+						<id>javadoc</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<quiet>true</quiet>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<version>${maven-eclipse-plugin.version}</version>
+				</plugin>
+				<!-- Apply more sensible defaults for user projects -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.0.0</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>${start-class}</mainClass>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<includes>
+							<include>**/*Tests.java</include>
+							<include>**/*Test.java</include>
+						</includes>
+						<excludes>
+							<exclude>**/Abstract*.java</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+						<archive>
+							<manifest>
+								<mainClass>${start-class}</mainClass>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<configuration>
+						<mainClass>${start-class}</mainClass>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<delimiters>
+							<delimiter>${resource.delimiter}</delimiter>
+						</delimiters>
+						<useDefaultDelimiters>false</useDefaultDelimiters>
+					</configuration>
+				</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.springframework.cloud</groupId>
+						<artifactId>spring-cloud-build-tools</artifactId>
+						<version>${spring-cloud-build.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<headerLocation>LICENSE.txt</headerLocation>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>true</failsOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+				<plugin>
+					<groupId>pl.project13.maven</groupId>
+					<artifactId>git-commit-id-plugin</artifactId>
+					<version>2.1.11</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>revision</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<verbose>true</verbose>
+						<dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
+						<generateGitPropertiesFile>true</generateGitPropertiesFile>
+						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+					</configuration>
+				</plugin>
+				<!-- Support our own plugin -->
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring-boot.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<mainClass>${start-class}</mainClass>
+					</configuration>
+				</plugin>
+				<!-- Support shade packaging (if the user does not want to use our plugin) -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>2.2</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-maven-plugin</artifactId>
+							<version>${spring-boot.version}</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+						<createDependencyReducedPom>true</createDependencyReducedPom>
+						<filters>
+							<filter>
+								<artifact>*:*</artifact>
+								<excludes>
+									<exclude>META-INF/*.SF</exclude>
+									<exclude>META-INF/*.DSA</exclude>
+									<exclude>META-INF/*.RSA</exclude>
+								</excludes>
+							</filter>
+						</filters>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>shade</goal>
+							</goals>
+							<configuration>
+								<transformers>
+									<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+										<resource>META-INF/spring.handlers</resource>
+									</transformer>
+									<transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+										<resource>META-INF/spring.factories</resource>
+									</transformer>
+									<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+										<resource>META-INF/spring.schemas</resource>
+									</transformer>
+									<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+									<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+										<mainClass>${start-class}</mainClass>
+									</transformer>
+								</transformers>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>1.4.1</version>
+					<executions>
+						<execution>
+							<id>enforce-versions</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<fail>false</fail>
+						<rules>
+							<dependencyConvergence/>
+						</rules>
+					</configuration>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-checkstyle-plugin
+										</artifactId>
+										<versionRange>
+											[2.17,)
+										</versionRange>
+										<goals>
+											<goal>check</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<distributionManagement>
+		<downloadUrl>https://github.com/spring-cloud</downloadUrl>
+		<site>
+			<id>spring-docs</id>
+			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-cloud/docs/${project.artifactId}/${project.version}</url>
+		</site>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<id>repo.spring.io</id>
+			<name>Spring Snapshot Repository</name>
+			<url>https://repo.spring.io/libs-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<profiles>
+		<profile>
+			<id>spring</id>
+			<repositories>
+				<repository>
+					<id>spring-snapshots</id>
+					<name>Spring Snapshots</name>
+					<url>https://repo.spring.io/libs-snapshot-local</url>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+					<releases>
+						<enabled>false</enabled>
+					</releases>
+				</repository>
+				<repository>
+					<id>spring-milestones</id>
+					<name>Spring Milestones</name>
+					<url>https://repo.spring.io/libs-milestone-local</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</repository>
+				<repository>
+					<id>spring-releases</id>
+					<name>Spring Releases</name>
+					<url>https://repo.spring.io/release</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>spring-snapshots</id>
+					<name>Spring Snapshots</name>
+					<url>https://repo.spring.io/libs-snapshot-local</url>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+					<releases>
+						<enabled>false</enabled>
+					</releases>
+				</pluginRepository>
+				<pluginRepository>
+					<id>spring-milestones</id>
+					<name>Spring Milestones</name>
+					<url>https://repo.spring.io/libs-milestone-local</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</pluginRepository>
+				<pluginRepository>
+					<id>spring-releases</id>
+					<name>Spring Releases</name>
+					<url>https://repo.spring.io/libs-release-local</url>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+		<profile>
+			<id>milestone</id>
+			<distributionManagement>
+				<repository>
+					<id>repo.spring.io</id>
+					<name>Spring Milestone Repository</name>
+					<url>https://repo.spring.io/libs-milestone-local</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>bintray</id>
+			<distributionManagement>
+				<repository>
+					<id>bintray</id>
+					<name>Jcenter Repository</name>
+					<url>https://api.bintray.com/maven/spring/jars/org.springframework.cloud:${bintray.package}</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>central</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>java8</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>java7</id>
+			<activation>
+				<file>
+					<missing>.jdk8</missing>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>animal-sniffer-maven-plugin</artifactId>
+						<version>1.14</version>
+						<configuration>
+							<signature>
+								<groupId>org.codehaus.mojo.signature</groupId>
+								<artifactId>java17</artifactId>
+								<version>1.0</version>
+							</signature>
+						</configuration>
+						<executions>
+							<execution>
+								<id>enforce-java-7</id>
+								<phase>test</phase>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- TODO: remove this (it's covered with checkstyle, but not all projects use that yet -->
+			<id>imports</id>
+			<activation>
+				<os>
+					<family>!windows</family>
+				</os>
+				<file>
+					<missing>.google</missing>
+				</file>
+				<property>
+					<name>project.packaging</name>
+					<value>jar</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>imports</id>
+								<phase>process-sources</phase>
+								<configuration>
+									<executable>egrep</executable>
+									<successCodes>
+										<successCode>1</successCode>
+									</successCodes>
+									<arguments>
+										<argument>-rm</argument>
+										<argument>1</argument>
+										<!-- Forbidden Keywords -->
+										<argument>^import com.google</argument>
+										<!-- file patterns -->
+										<argument>--include=*.java</argument>
+										<!-- search path -->
+										<argument>${project.basedir}</argument>
+									</arguments>
+								</configuration>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>docs</id>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-dependency-plugin</artifactId>
+							<version>3.0.0</version>
+							<executions>
+								<execution>
+									<id>unpack-docs</id>
+									<phase>generate-resources</phase>
+									<goals>
+										<goal>unpack</goal>
+									</goals>
+									<configuration>
+										<artifactItems>
+											<artifactItem>
+												<groupId>org.springframework.cloud</groupId>
+												<artifactId>spring-cloud-build-docs</artifactId>
+												<version>${spring-cloud-build.version}</version>
+												<classifier>sources</classifier>
+												<type>jar</type>
+												<overWrite>false</overWrite>
+												<outputDirectory>${docs.resources.dir}</outputDirectory>
+											</artifactItem>
+										</artifactItems>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>org.asciidoctor</groupId>
+							<artifactId>asciidoctor-maven-plugin</artifactId>
+							<version>1.5.5</version>
+							<dependencies>
+								<dependency>
+									<groupId>io.spring.asciidoctor</groupId>
+									<artifactId>spring-asciidoctor-extensions</artifactId>
+									<version>0.1.0.RELEASE</version>
+								</dependency>
+							</dependencies>
+							<executions>
+								<execution>
+									<id>generate-docbook</id>
+									<phase>prepare-package</phase>
+									<goals>
+										<goal>process-asciidoc</goal>
+									</goals>
+									<configuration>
+										<sourceDocumentName>${docs.main}.adoc</sourceDocumentName>
+										<backend>docbook5</backend>
+										<doctype>book</doctype>
+										<attributes>
+											<docinfo>true</docinfo>
+											<spring-boot-docs-version>${spring-boot.version}</spring-boot-docs-version>
+											<spring-cloud-version>${project.version}</spring-cloud-version>
+											<allow-uri-read>true</allow-uri-read>
+											<safe-mode>unsafe</safe-mode>
+										</attributes>
+									</configuration>
+								</execution>
+								<execution>
+									<id>generate-index</id>
+									<phase>process-resources</phase>
+									<goals>
+										<goal>process-asciidoc</goal>
+									</goals>
+									<configuration>
+										<sourceDocumentName>${docs.main}.adoc</sourceDocumentName>
+										<sourceDirectory>${basedir}/target/generated-index/</sourceDirectory>
+										<backend>html</backend>
+										<doctype>article</doctype>
+										<attributes>
+											<docinfo>true</docinfo>
+											<spring-cloud-version>${project.version}</spring-cloud-version>
+											<allow-uri-read>true</allow-uri-read>
+											<safe-mode>unsafe</safe-mode>
+											<source-highlighter>prettify</source-highlighter>
+											<docs-main>${docs.main}</docs-main>
+										</attributes>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>com.agilejava.docbkx</groupId>
+							<artifactId>docbkx-maven-plugin</artifactId>
+							<version>2.0.15</version>
+							<configuration>
+								<sourceDirectory>${basedir}/target/generated-docs</sourceDirectory>
+								<includes>${docs.main}.xml</includes>
+								<xincludeSupported>true</xincludeSupported>
+								<chunkedOutput>false</chunkedOutput>
+								<foCustomization>${docs.resources.dir}/docbook/xsl/pdf.xsl</foCustomization>
+								<useExtensions>1</useExtensions>
+								<highlightSource>1</highlightSource>
+								<highlightXslthlConfig>${docs.resources.dir}/docbook/xsl/xslthl-config.xml</highlightXslthlConfig>
+							</configuration>
+							<dependencies>
+								<dependency>
+									<groupId>net.sf.xslthl</groupId>
+									<artifactId>xslthl</artifactId>
+									<version>2.1.0</version>
+								</dependency>
+								<dependency>
+									<groupId>net.sf.docbook</groupId>
+									<artifactId>docbook-xml</artifactId>
+									<version>5.0-all</version>
+									<classifier>resources</classifier>
+									<type>zip</type>
+									<scope>runtime</scope>
+								</dependency>
+							</dependencies>
+							<executions>
+								<execution>
+									<id>html-single</id>
+									<goals>
+										<goal>generate-html</goal>
+									</goals>
+									<phase>prepare-package</phase>
+									<configuration>
+										<htmlCustomization>${docs.resources.dir}/docbook/xsl/html-singlepage.xsl</htmlCustomization>
+										<targetDirectory>${basedir}/target/docbook/htmlsingle</targetDirectory>
+										<postProcess>
+											<copy todir="${basedir}/target/contents/reference/htmlsingle">
+												<fileset dir="${basedir}/target/docbook/htmlsingle">
+													<include name="**/*.html" />
+												</fileset>
+											</copy>
+											<copy todir="${basedir}/target/contents/reference/htmlsingle">
+												<fileset dir="${docs.resources.dir}/docbook">
+													<include name="**/*.css" />
+													<include name="**/*.png" />
+													<include name="**/*.gif" />
+													<include name="**/*.jpg" />
+												</fileset>
+											</copy>
+										</postProcess>
+									</configuration>
+								</execution>
+								<execution>
+									<id>html</id>
+									<goals>
+										<goal>generate-html</goal>
+									</goals>
+									<phase>prepare-package</phase>
+									<configuration>
+										<htmlCustomization>${docs.resources.dir}/docbook/xsl/html-multipage.xsl</htmlCustomization>
+										<targetDirectory>${basedir}/target/docbook/html</targetDirectory>
+										<!-- By default `-` prefix is added to files and gh-pages don't render these files -->
+										<chunkedFilenamePrefix>multi_</chunkedFilenamePrefix>
+										<chunkedOutput>true</chunkedOutput>
+										<postProcess>
+											<copy todir="${basedir}/target/contents/reference/html">
+												<fileset dir="${basedir}/target/docbook/html">
+													<include name="**/*.html" />
+												</fileset>
+											</copy>
+											<copy todir="${basedir}/target/contents/reference/html">
+												<fileset dir="${docs.resources.dir}/docbook">
+													<include name="**/*.css" />
+													<include name="**/*.png" />
+													<include name="**/*.gif" />
+													<include name="**/*.jpg" />
+												</fileset>
+											</copy>
+										</postProcess>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>build-helper-maven-plugin</artifactId>
+							<version>1.12</version>
+							<inherited>false</inherited>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-antrun-plugin</artifactId>
+							<dependencies>
+								<dependency>
+									<groupId>ant-contrib</groupId>
+									<artifactId>ant-contrib</artifactId>
+									<version>1.0b3</version>
+									<exclusions>
+										<exclusion>
+											<groupId>ant</groupId>
+											<artifactId>ant</artifactId>
+										</exclusion>
+									</exclusions>
+								</dependency>
+								<dependency>
+									<groupId>org.apache.ant</groupId>
+									<artifactId>ant-nodeps</artifactId>
+									<version>1.8.1</version>
+								</dependency>
+								<dependency>
+									<groupId>org.tigris.antelope</groupId>
+									<artifactId>antelopetasks</artifactId>
+									<version>3.2.10</version>
+								</dependency>
+								<dependency>
+									<groupId>org.jruby</groupId>
+									<artifactId>jruby-complete</artifactId>
+									<version>1.7.17</version>
+								</dependency>
+								<dependency>
+									<groupId>org.asciidoctor</groupId>
+									<artifactId>asciidoctorj</artifactId>
+									<version>1.5.2</version>
+								</dependency>
+							</dependencies>
+							<executions>
+								<execution>
+									<id>readme</id>
+									<phase>process-resources</phase>
+									<goals>
+										<goal>run</goal>
+									</goals>
+									<configuration>
+										<target>
+											<java classname="org.jruby.Main" failonerror="yes">
+												<arg value="${docs.resources.dir}/ruby/generate_readme.sh"/>
+												<arg value="-o"/>
+												<arg value="${main.basedir}/README.adoc"/>
+											</java>
+										</target>
+									</configuration>
+								</execution>
+								<execution>
+									<id>copy-css</id>
+									<phase>process-resources</phase>
+									<goals>
+										<goal>run</goal>
+									</goals>
+									<configuration>
+										<target>
+											<copy todir="${basedir}/target/generated-docs/css">
+												<fileset dir="${docs.resources.dir}/docbook/css"/>
+											</copy>
+											<copy failonerror="false" todir="${basedir}/target/generated-docs/images">
+												<fileset dir="${docs.resources.dir}/docbook/images"/>
+											</copy>
+										</target>
+									</configuration>
+								</execution>
+								<execution>
+									<id>generate-documentation-index</id>
+									<phase>generate-resources</phase>
+									<goals>
+										<goal>run</goal>
+									</goals>
+									<configuration>
+										<target>
+											<echo file="${basedir}/target/generated-index/${docs.main}.adoc">
+:nofooter:
+:linkcss:
+:stylesdir: css
+:stylesheet: manual-singlepage.css
+
+= {docs-main}
+
+{spring-cloud-version}
+
+== Pick The Documentation Option
+
+- link:single/{docs-main}.html[Single HTML]
+- link:multi/multi_{docs-main}.html[Multi HTML]
+											</echo>
+										</target>
+									</configuration>
+								</execution>
+								<execution>
+									<id>copy-generated-html</id>
+									<phase>prepare-package</phase>
+									<goals>
+										<goal>run</goal>
+									</goals>
+									<configuration>
+										<target>
+											<copy todir="${basedir}/target/generated-docs/single">
+												<fileset dir="${basedir}/target/contents/reference/htmlsingle"/>
+											</copy>
+											<copy todir="${basedir}/target/generated-docs/multi">
+												<fileset dir="${basedir}/target/contents/reference/html"/>
+											</copy>
+										</target>
+									</configuration>
+								</execution>
+								<execution>
+									<id>setup-maven-properties</id>
+									<phase>validate</phase>
+									<goals>
+										<goal>run</goal>
+									</goals>
+									<configuration>
+										<exportAntProperties>true</exportAntProperties>
+										<target>
+											<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+											<taskdef name="stringutil" classname="ise.antelope.tasks.StringUtilTask"/>
+											<var name="version-type" value="${project.version}"/>
+											<propertyregex property="version-type"
+														   override="true" input="${version-type}" regexp=".*\.(.*)"
+														   replace="\1" />
+											<propertyregex property="version-type"
+														   override="true" input="${version-type}" regexp="(M)\d+"
+														   replace="MILESTONE" />
+											<propertyregex property="version-type"
+														   override="true" input="${version-type}" regexp="(RC)\d+"
+														   replace="MILESTONE" />
+											<propertyregex property="version-type"
+														   override="true" input="${version-type}" regexp="BUILD-(.*)"
+														   replace="SNAPSHOT" />
+											<stringutil string="${version-type}" property="spring-cloud-repo">
+												<lowercase/>
+											</stringutil>
+											<var name="github-tag" value="v${project.version}"/>
+											<propertyregex property="github-tag" override="true"
+														   input="${github-tag}" regexp=".*SNAPSHOT" replace="master" />
+										</target>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>org.jfrog.buildinfo</groupId>
+							<artifactId>artifactory-maven-plugin</artifactId>
+							<version>2.2.1</version>
+							<executions>
+								<execution>
+									<id>build-info</id>
+									<goals>
+										<goal>publish</goal>
+									</goals>
+									<configuration>
+										<deployProperties>
+											<zip.deployed>true</zip.deployed>
+											<zip.type>docs</zip.type>
+										</deployProperties>
+										<publisher>
+											<contextUrl>https://repo.spring.io</contextUrl>
+											<repoKey>libs-release-local</repoKey>
+											<snapshotRepoKey>libs-snapshots-local</snapshotRepoKey>
+										</publisher>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.7.4.201502262128</version>
+						<configuration>
+							<destFile>${sonar.jacoco.reportPath}</destFile>
+							<append>true</append>
+						</configuration>
+						<executions>
+							<execution>
+								<id>agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<properties>
+								<property>
+									<name>listener</name>
+									<value>org.sonar.java.jacoco.JUnitListener</value>
+								</property>
+							</properties>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>org.sonarsource.java</groupId>
+					<artifactId>sonar-jacoco-listeners</artifactId>
+					<version>3.8</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>license</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>license-maven-plugin</artifactId>
+						<version>1.8</version>
+						<executions>
+							<execution>
+								<id>aggregate-licenses</id>
+								<goals>
+									<goal>license:aggregate-add-third-party</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>fast</id>
+			<properties>
+				<checkstyle.skip>true</checkstyle.skip>
+			</properties>
+		</profile>
+	</profiles>
+</project>

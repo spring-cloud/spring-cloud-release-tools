@@ -173,6 +173,23 @@ public class PomUpdaterTests {
 	}
 
 	@Test
+	public void should_update_the_parent_from_properties_even_if_group_ids_dont_match() throws Exception {
+		File originalPom = pom("/projects/project/children", "pom_different_group_boot_parent.xml");
+		File pomInTemp = tmpFile("/project/children/pom_different_group_boot_parent.xml");
+		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
+		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp, this.versions);
+
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
+
+		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
+		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		BDDAssertions.then(overriddenPomModel.getVersion()).isEqualTo("0.0.3.BUILD-SNAPSHOT");
+		BDDAssertions.then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.1");
+		BDDAssertions.then(overriddenPomModel.getProperties())
+				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
+	}
+
+	@Test
 	public void should_only_update_the_properties_section_when_group_ids_dont_match_and_there_is_no_skip_deployment() throws Exception {
 		File originalPom = pom("/projects/project/children", "pom_different_group.xml");
 		File pomInTemp = tmpFile("/project/children/pom_different_group.xml");
@@ -245,7 +262,7 @@ public class PomUpdaterTests {
 	}
 
 	@Test
-	public void should_not_update_the_project_if_group_doesnt_match() throws Exception {
+	public void should_update_boot_parent_even_if_the_project_group_doesnt_match() throws Exception {
 		File originalPom = pom("/projects/project/children", "pom_case_from_contract.xml");
 		File pomInTemp = tmpFile("/project/children/pom_case_from_contract.xml");
 		ModelWrapper rootPom = model("spring-cloud-contract", "org.springframework.cloud");
@@ -253,7 +270,10 @@ public class PomUpdaterTests {
 
 		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions, pomInTemp);
 
-		BDDAssertions.then(asString(storedPom)).isEqualTo(asString(originalPom));
+		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
+		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		BDDAssertions.then(overriddenPomModel.getParent().getVersion()).isEqualTo("0.0.1");
+
 	}
 
 	@Test

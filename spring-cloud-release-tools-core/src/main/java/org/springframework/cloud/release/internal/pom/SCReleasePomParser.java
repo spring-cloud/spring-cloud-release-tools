@@ -75,8 +75,9 @@ class SCReleasePomParser {
 		Model model = pom(this.bootPom);
 		String bootArtifactId = model.getParent().getArtifactId();
 		log.debug("Boot artifact id is equal to [{}]", bootArtifactId);
-		if (!SpringCloudConstants.BOOT_STARTER_ARTIFACT_ID.equals(bootArtifactId)) {
-			throw new IllegalStateException("The pom doesn't have a [" + SpringCloudConstants.BOOT_STARTER_ARTIFACT_ID + "] artifact id");
+		if (!SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID.equals(bootArtifactId)) {
+			throw new IllegalStateException("The pom doesn't have a [" + SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID
+					+ "] artifact id");
 		}
 		String bootVersion = model.getParent().getVersion();
 		log.debug("Boot version is equal to [{}]", bootVersion);

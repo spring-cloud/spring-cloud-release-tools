@@ -170,16 +170,9 @@ class PomUpdater {
 	private List<VersionChange> updateParentIfPossible(ModelWrapper wrapper, Versions versions,
 			Model model, List<VersionChange> sourceChanges) {
 		String rootProjectName = wrapper.projectName();
-		String rootProjectGroupId = wrapper.groupId();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		if (model.getParent() == null || isEmpty(model.getParent().getVersion())) {
 			log.debug("Can't set the value for parent... Will return {}", sourceChanges);
-			return changes;
-		}
-		boolean skipDeployment = hasSkipDeployment(model);
-		if (!skipDeployment && model.getGroupId() != null && !model.getGroupId().equals(rootProjectGroupId)) {
-			log.info("Will not update the project's [{}] parent [{}] since its group id [{}] is not equal the parent group id [{}]",
-					model.getArtifactId(), model.getParent().getArtifactId(), model.getGroupId(), rootProjectGroupId);
 			return changes;
 		}
 		String parentGroupId = model.getParent().getGroupId();
