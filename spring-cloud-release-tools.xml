@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-02-02</date>
+<date>2018-02-04</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -64,6 +64,9 @@ why this tool makes it easy to automate the release / dependency update process 
 </listitem>
 <listitem>
 <simpara>Updates project information in Sagan (<link xl:href="http://spring.io">http://spring.io</link>) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)</simpara>
+</listitem>
+<listitem>
+<simpara>For <literal>GA</literal>/ <literal>SR</literal> release will create an issue in Spring Guides under <link xl:href="https://github.com/spring-guides/getting-started-guides/issues/">https://github.com/spring-guides/getting-started-guides/issues/</link></simpara>
 </listitem>
 </itemizedlist>
 <important>
