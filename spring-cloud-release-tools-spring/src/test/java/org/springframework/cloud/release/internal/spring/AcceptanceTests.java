@@ -340,9 +340,9 @@ public class AcceptanceTests {
 		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
 		releaserProperties.getPom().setBranch(branch);
 		releaserProperties.setWorkingDir(project.getPath());
-		releaserProperties.getMaven().setBuildCommand("touch build");
-		releaserProperties.getMaven().setDeployCommand("touch deploy");
-		releaserProperties.getMaven().setPublishDocsCommands(new String[] { "touch docs"} );
+		releaserProperties.getMaven().setBuildCommand("echo build");
+		releaserProperties.getMaven().setDeployCommand("echo deploy");
+		releaserProperties.getMaven().setPublishDocsCommands(new String[] { "echo docs"} );
 		return releaserProperties;
 	}
 
