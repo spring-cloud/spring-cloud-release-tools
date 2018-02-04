@@ -41,6 +41,7 @@ why this tool makes it easy to automate the release / dependency update process 
 - Generates a tweet template under `target/tweet.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a release notes template under `target/notes.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Updates project information in Sagan (http://spring.io) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)
+- For `GA`/ `SR` release will create an issue in Spring Guides under https://github.com/spring-guides/getting-started-guides/issues/
 
 IMPORTANT: Starting with version that does Sagan integration, you MUST pass the OAuth token,
 otherwise the application will fail to start

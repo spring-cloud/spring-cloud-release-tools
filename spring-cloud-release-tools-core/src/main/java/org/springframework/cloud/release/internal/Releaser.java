@@ -1,7 +1,9 @@
 package org.springframework.cloud.release.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +134,16 @@ public class Releaser {
 		}
 		File blog = this.templateGenerator.blog(projects);
 		log.info("\nSuccessfully created blog template at location [{}]", blog);
+
+	}
+
+	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects) {
+		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
+			log.info("\nWon't updated Spring Guides for a non Release / Service Release version");
+			return;
+		}
+		this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
+		log.info("\nSuccessfully updated Spring Guides issues");
 	}
 
 	public void createTweet(ProjectVersion releaseVersion) {

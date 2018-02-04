@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.pom.Projects;
 
 /**
  * Contains business logic around Git & Github operations
@@ -26,10 +27,12 @@ public class ProjectGitHandler {
 
 	private final ReleaserProperties properties;
 	private final GithubMilestones githubMilestones;
+	private final GithubIssues githubIssues;
 
 	public ProjectGitHandler(ReleaserProperties properties) {
 		this.properties = properties;
 		this.githubMilestones = new GithubMilestones(properties);
+		this.githubIssues = new GithubIssues(properties);
 	}
 
 	public void commitAndTagIfApplicable(File project, ProjectVersion version) {
@@ -88,6 +91,10 @@ public class ProjectGitHandler {
 
 	public void closeMilestone(ProjectVersion releaseVersion) {
 		this.githubMilestones.closeMilestone(releaseVersion);
+	}
+
+	public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
+		this.githubIssues.fileIssue(projects, version);
 	}
 
 	public String milestoneUrl(ProjectVersion releaseVersion) {

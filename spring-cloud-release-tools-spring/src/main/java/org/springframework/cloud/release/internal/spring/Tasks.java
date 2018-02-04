@@ -52,6 +52,12 @@ class Tasks {
 				args.releaser.createTweet(args.versionFromScRelease);
 				args.releaser.createReleaseNotes(args.versionFromScRelease, args.projects);
 	});
+	static Task UPDATE_GUIDES = task("updateGuides", "ug",
+			"UPDATE GUIDES",
+			"Updating Spring Guides",
+			args -> {
+				args.releaser.updateSpringGuides(args.versionFromScRelease, args.projects);
+	});
 	static Task UPDATE_SAGAN = task("updateSagan", "g",
 			"UPDATE SAGAN",
 			"Updating Sagan with release info",
@@ -69,7 +75,8 @@ class Tasks {
 			Tasks.PUSH,
 			Tasks.CLOSE_MILESTONE,
 			Tasks.CREATE_TEMPLATES,
-			Tasks.UPDATE_SAGAN
+			Tasks.UPDATE_SAGAN,
+			Tasks.UPDATE_GUIDES
 	).collect(Collectors.toList());
 
 	static Task RELEASE = Tasks.task("release", "r",

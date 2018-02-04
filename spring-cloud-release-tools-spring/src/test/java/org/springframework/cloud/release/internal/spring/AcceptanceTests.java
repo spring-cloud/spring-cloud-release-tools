@@ -25,6 +25,7 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
@@ -104,6 +105,7 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganClient).should(BDDMockito.times(2)).updateRelease(BDDMockito.eq("spring-cloud-consul"),
 				BDDMockito.anyList());
 		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
+		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 	}
 
 	// issue #74
@@ -139,6 +141,7 @@ public class AcceptanceTests {
 				BDDMockito.anyList());
 		BDDMockito.then(this.saganClient).should()
 				.deleteRelease("spring-cloud-build", "1.2.2.BUILD-SNAPSHOT");
+		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 	}
 
 	@Test
@@ -178,6 +181,8 @@ public class AcceptanceTests {
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
 		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
 				BDDMockito.anyList());
+		// we update guides only for SR / RELEASE
+		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
 	}
 
 	@Test
@@ -209,6 +214,7 @@ public class AcceptanceTests {
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1)");
 		BDDMockito.then(this.saganClient).should(BDDMockito.never()).updateRelease(
 				BDDMockito.anyString(), BDDMockito.anyList());
+		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
 	}
 
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -349,6 +355,7 @@ public class AcceptanceTests {
 	class TestProjectGitHandler extends ProjectGitHandler {
 
 		boolean closedMilestones = false;
+		boolean issueCreatedInSpringGuides = false;
 		final String expectedVersion;
 		final String projectName;
 
@@ -363,6 +370,11 @@ public class AcceptanceTests {
 			then(releaseVersion.projectName).isEqualTo(this.projectName);
 			then(releaseVersion.version).isEqualTo(this.expectedVersion);
 			this.closedMilestones = true;
+		}
+
+		@Override public void createIssueInSpringGuides(Projects projects,
+				ProjectVersion version) {
+			this.issueCreatedInSpringGuides = true;
 		}
 
 		@Override public String milestoneUrl(ProjectVersion releaseVersion) {
