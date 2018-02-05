@@ -1,11 +1,13 @@
 package org.springframework.cloud.release.internal.spring;
 
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.mockito.Matchers.anyString;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.maven.model.Model;
@@ -29,6 +31,8 @@ import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.sagan.Project;
+import org.springframework.cloud.release.internal.sagan.Release;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
@@ -52,6 +56,26 @@ public class AcceptanceTests {
 		this.springCloudConsulProject = new File(AcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
+		BDDMockito.given(this.saganClient.getProject(anyString()))
+				.willReturn(newProject());
+	}
+
+	private Project newProject() {
+		Project project = new Project();
+		project.projectReleases.addAll(Arrays.asList(
+				release("1.0.0.M8"),
+				release("1.1.0.M8"),
+				release("1.2.0.M8"),
+				release("2.0.0.M8"))
+		);
+		return project;
+	}
+
+	private Release release(String version) {
+		Release release = new Release();
+		release.version = version;
+		release.current = true;
+		return release;
 	}
 
 	@Test
@@ -104,7 +128,14 @@ public class AcceptanceTests {
 		// second time to update SNAPSHOT
 		BDDMockito.then(this.saganClient).should(BDDMockito.times(2)).updateRelease(BDDMockito.eq("spring-cloud-consul"),
 				BDDMockito.anyList());
-		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
+		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-consul",
+				"1.1.2.BUILD-SNAPSHOT");
+		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-consul",
+				"1.1.0.M8");
+		BDDMockito.then(this.saganClient).should(BDDMockito.never())
+				.deleteRelease("spring-cloud-build", "1.0.0.M8");
+		BDDMockito.then(this.saganClient).should(BDDMockito.never())
+				.deleteRelease("spring-cloud-build", "2.0.0.M8");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 	}
 
@@ -141,6 +172,12 @@ public class AcceptanceTests {
 				BDDMockito.anyList());
 		BDDMockito.then(this.saganClient).should()
 				.deleteRelease("spring-cloud-build", "1.2.2.BUILD-SNAPSHOT");
+		BDDMockito.then(this.saganClient).should()
+				.deleteRelease("spring-cloud-build", "1.2.0.M8");
+		BDDMockito.then(this.saganClient).should(BDDMockito.never())
+				.deleteRelease("spring-cloud-build", "1.1.0.M8");
+		BDDMockito.then(this.saganClient).should(BDDMockito.never())
+				.deleteRelease("spring-cloud-build", "2.0.0.M8");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 	}
 
@@ -181,6 +218,8 @@ public class AcceptanceTests {
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
 		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
 				BDDMockito.anyList());
+		BDDMockito.then(this.saganClient).should(BDDMockito.never()).deleteRelease(
+				BDDMockito.anyString(), BDDMockito.anyString());
 		// we update guides only for SR / RELEASE
 		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
 	}

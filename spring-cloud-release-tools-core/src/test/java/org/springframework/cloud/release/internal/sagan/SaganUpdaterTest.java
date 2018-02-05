@@ -1,9 +1,11 @@
 package org.springframework.cloud.release.internal.sagan;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
@@ -11,6 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 
 /**
  * @author Marcin Grzejszczak
@@ -21,10 +27,29 @@ public class SaganUpdaterTest {
 	@Mock SaganClient saganClient;
 	@InjectMocks SaganUpdater saganUpdater;
 
+	@Before
+	public void setup() {
+		Project project = new Project();
+		project.projectReleases.addAll(Arrays.asList(
+				release("1.0.0.RC1"),
+				release("1.1.0.BUILD-SNAPSHOT"),
+				release("2.0.0.M4"))
+		);
+		BDDMockito.given(this.saganClient.getProject(anyString()))
+				.willReturn(project);
+	}
+
+	private Release release(String version) {
+		Release release = new Release();
+		release.version = version;
+		release.current = true;
+		return release;
+	}
+
 	@Test public void should_update_sagan_for_milestone() throws Exception {
 		this.saganUpdater.updateSagan("master", version("1.0.0.M1"), version("1.0.0.M1"));
 
-		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.M1",
 						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
@@ -32,7 +57,7 @@ public class SaganUpdaterTest {
 	@Test public void should_update_sagan_for_rc() throws Exception {
 		this.saganUpdater.updateSagan("master", version("1.0.0.RC1"), version("1.0.0.RC1"));
 
-		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RC1",
 						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
@@ -46,7 +71,7 @@ public class SaganUpdaterTest {
 
 		this.saganUpdater.updateSagan("master", projectVersion, projectVersion);
 
-		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.BUILD-SNAPSHOT",
 						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
@@ -56,11 +81,13 @@ public class SaganUpdaterTest {
 
 		this.saganUpdater.updateSagan("master", projectVersion, projectVersion);
 
-		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
+		then(this.saganClient).should().deleteRelease("foo", "1.0.0.RC1");
+		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RELEASE",
 						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "GENERAL_AVAILABILITY")));
-		BDDMockito.then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
-		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
+		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.1.BUILD-SNAPSHOT",
 						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
@@ -70,7 +97,8 @@ public class SaganUpdaterTest {
 
 		this.saganUpdater.updateSagan("1.1.x", projectVersion, projectVersion);
 
-		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
+		then(this.saganClient).should(never()).deleteRelease(anyString(), anyString());
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.1.0.BUILD-SNAPSHOT",
 						"http://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
 	}
@@ -84,7 +112,8 @@ public class SaganUpdaterTest {
 						releaseStatus.equals(item.releaseStatus) &&
 						version.equals(item.version) &&
 						refDocUrl.equals(item.apiDocUrl) &&
-						refDocUrl.equals(item.refDocUrl);
+						refDocUrl.equals(item.refDocUrl) &&
+						item.current;
 			}
 
 			@Override public void describeTo(Description description) {

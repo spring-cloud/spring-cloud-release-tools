@@ -83,6 +83,13 @@ public class ProjectVersion {
 		return this.version.matches(".*.SR[0-9]+");
 	}
 
+	public boolean isSameMinor(String version) {
+		String[] splitThis = this.version.split("\\.");
+		String[] splitThat = version.split("\\.");
+		return splitThis.length == splitThat.length &&
+				splitThis[0].equals(splitThat[0]) && splitThis[1].equals(splitThat[1]);
+	}
+
 	@Override public String toString() {
 		return this.version;
 	}

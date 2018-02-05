@@ -1,5 +1,8 @@
 package org.springframework.cloud.release.internal.sagan;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -21,19 +24,39 @@ public class SaganUpdater {
 
 	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, version);
+		updateSaganForGa(branch, originalVersion, version);
 		log.info("Updating Sagan with \n\n{}", update);
 		this.saganClient.updateRelease(version.projectName, Collections.singletonList(update));
+	}
+
+	private void updateSaganForGa(String branch, ProjectVersion originalVersion,
+			ProjectVersion version) {
 		if (version.isRelease() || version.isServiceRelease()) {
-			log.info("Version is GA [{}]. Will remove old snapshot and add a new one", version);
+			log.info("Version is GA [{}]. Will remove all older versions and mark this as current", version);
+			Project project = this.saganClient.getProject(version.projectName);
+			if (project != null) {
+				removeAllSameMinorVersions(version, project);
+			}
 			String snapshot = toSnapshot(version.version);
+			removeVersionFromSagan(version, snapshot);
 			String bumpedSnapshot = toSnapshot(version.bumpedVersion());
-			log.info("Removing [{}/{}] from Sagan", version.projectName, snapshot);
-			this.saganClient.deleteRelease(version.projectName, snapshot);
 			ReleaseUpdate snapshotUpdate =
 					releaseUpdate(branch, originalVersion, new ProjectVersion(version.projectName, bumpedSnapshot));
 			log.info("Updating Sagan with \n\n[{}]", snapshotUpdate);
 			this.saganClient.updateRelease(version.projectName, Collections.singletonList(snapshotUpdate));
 		}
+	}
+
+	private void removeAllSameMinorVersions(ProjectVersion version, Project project) {
+		project.projectReleases.stream()
+				.filter(release -> version.isSameMinor(release.version))
+				.collect(Collectors.toList())
+				.forEach(release -> removeVersionFromSagan(version, release.version));
+	}
+
+	private void removeVersionFromSagan(ProjectVersion version, String snapshot) {
+		log.info("Removing [{}/{}] from Sagan", version.projectName, snapshot);
+		this.saganClient.deleteRelease(version.projectName, snapshot);
 	}
 
 	private ReleaseUpdate releaseUpdate(String branch, ProjectVersion originalVersion,
@@ -45,6 +68,7 @@ public class SaganUpdater {
 		update.releaseStatus = version(version);
 		update.apiDocUrl = referenceUrl(branch, version);
 		update.refDocUrl = referenceUrl(branch, version);
+		update.current = true;
 		return update;
 	}
 
