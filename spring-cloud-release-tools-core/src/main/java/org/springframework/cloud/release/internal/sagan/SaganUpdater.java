@@ -56,7 +56,11 @@ public class SaganUpdater {
 
 	private void removeVersionFromSagan(ProjectVersion version, String snapshot) {
 		log.info("Removing [{}/{}] from Sagan", version.projectName, snapshot);
-		this.saganClient.deleteRelease(version.projectName, snapshot);
+		try {
+			this.saganClient.deleteRelease(version.projectName, snapshot);
+		} catch (Exception e) {
+			log.error("Failed to remove [" + version.projectName + "/" + snapshot + "] from Sagan", e);
+		}
 	}
 
 	private ReleaseUpdate releaseUpdate(String branch, ProjectVersion originalVersion,
