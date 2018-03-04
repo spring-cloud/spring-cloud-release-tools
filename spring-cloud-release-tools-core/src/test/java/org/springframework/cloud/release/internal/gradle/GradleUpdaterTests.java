@@ -71,7 +71,7 @@ public class GradleUpdaterTests {
 
 		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromSCRelease(projectRoot,
 				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true))
-		.hasMessageContaining("contains a BUILD-SNAPSHOT version for a non snapshot release in line number");
+		.hasMessageContaining("contains a SNAPSHOT version for a non snapshot release in line number");
 	}
 
 	private File file(String relativePath) throws URISyntaxException {

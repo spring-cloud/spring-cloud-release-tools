@@ -65,7 +65,6 @@ public class GradleUpdater {
 
 		private final ReleaserProperties properties;
 		private final Projects projects;
-		private final ProjectVersion versionFromScRelease;
 		private final boolean snapshotVersion;
 		private final boolean assertSnapshots;
 
@@ -73,7 +72,6 @@ public class GradleUpdater {
 				ProjectVersion versionFromScRelease, boolean assertSnapshots) {
 			this.properties = properties;
 			this.projects = projects;
-			this.versionFromScRelease = versionFromScRelease;
 			this.snapshotVersion = !assertSnapshots || versionFromScRelease.isSnapshot();
 			this.assertSnapshots = assertSnapshots;
 		}
@@ -115,9 +113,9 @@ public class GradleUpdater {
 				while (scanner.hasNextLine()) {
 					String line = scanner.nextLine();
 					lineNumber++;
-					boolean containsSnapshot = line.contains("BUILD-SNAPSHOT");
+					boolean containsSnapshot = line.contains("SNAPSHOT");
 					if (containsSnapshot) {
-						throw new IllegalStateException("The file [" + path + "] contains a BUILD-SNAPSHOT "
+						throw new IllegalStateException("The file [" + path + "] contains a SNAPSHOT "
 								+ "version for a non snapshot release in line number [" + lineNumber + "]\n\n" + line);
 					}
 				}

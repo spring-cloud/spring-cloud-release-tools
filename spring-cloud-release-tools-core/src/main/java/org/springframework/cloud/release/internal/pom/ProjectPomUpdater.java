@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -37,6 +39,10 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
  * @author Marcin Grzejszczak
  */
 public class ProjectPomUpdater {
+
+	private static final List<String> IGNORED_SNAPSHOT_LINE_CHECKS = Arrays.asList(
+			"replace="
+	);
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectPomUpdater.class);
 
@@ -138,9 +144,10 @@ public class ProjectPomUpdater {
 					while (scanner.hasNextLine()) {
 						String line = scanner.nextLine();
 						lineNumber++;
-						boolean containsSnapshot = line.contains("BUILD-SNAPSHOT");
+						boolean containsSnapshot = line.contains("SNAPSHOT") &&
+								IGNORED_SNAPSHOT_LINE_CHECKS.stream().noneMatch(line::contains);
 						if (containsSnapshot) {
-							throw new IllegalStateException("The file [" + path + "] contains a BUILD-SNAPSHOT "
+							throw new IllegalStateException("The file [" + path + "] contains a SNAPSHOT "
 									+ "version for a non snapshot release in line number [" + lineNumber + "]\n\n" + line);
 						}
 					}
