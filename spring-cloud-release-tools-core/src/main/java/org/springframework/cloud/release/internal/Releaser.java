@@ -139,7 +139,7 @@ public class Releaser {
 
 	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects) {
 		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
-			log.info("\nWon't updated Spring Guides for a non Release / Service Release version");
+			log.info("\nWon't update Spring Guides for a non Release / Service Release version");
 			return;
 		}
 		this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);

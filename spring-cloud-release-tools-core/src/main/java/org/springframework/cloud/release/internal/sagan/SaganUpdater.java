@@ -1,6 +1,5 @@
 package org.springframework.cloud.release.internal.sagan;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -24,26 +23,28 @@ public class SaganUpdater {
 
 	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, version);
-		updateSaganForGa(branch, originalVersion, version);
+		updateSaganForNonSnapshot(branch, originalVersion, version);
 		log.info("Updating Sagan with \n\n{}", update);
 		this.saganClient.updateRelease(version.projectName, Collections.singletonList(update));
 	}
 
-	private void updateSaganForGa(String branch, ProjectVersion originalVersion,
+	private void updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion,
 			ProjectVersion version) {
-		if (version.isRelease() || version.isServiceRelease()) {
-			log.info("Version is GA [{}]. Will remove all older versions and mark this as current", version);
+		if (!version.isSnapshot()) {
+			log.info("Version is non snapshot [{}]. Will remove all older versions and mark this as current", version);
 			Project project = this.saganClient.getProject(version.projectName);
 			if (project != null) {
 				removeAllSameMinorVersions(version, project);
 			}
 			String snapshot = toSnapshot(version.version);
 			removeVersionFromSagan(version, snapshot);
-			String bumpedSnapshot = toSnapshot(version.bumpedVersion());
-			ReleaseUpdate snapshotUpdate =
-					releaseUpdate(branch, originalVersion, new ProjectVersion(version.projectName, bumpedSnapshot));
-			log.info("Updating Sagan with \n\n[{}]", snapshotUpdate);
-			this.saganClient.updateRelease(version.projectName, Collections.singletonList(snapshotUpdate));
+			if (version.isRelease() || version.isServiceRelease()) {
+				String bumpedSnapshot = toSnapshot(version.bumpedVersion());
+				ReleaseUpdate snapshotUpdate =
+						releaseUpdate(branch, originalVersion, new ProjectVersion(version.projectName, bumpedSnapshot));
+				log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
+				this.saganClient.updateRelease(version.projectName, Collections.singletonList(snapshotUpdate));
+			}
 		}
 	}
 

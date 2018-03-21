@@ -218,8 +218,10 @@ public class AcceptanceTests {
 				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
 		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
 				BDDMockito.anyList());
-		BDDMockito.then(this.saganClient).should(BDDMockito.never()).deleteRelease(
-				BDDMockito.anyString(), BDDMockito.anyString());
+		BDDMockito.then(this.saganClient).should()
+				.deleteRelease("spring-cloud-consul","1.2.0.M8");
+		BDDMockito.then(this.saganClient).should()
+				.deleteRelease("spring-cloud-consul","1.2.0.RC1");
 		// we update guides only for SR / RELEASE
 		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
 	}
