@@ -175,7 +175,7 @@ public class ReleaserProperties {
 		/**
 		 * Command to be executed to deploy a built project
 		 */
-		private String deployCommand = "./mvnw deploy -DskipTests -B -Pfast";
+		private String deployCommand = "./mvnw deploy -DskipTests -B -Pfast,deploy";
 
 		/**
 		 * Command to be executed to publish documentation. If present "{{version}}" will be replaced by the
