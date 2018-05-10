@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
@@ -49,6 +50,7 @@ public class AcceptanceTests {
 	File temporaryFolder;
 	TestProjectGitHandler gitHandler;
 	SaganClient saganClient = Mockito.mock(SaganClient.class);
+	ReleaserProperties releaserProperties;
 
 	@Before
 	public void setup() throws Exception {
@@ -90,6 +92,25 @@ public class AcceptanceTests {
 
 		BDDAssertions.thenThrownBy(releaser::release)
 				.hasMessageContaining("there is at least one SNAPSHOT library version in the Spring Cloud Release project");
+	}
+
+	@Test
+	public void should_not_clone_when_option_not_to_clone_was_switched_on() throws Exception {
+		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(), this.springCloudConsulProject);
+		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		consulPomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		File project = GitTestUtils.clonedProject(this.tmp.newFolder(), tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		SpringReleaser releaser = templateOnlyReleaser(project, "spring-cloud-consul",
+				"vCamden.SR5", "1.1.2.RELEASE");
+		this.releaserProperties.getGit().setFetchVersionsFromGit(false);
+		this.releaserProperties.getFixedVersions().put("spring-cloud-consul", "2.3.4.RELEASE");
+		File temporaryDestination = tmp.newFolder();
+		this.releaserProperties.getGit().setCloneDestinationDir(temporaryDestination.getAbsolutePath());
+
+		releaser.release();
+
+		then(temporaryDestination.list()).isEmpty();
 	}
 
 	@Test
@@ -384,12 +405,14 @@ public class AcceptanceTests {
 		releaserProperties.getMaven().setBuildCommand("echo build");
 		releaserProperties.getMaven().setDeployCommand("echo deploy");
 		releaserProperties.getMaven().setPublishDocsCommands(new String[] { "echo docs"} );
+		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}
 
 	private ReleaserProperties snapshotScReleaseReleaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = releaserProperties(project, branch);
 		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release-with-snapshot/").toURI().getPath());
+		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}
 

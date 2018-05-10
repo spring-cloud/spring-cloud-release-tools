@@ -3,6 +3,7 @@ package org.springframework.cloud.release.internal.spring;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.sagan.Project;
 
 /**
  * Releaser that gets input from console
@@ -48,14 +50,25 @@ public class SpringReleaser {
 	}
 
 	public void release(Options options) {
-		printVersionRetrieval();
 		String workingDir = this.properties.getWorkingDir();
 		File project = new File(workingDir);
 		ProjectVersion originalVersion = new ProjectVersion(project);
-		Projects projectsFromScRelease = this.releaser.retrieveVersionsFromSCRelease();
-		ProjectVersion versionFromScRelease = projectsFromScRelease.forFile(project);
-		assertNoSnapshotsForANonSnapshotProject(projectsFromScRelease, versionFromScRelease);
-		final Args defaultArgs = new Args(this.releaser, project, projectsFromScRelease,
+		ProjectVersion versionFromScRelease;
+		Projects projectsToUpdate;
+		if (this.properties.getGit().isFetchVersionsFromGit()) {
+			printVersionRetrieval();
+			projectsToUpdate = this.releaser.retrieveVersionsFromSCRelease();
+			versionFromScRelease = projectsToUpdate.forFile(project);
+			assertNoSnapshotsForANonSnapshotProject(projectsToUpdate, versionFromScRelease);
+		} else {
+			String fixedVersionForProject = this.properties.getFixedVersions().get(originalVersion.projectName);
+			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject);
+			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
+					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
+					.distinct().collect(Collectors.toCollection(Projects::new));
+			printSettingVersionFromFixedVersions(projectsToUpdate);
+		}
+		final Args defaultArgs = new Args(this.releaser, project, projectsToUpdate,
 				originalVersion, versionFromScRelease, this.properties, options.interactive);
 		this.optionsProcessor.processOptions(options, defaultArgs);
 	}
@@ -63,6 +76,11 @@ public class SpringReleaser {
 	private void printVersionRetrieval() {
 		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone Spring Cloud Release"
 				+ " to retrieve all versions for the branch [{}]", this.properties.getPom().getBranch());
+	}
+
+	private void printSettingVersionFromFixedVersions(Projects projectsToUpdate) {
+		log.info("\n\n\n=== RETRIEVED VERSIONS ===\n\nWill use the fixed versions"
+				+ " of projects [{}]", projectsToUpdate);
 	}
 
 	private void assertNoSnapshotsForANonSnapshotProject(Projects projects,

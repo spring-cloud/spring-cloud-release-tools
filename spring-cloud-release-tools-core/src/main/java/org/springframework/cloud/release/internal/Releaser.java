@@ -15,6 +15,7 @@ import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.util.Assert;
 
 /**
  * @author Marcin Grzejszczak
@@ -119,6 +120,8 @@ public class Releaser {
 	}
 
 	public void createEmail(ProjectVersion releaseVersion) {
+		Assert.notNull(releaseVersion, "You must provide a release version for your project");
+		Assert.notNull(releaseVersion.version, "You must provide a release version for your project");
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create email template for a SNAPSHOT version");
 			return;

@@ -60,6 +60,11 @@ public class ReleaserProperties {
 		private String cloneDestinationDir;
 
 		/**
+		 * If {@code true} then should fill the map of versions from Git. If {@code false} then picks fixed versions
+		 */
+		private boolean fetchVersionsFromGit = true;
+
+		/**
 		 * GitHub OAuth token to be used to interact with GitHub repo
 		 */
 		private String oauthToken = "";
@@ -126,6 +131,14 @@ public class ReleaserProperties {
 
 		public void setNumberOfCheckedMilestones(Integer numberOfCheckedMilestones) {
 			this.numberOfCheckedMilestones = numberOfCheckedMilestones;
+		}
+
+		public boolean isFetchVersionsFromGit() {
+			return this.fetchVersionsFromGit;
+		}
+
+		public void setFetchVersionsFromGit(boolean fetchVersionsFromGit) {
+			this.fetchVersionsFromGit = fetchVersionsFromGit;
 		}
 	}
 
