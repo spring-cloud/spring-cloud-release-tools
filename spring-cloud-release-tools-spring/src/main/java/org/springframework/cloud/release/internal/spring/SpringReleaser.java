@@ -62,10 +62,12 @@ public class SpringReleaser {
 			assertNoSnapshotsForANonSnapshotProject(projectsToUpdate, versionFromScRelease);
 		} else {
 			String fixedVersionForProject = this.properties.getFixedVersions().get(originalVersion.projectName);
-			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject);
+			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject == null ?
+			originalVersion.version : fixedVersionForProject);
 			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
 					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
 					.distinct().collect(Collectors.toCollection(Projects::new));
+			projectsToUpdate.add(versionFromScRelease);
 			printSettingVersionFromFixedVersions(projectsToUpdate);
 		}
 		final Args defaultArgs = new Args(this.releaser, project, projectsToUpdate,
@@ -80,7 +82,9 @@ public class SpringReleaser {
 
 	private void printSettingVersionFromFixedVersions(Projects projectsToUpdate) {
 		log.info("\n\n\n=== RETRIEVED VERSIONS ===\n\nWill use the fixed versions"
-				+ " of projects [{}]", projectsToUpdate);
+				+ " of projects\n\n {}", projectsToUpdate
+				.stream().map(p -> p.projectName + " => " + p.version)
+				.collect(Collectors.joining("\n")));
 	}
 
 	private void assertNoSnapshotsForANonSnapshotProject(Projects projects,
