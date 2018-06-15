@@ -67,7 +67,7 @@ public class PomUpdateAcceptanceTests {
 	}
 
 	@Test
-	public void should_update_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version() throws Exception {
+	public void should_not_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version() throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();

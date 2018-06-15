@@ -17,7 +17,6 @@ package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,11 +24,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
-import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
@@ -40,8 +36,10 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
  */
 public class ProjectPomUpdater {
 
-	private static final List<String> IGNORED_SNAPSHOT_LINE_CHECKS = Arrays.asList(
-			"replace="
+	private static final List<String> IGNORED_SNAPSHOT_LINE_PATTERNS = Arrays.asList(
+			"^.*replace=.*$",
+			// issue [#80]
+			"^[\\s]*<!--.*-->.*$"
 	);
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectPomUpdater.class);
@@ -145,7 +143,7 @@ public class ProjectPomUpdater {
 						String line = scanner.nextLine();
 						lineNumber++;
 						boolean containsSnapshot = line.contains("SNAPSHOT") &&
-								IGNORED_SNAPSHOT_LINE_CHECKS.stream().noneMatch(line::contains);
+								IGNORED_SNAPSHOT_LINE_PATTERNS.stream().noneMatch(line::matches);
 						if (containsSnapshot) {
 							throw new IllegalStateException("The file [" + path + "] contains a SNAPSHOT "
 									+ "version for a non snapshot release in line number [" + lineNumber + "]\n\n" + line);

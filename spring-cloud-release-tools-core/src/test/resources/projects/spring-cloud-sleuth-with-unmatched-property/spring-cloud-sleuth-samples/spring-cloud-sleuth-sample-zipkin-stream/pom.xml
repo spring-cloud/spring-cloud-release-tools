@@ -39,6 +39,15 @@
 		<sonar.skip>true</sonar.skip>
 	</properties>
 
+	<!-- BUILD-SNAPSHOT -->
+	<!--BUILD-SNAPSHOT-->
+	<!-- SNAPSHOT -->
+	<!--SNAPSHOT-->
+<!-- BUILD-SNAPSHOT -->
+<!--BUILD-SNAPSHOT-->
+<!-- SNAPSHOT -->
+<!--SNAPSHOT-->
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
