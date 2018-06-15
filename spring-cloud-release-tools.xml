@@ -68,6 +68,9 @@ why this tool makes it easy to automate the release / dependency update process 
 <listitem>
 <simpara>For <literal>GA</literal>/ <literal>SR</literal> release will create an issue in Spring Guides under <link xl:href="https://github.com/spring-guides/getting-started-guides/issues/">https://github.com/spring-guides/getting-started-guides/issues/</link></simpara>
 </listitem>
+<listitem>
+<simpara>For <literal>GA</literal>/ <literal>SR</literal> release will update the links under <link xl:href="https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current">https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current</link></simpara>
+</listitem>
 </itemizedlist>
 <important>
 <simpara>Starting with version that does Sagan integration, you MUST pass the OAuth token,
@@ -140,41 +143,45 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 <simpara>You will see a help screen looking like more or less like this</simpara>
 <programlisting language="bash" linenumbering="unnumbered">Here you can find the list of tasks in order
 
-[updatePoms,build,commit,deploy,docs,snapshots,push,closeMilestone,createTemplates]
+[updatePoms,build,commit,deploy,docs,snapshots,push,closeMilestone,createTemplates,updateSagan,updateGuides,updateDocumentation]
 
 
-Option                          Description
-------                          -----------
--a, --start-from &lt;String&gt;       Starts all release task starting from the given
-                                  task. Requires passing the task name (either
-                                  one letter or the full name)
--b, --build [String]            Build the project
--c, --commit [String]           Commit, tag and push the tag
--d, --deploy [String]           Deploy the artifacts
--f, --full-release [Boolean]    Do you want to do the full release (default:
-                                  false)
+Option                                Description
+------                                -----------
+-a, --start-from &lt;String&gt;             Starts all release task starting from the
+                                        given task. Requires passing the task
+                                        name (either one letter or the full
+                                        name)
+-b, --build [String]                  Build the project
+-c, --commit [String]                 Commit, tag and push the tag
+-d, --deploy [String]                 Deploy the artifacts
+-f, --full-release [Boolean]          Do you want to do the full release
+                                        (default: false)
+-g, --updateSagan [String]            Updating Sagan with release info
 -h, --help [String]
--i, --interactive &lt;Boolean&gt;     Do you want to set the properties from the
-                                  command line (default: true)
--m, --closeMilestone [String]   Close the milestone at Github
--o, --docs [String]             Publish the docs
--p, --push [String]             Push the commits
--r, --range &lt;String&gt;            Runs release tasks from the given range.
-                                  Requires passing the task names with a
-                                  hyphen. The first task is inclusive, the
-                                  second inclusive. E.g. 's-m' would mean
-                                  running 'snapshot', 'push' and 'milestone'
-                                  tasks
--s, --snapshots [String]        Go back to snapshots and bump originalVersion
-                                  by patch
--t, --createTemplates [String]  Create email / blog / tweet etc. templates
--u, --updatePoms [String]       Update poms with versions from Spring Cloud
-                                  Release
+-i, --interactive &lt;Boolean&gt;           Do you want to set the properties from
+                                        the command line (default: true)
+-m, --closeMilestone [String]         Close the milestone at Github
+-o, --docs [String]                   Publish the docs
+-p, --push [String]                   Push the commits
+-r, --range &lt;String&gt;                  Runs release tasks from the given range.
+                                        Requires passing the task names with a
+                                        hyphen. The first task is inclusive,
+                                        the second inclusive. E.g. 's-m' would
+                                        mean running 'snapshot', 'push' and
+                                        'milestone' tasks
+-s, --snapshots [String]              Go back to snapshots and bump
+                                        originalVersion by patch
+-t, --createTemplates [String]        Create email / blog / tweet etc. templates
+-u, --updatePoms [String]             Update poms with versions from Spring
+                                        Cloud Release
+--ud, --updateDocumentation [String]  Updating documentation repository
+--ug, --updateGuides [String]         Updating Spring Guides
 
 Examples of usage:
 
 Run 'build' &amp; 'commit' &amp; 'deploy'
-java -jar releaser.jar -b -c -d
+java -jar jar.jar -b -c -d
 
 Start from 'push'
 java -jar releaser.jar -a push
@@ -240,6 +247,12 @@ the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</liter
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.spring-cloud-release-git-url</literal> - URL to Spring Cloud Release Git repository. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-release">https://github.com/spring-cloud/spring-cloud-release</link></literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.documentation-url</literal> - URL to the documentation Git repository. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-static">https://github.com/spring-cloud/spring-cloud-static</link></literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.documentation-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
