@@ -42,6 +42,7 @@ why this tool makes it easy to automate the release / dependency update process 
 - Generates a release notes template under `target/notes.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Updates project information in Sagan (http://spring.io) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)
 - For `GA`/ `SR` release will create an issue in Spring Guides under https://github.com/spring-guides/getting-started-guides/issues/
+- For `GA`/ `SR` release will update the links under https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current
 
 IMPORTANT: Starting with version that does Sagan integration, you MUST pass the OAuth token,
 otherwise the application will fail to start
@@ -132,41 +133,45 @@ You will see a help screen looking like more or less like this
 ----
 Here you can find the list of tasks in order
 
-[updatePoms,build,commit,deploy,docs,snapshots,push,closeMilestone,createTemplates]
+[updatePoms,build,commit,deploy,docs,snapshots,push,closeMilestone,createTemplates,updateSagan,updateGuides,updateDocumentation]
 
 
-Option                          Description
-------                          -----------
--a, --start-from <String>       Starts all release task starting from the given
-                                  task. Requires passing the task name (either
-                                  one letter or the full name)
--b, --build [String]            Build the project
--c, --commit [String]           Commit, tag and push the tag
--d, --deploy [String]           Deploy the artifacts
--f, --full-release [Boolean]    Do you want to do the full release (default:
-                                  false)
+Option                                Description
+------                                -----------
+-a, --start-from <String>             Starts all release task starting from the
+                                        given task. Requires passing the task
+                                        name (either one letter or the full
+                                        name)
+-b, --build [String]                  Build the project
+-c, --commit [String]                 Commit, tag and push the tag
+-d, --deploy [String]                 Deploy the artifacts
+-f, --full-release [Boolean]          Do you want to do the full release
+                                        (default: false)
+-g, --updateSagan [String]            Updating Sagan with release info
 -h, --help [String]
--i, --interactive <Boolean>     Do you want to set the properties from the
-                                  command line (default: true)
--m, --closeMilestone [String]   Close the milestone at Github
--o, --docs [String]             Publish the docs
--p, --push [String]             Push the commits
--r, --range <String>            Runs release tasks from the given range.
-                                  Requires passing the task names with a
-                                  hyphen. The first task is inclusive, the
-                                  second inclusive. E.g. 's-m' would mean
-                                  running 'snapshot', 'push' and 'milestone'
-                                  tasks
--s, --snapshots [String]        Go back to snapshots and bump originalVersion
-                                  by patch
--t, --createTemplates [String]  Create email / blog / tweet etc. templates
--u, --updatePoms [String]       Update poms with versions from Spring Cloud
-                                  Release
+-i, --interactive <Boolean>           Do you want to set the properties from
+                                        the command line (default: true)
+-m, --closeMilestone [String]         Close the milestone at Github
+-o, --docs [String]                   Publish the docs
+-p, --push [String]                   Push the commits
+-r, --range <String>                  Runs release tasks from the given range.
+                                        Requires passing the task names with a
+                                        hyphen. The first task is inclusive,
+                                        the second inclusive. E.g. 's-m' would
+                                        mean running 'snapshot', 'push' and
+                                        'milestone' tasks
+-s, --snapshots [String]              Go back to snapshots and bump
+                                        originalVersion by patch
+-t, --createTemplates [String]        Create email / blog / tweet etc. templates
+-u, --updatePoms [String]             Update poms with versions from Spring
+                                        Cloud Release
+--ud, --updateDocumentation [String]  Updating documentation repository
+--ug, --updateGuides [String]         Updating Spring Guides
 
 Examples of usage:
 
 Run 'build' & 'commit' & 'deploy'
-java -jar releaser.jar -b -c -d
+java -jar jar.jar -b -c -d
 
 Start from 'push'
 java -jar releaser.jar -a push
@@ -224,8 +229,11 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 
 - `releaser.fixed-versions` - A String to String mapping of manually set versions. E.g. `"spring-cloud-cli" -> "1.0.0.RELEASE"` will set
 the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in `spring-cloud-release` project. Example `--releaser.fixed-versions[spring-cloud-cli]=1.0.0.RELEASE`.
+- `releaser.git.fetch-versions-from-git` - If `true` then should fill the map of versions from Git. If `false` then picks fixed versions
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
 - `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
+- `releaser.git.documentation-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-static`
+- `releaser.git.documentation-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
 - `releaser.git.username` - Optional Git username. If not passed keys will be used for authentication.
 - `releaser.git.password` - Optional Git password. If not passed keys will be used for authentication.

@@ -20,9 +20,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
-import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
@@ -48,6 +48,7 @@ public class AcceptanceTests {
 	TestPomReader testPomReader = new TestPomReader();
 	File springCloudConsulProject;
 	File temporaryFolder;
+	File documentationFolder;
 	TestProjectGitHandler gitHandler;
 	SaganClient saganClient = Mockito.mock(SaganClient.class);
 	ReleaserProperties releaserProperties;
@@ -158,6 +159,9 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganClient).should(BDDMockito.never())
 				.deleteRelease("spring-cloud-build", "2.0.0.M8");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
+		then(text(new File(this.documentationFolder, "current/index.html")))
+				.doesNotContain("Angel.SR3")
+				.contains("Camden.SR5");
 	}
 
 	// issue #74
@@ -200,6 +204,9 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganClient).should(BDDMockito.never())
 				.deleteRelease("spring-cloud-build", "2.0.0.M8");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
+		then(text(new File(this.documentationFolder, "current/index.html")))
+				.doesNotContain("Angel.SR3")
+				.contains("Camden.SR5");
 	}
 
 	@Test
@@ -245,6 +252,9 @@ public class AcceptanceTests {
 				.deleteRelease("spring-cloud-consul","1.2.0.RC1");
 		// we update guides only for SR / RELEASE
 		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
+		// haven't even checked out the branch
+		then(new File(this.documentationFolder, "current/index.html"))
+				.doesNotExist();
 	}
 
 	@Test
@@ -391,8 +401,16 @@ public class AcceptanceTests {
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
 		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient);
+		DocumentationUpdater documentationUpdater = new DocumentationUpdater(handler) {
+			@Override public File updateDocsRepo(ProjectVersion currentProject,
+					String springCloudReleaseBranch) {
+				File file = super.updateDocsRepo(currentProject, springCloudReleaseBranch);
+				documentationFolder = file;
+				return file;
+			}
+		};
 		Releaser releaser = new Releaser(pomUpdater, projectBuilder, handler,
-				templateGenerator, gradleUpdater, saganUpdater);
+				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater);
 		this.gitHandler = handler;
 		return releaser;
 	}
@@ -400,6 +418,7 @@ public class AcceptanceTests {
 	private ReleaserProperties releaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
 		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
+		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static-angel/").toURI().getPath());
 		releaserProperties.getPom().setBranch(branch);
 		releaserProperties.setWorkingDir(project.getPath());
 		releaserProperties.getMaven().setBuildCommand("echo build");
@@ -412,6 +431,7 @@ public class AcceptanceTests {
 	private ReleaserProperties snapshotScReleaseReleaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = releaserProperties(project, branch);
 		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release-with-snapshot/").toURI().getPath());
+		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().getPath());
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}
@@ -452,5 +472,9 @@ public class AcceptanceTests {
 
 	private File file(String relativePath) throws URISyntaxException {
 		return new File(AcceptanceTests.class.getResource(relativePath).toURI());
+	}
+
+	private String text(File file) throws IOException {
+		return new String(Files.readAllBytes(file.toPath()));
 	}
 }

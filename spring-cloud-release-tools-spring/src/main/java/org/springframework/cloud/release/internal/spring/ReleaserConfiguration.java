@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal.spring;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.options.Parser;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
@@ -39,7 +40,8 @@ class ReleaserConfiguration {
 		SaganUpdater saganUpdater = new SaganUpdater(saganClient);
 		return new SpringReleaser(new Releaser(pomUpdater, new ProjectBuilder(properties),
 				handler, new TemplateGenerator(properties, handler),
-				new GradleUpdater(properties), saganUpdater), properties);
+				new GradleUpdater(properties), saganUpdater,
+				new DocumentationUpdater(handler)), properties);
 	}
 
 	@Bean Parser optionsParser() {

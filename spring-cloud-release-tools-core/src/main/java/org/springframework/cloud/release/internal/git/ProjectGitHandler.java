@@ -50,22 +50,35 @@ public class ProjectGitHandler {
 	}
 
 	public void commitAfterBumpingVersions(File project, ProjectVersion version) {
-		GitRepo gitRepo = gitRepo(project);
 		if (version.isSnapshot()) {
 			log.info("Snapshot version [{}] found. Will only commit the changed poms", version);
-			gitRepo.commit(project, String.format(POST_RELEASE_BUMP_MSG, version.bumpedVersion()));
+			commit(project, String.format(POST_RELEASE_BUMP_MSG, version.bumpedVersion()));
 		} else {
 			log.info("Non snapshot version [{}] found. Won't do anything", version);
 		}
 	}
 
+	public void commit(File project, String message) {
+		GitRepo gitRepo = gitRepo(project);
+		gitRepo.commit(project, message);
+	}
+
 	public File cloneScReleaseProject() {
+		return cloneProject(this.properties.getGit().getSpringCloudReleaseGitUrl());
+	}
+
+	public File cloneDocumentationProject() {
+		File clonedProject = cloneProject(this.properties.getGit().getDocumentationUrl());
+		checkout(clonedProject, this.properties.getGit().getDocumentationBranch());
+		return clonedProject;
+	}
+
+	private File cloneProject(String url) {
 		try {
 			File destinationDir = properties.getGit().getCloneDestinationDir() != null ?
 					new File(properties.getGit().getCloneDestinationDir()) :
 					Files.createTempDirectory("releaser").toFile();
-			return gitRepo(destinationDir).cloneProject(
-					URI.create(this.properties.getGit().getSpringCloudReleaseGitUrl()));
+			return gitRepo(destinationDir).cloneProject(URI.create(url));
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -73,7 +86,6 @@ public class ProjectGitHandler {
 
 	public void checkout(File project, String branch) {
 		gitRepo(project).checkout(project, branch);
-
 	}
 
 	public void revertChangesIfApplicable(File project, ProjectVersion version) {

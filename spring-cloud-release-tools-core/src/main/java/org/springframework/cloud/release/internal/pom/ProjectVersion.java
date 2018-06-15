@@ -79,6 +79,10 @@ public class ProjectVersion {
 		return this.version.contains("RELEASE");
 	}
 
+	public boolean isReleaseOrServiceRelease() {
+		return isRelease() || isServiceRelease();
+	}
+
 	public boolean isServiceRelease() {
 		return this.version.matches(".*.SR[0-9]+");
 	}

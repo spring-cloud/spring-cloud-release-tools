@@ -146,6 +146,19 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_return_true_when_checking_ga_version_against_ga() {
+		then(projectVersion("1.0.1.RELEASE").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("1.0.1.SR1").isReleaseOrServiceRelease()).isTrue();
+	}
+
+	@Test
+	public void should_return_False_when_checking_ga_version_against_non_ga() {
+		then(projectVersion("1.0.1.BUILD-SNAPSHOT").isReleaseOrServiceRelease()).isFalse();
+		then(projectVersion("1.0.1.M4").isReleaseOrServiceRelease()).isFalse();
+		then(projectVersion("1.0.1.RC4").isReleaseOrServiceRelease()).isFalse();
+	}
+
+	@Test
 	public void should_return_false_when_checking_rc_version_against_non_rc() {
 		String version = "1.0.1.M1";
 

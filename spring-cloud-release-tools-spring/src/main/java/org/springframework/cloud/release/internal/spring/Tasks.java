@@ -64,6 +64,12 @@ class Tasks {
 			args -> {
 				args.releaser.updateSagan(args.project, args.versionFromScRelease);
 	});
+	static Task UPDATE_DOCUMENTATION = task("updateDocumentation", "ud",
+			"UPDATE DOCUMENTATION",
+			"Updating documentation repository",
+			args -> {
+				args.releaser.updateDocumentationRepository(args.properties, args.versionFromScRelease);
+	});
 
 	static final List<Task> DEFAULT_TASKS = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -76,7 +82,8 @@ class Tasks {
 			Tasks.CLOSE_MILESTONE,
 			Tasks.CREATE_TEMPLATES,
 			Tasks.UPDATE_SAGAN,
-			Tasks.UPDATE_GUIDES
+			Tasks.UPDATE_GUIDES,
+			Tasks.UPDATE_DOCUMENTATION
 	).collect(Collectors.toList());
 
 	static Task RELEASE = Tasks.task("release", "r",

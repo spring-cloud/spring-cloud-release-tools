@@ -1,12 +1,11 @@
 package org.springframework.cloud.release.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
@@ -32,16 +31,19 @@ public class Releaser {
 	private final TemplateGenerator templateGenerator;
 	private final GradleUpdater gradleUpdater;
 	private final SaganUpdater saganUpdater;
+	private final DocumentationUpdater documentationUpdater;
 
 	public Releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
 			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
-			GradleUpdater gradleUpdater, SaganUpdater saganUpdater) {
+			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
+			DocumentationUpdater documentationUpdater) {
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectBuilder = projectBuilder;
 		this.projectGitHandler = projectGitHandler;
 		this.templateGenerator = templateGenerator;
 		this.gradleUpdater = gradleUpdater;
 		this.saganUpdater = saganUpdater;
+		this.documentationUpdater = documentationUpdater;
 	}
 
 	public Projects retrieveVersionsFromSCRelease() {
@@ -174,7 +176,17 @@ public class Releaser {
 			this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
 			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 		} catch (Exception e) {
-			log.warn("\nUnable to update Sagan for branch ["+ currentBranch+ "]", e);
+			log.warn("\nUnable to update Sagan for branch ["+ currentBranch + "]", e);
+		}
+	}
+
+	public void updateDocumentationRepository(ReleaserProperties properties, ProjectVersion releaseVersion) {
+		String releaseBranch = properties.getPom().getBranch();
+		try {
+			this.documentationUpdater.updateDocsRepo(releaseVersion, releaseBranch);
+			log.info("\nSuccessfully updated documentation repository for branch [{}]", releaseBranch);
+		} catch (Exception e) {
+			log.warn("\nUnable to update documentation repository for branch ["+ releaseBranch + "]", e);
 		}
 	}
 }

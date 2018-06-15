@@ -10,6 +10,7 @@ public class TestUtils {
 	public static void prepareLocalRepo() throws IOException {
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-release");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-consul");
+		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-static");
 	}
 
 	private static void prepareLocalRepo(String buildDir, String repoPath) throws IOException {

@@ -117,7 +117,7 @@ class GitRepo {
 	 */
 	void checkout(File project, String branch) {
 		try {
-			log.info("Checking out branch [{}] for repo [{}] to [{}]", this.basedir, branch);
+			log.info("Checking out branch [{}] for repo [{}]", branch, this.basedir);
 			checkoutBranch(project, branch);
 			log.info("Successfully checked out the branch [{}]", branch);
 		}

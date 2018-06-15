@@ -55,6 +55,16 @@ public class ReleaserProperties {
 		private String springCloudReleaseGitUrl = "https://github.com/spring-cloud/spring-cloud-release";
 
 		/**
+		 * URL to the documentation Git repository
+		 */
+		private String documentationUrl = "https://github.com/spring-cloud/spring-cloud-static";
+
+		/**
+		 * Branch to check out for the documentation project
+		 */
+		private String documentationBranch = "gh-pages";
+
+		/**
 		 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
 		 */
 		private String cloneDestinationDir;
@@ -91,6 +101,22 @@ public class ReleaserProperties {
 
 		public void setSpringCloudReleaseGitUrl(String springCloudReleaseGitUrl) {
 			this.springCloudReleaseGitUrl = springCloudReleaseGitUrl;
+		}
+
+		public String getDocumentationUrl() {
+			return this.documentationUrl;
+		}
+
+		public void setDocumentationUrl(String documentationUrl) {
+			this.documentationUrl = documentationUrl;
+		}
+
+		public String getDocumentationBranch() {
+			return this.documentationBranch;
+		}
+
+		public void setDocumentationBranch(String documentationBranch) {
+			this.documentationBranch = documentationBranch;
 		}
 
 		public String getCloneDestinationDir() {

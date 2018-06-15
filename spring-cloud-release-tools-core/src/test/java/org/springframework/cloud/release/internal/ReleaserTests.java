@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
@@ -38,6 +39,7 @@ public class ReleaserTests {
 	@Mock TemplateGenerator templateGenerator;
 	@Mock GradleUpdater gradleUpdater;
 	@Mock SaganUpdater saganUpdater;
+	@Mock DocumentationUpdater documentationUpdater;
 	@Rule public OutputCapture outputCapture = new OutputCapture();
 	File pom;
 
@@ -50,7 +52,7 @@ public class ReleaserTests {
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
 				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater) {
+				this.saganUpdater, this.documentationUpdater) {
 			@Override ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
 			}
@@ -60,7 +62,7 @@ public class ReleaserTests {
 	Releaser releaser() {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
 				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater);
+				this.saganUpdater, this.documentationUpdater);
 	}
 
 	@Test
