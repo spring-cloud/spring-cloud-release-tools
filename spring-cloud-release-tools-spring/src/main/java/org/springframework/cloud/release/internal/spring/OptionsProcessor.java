@@ -33,7 +33,7 @@ class OptionsProcessor {
 	}
 
 	void processOptions(Options options, Args defaultArgs) {
-		Args args = args(defaultArgs, options.interactive);
+		Args args = args(defaultArgs, options.interactive, true);
 		if (options.fullRelease && !options.interactive) {
 			log.info("Executing a full release in non-interactive mode");
 			releaseTask().execute(args);
@@ -51,6 +51,15 @@ class OptionsProcessor {
 		} else {
 			throw new IllegalStateException("You haven't picked any recognizable option");
 		}
+	}
+
+	void postReleaseOptions(Options options, Args defaultArgs) {
+		Args args = args(defaultArgs, options.interactive, false);
+		postReleaseTask().execute(args);
+	}
+
+	Task postReleaseTask() {
+		return Tasks.POST_RELEASE;
 	}
 
 	Task releaseTask() {
@@ -144,7 +153,7 @@ class OptionsProcessor {
 			interactive = true;
 		}
 		log.info("\n\n\nYou chose [{}]: [{}]\n\n\n", chosenOption, task.description);
-		task.execute(args(defaultArgs, interactive));
+		task.execute(args(defaultArgs, interactive, true));
 	}
 
 	private void tasksInteractive(Args defaultArgs, String input) {
@@ -169,9 +178,9 @@ class OptionsProcessor {
 		range(firstName + "-" + second, defaultArgs);
 	}
 
-	private Args args(Args defaultArgs, boolean interactive) {
+	private Args args(Args defaultArgs, boolean interactive, boolean assertMetaRelease) {
 		return new Args(this.releaser, defaultArgs.project, defaultArgs.projects,
-				defaultArgs.originalVersion, defaultArgs.versionFromScRelease, this.properties, interactive);
+				defaultArgs.originalVersion, defaultArgs.versionFromScRelease, this.properties, interactive, assertMetaRelease);
 	}
 
 	String chosenOption() {

@@ -2,7 +2,6 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.cloud.release.internal.sagan.Project;
 
 /**
  * Releaser that gets input from console
@@ -24,6 +22,7 @@ import org.springframework.cloud.release.internal.sagan.Project;
  */
 public class SpringReleaser {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	public static final String RELEASE_TRAIN_PROJECT_NAME = "spring-cloud-release";
 
 	private final Releaser releaser;
 	private final ReleaserProperties properties;
@@ -60,9 +59,7 @@ public class SpringReleaser {
 				log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
 				processProject(options, clonedProjectFromOrg);
 			});
-			// TODO:
-			// skip the documentation etc. tasks and do them once
-			// at the end
+			this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options));
 		} else {
 			log.info("Single project release picked. Will release only the current project");
 			String workingDir = this.properties.getWorkingDir();
@@ -71,11 +68,18 @@ public class SpringReleaser {
 		}
 	}
 
+	Args postReleaseOptionsAgs(Options options) {
+		Projects projects = projectsToUpdateForFixedVersions();
+		ProjectVersion version = projects.forName(RELEASE_TRAIN_PROJECT_NAME);
+		return new Args(this.releaser, projects, version,
+				this.properties, options.interactive);
+	}
+
 	private void processProject(Options options, File project) {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		ProjectVersion versionFromScRelease;
 		Projects projectsToUpdate;
-		if (this.properties.getGit().isFetchVersionsFromGit() && !this.properties.getMetaRelease().isMetaRelease()) {
+		if (this.properties.getGit().isFetchVersionsFromGit() && !this.properties.getMetaRelease().isEnabled()) {
 			printVersionRetrieval();
 			projectsToUpdate = this.releaser.retrieveVersionsFromSCRelease();
 			versionFromScRelease = projectsToUpdate.forFile(project);
@@ -93,6 +97,14 @@ public class SpringReleaser {
 		final Args defaultArgs = new Args(this.releaser, project, projectsToUpdate,
 				originalVersion, versionFromScRelease, this.properties, options.interactive);
 		this.optionsProcessor.processOptions(options, defaultArgs);
+	}
+
+	private Projects projectsToUpdateForFixedVersions() {
+		Projects projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
+				.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
+				.distinct().collect(Collectors.toCollection(Projects::new));
+		printSettingVersionFromFixedVersions(projectsToUpdate);
+		return projectsToUpdate;
 	}
 
 	private void printVersionRetrieval() {

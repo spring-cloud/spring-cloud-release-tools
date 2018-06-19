@@ -10,7 +10,6 @@ import org.springframework.boot.test.rule.OutputCapture;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-import static org.junit.Assert.*;
 
 /**
  * @author Marcin Grzejszczak
@@ -25,7 +24,7 @@ public class TaskTests {
 			@Override public void accept(Args args) {
 				someBool.set(true);
 			}
-		});
+		}, TaskType.ANY);
 
 		task.execute(Mockito.mock(Args.class));
 
@@ -39,7 +38,7 @@ public class TaskTests {
 				someBool.set(true);
 				throw new RuntimeException("foooooooo");
 			}
-		});
+		}, TaskType.ANY);
 
 		thenThrownBy(() -> task.execute(Mockito.mock(Args.class)))
 				.isInstanceOf(RuntimeException.class);

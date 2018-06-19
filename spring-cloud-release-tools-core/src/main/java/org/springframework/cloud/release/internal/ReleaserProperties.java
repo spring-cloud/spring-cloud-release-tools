@@ -57,7 +57,7 @@ public class ReleaserProperties {
 		/**
 		 * Are we releasing the whole suite of apps or only one?
 		 */
-		private boolean metaRelease = false;
+		private boolean enabled = false;
 
 		/**
 		 * The URL of the Git organization. We'll append each project's
@@ -65,12 +65,12 @@ public class ReleaserProperties {
 		 */
 		private String gitOrgUrl = "https://github.com/spring-cloud";
 
-		public boolean isMetaRelease() {
-			return this.metaRelease;
+		public boolean isEnabled() {
+			return this.enabled;
 		}
 
-		public void setMetaRelease(boolean metaRelease) {
-			this.metaRelease = metaRelease;
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
 		}
 
 		public String getGitOrgUrl() {

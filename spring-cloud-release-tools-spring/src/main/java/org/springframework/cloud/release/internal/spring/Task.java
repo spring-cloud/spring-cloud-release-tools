@@ -19,16 +19,26 @@ class Task {
 	final String header;
 	final String description;
 	private final Consumer<Args> consumer;
+	final TaskType taskType;
 
-	Task(String name, String shortName, String header, String description, Consumer<Args> consumer) {
+	Task(String name, String shortName, String header, String description,
+			Consumer<Args> consumer, TaskType taskType) {
 		this.name = name;
 		this.shortName = shortName;
 		this.header = header;
 		this.description = description;
 		this.consumer = consumer;
+		this.taskType = taskType;
 	}
 
 	void execute(Args args) {
+		if (args.assertMetaRelease &&
+				args.properties.getMetaRelease().isEnabled() &&
+				this.taskType == TaskType.PER_RELEASE) {
+			printLog(false);
+			log.info("Skipping the task for a meta release [{}]", this.name);
+			return;
+		}
 		try {
 			boolean interactive = args.interactive;
 			printLog(interactive);
@@ -67,5 +77,8 @@ class Task {
 	String chosenOption() {
 		return System.console().readLine();
 	}
+}
 
+enum TaskType {
+	PER_PROJECT, PER_RELEASE, ANY
 }

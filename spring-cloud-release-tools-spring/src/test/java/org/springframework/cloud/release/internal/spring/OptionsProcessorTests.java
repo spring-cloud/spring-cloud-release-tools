@@ -245,7 +245,7 @@ public class OptionsProcessorTests {
 	}
 
 	private Args args() {
-		return new Args(null, null, null, null, null, null, false);
+		return new Args(null, null, null, null, null, null, false, false);
 	}
 
 	private List<String> list(String... list) {
@@ -253,7 +253,7 @@ public class OptionsProcessorTests {
 	}
 
 	static Task task(String name, String shortName, String header, String description, Consumer<Args> function) {
-		return new Task(name, shortName, header, description, function) {
+		return new Task(name, shortName, header, description, function, TaskType.ANY) {
 			@Override String chosenOption() {
 				return "whatever";
 			}
