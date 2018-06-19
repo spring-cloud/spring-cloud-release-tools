@@ -3,6 +3,7 @@ package org.springframework.cloud.release.internal.spring;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -50,12 +51,31 @@ public class SpringReleaser {
 	}
 
 	public void release(Options options) {
-		String workingDir = this.properties.getWorkingDir();
-		File project = new File(workingDir);
+		// if meta release, first clone, then continue as usual
+		if (options.metaRelease) {
+			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
+			Set<String> projects = this.properties.getFixedVersions().keySet();
+			projects.forEach(project -> {
+				File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
+				log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
+				processProject(options, clonedProjectFromOrg);
+			});
+			// TODO:
+			// skip the documentation etc. tasks and do them once
+			// at the end
+		} else {
+			log.info("Single project release picked. Will release only the current project");
+			String workingDir = this.properties.getWorkingDir();
+			File project = new File(workingDir);
+			processProject(options, project);
+		}
+	}
+
+	private void processProject(Options options, File project) {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		ProjectVersion versionFromScRelease;
 		Projects projectsToUpdate;
-		if (this.properties.getGit().isFetchVersionsFromGit()) {
+		if (this.properties.getGit().isFetchVersionsFromGit() && !this.properties.getMetaRelease().isMetaRelease()) {
 			printVersionRetrieval();
 			projectsToUpdate = this.releaser.retrieveVersionsFromSCRelease();
 			versionFromScRelease = projectsToUpdate.forFile(project);

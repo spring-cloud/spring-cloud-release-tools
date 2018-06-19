@@ -46,6 +46,10 @@ public class Releaser {
 		this.documentationUpdater = documentationUpdater;
 	}
 
+	public File clonedProjectFromOrg(String projectName) {
+		return this.projectGitHandler.cloneProjectFromOrg(projectName);
+	}
+
 	public Projects retrieveVersionsFromSCRelease() {
 		return this.projectPomUpdater.retrieveVersionsFromSCRelease();
 	}

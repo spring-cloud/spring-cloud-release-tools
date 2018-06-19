@@ -45,7 +45,42 @@ public class ReleaserProperties {
 
 	private Sagan sagan = new Sagan();
 
+	/**
+	 * Project name to its version - overrides all versions
+	 * retrieved from a repository like Spring Cloud Release
+	 */
 	private Map<String, String> fixedVersions = new HashMap<>();
+
+	private MetaRelease metaRelease = new MetaRelease();
+
+	public static class MetaRelease {
+		/**
+		 * Are we releasing the whole suite of apps or only one?
+		 */
+		private boolean metaRelease = false;
+
+		/**
+		 * The URL of the Git organization. We'll append each project's
+		 * name to it
+		 */
+		private String gitOrgUrl = "https://github.com/spring-cloud";
+
+		public boolean isMetaRelease() {
+			return this.metaRelease;
+		}
+
+		public void setMetaRelease(boolean metaRelease) {
+			this.metaRelease = metaRelease;
+		}
+
+		public String getGitOrgUrl() {
+			return this.gitOrgUrl;
+		}
+
+		public void setGitOrgUrl(String gitOrgUrl) {
+			this.gitOrgUrl = gitOrgUrl;
+		}
+	}
 
 	public static class Git {
 
@@ -386,6 +421,14 @@ public class ReleaserProperties {
 
 	public void setFixedVersions(Map<String, String> fixedVersions) {
 		this.fixedVersions = fixedVersions;
+	}
+
+	public MetaRelease getMetaRelease() {
+		return this.metaRelease;
+	}
+
+	public void setMetaRelease(MetaRelease metaRelease) {
+		this.metaRelease = metaRelease;
 	}
 
 	public Sagan getSagan() {

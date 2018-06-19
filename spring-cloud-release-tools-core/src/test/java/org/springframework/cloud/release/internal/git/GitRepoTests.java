@@ -70,7 +70,7 @@ public class GitRepoTests {
 	@Test
 	public void should_check_out_a_branch_on_cloned_repo() throws IOException {
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
-		this.gitRepo.checkout(project, "vCamden.SR3");
+		new GitRepo(project).checkout("vCamden.SR3");
 
 		File pom = new File(this.tmpFolder, "pom.xml");
 		then(pom).exists();
@@ -80,7 +80,7 @@ public class GitRepoTests {
 	@Test
 	public void should_check_out_a_branch_on_cloned_repo2() throws IOException {
 		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
-		this.gitRepo.checkout(project, "Camden.x");
+		new GitRepo(project).checkout("Camden.x");
 
 		File pom = new File(this.tmpFolder, "pom.xml");
 		then(pom).exists();
@@ -88,10 +88,24 @@ public class GitRepoTests {
 	}
 
 	@Test
+	public void should_return_true_if_branch_exists() throws IOException {
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
+
+		then(new GitRepo(project).hasBranch("Camden.x")).isTrue();
+	}
+
+	@Test
+	public void should_return_false_if_branch_does_not_exist() throws IOException {
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
+
+		then(new GitRepo(project).hasBranch("aksjdhkasjkajshd")).isFalse();
+	}
+
+	@Test
 	public void should_throw_an_exception_when_checking_out_nonexisting_branch() throws IOException {
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		try {
-			this.gitRepo.checkout(project, "nonExistingBranch");
+			new GitRepo(project).checkout("nonExistingBranch");
 			fail("should throw an exception");
 		} catch (IllegalStateException e) {
 			then(e).hasMessageContaining("Ref nonExistingBranch can not be resolved");
@@ -100,10 +114,10 @@ public class GitRepoTests {
 
 	@Test
 	public void should_commit_changes() throws Exception {
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		createNewFile(project);
 
-		this.gitRepo.commit(project, "some message");
+		new GitRepo(project).commit("some message");
 
 		try(Git git = openGitProject(project)) {
 			RevCommit revCommit = git.log().call().iterator().next();
@@ -113,11 +127,11 @@ public class GitRepoTests {
 
 	@Test
 	public void should_not_commit_empty_changes() throws Exception {
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		createNewFile(project);
-		this.gitRepo.commit(project, "some message");
+		new GitRepo(project).commit("some message");
 
-		this.gitRepo.commit(project, "empty commit");
+		new GitRepo(project).commit("empty commit");
 
 		try(Git git = openGitProject(project)) {
 			RevCommit revCommit = git.log().call().iterator().next();
@@ -127,11 +141,11 @@ public class GitRepoTests {
 
 	@Test
 	public void should_create_a_tag() throws Exception {
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		createNewFile(project);
-		this.gitRepo.commit(project, "some message");
+		new GitRepo(project).commit("some message");
 
-		this.gitRepo.tag(project, "v1.0.0");
+		new GitRepo(project).tag("v1.0.0");
 
 		try(Git git = openGitProject(project)) {
 			tagIsPresent(git, "v1.0.0");
@@ -147,12 +161,12 @@ public class GitRepoTests {
 	@Test
 	public void should_push_changes_to_master_branch() throws Exception {
 		File origin = clonedProject(this.tmp.newFolder(), this.springCloudReleaseProject);
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
-		this.gitRepo.commit(project, "some message");
+		new GitRepo(project).commit("some message");
 
-		this.gitRepo.pushBranch(project, "master");
+		new GitRepo(project).pushBranch("master");
 
 		try(Git git = openGitProject(origin)) {
 			RevCommit revCommit = git.log().call().iterator().next();
@@ -163,12 +177,12 @@ public class GitRepoTests {
 	@Test
 	public void should_push_changes_to_current_branch() throws Exception {
 		File origin = clonedProject(this.tmp.newFolder(), this.springCloudReleaseProject);
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
-		this.gitRepo.commit(project, "some message");
+		new GitRepo(project).commit("some message");
 
-		this.gitRepo.pushCurrentBranch(project);
+		new GitRepo(project).pushCurrentBranch();
 
 		try(Git git = openGitProject(origin)) {
 			RevCommit revCommit = git.log().call().iterator().next();
@@ -179,11 +193,11 @@ public class GitRepoTests {
 	@Test
 	public void should_return_the_branch_name() throws Exception {
 		File origin = clonedProject(this.tmp.newFolder(), this.springCloudReleaseProject);
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
 
-		String branch = this.gitRepo.currentBranch(project);
+		String branch = new GitRepo(project).currentBranch();
 
 		then(branch).isEqualTo("master");
 	}
@@ -191,13 +205,13 @@ public class GitRepoTests {
 	@Test
 	public void should_push_a_tag_to_new_branch_in_origin() throws Exception {
 		File origin = clonedProject(this.tmp.newFolder(), this.springCloudReleaseProject);
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
-		this.gitRepo.commit(project, "some message");
-		this.gitRepo.tag(project, "v5.6.7.RELEASE");
+		new GitRepo(project).commit("some message");
+		new GitRepo(project).tag("v5.6.7.RELEASE");
 
-		this.gitRepo.pushTag(project, "v5.6.7.RELEASE");
+		new GitRepo(project).pushTag("v5.6.7.RELEASE");
 
 		try(Git git = openGitProject(origin)) {
 			tagIsPresent(git, "v5.6.7");
@@ -225,12 +239,12 @@ public class GitRepoTests {
 
 	@Test
 	public void should_revert_changes() throws Exception {
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(this.tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 		File foo = new File(project, "foo");
 		foo.createNewFile();
-		this.gitRepo.commit(project, "Update SNAPSHOT to 1.0.0.RC1");
+		new GitRepo(project).commit("Update SNAPSHOT to 1.0.0.RC1");
 
-		this.gitRepo.revert(project, "Reverting the commit");
+		new GitRepo(project).revert("Reverting the commit");
 
 		try(Git git = openGitProject(project)) {
 			RevCommit revCommit = git.log().call().iterator().next();
@@ -240,10 +254,10 @@ public class GitRepoTests {
 
 	@Test
 	public void should_not_revert_changes_when_commit_message_is_not_related_to_updating_snapshots() throws Exception {
-		File project = this.gitRepo.cloneProject(this.springCloudReleaseProject.toURI());
+		File project = new GitRepo(tmpFolder).cloneProject(this.springCloudReleaseProject.toURI());
 
 		BDDAssertions.thenThrownBy(
-				() -> this.gitRepo.revert(project, "some message"))
+				() -> new GitRepo(project).revert("some message"))
 						.hasMessageContaining("Won't revert the commit with id");
 	}
 
