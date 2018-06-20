@@ -51,6 +51,15 @@ public class SCReleasePomParserTests {
 	}
 
 	@Test
+	public void should_populate_sc_release_version() {
+		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject);
+
+		String scReleaseVersion = parser.allVersions().versionForProject("spring-cloud-release");
+
+		then(scReleaseVersion).isEqualTo("Dalston.BUILD-SNAPSHOT");
+	}
+
+	@Test
 	public void should_populate_boot_version() {
 		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject);
 

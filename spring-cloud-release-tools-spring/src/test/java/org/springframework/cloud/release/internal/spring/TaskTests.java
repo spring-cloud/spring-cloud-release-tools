@@ -24,23 +24,21 @@ public class TaskTests {
 			@Override public void accept(Args args) {
 				someBool.set(true);
 			}
-		}, TaskType.ANY);
+		});
 
-		task.execute(Mockito.mock(Args.class));
+		task.execute(new Args(TaskType.RELEASE));
 
 		then(someBool.get()).isTrue();
 	}
 
 	@Test public void should_fail_with_nice_text_on_exception() {
 		final AtomicBoolean someBool = new AtomicBoolean();
-		Task task = new Task("foo", "bar", "baz", "descr", new Consumer<Args>() {
-			@Override public void accept(Args args) {
-				someBool.set(true);
-				throw new RuntimeException("foooooooo");
-			}
-		}, TaskType.ANY);
+		Task task = new Task("foo", "bar", "baz", "descr", args -> {
+			someBool.set(true);
+			throw new RuntimeException("foooooooo");
+		});
 
-		thenThrownBy(() -> task.execute(Mockito.mock(Args.class)))
+		thenThrownBy(() -> task.execute(new Args(TaskType.RELEASE)))
 				.isInstanceOf(RuntimeException.class);
 		then(someBool.get()).isTrue();
 		then(this.capture.toString())

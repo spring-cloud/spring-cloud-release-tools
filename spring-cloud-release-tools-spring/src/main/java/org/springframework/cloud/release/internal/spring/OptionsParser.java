@@ -35,7 +35,7 @@ class OptionsParser implements Parser {
 					.acceptsAll(Arrays.asList("i", "interactive"),
 							"Do you want to set the properties from the command line of a single project?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(true);
-			Tasks.ALL_TASKS.forEach(task ->
+			Tasks.NON_COMPOSITE_TASKS.forEach(task ->
 					parser.acceptsAll(Arrays.asList(task.shortName, task.name),
 							task.description)
 							.withOptionalArg());
@@ -56,7 +56,7 @@ class OptionsParser implements Parser {
 			Boolean metaRelease = options.valueOf(metaReleaseOpt);
 			Boolean interactive = options.valueOf(interactiveOpt);
 			Boolean fullRelease = options.has(fullReleaseOpt);
-			List<String> taskNames = Tasks.ALL_TASKS.stream()
+			List<String> taskNames = Tasks.NON_COMPOSITE_TASKS.stream()
 					.filter(task -> options.has(task.name)).map(task -> task.name)
 					.collect(Collectors.toList());
 			String startFrom = options.valueOf(startFromOpt);
@@ -100,7 +100,7 @@ class OptionsParser implements Parser {
 	}
 
 	private String intro() {
-		return "\nHere you can find the list of tasks in order\n\n[" + Tasks.tasksInOrder() + "]\n\n";
+		return "\nHere you can find the list of tasks in order\n\n[" + Tasks.allTasksInOrder() + "]\n\n";
 	}
 
 	private String examples() {

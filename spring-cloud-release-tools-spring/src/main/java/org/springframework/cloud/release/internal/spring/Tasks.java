@@ -15,74 +15,62 @@ class Tasks {
 	static Task UPDATING_POMS = task("updatePoms", "u",
 			"UPDATING POMS",
 			"Update poms with versions from Spring Cloud Release",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.updateProjectFromScRelease(args.project, args.projects, args.versionFromScRelease));
 	static Task BUILD_PROJECT = task("build", "b",
 			"BUILD PROJECT",
 			"Build the project",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.buildProject(args.versionFromScRelease));
 	static Task COMMIT = task("commit", "c",
 			"COMMITTING (ALL) AND PUSHING TAGS (NON-SNAPSHOTS)",
 			"Commit, tag and push the tag",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.commitAndPushTags(args.project, args.versionFromScRelease));
 	static Task DEPLOY = task("deploy", "d",
 			"ARTIFACT DEPLOYMENT",
 			"Deploy the artifacts",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.deploy(args.versionFromScRelease));
 	static Task PUBLISH_DOCS = task("docs", "o",
 			"PUBLISHING DOCS",
 			"Publish the docs",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.publishDocs(args.versionFromScRelease));
 	static Task SNAPSHOTS = task("snapshots", "s",
 			"REVERTING CHANGES & BUMPING VERSION (RELEASE ONLY)",
 			"Go back to snapshots and bump originalVersion by patch",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.rollbackReleaseVersion(args.project, args.projects, args.versionFromScRelease));
 	static Task PUSH = task("push", "p",
 			"PUSHING CHANGES",
 			"Push the commits",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.pushCurrentBranch(args.project));
 	static Task CLOSE_MILESTONE = task("closeMilestone", "m",
 			"CLOSING MILESTONE",
 			"Close the milestone at Github",
-			TaskType.PER_PROJECT,
 			args -> args.releaser.closeMilestone(args.versionFromScRelease));
 	static Task CREATE_TEMPLATES = task("createTemplates", "t",
 			"CREATING TEMPLATES",
 			"Create email / blog / tweet etc. templates",
-			TaskType.PER_RELEASE,
 			args -> {
 				args.releaser.createEmail(args.versionFromScRelease);
 				args.releaser.createBlog(args.versionFromScRelease, args.projects);
 				args.releaser.createTweet(args.versionFromScRelease);
 				args.releaser.createReleaseNotes(args.versionFromScRelease, args.projects);
-	});
+	},TaskType.POST_RELEASE);
 	static Task UPDATE_GUIDES = task("updateGuides", "ug",
 			"UPDATE GUIDES",
 			"Updating Spring Guides",
-			TaskType.PER_RELEASE,
 			args -> {
 				args.releaser.updateSpringGuides(args.versionFromScRelease, args.projects);
-	});
+	},TaskType.POST_RELEASE);
 	static Task UPDATE_SAGAN = task("updateSagan", "g",
 			"UPDATE SAGAN",
 			"Updating Sagan with release info",
-			TaskType.PER_PROJECT,
 			args -> {
 				args.releaser.updateSagan(args.project, args.versionFromScRelease);
 	});
 	static Task UPDATE_DOCUMENTATION = task("updateDocumentation", "ud",
 			"UPDATE DOCUMENTATION",
 			"Updating documentation repository",
-			TaskType.PER_RELEASE,
 			args -> {
 				args.releaser.updateDocumentationRepository(args.properties, args.versionFromScRelease);
-	});
+	},TaskType.POST_RELEASE);
 
 	static final List<Task> DEFAULT_TASKS_PER_PROJECT = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -102,7 +90,7 @@ class Tasks {
 			Tasks.UPDATE_DOCUMENTATION
 	).collect(Collectors.toList());
 
-	static final List<Task> DEFAULT_TASKS = new ArrayList<Task>() {
+	static final List<Task> NON_COMPOSITE_TASKS = new ArrayList<Task>() {
 		{
 			addAll(DEFAULT_TASKS_PER_PROJECT);
 			addAll(DEFAULT_TASKS_PER_RELEASE);
@@ -112,30 +100,33 @@ class Tasks {
 	static Task RELEASE = Tasks.task("release", "r",
 			"FULL RELEASE",
 			"Perform a full release of this project without interruptions",
-			TaskType.ANY,
-			args -> DEFAULT_TASKS.forEach(task -> task.execute(args)));
+			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
 	static Task POST_RELEASE = Tasks.task("post-release", "pr",
 			"POST RELEASE TASKS",
 			"Perform post release tasks for this release without interruptions",
-			TaskType.ANY,
-			args -> DEFAULT_TASKS_PER_RELEASE.forEach(task -> task.execute(args)));
+			args -> DEFAULT_TASKS_PER_RELEASE.forEach(task -> task.execute(args)),
+			TaskType.POST_RELEASE);
 	static Task RELEASE_VERBOSE = Tasks.task("release-verbose", "r",
 			"FULL VERBOSE RELEASE",
 			"Perform a full release of this project in interactive mode (you'll be asked about skipping steps)",
-			TaskType.ANY,
-			args -> DEFAULT_TASKS.forEach(task -> task.execute(args)));
+			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
 
 	static final List<Task> COMPOSITE_TASKS = Stream.of(
 			RELEASE,
 			RELEASE_VERBOSE
 	).collect(Collectors.toList());
 
-	static final List<Task> ALL_TASKS = Stream.of(
-			COMPOSITE_TASKS, DEFAULT_TASKS
+	static final List<Task> ALL_TASKS_PER_PROJECT = Stream.of(
+			COMPOSITE_TASKS, DEFAULT_TASKS_PER_PROJECT, DEFAULT_TASKS_PER_RELEASE
 	).flatMap(List::stream).collect(Collectors.toList());
 
 	static Task task(String name, String shortName, String header, String description,
-			TaskType taskType, Consumer<Args> function) {
+			Consumer<Args> function) {
+		return task(name, shortName, header, description, function, TaskType.RELEASE);
+	}
+
+	static Task task(String name, String shortName, String header, String description,
+			Consumer<Args> function, TaskType taskType) {
 		return new Task(name, shortName, header, description, function, taskType);
 	}
 
@@ -145,7 +136,11 @@ class Tasks {
 				.collect(Collectors.toList());
 	}
 
-	static String tasksInOrder() {
-		return DEFAULT_TASKS.stream().map(task -> task.name).collect(Collectors.joining(","));
+	static String allTasksInOrder() {
+		return ALL_TASKS_PER_PROJECT.stream().map(task -> task.name).collect(Collectors.joining(","));
 	}
+}
+
+enum TaskType {
+	RELEASE, POST_RELEASE
 }

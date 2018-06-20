@@ -36,6 +36,15 @@ public class ProjectsTests {
 	}
 
 	@Test
+	public void should_return_true_when_a_project_by_name_exists() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("spring-cloud-starter-build", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		then(projects.containsProject("spring-cloud-starter-build")).isTrue();
+	}
+
+	@Test
 	public void should_find_projects_starting_with_name() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
 		projectVersions.add(new ProjectVersion("spring-boot-starter-build", "1.0.0"));

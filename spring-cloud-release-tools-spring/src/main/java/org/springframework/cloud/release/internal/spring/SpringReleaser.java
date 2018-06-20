@@ -50,6 +50,7 @@ public class SpringReleaser {
 	}
 
 	public void release(Options options) {
+		ProjectsAndVersion projectsAndVersion = null;
 		// if meta release, first clone, then continue as usual
 		if (options.metaRelease) {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
@@ -57,26 +58,36 @@ public class SpringReleaser {
 			projects.forEach(project -> {
 				File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
 				log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
-				processProject(options, clonedProjectFromOrg);
+				processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
 			});
-			this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options));
 		} else {
 			log.info("Single project release picked. Will release only the current project");
-			String workingDir = this.properties.getWorkingDir();
-			File project = new File(workingDir);
-			processProject(options, project);
+			File projectFolder = projectFolder();
+			projectsAndVersion = processProject(options, projectFolder, TaskType.RELEASE);
 		}
+		this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
 	}
 
-	Args postReleaseOptionsAgs(Options options) {
-		Projects projects = projectsToUpdateForFixedVersions();
-		ProjectVersion version = projects.forName(RELEASE_TRAIN_PROJECT_NAME);
+	private File projectFolder() {
+		String workingDir = this.properties.getWorkingDir();
+		return new File(workingDir);
+	}
+
+	Args postReleaseOptionsAgs(Options options, ProjectsAndVersion projectsAndVersion) {
+		Projects projects = projectsAndVersion == null ?
+				projectsToUpdateForFixedVersions() : projectsAndVersion.projectVersions;
+		ProjectVersion version = projects.containsProject(RELEASE_TRAIN_PROJECT_NAME) ?
+				projects.forName(RELEASE_TRAIN_PROJECT_NAME) : versionFromBranch();
 		return new Args(this.releaser, projects, version,
 				this.properties, options.interactive);
 	}
 
-	private void processProject(Options options, File project) {
-		ProjectVersion originalVersion = new ProjectVersion(project);
+	private ProjectVersion versionFromBranch() {
+		String branch = this.properties.getPom().getBranch();
+		return new ProjectVersion(projectFolder().getName(), branch.startsWith("v") ? branch.substring(1) : branch);
+	}
+
+	private ProjectsAndVersion projects(File project) {
 		ProjectVersion versionFromScRelease;
 		Projects projectsToUpdate;
 		if (this.properties.getGit().isFetchVersionsFromGit() && !this.properties.getMetaRelease().isEnabled()) {
@@ -85,6 +96,7 @@ public class SpringReleaser {
 			versionFromScRelease = projectsToUpdate.forFile(project);
 			assertNoSnapshotsForANonSnapshotProject(projectsToUpdate, versionFromScRelease);
 		} else {
+			ProjectVersion originalVersion = new ProjectVersion(project);
 			String fixedVersionForProject = this.properties.getFixedVersions().get(originalVersion.projectName);
 			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject == null ?
 			originalVersion.version : fixedVersionForProject);
@@ -94,9 +106,27 @@ public class SpringReleaser {
 			projectsToUpdate.add(versionFromScRelease);
 			printSettingVersionFromFixedVersions(projectsToUpdate);
 		}
-		final Args defaultArgs = new Args(this.releaser, project, projectsToUpdate,
-				originalVersion, versionFromScRelease, this.properties, options.interactive);
+		return new ProjectsAndVersion(projectsToUpdate, versionFromScRelease);
+	}
+
+	class ProjectsAndVersion {
+		final Projects projectVersions;
+		final ProjectVersion versionFromScRelease;
+
+		ProjectsAndVersion(Projects projectVersions, ProjectVersion versionFromScRelease) {
+			this.projectVersions = projectVersions;
+			this.versionFromScRelease = versionFromScRelease;
+		}
+	}
+
+	private ProjectsAndVersion processProject(Options options, File project, TaskType taskType) {
+		ProjectsAndVersion projectsAndVersion = projects(project);
+		ProjectVersion originalVersion = new ProjectVersion(project);
+		final Args defaultArgs = new Args(this.releaser, project, projectsAndVersion.projectVersions,
+				originalVersion, projectsAndVersion.versionFromScRelease, this.properties,
+				options.interactive, taskType);
 		this.optionsProcessor.processOptions(options, defaultArgs);
+		return projectsAndVersion;
 	}
 
 	private Projects projectsToUpdateForFixedVersions() {

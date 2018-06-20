@@ -23,7 +23,7 @@ class OptionsProcessor {
 	private final List<Task> allTasks;
 
 	OptionsProcessor(Releaser releaser, ReleaserProperties properties) {
-		this(releaser, properties, Tasks.ALL_TASKS);
+		this(releaser, properties, Tasks.ALL_TASKS_PER_PROJECT);
 	}
 
 	OptionsProcessor(Releaser releaser, ReleaserProperties properties, List<Task> allTasks) {
@@ -33,29 +33,54 @@ class OptionsProcessor {
 	}
 
 	void processOptions(Options options, Args defaultArgs) {
-		Args args = args(defaultArgs, options.interactive, true);
+		processOptions(options, defaultArgs, this.allTasks);
+	}
+
+	void processOptions(Options options, Args defaultArgs, List<Task> tasks) {
+		Args args = args(defaultArgs, options.interactive);
+		if (args.taskType == TaskType.POST_RELEASE) {
+			String chosenOption = chosenOption();
+			int pickedInteger = Integer.parseInt(chosenOption);
+			boolean pickedOptionIsComposite = pickedInteger < 1;
+			boolean pickedOptionIsFromPostRelease = pickedInteger >= Tasks.ALL_TASKS_PER_PROJECT.size()
+					- Tasks.DEFAULT_TASKS_PER_RELEASE.size();
+			if (options.fullRelease || pickedOptionIsComposite) {
+				postReleaseTask().execute(args);
+			} else if (pickedOptionIsFromPostRelease) {
+				processNonComposite(options, tasks, args);
+			} else {
+				log.info("Picked option [{}] doesn't allow post release steps", pickedInteger);
+			}
+			return;
+		}
 		if (options.fullRelease && !options.interactive) {
 			log.info("Executing a full release in non-interactive mode");
 			releaseTask().execute(args);
 		} else if (options.fullRelease && options.interactive) {
 			log.info("Executing a full release in interactive mode");
 			releaseVerboseTask().execute(args);
-		} else if (StringUtils.hasText(options.startFrom)) {
-			startFrom(options, args);
+		} else {
+			processNonComposite(options, tasks, args);
+		}
+	}
+
+	private void processNonComposite(Options options, List<Task> tasks, Args args) {
+		if (StringUtils.hasText(options.startFrom)) {
+			startFrom(tasks, options, args);
 		} else if (StringUtils.hasText(options.range)) {
-			range(options.range, args);
+			range(tasks, options.range, args);
 		} else if (!options.taskNames.isEmpty()) {
-			tasks(options.taskNames, args);
+			tasks(tasks, options.taskNames, args);
 		} else if (options.interactive) {
-			interactiveOnly(args);
+			interactiveOnly(tasks, args);
 		} else {
 			throw new IllegalStateException("You haven't picked any recognizable option");
 		}
 	}
 
 	void postReleaseOptions(Options options, Args defaultArgs) {
-		Args args = args(defaultArgs, options.interactive, false);
-		postReleaseTask().execute(args);
+		Args args = args(defaultArgs, options.interactive);
+		processOptions(options, args);
 	}
 
 	Task postReleaseTask() {
@@ -70,16 +95,18 @@ class OptionsProcessor {
 		return Tasks.RELEASE_VERBOSE;
 	}
 
-	private void interactiveOnly(Args defaultArgs) {
-		log.info(buildOptionsText().toString());
-		executeTaskFromOption(defaultArgs);
+	private void interactiveOnly(List<Task> tasks, Args defaultArgs) {
+		if (defaultArgs.taskType != TaskType.POST_RELEASE) {
+			log.info(buildOptionsText().toString());
+		}
+		executeTaskFromOption(tasks, defaultArgs);
 	}
 
-	private void tasks(List<String> taskNames, Args defaultArgs) {
-		Tasks.forNames(this.allTasks, taskNames).forEach(task -> task.execute(defaultArgs));
+	private void tasks(List<Task> tasks, List<String> taskNames, Args defaultArgs) {
+		Tasks.forNames(tasks, taskNames).forEach(task -> task.execute(defaultArgs));
 	}
 
-	private void range(String range, Args defaultArgs) {
+	private void range(List<Task> tasks, String range, Args defaultArgs) {
 		String[] splitRange = range.split("-");
 		String start = splitRange[0];
 		String stop = "";
@@ -88,7 +115,7 @@ class OptionsProcessor {
 		}
 		boolean started = false;
 		boolean sameRange = start.equals(stop);
-		for (Task task : this.allTasks) {
+		for (Task task : tasks) {
 			if (start.equals(task.name) || start.equals(task.shortName)) {
 				started = true;
 				task.execute(defaultArgs);
@@ -104,9 +131,9 @@ class OptionsProcessor {
 		}
 	}
 
-	private void startFrom(Options options, Args defaultArgs) {
+	private void startFrom(List<Task> tasks, Options options, Args defaultArgs) {
 		boolean started = false;
-		for (Task task : this.allTasks) {
+		for (Task task : tasks) {
 			if (options.startFrom.equals(task.name) || options.startFrom.equals(task.shortName)) {
 				started = true;
 				task.execute(defaultArgs);
@@ -129,58 +156,59 @@ class OptionsProcessor {
 		return msg;
 	}
 
-	void executeTaskFromOption(Args defaultArgs) {
+	void executeTaskFromOption(List<Task> tasks, Args defaultArgs) {
 		String input = chosenOption();
 		switch (input.toLowerCase()) {
 		case "q":
 			System.exit(0);
 		default:
 			if (input.contains("-")) {
-				rangeInteractive(defaultArgs, input);
+				rangeInteractive(tasks, defaultArgs, input);
 			} else if (input.contains(",")) {
-				tasksInteractive(defaultArgs, input);
+				tasksInteractive(tasks, defaultArgs, input);
 			} else {
-				singleTask(defaultArgs, input);
+				singleTask(tasks, defaultArgs, input);
 			}
 		}
 	}
 
-	private void singleTask(Args defaultArgs, String input) {
+	private void singleTask(List<Task> tasks, Args defaultArgs, String input) {
 		int chosenOption = Integer.parseInt(input);
-		Task task = this.allTasks.get(chosenOption);
+		Task task = tasks.get(chosenOption);
 		boolean interactive = false;
 		if (task == Tasks.RELEASE_VERBOSE) {
 			interactive = true;
 		}
 		log.info("\n\n\nYou chose [{}]: [{}]\n\n\n", chosenOption, task.description);
-		task.execute(args(defaultArgs, interactive, true));
+		task.execute(args(defaultArgs, interactive));
 	}
 
-	private void tasksInteractive(Args defaultArgs, String input) {
-		List<String> tasks = Arrays.asList(input.split(","));
+	private void tasksInteractive(List<Task> tasks, Args defaultArgs, String input) {
+		List<String> tasksFromInput = Arrays.asList(input.split(","));
 		List<String> taskNames = new ArrayList<>();
-		for (String task : tasks) {
+		for (String task : tasksFromInput) {
 			Integer taskIndex = Integer.valueOf(task);
-			taskNames.add(this.allTasks.get(taskIndex).name);
+			taskNames.add(tasks.get(taskIndex).name);
 		}
-		tasks(taskNames, defaultArgs);
+		tasks(tasks, taskNames, defaultArgs);
 	}
 
-	private void rangeInteractive(Args defaultArgs, String input) {
+	private void rangeInteractive(List<Task> tasks, Args defaultArgs, String input) {
 		String[] range = input.split("-");
 		Integer start = Integer.valueOf(range[0]);
 		Integer stop = null;
 		if (range.length == 2) {
 			stop = Integer.valueOf(range[1]);
 		}
-		String firstName = this.allTasks.get(start).name;
-		String second = stop != null ? this.allTasks.get(stop).name : "";
-		range(firstName + "-" + second, defaultArgs);
+		String firstName = tasks.get(start).name;
+		String second = stop != null ? tasks.get(stop).name : "";
+		range(tasks, firstName + "-" + second, defaultArgs);
 	}
 
-	private Args args(Args defaultArgs, boolean interactive, boolean assertMetaRelease) {
+	private Args args(Args defaultArgs, boolean interactive) {
 		return new Args(this.releaser, defaultArgs.project, defaultArgs.projects,
-				defaultArgs.originalVersion, defaultArgs.versionFromScRelease, this.properties, interactive, assertMetaRelease);
+				defaultArgs.originalVersion, defaultArgs.versionFromScRelease,
+				this.properties, interactive, defaultArgs.taskType);
 	}
 
 	String chosenOption() {

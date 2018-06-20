@@ -2,6 +2,7 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
 
+import org.apache.commons.validator.Arg;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -18,18 +19,11 @@ class Args {
 	final ProjectVersion versionFromScRelease;
 	final ReleaserProperties properties;
 	final boolean interactive;
-	final boolean assertMetaRelease;
+	final TaskType taskType;
 
 	Args(Releaser releaser, File project, Projects projects, ProjectVersion originalVersion,
 			ProjectVersion versionFromScRelease, ReleaserProperties properties,
-			boolean interactive) {
-		this(releaser, project, projects, originalVersion, versionFromScRelease,
-				properties, interactive, true);
-	}
-
-	Args(Releaser releaser, File project, Projects projects, ProjectVersion originalVersion,
-			ProjectVersion versionFromScRelease, ReleaserProperties properties,
-			boolean interactive, boolean assertMetaRelease) {
+			boolean interactive, TaskType taskType) {
 		this.releaser = releaser;
 		this.project = project;
 		this.projects = projects;
@@ -37,7 +31,7 @@ class Args {
 		this.versionFromScRelease = versionFromScRelease;
 		this.properties = properties;
 		this.interactive = interactive;
-		this.assertMetaRelease = assertMetaRelease;
+		this.taskType = taskType;
 	}
 
 	// Used by meta-release task
@@ -52,6 +46,18 @@ class Args {
 		this.versionFromScRelease = versionFromScRelease;
 		this.properties = properties;
 		this.interactive = interactive;
-		this.assertMetaRelease = false;
+		this.taskType = TaskType.POST_RELEASE;
+	}
+
+	// Used for tests
+	Args(TaskType taskType) {
+		this.releaser = null;
+		this.project = null;
+		this.projects = null;
+		this.originalVersion = null;
+		this.versionFromScRelease = null;
+		this.properties = null;
+		this.interactive = false;
+		this.taskType = taskType;
 	}
 }

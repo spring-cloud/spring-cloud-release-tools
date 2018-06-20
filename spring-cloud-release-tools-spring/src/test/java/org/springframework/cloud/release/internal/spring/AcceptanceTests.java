@@ -110,6 +110,7 @@ public class AcceptanceTests {
 		SpringReleaser releaser = templateOnlyReleaser(project, "spring-cloud-consul",
 				"vCamden.SR5", "1.1.2.RELEASE");
 		this.releaserProperties.getGit().setFetchVersionsFromGit(false);
+		this.releaserProperties.getFixedVersions().put("spring-cloud-release", "Finchley.RELEASE");
 		this.releaserProperties.getFixedVersions().put("spring-cloud-consul", "2.3.4.RELEASE");
 		File temporaryDestination = tmp.newFolder();
 		this.releaserProperties.getGit().setCloneDestinationDir(temporaryDestination.getAbsolutePath());
@@ -172,7 +173,6 @@ public class AcceptanceTests {
 	@Test
 	public void should_perform_a_meta_release_of_sc_release_and_consul() throws Exception {
 		// simulates an org
-		File project = new File(".");
 		Map<String, String> versions = new HashMap<>();
 		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
 		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
@@ -397,6 +397,11 @@ public class AcceptanceTests {
 			@Override String chosenOption() {
 				return "0";
 			}
+
+			@Override void postReleaseOptions(Options options, Args defaultArgs) {
+				options.interactive = false;
+				super.postReleaseOptions(options, defaultArgs);
+			}
 		});
 	}
 
@@ -426,6 +431,11 @@ public class AcceptanceTests {
 		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties) {
 			@Override String chosenOption() {
 				return "11";
+			}
+
+			@Override void postReleaseOptions(Options options, Args defaultArgs) {
+				options.interactive = true;
+				super.postReleaseOptions(options, defaultArgs);
 			}
 		});
 	}

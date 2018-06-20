@@ -7,10 +7,10 @@ import java.util.List;
  * @author Marcin Grzejszczak
  */
 public class Options {
-	public Boolean metaRelease = false;
-	public Boolean fullRelease = true;
-	public Boolean interactive = true;
-	public List<String> taskNames = new ArrayList<>();
+	public Boolean metaRelease;
+	public Boolean fullRelease;
+	public Boolean interactive;
+	public List<String> taskNames;
 	public String startFrom = "";
 	public String range = "";
 
