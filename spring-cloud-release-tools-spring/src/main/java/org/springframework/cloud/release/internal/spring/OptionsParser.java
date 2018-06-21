@@ -24,8 +24,8 @@ class OptionsParser implements Parser {
 		parser.allowsUnrecognizedOptions();
 		try {
 			ArgumentAcceptingOptionSpec<Boolean> metaReleaseOpt = parser
-					.acceptsAll(Arrays.asList("m", "meta-release"),
-							"Do you want to do the full release of a single project?")
+					.acceptsAll(Arrays.asList("x", "meta-release"),
+							"Do you want to do the meta release?")
 					.withOptionalArg().ofType(Boolean.class).defaultsTo(false);
 			ArgumentAcceptingOptionSpec<Boolean> fullReleaseOpt = parser
 					.acceptsAll(Arrays.asList("f", "full-release"),

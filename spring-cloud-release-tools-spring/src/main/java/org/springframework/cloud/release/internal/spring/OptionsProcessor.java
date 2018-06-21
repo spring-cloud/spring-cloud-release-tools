@@ -41,7 +41,7 @@ class OptionsProcessor {
 		if (args.taskType == TaskType.POST_RELEASE) {
 			String chosenOption = chosenOption();
 			int pickedInteger = Integer.parseInt(chosenOption);
-			boolean pickedOptionIsComposite = pickedInteger < 1;
+			boolean pickedOptionIsComposite = pickedInteger <= 1;
 			boolean pickedOptionIsFromPostRelease = pickedInteger >= Tasks.ALL_TASKS_PER_PROJECT.size()
 					- Tasks.DEFAULT_TASKS_PER_RELEASE.size();
 			if (options.fullRelease || pickedOptionIsComposite) {

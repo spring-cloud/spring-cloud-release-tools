@@ -38,7 +38,8 @@ class Task {
 
 	void execute(Args args) {
 		if (args.taskType != this.taskType) {
-			log.info("Skipping [{}] since task type is [{}]", this.name, this.taskType);
+			log.info("Skipping [{}] since task type is [{}] and should be [{}]]",
+					this.name, this.taskType, args.taskType);
 			return;
 		}
 		try {

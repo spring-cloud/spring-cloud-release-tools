@@ -2,6 +2,9 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,6 +17,7 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.util.StringUtils;
 
 /**
  * Releaser that gets input from console
@@ -22,13 +26,12 @@ import org.springframework.cloud.release.internal.pom.Projects;
  */
 public class SpringReleaser {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	public static final String RELEASE_TRAIN_PROJECT_NAME = "spring-cloud-release";
+	private static final String RELEASE_TRAIN_PROJECT_NAME = "spring-cloud-release";
 
 	private final Releaser releaser;
 	private final ReleaserProperties properties;
 	private final OptionsProcessor optionsProcessor;
 
-	@Autowired
 	public SpringReleaser(Releaser releaser, ReleaserProperties properties) {
 		this.releaser = releaser;
 		this.properties = properties;
@@ -54,8 +57,7 @@ public class SpringReleaser {
 		// if meta release, first clone, then continue as usual
 		if (options.metaRelease) {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
-			Set<String> projects = this.properties.getFixedVersions().keySet();
-			projects.forEach(project -> {
+			metaReleaseProjects(options).forEach(project -> {
 				File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
 				log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
 				processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
@@ -66,6 +68,23 @@ public class SpringReleaser {
 			projectsAndVersion = processProject(options, projectFolder, TaskType.RELEASE);
 		}
 		this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
+	}
+
+	private List<String> metaReleaseProjects(Options options) {
+		List<String> projects = new ArrayList<>(this.properties.getFixedVersions().keySet());
+		if (StringUtils.hasText(options.startFrom)) {
+			int projectIndex = projects.indexOf(options.startFrom);
+			if (projectIndex < 0) throw new IllegalStateException("Project [" + options.startFrom + "] not found");
+			projects = projects.subList(projectIndex, projects.size());
+			options.startFrom = "";
+		} else if (!options.taskNames.isEmpty()) {
+			projects = projects.stream()
+					.filter(project -> options.taskNames.contains(project))
+					.collect(Collectors.toList());
+			options.taskNames = new ArrayList<>();
+		}
+		log.info("\n\n\nFor meta-release, will release the projects {}\n\n\n", projects);
+		return projects;
 	}
 
 	private File projectFolder() {
