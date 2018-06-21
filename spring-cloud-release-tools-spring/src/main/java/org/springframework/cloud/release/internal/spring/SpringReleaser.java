@@ -1,22 +1,25 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.StringUtils;
 
 /**
@@ -31,6 +34,7 @@ public class SpringReleaser {
 	private final Releaser releaser;
 	private final ReleaserProperties properties;
 	private final OptionsProcessor optionsProcessor;
+	private final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
 	public SpringReleaser(Releaser releaser, ReleaserProperties properties) {
 		this.releaser = releaser;
@@ -57,8 +61,11 @@ public class SpringReleaser {
 		// if meta release, first clone, then continue as usual
 		if (options.metaRelease) {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
+			ReleaserProperties original = new ReleaserProperties();
+			BeanUtils.copyProperties(this.properties, original);
 			metaReleaseProjects(options).forEach(project -> {
 				File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
+				updatePropertiesIfPresent(original, clonedProjectFromOrg);
 				log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
 				processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
 			});
@@ -68,6 +75,23 @@ public class SpringReleaser {
 			projectsAndVersion = processProject(options, projectFolder, TaskType.RELEASE);
 		}
 		this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
+	}
+
+	private void updatePropertiesIfPresent(ReleaserProperties original,
+			File clonedProjectFromOrg) {
+		File releaserConfig = new File(clonedProjectFromOrg, "config/releaser.yml");
+		if (releaserConfig.exists()) {
+			try {
+				ReleaserProperties releaserProperties = this.objectMapper
+						.readValue(releaserConfig, ReleaserProperties.class);
+				BeanUtils.copyProperties(releaserProperties, this.properties);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			BeanUtils.copyProperties(original, this.properties);
+		}
 	}
 
 	private List<String> metaReleaseProjects(Options options) {
