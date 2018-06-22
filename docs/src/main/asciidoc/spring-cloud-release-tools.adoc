@@ -234,6 +234,16 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --closeMilestone -i=false
 ----
 
+=== How to run meta-release (automatic-mode)
+
+All you have to do is run the jar with the releaser and pass the
+`-x=true` option to turn on meta-release and a list of fixed versions
+in the `--"releaser.fixed-versions[project-name]=project-version" format
+
+```
+$ java -jar spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
+```
+
 IMPORTANT: For the meta release the `startFrom` or `taskNames` take into consideration
 the project names, not task names. E.g. you can start from `spring-cloud-netflix` project,
 or build only tasks with names `spring-cloud-build,spring-cloud-sleuth`.
