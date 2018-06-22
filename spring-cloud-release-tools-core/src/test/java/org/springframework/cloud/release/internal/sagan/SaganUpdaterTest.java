@@ -8,10 +8,11 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
 import static org.mockito.BDDMockito.then;
@@ -103,23 +104,17 @@ public class SaganUpdaterTest {
 						"http://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
 	}
 
-	private TypeSafeMatcher<List<ReleaseUpdate>> withReleaseUpdate(final String version,
+	private ArgumentMatcher<List<ReleaseUpdate>> withReleaseUpdate(final String version,
 			final String refDocUrl, final String releaseStatus) {
-		return new TypeSafeMatcher<List<ReleaseUpdate>>() {
-			@Override protected boolean matchesSafely(List<ReleaseUpdate> items) {
-				ReleaseUpdate item = items.get(0);
+		return argument ->  {
+			ReleaseUpdate item = argument.get(0);
 				return "foo".equals(item.artifactId) &&
 						releaseStatus.equals(item.releaseStatus) &&
 						version.equals(item.version) &&
 						refDocUrl.equals(item.apiDocUrl) &&
 						refDocUrl.equals(item.refDocUrl) &&
 						item.current;
-			}
-
-			@Override public void describeTo(Description description) {
-
-			}
-		};
+			};
 	}
 
 }
