@@ -26,7 +26,7 @@ class OptionsParser implements Parser {
 			ArgumentAcceptingOptionSpec<Boolean> metaReleaseOpt = parser
 					.acceptsAll(Arrays.asList("x", "meta-release"),
 							"Do you want to do the meta release?")
-					.withOptionalArg().ofType(Boolean.class).defaultsTo(false);
+					.withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 			ArgumentAcceptingOptionSpec<Boolean> fullReleaseOpt = parser
 					.acceptsAll(Arrays.asList("f", "full-release"),
 							"Do you want to do the full release of a single project?")

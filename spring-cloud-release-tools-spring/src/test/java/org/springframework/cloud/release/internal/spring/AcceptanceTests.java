@@ -44,6 +44,7 @@ import org.springframework.cloud.release.internal.sagan.Release;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.FileSystemUtils;
 
 /**
@@ -64,6 +65,8 @@ public class AcceptanceTests {
 	TemplateGenerator templateGenerator;
 	SaganUpdater saganUpdater;
 	DocumentationUpdater documentationUpdater;
+	ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
+	ReleaserPropertiesUpdater updater = new ReleaserPropertiesUpdater(this.applicationContext);
 
 	@Before
 	public void setup() throws Exception {
@@ -470,7 +473,7 @@ public class AcceptanceTests {
 				options.interactive = false;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		});
+		}, updater);
 	}
 
 	private SpringReleaser metaReleaserWithFullDeployment(ReleaserProperties properties) throws Exception {
@@ -484,7 +487,7 @@ public class AcceptanceTests {
 				options.interactive = false;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		});
+		}, updater);
 	}
 
 	private SpringReleaser releaserWithSnapshotScRelease(File projectFile, String projectName,
@@ -505,7 +508,7 @@ public class AcceptanceTests {
 				options.interactive = true;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		});
+		}, updater);
 	}
 
 	private Releaser defaultReleaser(String expectedVersion, String projectName,

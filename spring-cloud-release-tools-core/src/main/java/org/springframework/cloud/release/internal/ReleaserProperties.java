@@ -60,6 +60,11 @@ public class ReleaserProperties {
 		private boolean enabled = false;
 
 		/**
+		 * Name of the release train project
+		 */
+		private String releaseTrainProjectName = "spring-cloud-release";
+
+		/**
 		 * The URL of the Git organization. We'll append each project's
 		 * name to it
 		 */
@@ -79,6 +84,14 @@ public class ReleaserProperties {
 
 		public void setGitOrgUrl(String gitOrgUrl) {
 			this.gitOrgUrl = gitOrgUrl;
+		}
+
+		public String getReleaseTrainProjectName() {
+			return this.releaseTrainProjectName;
+		}
+
+		public void setReleaseTrainProjectName(String releaseTrainProjectName) {
+			this.releaseTrainProjectName = releaseTrainProjectName;
 		}
 	}
 

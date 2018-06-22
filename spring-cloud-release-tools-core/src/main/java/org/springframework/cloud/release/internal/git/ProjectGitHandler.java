@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.util.StringUtils;
@@ -17,7 +18,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class ProjectGitHandler {
+public class ProjectGitHandler implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -26,7 +27,7 @@ public class ProjectGitHandler {
 	private static final String POST_RELEASE_MSG = "Going back to snapshots";
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
 
-	private final ReleaserProperties properties;
+	private ReleaserProperties properties;
 	private final GithubMilestones githubMilestones;
 	private final GithubIssues githubIssues;
 
@@ -81,7 +82,8 @@ public class ProjectGitHandler {
 	 */
 	public File cloneProjectFromOrg(String projectName) {
 		String orgUrl = this.properties.getMetaRelease().getGitOrgUrl();
-		String fullUrl = orgUrl.endsWith("/") ? orgUrl + projectName : orgUrl + "/" + projectName + "/";
+		String fullUrl = orgUrl.endsWith("/") ? orgUrl + projectName : orgUrl + "/" +
+				projectName + suffixNonHttpRepo(orgUrl);
 		File clonedProject = cloneProject(fullUrl);
 		String version = this.properties.getFixedVersions().get(projectName);
 		if (StringUtils.isEmpty(version)) {
@@ -96,6 +98,10 @@ public class ProjectGitHandler {
 		log.info("Branch [{}] exists. Will check it out", branchFromVersion);
 		checkout(clonedProject, branchFromVersion);
 		return clonedProject;
+	}
+
+	private String suffixNonHttpRepo(String orgUrl) {
+		return orgUrl.startsWith("http") || orgUrl.startsWith("git") ? "" : "/";
 	}
 
 	File cloneProject(String url) {
@@ -165,5 +171,9 @@ public class ProjectGitHandler {
 
 	GitRepo gitRepo(File workingDir) {
 		return new GitRepo(workingDir, this.properties);
+	}
+
+	@Override public void setReleaserProperties(ReleaserProperties properties) {
+		this.properties = properties;
 	}
 }
