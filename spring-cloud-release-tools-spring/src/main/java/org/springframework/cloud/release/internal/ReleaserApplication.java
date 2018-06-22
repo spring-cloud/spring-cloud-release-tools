@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.Parser;
@@ -28,7 +29,7 @@ public class ReleaserApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(ReleaserApplication.class);
-		application.setWebEnvironment(false);
+		application.setWebApplicationType(WebApplicationType.NONE);
 		application.run(args);
 	}
 
