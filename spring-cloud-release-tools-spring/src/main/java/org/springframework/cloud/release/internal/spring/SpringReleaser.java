@@ -67,7 +67,13 @@ public class SpringReleaser {
 				File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
 				updatePropertiesIfPresent(original, clonedProjectFromOrg);
 				log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
-				processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
+				try {
+					processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
+				} catch (Exception e) {
+					log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for project <" +
+							project + "> \n\n");
+					throw e;
+				}
 			});
 		} else {
 			log.info("Single project release picked. Will release only the current project");
@@ -87,7 +93,7 @@ public class SpringReleaser {
 				BeanUtils.copyProperties(releaserProperties, this.properties);
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				throw new IllegalStateException(e);
 			}
 		} else {
 			BeanUtils.copyProperties(original, this.properties);
