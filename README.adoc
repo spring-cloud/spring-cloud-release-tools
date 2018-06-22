@@ -63,6 +63,9 @@ After project release
 - Performs the release tasks per each project
 - Performs the post release tasks at the end of the release
 
+IMPORTANT: For the meta-releaser to work we assume that the path to the
+custom configuration file for each project is always `config/releaser.yml`.
+
 === What should I do first?
 
 Members of the Spring Cloud Team typically use this tool as follows. They first
@@ -252,6 +255,7 @@ the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in 
 Use these properties to provide versions for the meta release.
 
 - `releaser.meta-release.enabled` - You have to turn it on to enable a meta release. Defaults to `false`
+- `releaser.meta-release.release-train-project-name` - Name of the project that represents the BOM of the release train. Defaults to `spring-cloud-release`
 - `releaser.meta-release.git-org-url` - The URL of the Git organization. We'll append each project's name to it.
 Defaults to `https://github.com/spring-cloud`
 
@@ -307,6 +311,9 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.confi
 
 TIP: Notice that we're downloading the jar to a parent folder, not to `target`. That's because `target` get cleaned
 during the build process
+
+IMPORTANT: For the meta-releaser to work we assume that the path to the
+configuration file is always `config/releaser.yml`.
 
 ==== Specifying A Branch
 
