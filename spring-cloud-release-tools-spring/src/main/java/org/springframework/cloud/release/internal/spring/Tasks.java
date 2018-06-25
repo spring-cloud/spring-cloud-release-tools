@@ -101,16 +101,16 @@ class Tasks {
 			"FULL RELEASE",
 			"Perform a full release of this project without interruptions",
 			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
-	static Task POST_RELEASE = Tasks.task("post-release", "pr",
+	static Task POST_RELEASE = Tasks.task("postRelease", "pr",
 			"POST RELEASE TASKS",
 			"Perform post release tasks for this release without interruptions",
 			args -> DEFAULT_TASKS_PER_RELEASE.forEach(task -> task.execute(args)),
 			TaskType.POST_RELEASE);
-	static Task RELEASE_VERBOSE = Tasks.task("release-verbose", "r",
+	static Task RELEASE_VERBOSE = Tasks.task("releaseVerbose", "r",
 			"FULL VERBOSE RELEASE",
 			"Perform a full release of this project in interactive mode (you'll be asked about skipping steps)",
 			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
-	static Task META_RELEASE = Tasks.task("meta-release", "x",
+	static Task META_RELEASE = Tasks.task("metaRelease", "x",
 			"META RELEASE",
 			"Perform a meta release of projects",
 			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> {
@@ -121,7 +121,8 @@ class Tasks {
 	static final List<Task> COMPOSITE_TASKS = Stream.of(
 			RELEASE,
 			RELEASE_VERBOSE,
-			META_RELEASE
+			META_RELEASE,
+			POST_RELEASE
 	).collect(Collectors.toList());
 
 	static final List<Task> ALL_TASKS_PER_PROJECT = Stream.of(

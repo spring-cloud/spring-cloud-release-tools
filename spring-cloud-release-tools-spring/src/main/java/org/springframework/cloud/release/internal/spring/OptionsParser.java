@@ -43,6 +43,10 @@ class OptionsParser implements Parser {
 					.acceptsAll(Arrays.asList("a", "start-from"),
 							"Starts all release task starting from the given task. Requires passing the task name (either one letter or the full name)")
 					.withRequiredArg().ofType(String.class);
+			ArgumentAcceptingOptionSpec<String> taskNamesOpt = parser
+					.acceptsAll(Arrays.asList("tn", "task-names"),
+							"Starts all release task for the given task names")
+					.withRequiredArg().ofType(String.class);
 			ArgumentAcceptingOptionSpec<String> rangeOpt = parser.acceptsAll(Arrays.asList("r", "range"),
 					"Runs release tasks from the given range. Requires passing the task names with a hyphen. The first task is inclusive, the second inclusive. E.g. 's-m' would mean running 'snapshot', 'push' and 'milestone' tasks")
 					.withRequiredArg().ofType(String.class);
@@ -56,8 +60,16 @@ class OptionsParser implements Parser {
 			Boolean metaRelease = options.valueOf(metaReleaseOpt);
 			Boolean interactive = options.valueOf(interactiveOpt);
 			Boolean fullRelease = options.has(fullReleaseOpt);
-			List<String> taskNames = Tasks.NON_COMPOSITE_TASKS.stream()
-					.filter(task -> options.has(task.name)).map(task -> task.name)
+			List<String> providedTaskNames = Arrays
+					.asList(options.valueOf(taskNamesOpt).split(","));
+			List<String> allTaskNames = Tasks.NON_COMPOSITE_TASKS.stream()
+					.map(task -> task.name)
+					.collect(Collectors.toList());
+			if (providedTaskNames.isEmpty()) {
+				providedTaskNames.addAll(allTaskNames);
+			}
+			List<String> taskNames = allTaskNames.stream()
+					.filter(providedTaskNames::contains)
 					.collect(Collectors.toList());
 			String startFrom = options.valueOf(startFromOpt);
 			String range = options.valueOf(rangeOpt);

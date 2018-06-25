@@ -517,7 +517,7 @@ public class AcceptanceTests {
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
 		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties) {
 			@Override String chosenOption() {
-				return "12";
+				return "13";
 			}
 
 			@Override void postReleaseOptions(Options options, Args defaultArgs) {
