@@ -46,7 +46,7 @@ class OptionsParser implements Parser {
 			ArgumentAcceptingOptionSpec<String> taskNamesOpt = parser
 					.acceptsAll(Arrays.asList("tn", "task-names"),
 							"Starts all release task for the given task names")
-					.withRequiredArg().ofType(String.class);
+					.withRequiredArg().ofType(String.class).defaultsTo("");
 			ArgumentAcceptingOptionSpec<String> rangeOpt = parser.acceptsAll(Arrays.asList("r", "range"),
 					"Runs release tasks from the given range. Requires passing the task names with a hyphen. The first task is inclusive, the second inclusive. E.g. 's-m' would mean running 'snapshot', 'push' and 'milestone' tasks")
 					.withRequiredArg().ofType(String.class);
@@ -89,7 +89,9 @@ class OptionsParser implements Parser {
 	}
 
 	private void printErrorMessage(Exception e, OptionParser parser) {
+		System.err.println("Following exception has occurred: ");
 		System.err.println(e.getMessage());
+		e.printStackTrace();
 		System.err.println(intro());
 		System.err.println(
 				"java -jar spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar [options...] ");
