@@ -121,7 +121,10 @@ public class SpringReleaser {
 		if (StringUtils.hasText(options.startFrom)) {
 			int projectIndex = filteredProjects.indexOf(options.startFrom);
 			if (projectIndex < 0) throw new IllegalStateException("Project [" + options.startFrom + "] not found");
-			filteredProjects = filteredProjects.subList(projectIndex, projects.size());
+			if (log.isDebugEnabled()) {
+				log.debug("Index of project [{}] is [{}]", options.startFrom, projectIndex);
+			}
+			filteredProjects = filteredProjects.subList(projectIndex, filteredProjects.size());
 			options.startFrom = "";
 		} else if (!options.taskNames.isEmpty()) {
 			filteredProjects = filteredProjects.stream()
