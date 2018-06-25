@@ -24,7 +24,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +71,18 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 		this.properties.getFixedVersions().forEach(versions::setVersion);
 		log.info("Retrieved the following versions\n{}", versions);
 		return versions.toProjectVersions();
+	}
+
+	/**
+	 * @return map of fixed versions
+	 */
+	public Projects fixedVersions() {
+		Set<ProjectVersion> projectVersions = this.properties.getFixedVersions()
+				.entrySet()
+				.stream()
+				.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
+				.collect(Collectors.toSet());
+		return new Versions(projectVersions).toProjectVersions();
 	}
 
 	/**

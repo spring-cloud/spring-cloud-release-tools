@@ -54,6 +54,10 @@ public class Releaser {
 		return this.projectPomUpdater.retrieveVersionsFromSCRelease();
 	}
 
+	public Projects fixedVersions() {
+		return this.projectPomUpdater.fixedVersions();
+	}
+
 	public void updateProjectFromScRelease(File project, Projects versions,
 			ProjectVersion versionFromScRelease) {
 		updateProjectFromScRelease(project, versions, versionFromScRelease, ASSERT_SNAPSHOTS);

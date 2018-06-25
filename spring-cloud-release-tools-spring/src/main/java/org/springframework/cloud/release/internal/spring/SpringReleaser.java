@@ -195,9 +195,7 @@ public class SpringReleaser {
 	}
 
 	private Projects projectsToUpdateForFixedVersions() {
-		Projects projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
-				.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
-				.distinct().collect(Collectors.toCollection(Projects::new));
+		Projects projectsToUpdate = this.releaser.fixedVersions();
 		printSettingVersionFromFixedVersions(projectsToUpdate);
 		return projectsToUpdate;
 	}

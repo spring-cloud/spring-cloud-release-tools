@@ -16,6 +16,7 @@
 package org.springframework.cloud.release.internal.pom;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,9 +75,7 @@ class Versions {
 				.findFirst().orElse(new ProjectVersion(SPRING_BOOT_PROJECT_NAME, "")).version;
 		this.scBuildVersion = versions.stream().filter(projectVersion -> BUILD_ARTIFACT_ID.equals(projectVersion.projectName))
 				.findFirst().orElse(new ProjectVersion(BUILD_ARTIFACT_ID, "")).version;
-		this.projects = versions.stream()
-				.map(projectVersion -> new Project(projectVersion.projectName, projectVersion.version))
-				.collect(Collectors.toSet());
+		versions.forEach(projectVersion -> setVersion(projectVersion.projectName, projectVersion.version));
 	}
 
 	String versionForProject(String projectName) {
@@ -98,8 +97,9 @@ class Versions {
 	}
 
 	Projects toProjectVersions() {
-		return new Projects(this.projects.stream().map(project -> new ProjectVersion(project.name, project.version))
-				.collect(Collectors.toSet()));
+		return this.projects.stream()
+				.map(project -> new ProjectVersion(project.name, project.version))
+				.distinct().collect(Collectors.toCollection(Projects::new));
 	}
 
 	private boolean nameMatches(String projectName, Project project) {
