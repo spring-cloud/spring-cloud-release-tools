@@ -15,6 +15,7 @@
  */
 package org.springframework.cloud.release.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +71,16 @@ public class ReleaserProperties {
 		 */
 		private String gitOrgUrl = "https://github.com/spring-cloud";
 
+		/**
+		 * Names of projects to skip deployment for meta-release
+		 */
+		private List<String> projectsToSkip = new ArrayList<String>() {
+			{
+				this.add("spring-cloud-stream");
+				this.add("spring-cloud-task");
+			}
+		};
+
 		public boolean isEnabled() {
 			return this.enabled;
 		}
@@ -92,6 +103,14 @@ public class ReleaserProperties {
 
 		public void setReleaseTrainProjectName(String releaseTrainProjectName) {
 			this.releaseTrainProjectName = releaseTrainProjectName;
+		}
+
+		public List<String> getProjectsToSkip() {
+			return this.projectsToSkip;
+		}
+
+		public void setProjectsToSkip(List<String> projectsToSkip) {
+			this.projectsToSkip = projectsToSkip;
 		}
 	}
 

@@ -204,6 +204,22 @@ public class AcceptanceTests {
 	}
 
 	@Test
+	public void should_not_clone_any_projects_when_they_are_on_list_of_projects_to_skip() throws Exception {
+		Map<String, String> versions = new HashMap<>();
+		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
+		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
+		SpringReleaser releaser = metaReleaser(versions);
+		this.releaserProperties.getMetaRelease().getProjectsToSkip().add("spring-cloud-release");
+		this.releaserProperties.getMetaRelease().getProjectsToSkip().add("spring-cloud-consul");
+		File temporaryDestination = tmp.newFolder();
+		this.releaserProperties.getGit().setCloneDestinationDir(temporaryDestination.getAbsolutePath());
+
+		releaser.release(new OptionsBuilder().metaRelease(true).options());
+
+		then(temporaryDestination.list()).isEmpty();
+	}
+
+	@Test
 	public void should_perform_a_meta_release_of_consul_only_when_run_from_got_passed() throws Exception {
 		// simulates an org
 		Map<String, String> versions = new HashMap<>();

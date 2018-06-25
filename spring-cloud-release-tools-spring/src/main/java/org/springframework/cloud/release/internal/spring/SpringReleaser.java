@@ -62,9 +62,8 @@ public class SpringReleaser {
 		if (options.metaRelease) {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
 			this.properties.getGit().setFetchVersionsFromGit(false);
-			metaReleaseProjects(options).forEach(project -> {
-				processProjectForMetaRelease(options, project);
-			});
+			metaReleaseProjects(options)
+					.forEach(project -> processProjectForMetaRelease(options, project));
 		} else {
 			log.info("Single project release picked. Will release only the current project");
 			File projectFolder = projectFolder();
@@ -115,19 +114,23 @@ public class SpringReleaser {
 
 	private List<String> metaReleaseProjects(Options options) {
 		List<String> projects = new ArrayList<>(this.properties.getFixedVersions().keySet());
+		log.info("List of projects that should not be cloned {}", this.properties.getMetaRelease().getProjectsToSkip());
+		List<String> filteredProjects = projects.stream()
+				.filter(project -> !this.properties.getMetaRelease().getProjectsToSkip().contains(project))
+				.collect(Collectors.toList());
 		if (StringUtils.hasText(options.startFrom)) {
-			int projectIndex = projects.indexOf(options.startFrom);
+			int projectIndex = filteredProjects.indexOf(options.startFrom);
 			if (projectIndex < 0) throw new IllegalStateException("Project [" + options.startFrom + "] not found");
-			projects = projects.subList(projectIndex, projects.size());
+			filteredProjects = filteredProjects.subList(projectIndex, projects.size());
 			options.startFrom = "";
 		} else if (!options.taskNames.isEmpty()) {
-			projects = projects.stream()
+			filteredProjects = filteredProjects.stream()
 					.filter(project -> options.taskNames.contains(project))
 					.collect(Collectors.toList());
 			options.taskNames = new ArrayList<>();
 		}
-		log.info("\n\n\nFor meta-release, will release the projects {}\n\n\n", projects);
-		return projects;
+		log.info("\n\n\nFor meta-release, will release the projects {}\n\n\n", filteredProjects);
+		return filteredProjects;
 	}
 
 	private File projectFolder() {

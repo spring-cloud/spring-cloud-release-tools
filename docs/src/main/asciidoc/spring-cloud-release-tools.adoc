@@ -258,6 +258,8 @@ Use these properties to provide versions for the meta release.
 - `releaser.meta-release.release-train-project-name` - Name of the project that represents the BOM of the release train. Defaults to `spring-cloud-release`
 - `releaser.meta-release.git-org-url` - The URL of the Git organization. We'll append each project's name to it.
 Defaults to `https://github.com/spring-cloud`
+- `releaser.meta-release.projects-to-skip` - List of projects that we should not clone and release. Spring Cloud release
+train depends on projects that got already released. We default this list to `[spring-cloud-stream, spring-cloud-task]`.
 
 - `releaser.git.fetch-versions-from-git` - If `true` then should fill the map of versions from Git. If `false` then picks fixed versions
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
