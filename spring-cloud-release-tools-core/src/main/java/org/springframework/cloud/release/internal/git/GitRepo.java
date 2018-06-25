@@ -38,6 +38,7 @@ import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.OpenSshConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FileUtils;
@@ -94,7 +95,7 @@ class GitRepo {
 	 * @param projectUri - URI of the project
 	 * @return file where the project was cloned
 	 */
-	File cloneProject(URI projectUri) {
+	File cloneProject(URIish projectUri) {
 		try {
 			log.info("Cloning repo from [{}] to [{}]", projectUri, this.basedir);
 			Git git = cloneToBasedir(projectUri, this.basedir);
@@ -243,7 +244,7 @@ class GitRepo {
 		return ResourceUtils.getFile(project.toURI()).getAbsoluteFile();
 	}
 
-	private Git cloneToBasedir(URI projectUrl, File destinationFolder)
+	private Git cloneToBasedir(URIish projectUrl, File destinationFolder)
 			throws GitAPIException {
 		CloneCommand command = this.gitFactory.getCloneCommandByCloneRepository()
 				.setURI(projectUrl.toString() + ".git").setDirectory(destinationFolder);

@@ -576,8 +576,8 @@ public class AcceptanceTests {
 
 	private ReleaserProperties releaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
-		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().getPath());
-		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static-angel/").toURI().getPath());
+		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().toString());
+		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static-angel/").toURI().toString());
 		releaserProperties.getMaven().setBuildCommand("echo build");
 		releaserProperties.getMaven().setDeployCommand("echo deploy");
 		releaserProperties.getMaven().setPublishDocsCommands(new String[] { "echo docs"} );
@@ -589,7 +589,7 @@ public class AcceptanceTests {
 
 	private ReleaserProperties metaReleaserProperties(Map<String, String> versions) throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
-		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static-angel/").toURI().getPath());
+		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static-angel/").toURI().toString());
 		releaserProperties.getMaven().setBuildCommand("echo executed_build");
 		releaserProperties.getMaven().setDeployCommand("echo executed_deploy");
 		releaserProperties.getMaven().setPublishDocsCommands(new String[] { "echo executed_docs"} );
@@ -602,8 +602,8 @@ public class AcceptanceTests {
 
 	private ReleaserProperties snapshotScReleaseReleaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = releaserProperties(project, branch);
-		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release-with-snapshot/").toURI().getPath());
-		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().getPath());
+		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release-with-snapshot/").toURI().toString());
+		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}

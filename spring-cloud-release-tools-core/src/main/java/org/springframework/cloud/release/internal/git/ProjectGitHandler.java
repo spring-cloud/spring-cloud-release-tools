@@ -3,8 +3,10 @@ package org.springframework.cloud.release.internal.git;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 
+import org.eclipse.jgit.transport.URIish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
@@ -82,9 +84,15 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	 */
 	public File cloneProjectFromOrg(String projectName) {
 		String orgUrl = this.properties.getMetaRelease().getGitOrgUrl();
-		String fullUrl = orgUrl.endsWith("/") ? orgUrl + projectName : orgUrl + "/" +
-				projectName + suffixNonHttpRepo(orgUrl);
+		String fullUrl = orgUrl.endsWith("/") ? (orgUrl + projectName) : (orgUrl + "/" +
+				projectName + suffixNonHttpRepo(orgUrl));
+		if (log.isDebugEnabled()) {
+			log.debug("Full url of the project is [{}]", fullUrl);
+		}
 		File clonedProject = cloneProject(fullUrl);
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully cloned the project to [{}]", clonedProject);
+		}
 		String version = this.properties.getFixedVersions().get(projectName);
 		if (StringUtils.isEmpty(version)) {
 			throw new IllegalStateException("You haven't provided a version for project [" + projectName + "]");
@@ -109,7 +117,7 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 			File destinationDir = properties.getGit().getCloneDestinationDir() != null ?
 					new File(properties.getGit().getCloneDestinationDir()) :
 					Files.createTempDirectory("releaser").toFile();
-			return gitRepo(destinationDir).cloneProject(URI.create(url));
+			return gitRepo(destinationDir).cloneProject(new URIish(url));
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}

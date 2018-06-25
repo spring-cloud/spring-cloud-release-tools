@@ -40,7 +40,7 @@ public class DocumentationUpdaterTests {
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects"), this.tmpFolder);
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().getPath());
+		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 		this.handler = new ProjectGitHandler(properties);
 		this.clonedDocProject = this.handler.cloneDocumentationProject();
 	}
@@ -51,7 +51,7 @@ public class DocumentationUpdaterTests {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "1.3.4.SR10");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationBranch("master");
-		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-release/").toURI().getPath());
+		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-release/").toURI().toString());
 
 		BDDAssertions.thenThrownBy(() ->
 				new DocumentationUpdater(new ProjectGitHandler(properties))
@@ -65,7 +65,7 @@ public class DocumentationUpdaterTests {
 			throws URISyntaxException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "1.3.4.SR10");
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().getPath());
+		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 
 		BDDAssertions.thenThrownBy(() ->
 				new DocumentationUpdater(new ProjectGitHandler(properties)) {
@@ -94,7 +94,7 @@ public class DocumentationUpdaterTests {
 			throws URISyntaxException, IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "1.3.4.SR10");
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().getPath());
+		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 
 		File updatedDocs = new DocumentationUpdater(new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "vAngel.SR33");
@@ -110,7 +110,7 @@ public class DocumentationUpdaterTests {
 			throws URISyntaxException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "1.3.4.SR10");
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().getPath());
+		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
 
 		new DocumentationUpdater(handler)
@@ -125,7 +125,7 @@ public class DocumentationUpdaterTests {
 			throws URISyntaxException, IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "1.3.4.SR10");
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().getPath());
+		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = new DocumentationUpdater(new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "Angel.SR33");
@@ -141,7 +141,7 @@ public class DocumentationUpdaterTests {
 			throws URISyntaxException, IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "2.0.0.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().getPath());
+		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = new DocumentationUpdater(new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "vFinchley.SR33");
@@ -157,7 +157,7 @@ public class DocumentationUpdaterTests {
 			throws URISyntaxException, IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "2.0.0.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().getPath());
+		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = new DocumentationUpdater(new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "Finchley.SR33");
