@@ -152,7 +152,7 @@ You will see a help screen looking like more or less like this
 ----
 Here you can find the list of tasks in order
 
-[updatePoms,build,commit,deploy,docs,snapshots,push,closeMilestone,createTemplates,updateSagan,updateGuides,updateDocumentation]
+[release,releaseVerbose,metaRelease,postRelease,updatePoms,build,commit,deploy,docs,snapshots,push,closeMilestone,updateSagan,createTemplates,updateGuides,updateDocumentation]
 
 
 Option                                Description
@@ -164,12 +164,13 @@ Option                                Description
 -b, --build [String]                  Build the project
 -c, --commit [String]                 Commit, tag and push the tag
 -d, --deploy [String]                 Deploy the artifacts
--f, --full-release [Boolean]          Do you want to do the full release
-                                        (default: false)
+-f, --full-release [Boolean]          Do you want to do the full release of a
+                                        single project? (default: false)
 -g, --updateSagan [String]            Updating Sagan with release info
 -h, --help [String]
 -i, --interactive <Boolean>           Do you want to set the properties from
-                                        the command line (default: true)
+                                        the command line of a single project?
+                                        (default: true)
 -m, --closeMilestone [String]         Close the milestone at Github
 -o, --docs [String]                   Publish the docs
 -p, --push [String]                   Push the commits
@@ -182,10 +183,14 @@ Option                                Description
 -s, --snapshots [String]              Go back to snapshots and bump
                                         originalVersion by patch
 -t, --createTemplates [String]        Create email / blog / tweet etc. templates
+--task-names, --tn <String>           Starts all release task for the given
+                                        task names
 -u, --updatePoms [String]             Update poms with versions from Spring
                                         Cloud Release
 --ud, --updateDocumentation [String]  Updating documentation repository
 --ug, --updateGuides [String]         Updating Spring Guides
+-x, --meta-release <Boolean>          Do you want to do the meta release?
+                                        (default: false)
 
 Examples of usage:
 

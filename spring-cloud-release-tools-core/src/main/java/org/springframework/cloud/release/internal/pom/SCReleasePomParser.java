@@ -98,9 +98,10 @@ class SCReleasePomParser {
 	Versions springCloudVersions() {
 		Model model = pom(this.dependenciesPomPath);
 		String buildArtifact = model.getParent().getArtifactId();
-		log.debug("[{}] artifact id is equal to [{}]", SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID, buildArtifact);
-		if (!SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID.equals(buildArtifact)) {
-			throw new IllegalStateException("The pom doesn't have a [" + SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID + "] artifact id");
+		log.debug("[{}] artifact id is equal to [{}]", SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
+		if (!SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID.equals(buildArtifact)) {
+			throw new IllegalStateException("The pom doesn't have a [" + SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID
+					+ "] artifact id");
 		}
 		String buildVersion = model.getParent().getVersion();
 		log.debug("Spring Cloud Build version is equal to [{}]", buildVersion);

@@ -23,7 +23,10 @@ import java.util.stream.Collectors;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BUILD_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD_RELEASE;
 
 /**
  * Represents versions taken out from Spring Cloud Release pom
@@ -49,6 +52,7 @@ class Versions {
 	Versions(String scBuildVersion, Set<Project> projects) {
 		this.scBuildVersion = scBuildVersion;
 		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
+		this.projects.add(new Project(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, scBuildVersion));
 		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
 		this.projects.addAll(projects);
 	}
@@ -61,6 +65,7 @@ class Versions {
 		this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion));
 		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
 		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
+		this.projects.add(new Project(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, scBuildVersion));
 		this.projects.addAll(projects);
 	}
 
@@ -129,11 +134,21 @@ class Versions {
 				break;
 			case BUILD_ARTIFACT_ID:
 			case CLOUD_DEPENDENCIES_ARTIFACT_ID:
+			case CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID:
 				this.scBuildVersion = version;
 				remove(BUILD_ARTIFACT_ID);
+				remove(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID);
 				remove(CLOUD_DEPENDENCIES_ARTIFACT_ID);
 				this.projects.add(new Project(BUILD_ARTIFACT_ID, version));
+				this.projects.add(new Project(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, version));
 				this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, version));
+				break;
+			case SPRING_CLOUD_RELEASE:
+			case SPRING_CLOUD:
+				remove(SPRING_CLOUD_RELEASE);
+				remove(SPRING_CLOUD);
+				this.projects.add(new Project(SPRING_CLOUD_RELEASE, version));
+				this.projects.add(new Project(SPRING_CLOUD, version));
 				break;
 			default:
 				remove(projectName);

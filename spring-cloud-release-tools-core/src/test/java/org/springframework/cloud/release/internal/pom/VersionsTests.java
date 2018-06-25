@@ -108,11 +108,26 @@ public class VersionsTests {
 
 		then(versions.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
 		then(versions.versionForProject("spring-cloud-dependencies-parent")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-dependencies")).isEqualTo("3.0.0");
 
 		versions = mixedVersions().setVersion("spring-cloud-dependencies-parent", "3.0.0");
 
 		then(versions.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
 		then(versions.versionForProject("spring-cloud-dependencies-parent")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-dependencies")).isEqualTo("3.0.0");
+	}
+
+	@Test
+	public void should_update_projects_for_spring_cloud_release() {
+		Versions versions = mixedVersions().setVersion("spring-cloud", "3.0.0");
+
+		then(versions.versionForProject("spring-cloud")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-release")).isEqualTo("3.0.0");
+
+		versions = mixedVersions().setVersion("spring-cloud-release", "3.0.0");
+
+		then(versions.versionForProject("spring-cloud")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-release")).isEqualTo("3.0.0");
 	}
 
 	@Test
