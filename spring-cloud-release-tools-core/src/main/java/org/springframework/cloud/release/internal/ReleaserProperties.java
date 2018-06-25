@@ -76,6 +76,7 @@ public class ReleaserProperties {
 		 */
 		private List<String> projectsToSkip = new ArrayList<String>() {
 			{
+				this.add("spring-boot");
 				this.add("spring-cloud-stream");
 				this.add("spring-cloud-task");
 			}
