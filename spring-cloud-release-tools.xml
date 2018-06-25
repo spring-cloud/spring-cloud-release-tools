@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-06-15</date>
+<date>2018-06-25</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -12,6 +12,9 @@
 why this tool makes it easy to automate the release / dependency update process of our applications.</simpara>
 <section xml:id="_what_does_it_do">
 <title>What does it do?</title>
+<section xml:id="_single_project">
+<title>Single project</title>
+<simpara>For a single project</simpara>
 <itemizedlist>
 <listitem>
 <simpara>Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)</simpara>
@@ -50,6 +53,13 @@ why this tool makes it easy to automate the release / dependency update process 
 <listitem>
 <simpara>Closes the milestone on Github (e.g. <literal>v1.0.1.RELEASE</literal>) (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
 </listitem>
+</itemizedlist>
+<important>
+<simpara>Starting with version that does Sagan integration, you MUST pass the OAuth token,
+otherwise the application will fail to start</simpara>
+</important>
+<simpara>After project release</simpara>
+<itemizedlist>
 <listitem>
 <simpara>Generates an email template under <literal>target/email.txt</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
 </listitem>
@@ -72,10 +82,36 @@ why this tool makes it easy to automate the release / dependency update process 
 <simpara>For <literal>GA</literal>/ <literal>SR</literal> release will update the links under <link xl:href="https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current">https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current</link></simpara>
 </listitem>
 </itemizedlist>
+</section>
+<section xml:id="_meta_release">
+<title>Meta-release</title>
+<itemizedlist>
+<listitem>
+<simpara>Uses the fixed versions to clone and check out each project (e.g. <literal>spring-cloud-sleuth: 2.1.0.RELEASE</literal>)</simpara>
+</listitem>
+<listitem>
+<simpara>From the version analyzes the branch and checks it out. E.g.</simpara>
+<itemizedlist>
+<listitem>
+<simpara>for <literal>spring-cloud-release&#8217;s `Finchley.RELEASE</literal> version will resolve either <literal>Finchley.x</literal> branch or will fallback to <literal>master</literal> if there&#8217;s no <literal>Finchley.x</literal> branch.</simpara>
+</listitem>
+<listitem>
+<simpara>for <literal>spring-cloud-sleuth&#8217;s `2.1.0.RELEASE</literal> version will resolve <literal>2.1.x</literal> branch</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Performs the release tasks per each project</simpara>
+</listitem>
+<listitem>
+<simpara>Performs the post release tasks at the end of the release</simpara>
+</listitem>
+</itemizedlist>
 <important>
-<simpara>Starting with version that does Sagan integration, you MUST pass the OAuth token,
-otherwise the application will fail to start</simpara>
+<simpara>For the meta-releaser to work we assume that the path to the
+custom configuration file for each project is always <literal>config/releaser.yml</literal>.</simpara>
 </important>
+</section>
 </section>
 <section xml:id="_what_should_i_do_first">
 <title>What should I do first?</title>
@@ -232,12 +268,35 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 </para>
 </formalpara>
 </section>
+<section xml:id="_how_to_run_meta_release_automatic_mode">
+<title>How to run meta-release (automatic-mode)</title>
+<simpara>All you have to do is run the jar with the releaser and pass the
+<literal>-x=true</literal> option to turn on meta-release and a list of fixed versions
+in the `--"releaser.fixed-versions[project-name]=project-version" format</simpara>
+<screen>$ java -jar spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"</screen>
+<important>
+<simpara>For the meta release the <literal>startFrom</literal> or <literal>taskNames</literal> take into consideration
+the project names, not task names. E.g. you can start from <literal>spring-cloud-netflix</literal> project,
+or build only tasks with names <literal>spring-cloud-build,spring-cloud-sleuth</literal>.</simpara>
+</important>
+</section>
 <section xml:id="_project_options">
 <title>Project options</title>
 <itemizedlist>
 <listitem>
 <simpara><literal>releaser.fixed-versions</literal> - A String to String mapping of manually set versions. E.g. <literal>"spring-cloud-cli" &#8594; "1.0.0.RELEASE"</literal> will set
-the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</literal> regardless of what was set in <literal>spring-cloud-release</literal> project. Example <literal>--releaser.fixed-versions[spring-cloud-cli]=1.0.0.RELEASE</literal>.</simpara>
+the <literal>spring-cloud-cli.version</literal> to <literal>1.0.0.RELEASE</literal> regardless of what was set in <literal>spring-cloud-release</literal> project. Example <literal>--releaser.fixed-versions[spring-cloud-cli]=1.0.0.RELEASE</literal>.
+Use these properties to provide versions for the meta release.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.meta-release.enabled</literal> - You have to turn it on to enable a meta release. Defaults to <literal>false</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.meta-release.release-train-project-name</literal> - Name of the project that represents the BOM of the release train. Defaults to <literal>spring-cloud-release</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.meta-release.git-org-url</literal> - The URL of the Git organization. We&#8217;ll append each project&#8217;s name to it.
+Defaults to <literal><link xl:href="https://github.com/spring-cloud">https://github.com/spring-cloud</link></literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.fetch-versions-from-git</literal> - If <literal>true</literal> then should fill the map of versions from Git. If <literal>false</literal> then picks fixed versions</simpara>
@@ -326,6 +385,10 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.confi
 <simpara>Notice that we&#8217;re downloading the jar to a parent folder, not to <literal>target</literal>. That&#8217;s because <literal>target</literal> get cleaned
 during the build process</simpara>
 </tip>
+<important>
+<simpara>For the meta-releaser to work we assume that the path to the
+configuration file is always <literal>config/releaser.yml</literal>.</simpara>
+</important>
 </section>
 <section xml:id="_specifying_a_branch">
 <title>Specifying A Branch</title>
