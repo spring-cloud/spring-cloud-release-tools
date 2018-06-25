@@ -81,7 +81,7 @@ public class SpringReleaser {
 			processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
 		} catch (Exception e) {
 			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for project <" +
-					project + "> \n\n");
+					project + "> \n\n", e);
 			throw e;
 		}
 	}
