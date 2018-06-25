@@ -10,7 +10,6 @@ import org.springframework.boot.test.rule.OutputCapture;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-import static org.junit.Assert.*;
 
 /**
  * @author Marcin Grzejszczak
@@ -27,21 +26,19 @@ public class TaskTests {
 			}
 		});
 
-		task.execute(Mockito.mock(Args.class));
+		task.execute(new Args(TaskType.RELEASE));
 
 		then(someBool.get()).isTrue();
 	}
 
 	@Test public void should_fail_with_nice_text_on_exception() {
 		final AtomicBoolean someBool = new AtomicBoolean();
-		Task task = new Task("foo", "bar", "baz", "descr", new Consumer<Args>() {
-			@Override public void accept(Args args) {
-				someBool.set(true);
-				throw new RuntimeException("foooooooo");
-			}
+		Task task = new Task("foo", "bar", "baz", "descr", args -> {
+			someBool.set(true);
+			throw new RuntimeException("foooooooo");
 		});
 
-		thenThrownBy(() -> task.execute(Mockito.mock(Args.class)))
+		thenThrownBy(() -> task.execute(new Args(TaskType.RELEASE)))
 				.isInstanceOf(RuntimeException.class);
 		then(someBool.get()).isTrue();
 		then(this.capture.toString())

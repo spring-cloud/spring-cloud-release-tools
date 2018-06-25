@@ -18,17 +18,30 @@ class Task {
 	final String shortName;
 	final String header;
 	final String description;
+	final TaskType taskType;
 	private final Consumer<Args> consumer;
 
-	Task(String name, String shortName, String header, String description, Consumer<Args> consumer) {
+	Task(String name, String shortName, String header, String description,
+			Consumer<Args> consumer) {
+		this(name, shortName, header, description, consumer, TaskType.RELEASE);
+	}
+
+	Task(String name, String shortName, String header, String description,
+			Consumer<Args> consumer, TaskType taskType) {
 		this.name = name;
 		this.shortName = shortName;
 		this.header = header;
 		this.description = description;
 		this.consumer = consumer;
+		this.taskType = taskType;
 	}
 
 	void execute(Args args) {
+		if (args.taskType != this.taskType) {
+			log.info("Skipping [{}] since task type is [{}] and should be [{}]]",
+					this.name, this.taskType, args.taskType);
+			return;
+		}
 		try {
 			boolean interactive = args.interactive;
 			printLog(interactive);
@@ -48,7 +61,7 @@ class Task {
 	}
 
 	private void printLog(boolean interactive) {
-		log.info("\n\n\n=== {} ===\n\n{} {}\n\n", header, description, interactive ? MSG : "");
+			log.info("\n\n\n=== {} ===\n\n{} {}\n\n", header, description, interactive ? MSG : "");
 	}
 
 	boolean skipStep() {
@@ -67,5 +80,4 @@ class Task {
 	String chosenOption() {
 		return System.console().readLine();
 	}
-
 }

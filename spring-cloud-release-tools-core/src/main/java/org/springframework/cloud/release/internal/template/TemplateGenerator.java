@@ -9,13 +9,14 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class TemplateGenerator {
+public class TemplateGenerator implements ReleaserPropertiesAware {
 
 	private static final String EMAIL_TEMPLATE = "email";
 	private static final String BLOG_TEMPLATE = "blog";
@@ -25,7 +26,7 @@ public class TemplateGenerator {
 	private final File blogOutput;
 	private final File tweetOutput;
 	private final File releaseNotesOutput;
-	private final ReleaserProperties props;
+	private ReleaserProperties props;
 	private final ProjectGitHandler handler;
 
 	public TemplateGenerator(ReleaserProperties props, ProjectGitHandler handler) {
@@ -108,5 +109,9 @@ public class TemplateGenerator {
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	@Override public void setReleaserProperties(ReleaserProperties properties) {
+		this.props = properties;
 	}
 }

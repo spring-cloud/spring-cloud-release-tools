@@ -66,6 +66,11 @@ public class Projects extends HashSet<ProjectVersion> {
 				.orElseThrow(() -> exception(projectName));
 	}
 
+	public boolean containsProject(String projectName) {
+		return this.stream()
+				.anyMatch(projectVersion -> projectVersion.projectName.equals(projectName));
+	}
+
 	public List<ProjectVersion> forNameStartingWith(String projectName) {
 		return this.stream().filter(projectVersion -> projectVersion.projectName.startsWith(projectName))
 				.collect(Collectors.toList());

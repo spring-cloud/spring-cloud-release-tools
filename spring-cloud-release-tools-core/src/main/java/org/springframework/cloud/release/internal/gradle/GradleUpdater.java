@@ -17,17 +17,18 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class GradleUpdater {
+public class GradleUpdater implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	private final ReleaserProperties properties;
+	private ReleaserProperties properties;
 
 	public GradleUpdater(ReleaserProperties properties) {
 		this.properties = properties;
@@ -57,6 +58,10 @@ public class GradleUpdater {
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	@Override public void setReleaserProperties(ReleaserProperties properties) {
+		this.properties = properties;
 	}
 
 	private class GradlePropertiesWalker extends SimpleFileVisitor<Path> {

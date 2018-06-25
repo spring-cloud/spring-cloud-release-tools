@@ -1,5 +1,6 @@
 package org.springframework.cloud.release.internal.spring;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -51,13 +52,13 @@ class Tasks {
 				args.releaser.createBlog(args.versionFromScRelease, args.projects);
 				args.releaser.createTweet(args.versionFromScRelease);
 				args.releaser.createReleaseNotes(args.versionFromScRelease, args.projects);
-	});
+	},TaskType.POST_RELEASE);
 	static Task UPDATE_GUIDES = task("updateGuides", "ug",
 			"UPDATE GUIDES",
 			"Updating Spring Guides",
 			args -> {
 				args.releaser.updateSpringGuides(args.versionFromScRelease, args.projects);
-	});
+	},TaskType.POST_RELEASE);
 	static Task UPDATE_SAGAN = task("updateSagan", "g",
 			"UPDATE SAGAN",
 			"Updating Sagan with release info",
@@ -69,9 +70,9 @@ class Tasks {
 			"Updating documentation repository",
 			args -> {
 				args.releaser.updateDocumentationRepository(args.properties, args.versionFromScRelease);
-	});
+	},TaskType.POST_RELEASE);
 
-	static final List<Task> DEFAULT_TASKS = Stream.of(
+	static final List<Task> DEFAULT_TASKS_PER_PROJECT = Stream.of(
 			Tasks.UPDATING_POMS,
 			Tasks.BUILD_PROJECT,
 			Tasks.COMMIT,
@@ -80,32 +81,61 @@ class Tasks {
 			Tasks.SNAPSHOTS,
 			Tasks.PUSH,
 			Tasks.CLOSE_MILESTONE,
+			Tasks.UPDATE_SAGAN
+	).collect(Collectors.toList());
+
+	static final List<Task> DEFAULT_TASKS_PER_RELEASE = Stream.of(
 			Tasks.CREATE_TEMPLATES,
-			Tasks.UPDATE_SAGAN,
 			Tasks.UPDATE_GUIDES,
 			Tasks.UPDATE_DOCUMENTATION
 	).collect(Collectors.toList());
 
-	static Task RELEASE = Tasks.task("release", "r",
+	static final List<Task> NON_COMPOSITE_TASKS = new ArrayList<Task>() {
+		{
+			addAll(DEFAULT_TASKS_PER_PROJECT);
+			addAll(DEFAULT_TASKS_PER_RELEASE);
+		}
+	};
+
+	static Task RELEASE = Tasks.task("release", "fr",
 			"FULL RELEASE",
 			"Perform a full release of this project without interruptions",
-			args -> DEFAULT_TASKS.forEach(task -> task.execute(args)));
+			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
+	static Task POST_RELEASE = Tasks.task("post-release", "pr",
+			"POST RELEASE TASKS",
+			"Perform post release tasks for this release without interruptions",
+			args -> DEFAULT_TASKS_PER_RELEASE.forEach(task -> task.execute(args)),
+			TaskType.POST_RELEASE);
 	static Task RELEASE_VERBOSE = Tasks.task("release-verbose", "r",
 			"FULL VERBOSE RELEASE",
 			"Perform a full release of this project in interactive mode (you'll be asked about skipping steps)",
-			args -> DEFAULT_TASKS.forEach(task -> task.execute(args)));
+			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
+	static Task META_RELEASE = Tasks.task("meta-release", "x",
+			"META RELEASE",
+			"Perform a meta release of projects",
+			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> {
+				args.properties.getMetaRelease().setEnabled(true);
+				task.execute(args);
+			}));
 
 	static final List<Task> COMPOSITE_TASKS = Stream.of(
 			RELEASE,
-			RELEASE_VERBOSE
+			RELEASE_VERBOSE,
+			META_RELEASE
 	).collect(Collectors.toList());
 
-	static final List<Task> ALL_TASKS = Stream.of(
-			COMPOSITE_TASKS, DEFAULT_TASKS
+	static final List<Task> ALL_TASKS_PER_PROJECT = Stream.of(
+			COMPOSITE_TASKS, DEFAULT_TASKS_PER_PROJECT, DEFAULT_TASKS_PER_RELEASE
 	).flatMap(List::stream).collect(Collectors.toList());
 
-	static Task task(String name, String shortName, String header, String description, Consumer<Args> function) {
-		return new Task(name, shortName, header, description, function);
+	static Task task(String name, String shortName, String header, String description,
+			Consumer<Args> function) {
+		return task(name, shortName, header, description, function, TaskType.RELEASE);
+	}
+
+	static Task task(String name, String shortName, String header, String description,
+			Consumer<Args> function, TaskType taskType) {
+		return new Task(name, shortName, header, description, function, taskType);
 	}
 
 	static List<Task> forNames(List<Task> tasks, List<String> names) {
@@ -114,7 +144,11 @@ class Tasks {
 				.collect(Collectors.toList());
 	}
 
-	static String tasksInOrder() {
-		return DEFAULT_TASKS.stream().map(task -> task.name).collect(Collectors.joining(","));
+	static String allTasksInOrder() {
+		return ALL_TASKS_PER_PROJECT.stream().map(task -> task.name).collect(Collectors.joining(","));
 	}
+}
+
+enum TaskType {
+	RELEASE, POST_RELEASE
 }

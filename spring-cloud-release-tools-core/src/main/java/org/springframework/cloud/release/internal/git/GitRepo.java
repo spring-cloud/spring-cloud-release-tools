@@ -112,13 +112,12 @@ class GitRepo {
 
 	/**
 	 * Checks out a branch for a project
-	 * @param project - a Git project
 	 * @param branch - branch to check out
 	 */
-	void checkout(File project, String branch) {
+	void checkout(String branch) {
 		try {
 			log.info("Checking out branch [{}] for repo [{}]", branch, this.basedir);
-			checkoutBranch(project, branch);
+			checkoutBranch(this.basedir, branch);
 			log.info("Successfully checked out the branch [{}]", branch);
 		}
 		catch (Exception e) {
@@ -128,16 +127,25 @@ class GitRepo {
 
 	/**
 	 * Performs a commit
-	 * @param project - a Git project
 	 * @param message - commit message
 	 */
-	void commit(File project, String message) {
-		try(Git git = this.gitFactory.open(file(project))) {
+	void commit(String message) {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			git.add().addFilepattern(".").call();
 			git.commit().setAllowEmpty(false).setMessage(message).call();
 			printLog(git);
 		} catch (EmtpyCommitException e) {
 			log.info("There were no changes detected. Will not commit an empty commit");
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	boolean hasBranch(String branch) {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
+			List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL)
+					.call();
+			return refs.stream().anyMatch(ref -> ref.getName().contains(branch));
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -155,11 +163,10 @@ class GitRepo {
 
 	/**
 	 * Creates a tag with a given name
-	 * @param project
 	 * @param tagName
 	 */
-	void tag(File project, String tagName) {
-		try(Git git = this.gitFactory.open(file(project))) {
+	void tag(String tagName) {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			git.tag().setName(tagName).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -168,11 +175,10 @@ class GitRepo {
 
 	/**
 	 * Pushes the commits to {@code origin} remote branch
-	 * @param project - Git project
 	 * @param branch - remote branch to which the code should be pushed
 	 */
-	void pushBranch(File project, String branch) {
-		try(Git git = this.gitFactory.open(file(project))) {
+	void pushBranch(String branch) {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + branch);
 			this.gitFactory.push(git).setPushTags().setRefSpecs(refSpec).call();
@@ -183,10 +189,9 @@ class GitRepo {
 
 	/**
 	 * Pushes the commits od current branch
-	 * @param project - Git project
 	 */
-	void pushCurrentBranch(File project) {
-		try(Git git = this.gitFactory.open(file(project))) {
+	void pushCurrentBranch() {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			this.gitFactory.push(git).call();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -195,11 +200,10 @@ class GitRepo {
 
 	/**
 	 * Pushes the commits to {@code origin} remote tag
-	 * @param project - Git project
 	 * @param tagName - remote tag to which the code should be pushed
 	 */
-	void pushTag(File project, String tagName) {
-		try(Git git = this.gitFactory.open(file(project))) {
+	void pushTag(String tagName) {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + "refs/tags/" + tagName);
 			this.gitFactory.push(git).setPushTags().setRefSpecs(refSpec).call();
@@ -208,8 +212,8 @@ class GitRepo {
 		}
 	}
 
-	void revert(File project, String message) {
-		try(Git git = this.gitFactory.open(file(project))) {
+	void revert(String message) {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			RevCommit commit = git.log().setMaxCount(1).call().iterator().next();
 			String shortMessage = commit.getShortMessage();
 			String id = commit.getId().getName();
@@ -227,8 +231,8 @@ class GitRepo {
 		}
 	}
 
-	String currentBranch(File project) {
-		try(Git git = this.gitFactory.open(file(project))) {
+	String currentBranch() {
+		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			return git.getRepository().getBranch();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);

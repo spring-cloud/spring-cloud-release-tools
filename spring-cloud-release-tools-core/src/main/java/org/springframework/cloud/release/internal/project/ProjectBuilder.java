@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.util.StringUtils;
@@ -25,12 +26,12 @@ import org.springframework.util.StringUtils;
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectBuilder {
+public class ProjectBuilder implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static final String VERSION_MUSTACHE = "{{version}}";
 
-	private final ReleaserProperties properties;
+	private ReleaserProperties properties;
 	private final ProcessExecutor executor;
 
 	public ProjectBuilder(ReleaserProperties properties) {
@@ -161,12 +162,17 @@ public class ProjectBuilder {
 		}
 		return commandsList.toArray(new String[commandsList.size()]);
 	}
+
+	@Override public void setReleaserProperties(ReleaserProperties properties) {
+		this.properties = properties;
+		this.executor.setReleaserProperties(properties);
+	}
 }
 
-class ProcessExecutor {
+class ProcessExecutor implements ReleaserPropertiesAware {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	private final ReleaserProperties properties;
+	private ReleaserProperties properties;
 
 	ProcessExecutor(ReleaserProperties properties) {
 		this.properties = properties;
@@ -175,7 +181,8 @@ class ProcessExecutor {
 	void runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
 			String workingDir = this.properties.getWorkingDir();
-			log.debug("Will run the build via {} and wait for result for [{}] minutes", commands, waitTimeInMinutes);
+			log.debug("Will run the build from [{}] via {} and wait for result for [{}] minutes",
+					workingDir, commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
 			Process process = startProcess(builder);
 			boolean finished = process.waitFor(waitTimeInMinutes, TimeUnit.MINUTES);
@@ -201,6 +208,10 @@ class ProcessExecutor {
 		return new ProcessBuilder(commands)
 				.directory(new File(workingDir))
 				.inheritIO();
+	}
+
+	@Override public void setReleaserProperties(ReleaserProperties properties) {
+		this.properties = properties;
 	}
 }
 

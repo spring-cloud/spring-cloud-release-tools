@@ -15,6 +15,10 @@ why this tool makes it easy to automate the release / dependency update process 
 
 === What does it do?
 
+==== Single project
+
+For a single project
+
 - Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)
 - Modifies the project versions with values from SC-Release
   * throws an exception when we bump versions to release and there's a SNAPSHOT version referenced in the POM
@@ -26,6 +30,12 @@ why this tool makes it easy to automate the release / dependency update process 
 - Publishes the docs (to `spring-cloud-static` for non-snapshots, to `gh-pages` for snapshots)
 - Reverts back to snapshots, bumps the version by a patch (`1.0.1.RELEASE` -> `1.0.2.BUILD-SNAPSHOT`) (ONLY FOR RELEASE VERSIONS)
 - Closes the milestone on Github (e.g. `v1.0.1.RELEASE`) (ONLY FOR NON-SNAPSHOT VERSIONS)
+
+IMPORTANT: Starting with version that does Sagan integration, you MUST pass the OAuth token,
+otherwise the application will fail to start
+
+After project release
+
 - Generates an email template under `target/email.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a blog template under `target/blog.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a tweet template under `target/tweet.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
@@ -34,8 +44,17 @@ why this tool makes it easy to automate the release / dependency update process 
 - For `GA`/ `SR` release will create an issue in Spring Guides under https://github.com/spring-guides/getting-started-guides/issues/
 - For `GA`/ `SR` release will update the links under https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current
 
-IMPORTANT: Starting with version that does Sagan integration, you MUST pass the OAuth token,
-otherwise the application will fail to start
+==== Meta-release
+
+- Uses the fixed versions to clone and check out each project (e.g. `spring-cloud-sleuth: 2.1.0.RELEASE`)
+- From the version analyzes the branch and checks it out. E.g.
+** for `spring-cloud-release`'s `Finchley.RELEASE` version will resolve either `Finchley.x` branch or will fallback to `master` if there's no `Finchley.x` branch.
+** for `spring-cloud-sleuth`'s `2.1.0.RELEASE` version will resolve `2.1.x` branch
+- Performs the release tasks per each project
+- Performs the post release tasks at the end of the release
+
+IMPORTANT: For the meta-releaser to work we assume that the path to the
+custom configuration file for each project is always `config/releaser.yml`.
 
 === What should I do first?
 
@@ -215,10 +234,31 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --closeMilestone -i=false
 ----
 
+=== How to run meta-release (automatic-mode)
+
+All you have to do is run the jar with the releaser and pass the
+`-x=true` option to turn on meta-release and a list of fixed versions
+in the `--"releaser.fixed-versions[project-name]=project-version" format
+
+```
+$ java -jar spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
+```
+
+IMPORTANT: For the meta release the `startFrom` or `taskNames` take into consideration
+the project names, not task names. E.g. you can start from `spring-cloud-netflix` project,
+or build only tasks with names `spring-cloud-build,spring-cloud-sleuth`.
+
 === Project options
 
 - `releaser.fixed-versions` - A String to String mapping of manually set versions. E.g. `"spring-cloud-cli" -> "1.0.0.RELEASE"` will set
 the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in `spring-cloud-release` project. Example `--releaser.fixed-versions[spring-cloud-cli]=1.0.0.RELEASE`.
+Use these properties to provide versions for the meta release.
+
+- `releaser.meta-release.enabled` - You have to turn it on to enable a meta release. Defaults to `false`
+- `releaser.meta-release.release-train-project-name` - Name of the project that represents the BOM of the release train. Defaults to `spring-cloud-release`
+- `releaser.meta-release.git-org-url` - The URL of the Git organization. We'll append each project's name to it.
+Defaults to `https://github.com/spring-cloud`
+
 - `releaser.git.fetch-versions-from-git` - If `true` then should fill the map of versions from Git. If `false` then picks fixed versions
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
 - `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
@@ -271,6 +311,9 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.confi
 
 TIP: Notice that we're downloading the jar to a parent folder, not to `target`. That's because `target` get cleaned
 during the build process
+
+IMPORTANT: For the meta-releaser to work we assume that the path to the
+configuration file is always `config/releaser.yml`.
 
 ==== Specifying A Branch
 

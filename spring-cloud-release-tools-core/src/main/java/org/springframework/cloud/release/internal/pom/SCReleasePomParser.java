@@ -45,7 +45,7 @@ class SCReleasePomParser {
 
 	private final File springCloudReleaseDir;
 	private final String bootPom;
-	private final String dependenciesPom;
+	private final String dependenciesPomPath;
 	private final PomReader pomReader = new PomReader();
 
 	SCReleasePomParser(File springCloudReleaseDir) {
@@ -55,7 +55,7 @@ class SCReleasePomParser {
 	SCReleasePomParser(File springCloudReleaseDir, String bootPom, String dependenciesPom) {
 		this.springCloudReleaseDir = springCloudReleaseDir;
 		this.bootPom = bootPom;
-		this.dependenciesPom = dependenciesPom;
+		this.dependenciesPomPath = dependenciesPom;
 	}
 
 	Versions allVersions() {
@@ -96,7 +96,7 @@ class SCReleasePomParser {
 	}
 
 	Versions springCloudVersions() {
-		Model model = pom(this.dependenciesPom);
+		Model model = pom(this.dependenciesPomPath);
 		String buildArtifact = model.getParent().getArtifactId();
 		log.debug("[{}] artifact id is equal to [{}]", SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID, buildArtifact);
 		if (!SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID.equals(buildArtifact)) {
@@ -109,6 +109,8 @@ class SCReleasePomParser {
 				.filter(propertyMatchesSCPattern())
 				.map(toProject())
 				.collect(Collectors.toSet());
+		String scReleaseVersion = model.getVersion();
+		projects.add(new Project("spring-cloud-release", scReleaseVersion));
 		return new Versions(buildVersion, projects);
 	}
 

@@ -210,6 +210,10 @@ public class OptionsProcessorTests {
 			@Override Task releaseTask() {
 				return firstTask;
 			}
+
+			@Override String chosenOption() {
+				return "0";
+			}
 		};
 		Options options = nonInteractiveOpts().fullRelease(true).options();
 
@@ -225,6 +229,10 @@ public class OptionsProcessorTests {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override Task releaseVerboseTask() {
 				return firstTask;
+			}
+
+			@Override String chosenOption() {
+				return "0";
 			}
 		};
 		Options options = interactiveOpts().fullRelease(true).options();
@@ -245,7 +253,7 @@ public class OptionsProcessorTests {
 	}
 
 	private Args args() {
-		return new Args(null, null, null, null, null, null, false);
+		return new Args(null, null, null, null, null, null, false, TaskType.RELEASE);
 	}
 
 	private List<String> list(String... list) {

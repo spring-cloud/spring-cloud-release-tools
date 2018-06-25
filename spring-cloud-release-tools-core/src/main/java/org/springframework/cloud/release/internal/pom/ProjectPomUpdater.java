@@ -29,12 +29,13 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectPomUpdater {
+public class ProjectPomUpdater implements ReleaserPropertiesAware {
 
 	private static final List<String> IGNORED_SNAPSHOT_LINE_PATTERNS = Arrays.asList(
 			"^.*replace=.*$",
@@ -44,7 +45,7 @@ public class ProjectPomUpdater {
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectPomUpdater.class);
 
-	private final ReleaserProperties properties;
+	private ReleaserProperties properties;
 	private final ProjectGitHandler gitRepo;
 	private final PomUpdater pomUpdater = new PomUpdater();
 
@@ -101,6 +102,10 @@ public class ProjectPomUpdater {
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	@Override public void setReleaserProperties(ReleaserProperties properties) {
+		this.properties = properties;
 	}
 
 	private class PomWalker extends SimpleFileVisitor<Path> {
