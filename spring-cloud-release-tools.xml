@@ -305,7 +305,7 @@ Defaults to <literal><link xl:href="https://github.com/spring-cloud">https://git
 </listitem>
 <listitem>
 <simpara><literal>releaser.meta-release.projects-to-skip</literal> - List of projects that we should not clone and release. Spring Cloud release
-train depends on projects that got already released. We default this list to <literal>[spring-cloud-stream, spring-cloud-task]</literal>.</simpara>
+train depends on projects that got already released. We default this list to <literal>[spring-boot, spring-cloud-stream, spring-cloud-task]</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.fetch-versions-from-git</literal> - If <literal>true</literal> then should fill the map of versions from Git. If <literal>false</literal> then picks fixed versions</simpara>
