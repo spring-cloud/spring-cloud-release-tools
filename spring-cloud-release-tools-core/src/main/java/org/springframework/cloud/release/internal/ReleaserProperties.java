@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class ReleaserProperties {
 	 * Project name to its version - overrides all versions
 	 * retrieved from a repository like Spring Cloud Release
 	 */
-	private Map<String, String> fixedVersions = new HashMap<>();
+	private Map<String, String> fixedVersions = new LinkedHashMap<>();
 
 	private MetaRelease metaRelease = new MetaRelease();
 
