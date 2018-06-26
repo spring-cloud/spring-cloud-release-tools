@@ -82,6 +82,9 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 				.stream()
 				.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
 				.collect(Collectors.toSet());
+		if (log.isDebugEnabled()) {
+			log.debug("Will apply the following fixed versions {}", projectVersions);
+		}
 		return new Versions(projectVersions).toProjectVersions();
 	}
 

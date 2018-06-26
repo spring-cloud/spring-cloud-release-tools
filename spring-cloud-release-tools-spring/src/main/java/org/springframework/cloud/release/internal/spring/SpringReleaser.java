@@ -126,14 +126,20 @@ public class SpringReleaser {
 			}
 			filteredProjects = filteredProjects.subList(projectIndex, filteredProjects.size());
 			options.startFrom = "";
+			enforceFullRelease(options);
 		} else if (!options.taskNames.isEmpty()) {
 			filteredProjects = filteredProjects.stream()
 					.filter(project -> options.taskNames.contains(project))
 					.collect(Collectors.toList());
 			options.taskNames = new ArrayList<>();
+			enforceFullRelease(options);
 		}
 		log.info("\n\n\nFor meta-release, will release the projects {}\n\n\n", filteredProjects);
 		return filteredProjects;
+	}
+
+	protected void enforceFullRelease(Options options) {
+		options.fullRelease = true;
 	}
 
 	private File projectFolder() {
@@ -210,7 +216,7 @@ public class SpringReleaser {
 
 	private void printSettingVersionFromFixedVersions(Projects projectsToUpdate) {
 		log.info("\n\n\n=== RETRIEVED VERSIONS ===\n\nWill use the fixed versions"
-				+ " of projects\n\n {}", projectsToUpdate
+				+ " of projects\n\n{}", projectsToUpdate
 				.stream().map(p -> p.projectName + " => " + p.version)
 				.collect(Collectors.joining("\n")));
 	}
@@ -223,7 +229,5 @@ public class SpringReleaser {
 					+ "there is at least one SNAPSHOT library version in the Spring Cloud Release project");
 		}
 	}
-
-
 }
 

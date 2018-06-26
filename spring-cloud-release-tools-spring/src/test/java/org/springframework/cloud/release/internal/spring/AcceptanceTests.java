@@ -14,10 +14,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.*;
+
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,6 +79,12 @@ public class AcceptanceTests {
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 		BDDMockito.given(this.saganClient.getProject(anyString()))
 				.willReturn(newProject());
+		Task.stepSkipper = () -> false;
+	}
+
+	@After
+	public void clean() {
+		Task.stepSkipper = new ConsoleInputStepSkipper();
 	}
 
 	private Project newProject() {

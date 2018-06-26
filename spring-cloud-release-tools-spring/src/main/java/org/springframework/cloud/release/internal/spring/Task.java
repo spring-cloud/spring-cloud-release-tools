@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
  */
 class Task {
 
+	static StepSkipper stepSkipper = new ConsoleInputStepSkipper();
+
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static final String MSG = "\nPress 'q' to quit, 's' to skip, any key to continue\n\n";
 
@@ -46,7 +48,7 @@ class Task {
 			boolean interactive = args.interactive;
 			printLog(interactive);
 			if (interactive) {
-				boolean skipStep = skipStep();
+				boolean skipStep = stepSkipper.skipStep();
 				if (!skipStep) {
 					consumer.accept(args);
 				}
@@ -62,22 +64,5 @@ class Task {
 
 	private void printLog(boolean interactive) {
 			log.info("\n\n\n=== {} ===\n\n{} {}\n\n", header, description, interactive ? MSG : "");
-	}
-
-	boolean skipStep() {
-		String input = chosenOption();
-		switch (input.toLowerCase()) {
-		case "s":
-			return true;
-		case "q":
-			System.exit(0);
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	String chosenOption() {
-		return System.console().readLine();
 	}
 }

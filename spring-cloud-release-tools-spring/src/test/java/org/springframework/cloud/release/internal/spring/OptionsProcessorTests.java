@@ -5,6 +5,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +42,12 @@ public class OptionsProcessorTests {
 	@Before
 	public void setup() {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks);
+		Task.stepSkipper = () -> false;
+	}
+
+	@After
+	public void clean() {
+		Task.stepSkipper = new ConsoleInputStepSkipper();
 	}
 
 	@Test
@@ -261,11 +268,7 @@ public class OptionsProcessorTests {
 	}
 
 	static Task task(String name, String shortName, String header, String description, Consumer<Args> function) {
-		return new Task(name, shortName, header, description, function) {
-			@Override String chosenOption() {
-				return "whatever";
-			}
-		};
+		return new Task(name, shortName, header, description, function);
 	}
 
 }
