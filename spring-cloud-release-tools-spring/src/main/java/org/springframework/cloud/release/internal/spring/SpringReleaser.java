@@ -120,6 +120,7 @@ public class SpringReleaser {
 				.collect(Collectors.toList());
 		log.info("List of all projects to clone before filtering {}", filteredProjects);
 		if (StringUtils.hasText(options.startFrom)) {
+			options.startFrom = removeQuotingChars(options.startFrom);
 			int projectIndex = filteredProjects.indexOf(options.startFrom);
 			if (projectIndex < 0) throw new IllegalStateException("Project [" + options.startFrom + "] not found");
 			if (log.isDebugEnabled()) {
@@ -137,6 +138,13 @@ public class SpringReleaser {
 		}
 		log.info("\n\n\nFor meta-release, will release the projects {}\n\n\n", filteredProjects);
 		return filteredProjects;
+	}
+
+	private String removeQuotingChars(String string) {
+		if (string.startsWith("'") && string.endsWith("'")) {
+			return string.substring(1, string.length() - 1);
+		}
+		return string;
 	}
 
 	protected void enforceFullRelease(Options options) {
