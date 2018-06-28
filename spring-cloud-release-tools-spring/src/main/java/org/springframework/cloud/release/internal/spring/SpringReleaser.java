@@ -130,6 +130,10 @@ public class SpringReleaser {
 			options.startFrom = "";
 			enforceFullRelease(options);
 		} else if (!options.taskNames.isEmpty()) {
+			options.taskNames = new ArrayList<>(options.taskNames)
+					.stream()
+					.map(this::removeQuotingChars)
+					.collect(Collectors.toList());
 			filteredProjects = filteredProjects.stream()
 					.filter(project -> options.taskNames.contains(project))
 					.collect(Collectors.toList());
