@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-06-26</date>
+<date>2018-06-28</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -93,7 +93,7 @@ otherwise the application will fail to start</simpara>
 <simpara>From the version analyzes the branch and checks it out. E.g.</simpara>
 <itemizedlist>
 <listitem>
-<simpara>for <literal>spring-cloud-release&#8217;s `Finchley.RELEASE</literal> version will resolve either <literal>Finchley.x</literal> branch or will fallback to <literal>master</literal> if there&#8217;s no <literal>Finchley.x</literal> branch.</simpara>
+<simpara>for <literal>spring-cloud-release&#8217;s `Finchley.RELEASE</literal> version will resolve either <literal>Finchley</literal> branch or will fallback to <literal>master</literal> if there&#8217;s no <literal>Finchley</literal> branch.</simpara>
 </listitem>
 <listitem>
 <simpara>for <literal>spring-cloud-sleuth&#8217;s `2.1.0.RELEASE</literal> version will resolve <literal>2.1.x</literal> branch</simpara>
