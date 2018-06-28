@@ -46,6 +46,7 @@ public class ReleaserApplication implements CommandLineRunner {
 			this.releaser.release(options);
 		} catch (Exception e) {
 			log.error("Exception occurred for the releaser", e);
+			throw e;
 		}
 		System.exit(0);
 	}

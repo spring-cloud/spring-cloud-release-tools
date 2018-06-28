@@ -22,6 +22,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -190,6 +191,7 @@ public class AcceptanceTests {
 	}
 
 	@Test
+	@Ignore("Add a camden branch to the spring cloud release from sources")
 	public void should_perform_a_meta_release_of_sc_release_and_consul() throws Exception {
 		// simulates an org
 		Map<String, String> versions = new HashMap<>();

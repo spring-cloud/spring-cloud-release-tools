@@ -58,7 +58,7 @@ After project release
 
 - Uses the fixed versions to clone and check out each project (e.g. `spring-cloud-sleuth: 2.1.0.RELEASE`)
 - From the version analyzes the branch and checks it out. E.g.
-** for `spring-cloud-release`'s `Finchley.RELEASE` version will resolve either `Finchley.x` branch or will fallback to `master` if there's no `Finchley.x` branch.
+** for `spring-cloud-release`'s `Finchley.RELEASE` version will resolve either `Finchley` branch or will fallback to `master` if there's no `Finchley` branch.
 ** for `spring-cloud-sleuth`'s `2.1.0.RELEASE` version will resolve `2.1.x` branch
 - Performs the release tasks per each project
 - Performs the post release tasks at the end of the release

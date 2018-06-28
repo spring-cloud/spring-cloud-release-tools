@@ -142,7 +142,7 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 			return splitVersion[0] + "." + splitVersion[1] + ".x";
 		} else if (splitVersion.length == 1) {
 			// [Camden] -> [Camden.x]
-			return splitVersion[0] + ".x";
+			return splitVersion[0];
 		}
 		throw new IllegalStateException("Wrong version [" + version + "]. Can't extract semver pieces of it");
 

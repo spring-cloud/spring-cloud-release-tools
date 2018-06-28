@@ -125,11 +125,11 @@ public class ProjectGitHandlerTests {
 	public void should_check_out_a_branch_if_it_exists_when_cloning_from_org_and_its_a_release_train_version() {
 		this.properties.getFixedVersions().put("spring-cloud-release", "Finchley.SR6");
 		given(this.gitRepo.hasBranch(anyString())).willReturn(false);
-		given(this.gitRepo.hasBranch("Finchley.x")).willReturn(true);
+		given(this.gitRepo.hasBranch("Finchley")).willReturn(true);
 
 		this.updater.cloneProjectFromOrg("spring-cloud-release");
 
-		then(this.gitRepo).should().checkout("Finchley.x");
+		then(this.gitRepo).should().checkout("Finchley");
 	}
 
 	private ProjectVersion projectVersion(String version) {
