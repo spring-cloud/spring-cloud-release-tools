@@ -118,6 +118,7 @@ public class SpringReleaser {
 		List<String> filteredProjects = projects.stream()
 				.filter(project -> !this.properties.getMetaRelease().getProjectsToSkip().contains(project))
 				.collect(Collectors.toList());
+		log.info("List of all projects to clone before filtering {}", filteredProjects);
 		if (StringUtils.hasText(options.startFrom)) {
 			int projectIndex = filteredProjects.indexOf(options.startFrom);
 			if (projectIndex < 0) throw new IllegalStateException("Project [" + options.startFrom + "] not found");
