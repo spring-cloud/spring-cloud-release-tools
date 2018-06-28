@@ -47,9 +47,10 @@ public class GitRepoTests {
 
 	@Test
 	public void should_clone_the_project_from_a_given_location() throws IOException {
-		this.gitRepo.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
+		URIish uri = new URIish(this.springCloudReleaseProject.toURI().toURL());
+		this.gitRepo.cloneProject(uri);
 
-		then(new File(this.tmpFolder, ".git")).exists();
+		then(new File(new File(this.tmpFolder, uri.getHumanishName()), ".git")).exists();
 	}
 
 	@Test
@@ -71,22 +72,24 @@ public class GitRepoTests {
 
 	@Test
 	public void should_check_out_a_branch_on_cloned_repo() throws IOException {
+		URIish uri = new URIish(this.springCloudReleaseProject.toURI().toURL());
 		File project = this.gitRepo
-				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
+				.cloneProject(uri);
 		new GitRepo(project).checkout("vCamden.SR3");
 
-		File pom = new File(this.tmpFolder, "pom.xml");
+		File pom = new File(new File(this.tmpFolder, uri.getHumanishName()), "pom.xml");
 		then(pom).exists();
 		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.SR3</version>"))).isTrue();
 	}
 
 	@Test
 	public void should_check_out_a_branch_on_cloned_repo2() throws IOException {
+		URIish uri = new URIish(this.springCloudReleaseProject.toURI().toURL());
 		File project = this.gitRepo
-				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
+				.cloneProject(uri);
 		new GitRepo(project).checkout("Camden.x");
 
-		File pom = new File(this.tmpFolder, "pom.xml");
+		File pom = new File(new File(this.tmpFolder, uri.getHumanishName()), "pom.xml");
 		then(pom).exists();
 		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.BUILD-SNAPSHOT</version>"))).isTrue();
 	}
@@ -121,8 +124,8 @@ public class GitRepoTests {
 
 	@Test
 	public void should_commit_changes() throws Exception {
-		File project = new GitRepo(this.tmpFolder)
-				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
+		URIish uri = new URIish(this.springCloudReleaseProject.toURI().toURL());
+		File project = new GitRepo(this.tmpFolder).cloneProject(uri);
 		createNewFile(project);
 
 		new GitRepo(project).commit("some message");
@@ -241,7 +244,7 @@ public class GitRepoTests {
 	}
 
 	private void createNewFile(File project) throws Exception {
-		File newFile = new File(this.tmpFolder, "newFile");
+		File newFile = new File(project, "newFile");
 		newFile.createNewFile();
 		try (PrintStream out = new PrintStream(new FileOutputStream(newFile))) {
 			out.print("foo");

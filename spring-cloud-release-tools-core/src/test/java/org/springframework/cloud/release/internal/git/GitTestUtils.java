@@ -35,7 +35,6 @@ public class GitTestUtils {
 
 	public static File clonedProject(File baseDir, File projectToClone) throws IOException {
 		GitRepo projectRepo = new GitRepo(baseDir);
-		projectRepo.cloneProject(new URIish(projectToClone.toURI().toURL()));
-		return baseDir;
+		return projectRepo.cloneProject(new URIish(projectToClone.toURI().toURL()));
 	}
 }

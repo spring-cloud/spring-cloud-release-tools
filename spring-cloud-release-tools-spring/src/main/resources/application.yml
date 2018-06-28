@@ -1,1 +1,3 @@
-spring.main.web-environment: false
+spring:
+  main:
+    web-application-type: none

@@ -97,7 +97,8 @@ class GitRepo {
 	 */
 	File cloneProject(URIish projectUri) {
 		try {
-			log.info("Cloning repo from [{}] to [{}]", projectUri, this.basedir);
+			log.info("Cloning repo from [{}] to [{}]", projectUri,
+					humanishDestination(projectUri, this.basedir));
 			Git git = cloneToBasedir(projectUri, this.basedir);
 			if (git != null) {
 				git.close();
@@ -247,7 +248,8 @@ class GitRepo {
 	private Git cloneToBasedir(URIish projectUrl, File destinationFolder)
 			throws GitAPIException {
 		CloneCommand command = this.gitFactory.getCloneCommandByCloneRepository()
-				.setURI(projectUrl.toString() + ".git").setDirectory(destinationFolder);
+				.setURI(projectUrl.toString() + ".git").setDirectory(
+						humanishDestination(projectUrl, destinationFolder));
 		try {
 			return command.call();
 		}
@@ -255,6 +257,10 @@ class GitRepo {
 			deleteBaseDirIfExists();
 			throw e;
 		}
+	}
+
+	private File humanishDestination(URIish projectUrl, File destinationFolder) {
+		return new File(destinationFolder, projectUrl.getHumanishName());
 	}
 
 	private Ref checkoutBranch(File projectDir, String branch)
