@@ -191,7 +191,6 @@ public class AcceptanceTests {
 	}
 
 	@Test
-	@Ignore("Add a camden branch to the spring cloud release from sources")
 	public void should_perform_a_meta_release_of_sc_release_and_consul() throws Exception {
 		// simulates an org
 		Map<String, String> versions = new HashMap<>();

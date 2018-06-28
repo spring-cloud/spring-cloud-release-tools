@@ -29,3 +29,6 @@ b566ab3bea0506bccaa10f83784a41673606d6ee 320597b84bb0312c15228c4d42f46c189b86ed9
 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 29dde5f8e4c5096612ac8669dd7bfbcc95c7ef39 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489664824 +0100	checkout: moving from master to Dalston.RC1
 29dde5f8e4c5096612ac8669dd7bfbcc95c7ef39 e4d44f5a1a67429e37edbb57d3da96bb6717266c Marcin Grzejszczak <marcin@grzejszczak.pl> 1489668889 +0100	checkout: moving from Dalston.RC1 to vCamden.M1
 e4d44f5a1a67429e37edbb57d3da96bb6717266c 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489668895 +0100	checkout: moving from e4d44f5a1a67429e37edbb57d3da96bb6717266c to master
+0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1530201218 +0200	reset: moving to HEAD
+0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1530201221 +0200	checkout: moving from master to Camden.x
+320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1530201227 +0200	checkout: moving from Camden.x to Camden
