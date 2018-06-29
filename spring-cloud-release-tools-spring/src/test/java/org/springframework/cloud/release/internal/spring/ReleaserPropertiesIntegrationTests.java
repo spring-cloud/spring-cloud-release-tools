@@ -53,7 +53,24 @@ public class ReleaserPropertiesIntegrationTests {
 			ReleaserPropertiesHaving having = ((ReleaserPropertiesHaving) aware);
 				BDDAssertions.then(having.properties.getPom().getBranch()).isEqualTo("barrrr");
 				BDDAssertions.then(having.properties.getMaven().getBuildCommand()).isEqualTo("./scripts/noIntegration.sh");
-	});
+		});
+	}
+
+	@Test public void should_update_properties_including_existing_releaser_config_for_netflix() {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getPom().setBranch("bazzzz");
+		URL resource = ReleaserPropertiesIntegrationTests.class
+				.getResource("/projects/project-with-netflix-config");
+
+		new ReleaserPropertiesUpdater(this.context).updateProperties(properties,
+				new File(resource.getFile()));
+
+		BDDAssertions.then(this.propertiesAware).hasSize(2);
+		this.propertiesAware.forEach(aware -> {
+			ReleaserPropertiesHaving having = ((ReleaserPropertiesHaving) aware);
+				BDDAssertions.then(having.properties.getPom().getBranch()).isEqualTo("bazzzz");
+				BDDAssertions.then(having.properties.getMaven().getBuildCommand()).isEqualTo("./scripts/build.sh  {{systemProps}}");
+		});
 	}
 
 	@Configuration

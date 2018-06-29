@@ -1,20 +1,20 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
-import com.esotericsoftware.yamlbeans.YamlReader;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.YamlMapFactoryBean;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.FileSystemResource;
 
 /**
  * @author Marcin Grzejszczak
@@ -41,10 +41,16 @@ class ReleaserPropertiesUpdater {
 		File releaserConfig = new File(clonedProjectFromOrg, "config/releaser.yml");
 		if (releaserConfig.exists()) {
 			try {
-				Object read = new YamlReader(new FileReader(releaserConfig)).read();
+				YamlPropertiesFactoryBean yamlProcessor = new YamlPropertiesFactoryBean();
+				yamlProcessor.setResources(new FileSystemResource(releaserConfig));
+				Properties properties = yamlProcessor.getObject();
 				ReleaserProperties releaserProperties = new Binder(
-						new MapConfigurationPropertySource((Map) read))
-						.bind("releaser", ReleaserProperties.class).get();
+						new MapConfigurationPropertySource(properties.entrySet().stream().collect(
+								Collectors.toMap(
+										e -> e.getKey().toString(),
+										e -> e.getValue().toString()
+								)
+						))).bind("releaser", ReleaserProperties.class).get();
 				log.info("config/releaser.yml found. Will update the current properties");
 				copy.setMaven(releaserProperties.getMaven());
 				copy.setGradle(releaserProperties.getGradle());

@@ -36,10 +36,14 @@
 			<version>5.0.3</version>
 			<optional>true</optional>
 		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.esotericsoftware.yamlbeans</groupId>-->
+			<!--<artifactId>yamlbeans</artifactId>-->
+			<!--<version>1.13</version>-->
+		<!--</dependency>-->
 		<dependency>
-			<groupId>com.esotericsoftware.yamlbeans</groupId>
-			<artifactId>yamlbeans</artifactId>
-			<version>1.13</version>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
 
 		<dependency>
