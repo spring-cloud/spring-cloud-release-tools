@@ -52,8 +52,10 @@ class ReleaserPropertiesUpdater {
 								)
 						))).bind("releaser", ReleaserProperties.class).get();
 				log.info("config/releaser.yml found. Will update the current properties");
-				copy.setMaven(releaserProperties.getMaven());
-				copy.setGradle(releaserProperties.getGradle());
+				copy.getMaven().setBuildCommand(releaserProperties.getMaven().getBuildCommand());
+				copy.getMaven().setDeployCommand(releaserProperties.getMaven().getDeployCommand());
+				copy.getGradle().setGradlePropsSubstitution(releaserProperties.getGradle().getGradlePropsSubstitution());
+				copy.getGradle().setIgnoredGradleRegex(releaserProperties.getGradle().getIgnoredGradleRegex());
 			}
 			catch (Exception e) {
 				throw new IllegalStateException(e);
