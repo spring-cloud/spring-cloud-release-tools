@@ -31,6 +31,10 @@ class ReleaserPropertiesUpdater {
 
 	void updateProperties(ReleaserProperties properties, File clonedProjectFromOrg) {
 		ReleaserProperties props = updatePropertiesFromFile(properties, clonedProjectFromOrg);
+		updateProperties(props);
+	}
+
+	void updateProperties(ReleaserProperties props) {
 		Map<String, ReleaserPropertiesAware> beans = this.context
 				.getBeansOfType(ReleaserPropertiesAware.class);
 		beans.values().forEach(aware -> aware.setReleaserProperties(props));

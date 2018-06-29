@@ -58,8 +58,9 @@ public class SpringReleaser {
 		if (options.metaRelease) {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
 			this.properties.getGit().setFetchVersionsFromGit(false);
+			ReleaserProperties copy = clonePropertiesForProject();
 			metaReleaseProjects(options)
-					.forEach(project -> processProjectForMetaRelease(options, project));
+					.forEach(project -> processProjectForMetaRelease(copy, options, project));
 		} else {
 			log.info("Single project release picked. Will release only the current project");
 			File projectFolder = projectFolder();
@@ -68,13 +69,13 @@ public class SpringReleaser {
 		this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
 	}
 
-	private void processProjectForMetaRelease(Options options, String project) {
+	private void processProjectForMetaRelease(ReleaserProperties copy, Options options, String project) {
 		File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
-		ReleaserProperties copy = clonePropertiesForProject();
 		updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
 		log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
 		try {
 			processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
+			this.updater.updateProperties(copy);
 		} catch (Exception e) {
 			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for project <" +
 					project + "> \n\n", e);
