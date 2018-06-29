@@ -1,17 +1,13 @@
 package org.springframework.cloud.release.internal.spring;
 
-import java.util.HashMap;
+import java.io.File;
+import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.cloud.release.internal.ReleaserApplication;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.context.ApplicationContext;
@@ -34,12 +30,30 @@ public class ReleaserPropertiesIntegrationTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getPom().setBranch("fooooo");
 		
-		new ReleaserPropertiesUpdater(this.context).updateProperties(properties);
+		new ReleaserPropertiesUpdater(this.context).updateProperties(properties,
+				new File("."));
 
 		BDDAssertions.then(this.propertiesAware).hasSize(2);
 		this.propertiesAware.forEach(aware ->
 				BDDAssertions.then(((ReleaserPropertiesHaving) aware)
 						.properties.getPom().getBranch()).isEqualTo("fooooo"));
+	}
+
+	@Test public void should_update_properties_including_existing_releaser_config() {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getPom().setBranch("barrrr");
+		URL resource = ReleaserPropertiesIntegrationTests.class
+				.getResource("/projects/project-with-config");
+
+		new ReleaserPropertiesUpdater(this.context).updateProperties(properties,
+				new File(resource.getFile()));
+
+		BDDAssertions.then(this.propertiesAware).hasSize(2);
+		this.propertiesAware.forEach(aware -> {
+			ReleaserPropertiesHaving having = ((ReleaserPropertiesHaving) aware);
+				BDDAssertions.then(having.properties.getPom().getBranch()).isEqualTo("barrrr");
+				BDDAssertions.then(having.properties.getMaven().getBuildCommand()).isEqualTo("./scripts/noIntegration.sh");
+	});
 	}
 
 	@Configuration

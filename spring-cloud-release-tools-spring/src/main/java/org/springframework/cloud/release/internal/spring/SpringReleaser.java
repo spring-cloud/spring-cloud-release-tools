@@ -1,13 +1,10 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -31,7 +28,6 @@ public class SpringReleaser {
 	private final ReleaserProperties properties;
 	private final OptionsProcessor optionsProcessor;
 	private final ReleaserPropertiesUpdater updater;
-	private final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
 	public SpringReleaser(Releaser releaser, ReleaserProperties properties,
 			ReleaserPropertiesUpdater updater) {
@@ -94,22 +90,7 @@ public class SpringReleaser {
 
 	private void updatePropertiesIfCustomConfigPresent(ReleaserProperties copy,
 			File clonedProjectFromOrg) {
-		File releaserConfig = new File(clonedProjectFromOrg, "config/releaser.yml");
-		if (releaserConfig.exists()) {
-			try {
-				ReleaserProperties releaserProperties = this.objectMapper
-						.readValue(releaserConfig, ReleaserProperties.class);
-				log.info("config/releaser.yml found. Will update the current properties");
-				copy.setMaven(releaserProperties.getMaven());
-				copy.setGradle(releaserProperties.getGradle());
-			}
-			catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
-		}
-		log.info("Updating working directory to [{}]", clonedProjectFromOrg.getAbsolutePath());
-		copy.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
-		this.updater.updateProperties(copy);
+		this.updater.updateProperties(copy, clonedProjectFromOrg);
 	}
 
 	private List<String> metaReleaseProjects(Options options) {

@@ -1,17 +1,15 @@
 package org.springframework.cloud.release.internal.spring;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.context.ApplicationContext;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Marcin Grzejszczak
@@ -26,7 +24,7 @@ public class ReleaserPropertiesUpdaterTests {
 				.willReturn(beansOfType(aware));
 		ReleaserPropertiesUpdater updater = new ReleaserPropertiesUpdater(this.context);
 
-		updater.updateProperties(new ReleaserProperties());
+		updater.updateProperties(new ReleaserProperties(), new File("."));
 
 		BDDAssertions.then(aware.properties).isNotNull();
 	}
