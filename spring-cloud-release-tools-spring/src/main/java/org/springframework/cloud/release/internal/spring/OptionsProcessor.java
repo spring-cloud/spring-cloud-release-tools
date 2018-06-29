@@ -39,12 +39,16 @@ class OptionsProcessor {
 	void processOptions(Options options, Args defaultArgs, List<Task> tasks) {
 		Args args = args(defaultArgs, options.interactive);
 		if (args.taskType == TaskType.POST_RELEASE) {
+			if (options.metaRelease) {
+				postReleaseTask().execute(args);
+				return;
+			}
 			String chosenOption = chosenOption();
 			int pickedInteger = Integer.parseInt(chosenOption);
 			boolean pickedOptionIsComposite = pickedInteger <= 1;
 			boolean pickedOptionIsFromPostRelease = pickedInteger >= Tasks.ALL_TASKS_PER_PROJECT.size()
 					- Tasks.DEFAULT_TASKS_PER_RELEASE.size();
-			if (options.fullRelease || pickedOptionIsComposite) {
+			if (options.metaRelease || options.fullRelease || pickedOptionIsComposite) {
 				postReleaseTask().execute(args);
 			} else if (pickedOptionIsFromPostRelease) {
 				processNonComposite(options, tasks, args);
