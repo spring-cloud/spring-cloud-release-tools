@@ -43,11 +43,18 @@ public class ProjectVersion {
 	public String bumpedVersion() {
 		// 1.0.0.BUILD-SNAPSHOT
 		String[] splitVersion = this.version.split("\\.");
-		if (splitVersion.length < 4) {
+		if (splitVersion.length < 4 && isNumeric(splitVersion[0])) {
 			throw new IllegalStateException("Version is invalid. Should be of format [1.2.3.A]");
+		}
+		if (splitVersion.length == 2 && !isNumeric(splitVersion[0])) {
+			return this.version;
 		}
 		Integer incrementedPatch = Integer.valueOf(splitVersion[2]) + 1;
 		return String.format("%s.%s.%s.%s", splitVersion[0], splitVersion[1], incrementedPatch, splitVersion[3]);
+	}
+
+	private boolean isNumeric(String string) {
+		return string.matches("[0-9]+");
 	}
 
 	public String groupId() {

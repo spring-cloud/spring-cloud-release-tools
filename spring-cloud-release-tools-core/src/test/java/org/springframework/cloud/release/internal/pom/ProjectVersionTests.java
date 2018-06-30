@@ -83,6 +83,13 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_return_the_previous_version_for_release_train_version() {
+		String version = "Edgware.BUILD-SNAPSHOT";
+
+		then(projectVersion(version).bumpedVersion()).isEqualTo("Edgware.BUILD-SNAPSHOT");
+	}
+
+	@Test
 	public void should_return_true_for_snapshot_version() {
 		String version = "1.0.1.BUILD-SNAPSHOT";
 
