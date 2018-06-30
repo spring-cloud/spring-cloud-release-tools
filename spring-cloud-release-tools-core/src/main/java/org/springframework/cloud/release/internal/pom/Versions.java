@@ -16,7 +16,6 @@
 package org.springframework.cloud.release.internal.pom;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,10 +23,11 @@ import java.util.stream.Collectors;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BUILD_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD_RELEASE;
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD_STARTER;
 
 /**
  * Represents versions taken out from Spring Cloud Release pom
@@ -145,10 +145,13 @@ class Versions {
 				break;
 			case SPRING_CLOUD_RELEASE:
 			case SPRING_CLOUD:
+			case SPRING_CLOUD_STARTER:
 				remove(SPRING_CLOUD_RELEASE);
 				remove(SPRING_CLOUD);
+				remove(SPRING_CLOUD_STARTER);
 				this.projects.add(new Project(SPRING_CLOUD_RELEASE, version));
 				this.projects.add(new Project(SPRING_CLOUD, version));
+				this.projects.add(new Project(SPRING_CLOUD_STARTER, version));
 				break;
 			default:
 				remove(projectName);

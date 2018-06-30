@@ -29,6 +29,7 @@ final class SpringCloudConstants {
 	static final String BUILD_ARTIFACT_ID = "spring-cloud-build";
 	static final String SPRING_CLOUD_RELEASE = "spring-cloud-release";
 	static final String SPRING_CLOUD = "spring-cloud";
+	static final String SPRING_CLOUD_STARTER = "spring-cloud-starter";
 
 	private SpringCloudConstants() {
 		throw new IllegalStateException("Don't instantiate a utility class");

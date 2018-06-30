@@ -123,11 +123,13 @@ public class VersionsTests {
 
 		then(versions.versionForProject("spring-cloud")).isEqualTo("3.0.0");
 		then(versions.versionForProject("spring-cloud-release")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-starter")).isEqualTo("3.0.0");
 
 		versions = mixedVersions().setVersion("spring-cloud-release", "3.0.0");
 
 		then(versions.versionForProject("spring-cloud")).isEqualTo("3.0.0");
 		then(versions.versionForProject("spring-cloud-release")).isEqualTo("3.0.0");
+		then(versions.versionForProject("spring-cloud-starter")).isEqualTo("3.0.0");
 	}
 
 	@Test
