@@ -45,7 +45,7 @@ class OptionsProcessor {
 			}
 			String chosenOption = chosenOption();
 			int pickedInteger = Integer.parseInt(chosenOption);
-			boolean pickedOptionIsComposite = pickedInteger <= 1;
+			boolean pickedOptionIsComposite = pickedInteger <= 1 && pickedInteger >= 0;
 			boolean pickedOptionIsFromPostRelease = pickedInteger >= Tasks.ALL_TASKS_PER_PROJECT.size()
 					- Tasks.DEFAULT_TASKS_PER_RELEASE.size();
 			if (options.metaRelease || options.fullRelease || pickedOptionIsComposite) {
@@ -216,6 +216,6 @@ class OptionsProcessor {
 	}
 
 	String chosenOption() {
-		return System.console().readLine();
+		return System.console() == null ? "-1" : System.console().readLine();
 	}
 }
