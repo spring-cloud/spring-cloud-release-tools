@@ -45,7 +45,7 @@ public class ReleaserApplication implements CommandLineRunner {
 		try {
 			this.releaser.release(options);
 		} catch (Exception e) {
-			log.error("Exception occurred for the releaser", e);
+			log.error("Exception occurred for the releaser. Picked options were [" + options + "]", e);
 			throw e;
 		}
 		System.exit(0);
