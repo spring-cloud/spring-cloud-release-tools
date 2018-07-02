@@ -24,4 +24,10 @@ public class Options {
 		this.startFrom = startFrom;
 		this.range = range;
 	}
+
+	@Override public String toString() {
+		return "Options{" + "metaRelease=" + this.metaRelease + ", fullRelease=" + this.fullRelease
+				+ ", interactive=" + this.interactive + ", taskNames=" + this.taskNames
+				+ ", startFrom='" + this.startFrom + '\'' + ", range='" + this.range + '\'' + '}';
+	}
 }

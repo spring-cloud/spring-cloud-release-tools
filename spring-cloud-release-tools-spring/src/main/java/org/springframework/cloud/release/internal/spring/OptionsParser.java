@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.options.Parser;
@@ -17,6 +19,8 @@ import org.springframework.cloud.release.internal.options.Parser;
  * @author Marcin Grzejszczak
  */
 class OptionsParser implements Parser {
+
+	private static final Logger log = LoggerFactory.getLogger(OptionsParser.class);
 
 	@Override
 	public Options parse(String[] args) {
@@ -73,7 +77,7 @@ class OptionsParser implements Parser {
 					.collect(Collectors.toList());
 			String startFrom = options.valueOf(startFromOpt);
 			String range = options.valueOf(rangeOpt);
-			return new OptionsBuilder()
+			Options buildOptions = new OptionsBuilder()
 					.metaRelease(metaRelease)
 					.fullRelease(fullRelease)
 					.interactive(interactive)
@@ -81,6 +85,7 @@ class OptionsParser implements Parser {
 					.startFrom(startFrom)
 					.range(range)
 					.options();
+			log.info("\n\nWill use the following options ot process the project\n\n{}\n\n", buildOptions);
 		}
 		catch (Exception e) {
 			printErrorMessage(e, parser);
