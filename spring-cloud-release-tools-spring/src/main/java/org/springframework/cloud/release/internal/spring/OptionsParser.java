@@ -86,6 +86,7 @@ class OptionsParser implements Parser {
 					.range(range)
 					.options();
 			log.info("\n\nWill use the following options ot process the project\n\n{}\n\n", buildOptions);
+			return buildOptions;
 		}
 		catch (Exception e) {
 			printErrorMessage(e, parser);
