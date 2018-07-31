@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
 import java.util.List;
 
 import org.eclipse.jgit.api.CheckoutCommand;
@@ -147,10 +146,14 @@ class GitRepo {
 		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL)
 					.call();
-			return refs.stream().anyMatch(ref -> ref.getName().contains(branch));
+			return refs.stream().anyMatch(ref -> branch.equals(nameOfBranch(ref.getName())));
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	private String nameOfBranch(String branch) {
+		return branch.substring(branch.lastIndexOf("/") + 1);
 	}
 
 	private void printLog(Git git) throws GitAPIException, IOException {
