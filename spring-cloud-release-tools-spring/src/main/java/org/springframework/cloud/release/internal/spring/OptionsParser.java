@@ -1,15 +1,14 @@
 package org.springframework.cloud.release.internal.spring;
 
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import joptsimple.ArgumentAcceptingOptionSpec;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.options.Options;
@@ -75,7 +74,7 @@ class OptionsParser implements Parser {
 			List<String> tasksFromOptions = Tasks.NON_COMPOSITE_TASKS.stream()
 					.filter(task -> options.has(task.name) || options.has(task.shortName))
 					.map(task -> task.name).collect(Collectors.toList());
-			if (providedTaskNames.isEmpty()) {
+			if (providedTaskNames.isEmpty() && !metaRelease) {
 				providedTaskNames.addAll(tasksFromOptions.isEmpty() ? allTaskNames : tasksFromOptions);
 			}
 			List<String> taskNames = allTaskNames.stream()
