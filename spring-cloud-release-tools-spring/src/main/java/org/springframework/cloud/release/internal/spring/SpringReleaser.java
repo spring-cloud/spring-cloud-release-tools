@@ -168,12 +168,11 @@ public class SpringReleaser {
 			assertNoSnapshotsForANonSnapshotProject(projectsToUpdate, versionFromScRelease);
 		} else {
 			ProjectVersion originalVersion = new ProjectVersion(project);
-			String fixedVersionForProject = this.properties.getFixedVersions().get(originalVersion.projectName);
-			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject == null ?
-			originalVersion.version : fixedVersionForProject);
+			String fixedVersionForProject = this.properties.getFixedVersions().get("spring-cloud-release");
+			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject);
 			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
 					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
-					.distinct().collect(Collectors.toCollection(Projects::new));
+					.collect(Collectors.toCollection(Projects::new));
 			projectsToUpdate.add(versionFromScRelease);
 			printSettingVersionFromFixedVersions(projectsToUpdate);
 		}
