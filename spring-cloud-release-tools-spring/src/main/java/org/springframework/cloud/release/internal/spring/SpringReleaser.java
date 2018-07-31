@@ -102,6 +102,7 @@ public class SpringReleaser {
 				.collect(Collectors.toList());
 		log.info("List of all projects to clone before filtering {}", filteredProjects);
 		if (StringUtils.hasText(options.startFrom)) {
+			log.info("Start from option provided [{}]", options.startFrom);
 			options.startFrom = removeQuotingChars(options.startFrom);
 			int projectIndex = filteredProjects.indexOf(options.startFrom);
 			if (projectIndex < 0) throw new IllegalStateException("Project [" + options.startFrom + "] not found");
@@ -112,6 +113,7 @@ public class SpringReleaser {
 			options.startFrom = "";
 			enforceFullRelease(options);
 		} else if (!options.taskNames.isEmpty()) {
+			log.info("Task names provided provided {}", options.taskNames);
 			options.taskNames = new ArrayList<>(options.taskNames)
 					.stream()
 					.map(this::removeQuotingChars)
