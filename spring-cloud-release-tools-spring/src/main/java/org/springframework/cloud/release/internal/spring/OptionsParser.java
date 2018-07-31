@@ -74,8 +74,9 @@ class OptionsParser implements Parser {
 			List<String> tasksFromOptions = Tasks.NON_COMPOSITE_TASKS.stream()
 					.filter(task -> options.has(task.name) || options.has(task.shortName))
 					.map(task -> task.name).collect(Collectors.toList());
-			if (providedTaskNames.isEmpty() && !metaRelease) {
-				providedTaskNames.addAll(tasksFromOptions.isEmpty() ? allTaskNames : tasksFromOptions);
+			if (providedTaskNames.isEmpty()) {
+				providedTaskNames.addAll(tasksFromOptions.isEmpty() && !metaRelease ?
+						allTaskNames : tasksFromOptions);
 			}
 			List<String> taskNames = allTaskNames.stream()
 					.filter(providedTaskNames::contains)
