@@ -149,6 +149,9 @@ public class SpringReleaser {
 				projectsToUpdateForFixedVersions() : projectsAndVersion.projectVersions;
 		ProjectVersion version = projects.containsProject(this.properties.getMetaRelease().getReleaseTrainProjectName()) ?
 				projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()) : versionFromBranch();
+		if (options.metaRelease) {
+			this.properties.getPom().setBranch(version.version);
+		}
 		return new Args(this.releaser, projects, version,
 				this.properties, options.interactive);
 	}
@@ -168,7 +171,8 @@ public class SpringReleaser {
 			assertNoSnapshotsForANonSnapshotProject(projectsToUpdate, versionFromScRelease);
 		} else {
 			ProjectVersion originalVersion = new ProjectVersion(project);
-			String fixedVersionForProject = this.properties.getFixedVersions().get("spring-cloud-release");
+			String fixedVersionForProject = this.properties.getFixedVersions()
+					.get(this.properties.getMetaRelease().getReleaseTrainProjectName());
 			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject);
 			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
 					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
