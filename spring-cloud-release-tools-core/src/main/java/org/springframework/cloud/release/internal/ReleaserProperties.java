@@ -79,6 +79,7 @@ public class ReleaserProperties {
 			{
 				this.add("spring-boot");
 				this.add("spring-cloud-stream");
+				this.add("spring-cloud-task");
 			}
 		};
 
