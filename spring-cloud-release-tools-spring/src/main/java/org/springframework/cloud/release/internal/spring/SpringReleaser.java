@@ -175,7 +175,9 @@ public class SpringReleaser {
 			ProjectVersion originalVersion = new ProjectVersion(project);
 			String fixedVersionForProject = this.properties.getFixedVersions()
 					.get(this.properties.getMetaRelease().getReleaseTrainProjectName());
-			versionFromScRelease = new ProjectVersion(originalVersion.projectName, fixedVersionForProject);
+			versionFromScRelease = StringUtils.hasText(fixedVersionForProject) ?
+					new ProjectVersion(originalVersion.projectName, fixedVersionForProject) :
+					new ProjectVersion(project);
 			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
 					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
 					.collect(Collectors.toCollection(Projects::new));
