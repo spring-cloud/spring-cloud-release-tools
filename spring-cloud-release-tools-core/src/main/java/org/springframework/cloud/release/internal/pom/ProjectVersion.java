@@ -41,6 +41,9 @@ public class ProjectVersion {
 	}
 
 	public String bumpedVersion() {
+		if (this.version == null) {
+			throw new IllegalStateException("Version can't be null!");
+		}
 		// 1.0.0.BUILD-SNAPSHOT
 		String[] splitVersion = this.version.split("\\.");
 		if (splitVersion.length < 4 && isNumeric(splitVersion[0])) {
@@ -71,19 +74,19 @@ public class ProjectVersion {
 	}
 
 	public boolean isSnapshot() {
-		return this.version.contains("SNAPSHOT");
+		return this.version != null && this.version.contains("SNAPSHOT");
 	}
 
 	public boolean isRc() {
-		return this.version.contains("RC");
+		return this.version != null && this.version.contains("RC");
 	}
 
 	public boolean isMilestone() {
-		return this.version.matches(".*M[0-9]+");
+		return this.version != null && this.version.matches(".*M[0-9]+");
 	}
 
 	public boolean isRelease() {
-		return this.version.contains("RELEASE");
+		return this.version != null && this.version.contains("RELEASE");
 	}
 
 	public boolean isReleaseOrServiceRelease() {
@@ -91,10 +94,13 @@ public class ProjectVersion {
 	}
 
 	public boolean isServiceRelease() {
-		return this.version.matches(".*.SR[0-9]+");
+		return this.version != null && this.version.matches(".*.SR[0-9]+");
 	}
 
 	public boolean isSameMinor(String version) {
+		if (this.version == null) {
+			return false;
+		}
 		String[] splitThis = this.version.split("\\.");
 		String[] splitThat = version.split("\\.");
 		return splitThis.length == splitThat.length &&
