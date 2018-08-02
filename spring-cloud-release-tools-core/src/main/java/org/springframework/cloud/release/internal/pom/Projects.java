@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,7 +21,7 @@ public class Projects extends HashSet<ProjectVersion> {
 
 	@SuppressWarnings("unchecked")
 	public Projects(ProjectVersion... versions) {
-		addAll(new HashSet<>(Arrays.asList(versions)));
+		addAll(new HashSet<>(Arrays.stream(versions).filter(Objects::nonNull).collect(Collectors.toList())));
 	}
 
 	public static Projects forRollback(Projects projects, ProjectVersion originalVersion) {
@@ -29,6 +30,13 @@ public class Projects extends HashSet<ProjectVersion> {
 		newProjects.addAll(projects.forNameStartingWith(SpringCloudConstants.SPRING_BOOT));
 		newProjects.add(projects.forName(SpringCloudConstants.BUILD_ARTIFACT_ID));
 		return newProjects;
+	}
+
+	@Override public boolean add(ProjectVersion projectVersion) {
+		if (projectVersion == null) {
+			return false;
+		}
+		return super.add(projectVersion);
 	}
 
 	public void remove(String projectName) {

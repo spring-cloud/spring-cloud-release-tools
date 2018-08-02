@@ -164,6 +164,8 @@ public class SpringReleaser {
 	private ProjectsAndVersion projects(File project) {
 		ProjectVersion versionFromScRelease;
 		Projects projectsToUpdate;
+		log.info("Fetch from git [{}], meta release [{}]", this.properties.getGit().isFetchVersionsFromGit(),
+				this.properties.getMetaRelease().isEnabled());
 		if (this.properties.getGit().isFetchVersionsFromGit() && !this.properties.getMetaRelease().isEnabled()) {
 			printVersionRetrieval();
 			projectsToUpdate = this.releaser.retrieveVersionsFromSCRelease();
