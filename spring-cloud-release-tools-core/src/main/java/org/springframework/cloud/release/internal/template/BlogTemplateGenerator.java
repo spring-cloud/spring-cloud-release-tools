@@ -1,8 +1,5 @@
 package org.springframework.cloud.release.internal.template;
 
-import com.github.jknack.handlebars.Template;
-import com.google.common.collect.ImmutableMap;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.github.jknack.handlebars.Template;
+import com.google.common.collect.ImmutableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.util.StringUtils;
 
@@ -20,6 +21,8 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 class BlogTemplateGenerator {
+
+	private static final Logger log = LoggerFactory.getLogger(BlogTemplateGenerator.class);
 
 	private static final Pattern RC_PATTERN = Pattern.compile("(.*)(RC)([0-9]+)");
 	private static final Pattern MILESTONE_PATTERN = Pattern.compile("(.*)(M)([0-9]+)");
@@ -93,9 +96,16 @@ class BlogTemplateGenerator {
 		} else if (rc.matches()) {
 			return availabilityText(rc, "Release Candidate", "RC");
 		} else if (milestone.matches()) {
-			return availabilityText(milestone, "Milestone", "M");
+			return milestone(milestone);
 		}
-		throw new IllegalStateException("Wrong version [" + this.releaseVersion + "] for a blog post");
+		if (log.isWarnEnabled()) {
+			log.warn("Unrecognized release [{}] . Hopefully, you know what you're doing. Will treat it as milestone", this.releaseVersion);
+		}
+		return milestone(milestone);
+	}
+
+	private String milestone(Matcher milestone) {
+		return availabilityText(milestone, "Milestone", "M");
 	}
 
 	private String availabilityText(Matcher matcher, String text, String shortText) {
