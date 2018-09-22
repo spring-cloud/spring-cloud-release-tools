@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.YamlMapFactoryBean;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
@@ -31,6 +30,7 @@ class ReleaserPropertiesUpdater {
 
 	void updateProperties(ReleaserProperties properties, File clonedProjectFromOrg) {
 		ReleaserProperties props = updatePropertiesFromFile(properties, clonedProjectFromOrg);
+		log.info("Updated properties [\n\n{}\n\n]", props);
 		updateProperties(props);
 	}
 
@@ -64,6 +64,8 @@ class ReleaserPropertiesUpdater {
 			catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
+		} else {
+			log.info("No config/releaser.yml found. Will NOT update the current properties");
 		}
 		log.info("Updating working directory to [{}]", clonedProjectFromOrg.getAbsolutePath());
 		copy.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());

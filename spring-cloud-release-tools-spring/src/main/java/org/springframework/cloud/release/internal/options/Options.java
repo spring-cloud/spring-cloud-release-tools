@@ -1,7 +1,7 @@
 package org.springframework.cloud.release.internal.options;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcin Grzejszczak
@@ -20,9 +20,18 @@ public class Options {
 		this.metaRelease = metaRelease;
 		this.fullRelease = fullRelease;
 		this.interactive = interactive;
-		this.taskNames = taskNames;
-		this.startFrom = startFrom;
-		this.range = range;
+		this.taskNames = taskNames.stream()
+				.map(this::removeQuotingChars).collect(
+				Collectors.toList());
+		this.startFrom = removeQuotingChars(startFrom);
+		this.range = removeQuotingChars(range);
+	}
+
+	private String removeQuotingChars(String string) {
+		if (string.startsWith("'") && string.endsWith("'")) {
+			return string.substring(1, string.length() - 1);
+		}
+		return string;
 	}
 
 	@Override public String toString() {

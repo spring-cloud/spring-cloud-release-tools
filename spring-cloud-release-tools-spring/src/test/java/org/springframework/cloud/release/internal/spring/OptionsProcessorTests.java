@@ -1,7 +1,6 @@
 package org.springframework.cloud.release.internal.spring;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -249,6 +248,19 @@ public class OptionsProcessorTests {
 		then(this.first.executed).isTrue();
 		then(this.second.executed).isFalse();
 		then(this.third.executed).isFalse();
+	}
+
+	@Test
+	public void should_remove_single_quotes() throws Exception {
+		Options options = interactiveOpts().fullRelease(true)
+				.range("'1-2'")
+				.startFrom("'c'")
+				.taskNames(Arrays.asList("'a'", "'b'"))
+				.options();
+
+		then(options.range).isEqualTo("1-2");
+		then(options.startFrom).isEqualTo("c");
+		then(options.taskNames).containsOnly("a", "b");
 	}
 
 	private OptionsBuilder interactiveOpts() {

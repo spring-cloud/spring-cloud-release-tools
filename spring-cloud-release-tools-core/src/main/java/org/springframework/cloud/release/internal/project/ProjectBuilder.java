@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
  */
 public class ProjectBuilder implements ReleaserPropertiesAware {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(ProjectBuilder.class);
 	private static final String VERSION_MUSTACHE = "{{version}}";
 
 	private ReleaserProperties properties;

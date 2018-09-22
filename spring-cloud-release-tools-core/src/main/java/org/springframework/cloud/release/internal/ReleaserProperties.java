@@ -235,6 +235,15 @@ public class ReleaserProperties {
 		public void setFetchVersionsFromGit(boolean fetchVersionsFromGit) {
 			this.fetchVersionsFromGit = fetchVersionsFromGit;
 		}
+
+		@Override public String toString() {
+			return "Git{" + "springCloudReleaseGitUrl='" + this.springCloudReleaseGitUrl + '\''
+					+ ", documentationUrl='" + this.documentationUrl + '\''
+					+ ", documentationBranch='" + this.documentationBranch + '\''
+					+ ", cloneDestinationDir='" + this.cloneDestinationDir + '\''
+					+ ", fetchVersionsFromGit=" + this.fetchVersionsFromGit
+					+ ", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones + '}';
+		}
 	}
 
 	public static class Pom {
@@ -271,6 +280,10 @@ public class ReleaserProperties {
 			this.ignoredPomRegex = ignoredPomRegex;
 		}
 
+		@Override public String toString() {
+			return "Pom{" + "branch='" + this.branch + '\'' + ", ignoredPomRegex="
+					+ this.ignoredPomRegex + '}';
+		}
 	}
 
 	public static class Maven {
@@ -348,6 +361,13 @@ public class ReleaserProperties {
 		public void setSystemProperties(String systemProperties) {
 			this.systemProperties = systemProperties;
 		}
+
+		@Override public String toString() {
+			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='"
+					+ this.deployCommand + '\'' + ", publishDocsCommands=" + Arrays
+					.toString(this.publishDocsCommands) + ", waitTimeInMinutes="
+					+ this.waitTimeInMinutes + '}';
+		}
 	}
 
 	public static class Gradle {
@@ -391,6 +411,11 @@ public class ReleaserProperties {
 		public void setIgnoredGradleRegex(List<String> ignoredGradleRegex) {
 			this.ignoredGradleRegex = ignoredGradleRegex;
 		}
+
+		@Override public String toString() {
+			return "Gradle{" + "gradlePropsSubstitution=" + this.gradlePropsSubstitution
+					+ ", ignoredGradleRegex=" + this.ignoredGradleRegex + '}';
+		}
 	}
 
 	public static class Sagan {
@@ -405,6 +430,10 @@ public class ReleaserProperties {
 
 		public void setBaseUrl(String baseUrl) {
 			this.baseUrl = baseUrl;
+		}
+
+		@Override public String toString() {
+			return "Sagan{" + "baseUrl='" + this.baseUrl + '\'' + '}';
 		}
 	}
 
@@ -471,5 +500,12 @@ public class ReleaserProperties {
 
 	public void setSagan(Sagan sagan) {
 		this.sagan = sagan;
+	}
+
+	@Override public String toString() {
+		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git
+				+ ", pom=" + this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan="
+				+ this.sagan + ", fixedVersions=" + this.fixedVersions + ", metaRelease="
+				+ this.metaRelease + '}';
 	}
 }

@@ -58,9 +58,8 @@ public class SpringReleaser {
 		if (options.metaRelease) {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
 			this.properties.getGit().setFetchVersionsFromGit(false);
-			ReleaserProperties copy = clonePropertiesForProject();
 			metaReleaseProjects(options)
-					.forEach(project -> processProjectForMetaRelease(copy, options, project));
+					.forEach(project -> processProjectForMetaRelease(clonePropertiesForProject(), options, project));
 		} else {
 			log.info("Single project release picked. Will release only the current project");
 			File projectFolder = projectFolder();
@@ -70,6 +69,7 @@ public class SpringReleaser {
 	}
 
 	private void processProjectForMetaRelease(ReleaserProperties copy, Options options, String project) {
+		log.info("Original properties [\n\n{}\n\n]", copy);
 		File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
 		updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
 		log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
@@ -103,7 +103,6 @@ public class SpringReleaser {
 		log.info("List of all projects to clone before filtering {}", filteredProjects);
 		if (StringUtils.hasText(options.startFrom)) {
 			log.info("Start from option provided [{}]", options.startFrom);
-			options.startFrom = removeQuotingChars(options.startFrom);
 			int projectIndex = filteredProjects.indexOf(options.startFrom);
 			if (projectIndex < 0) throw new IllegalStateException("Project [" + options.startFrom + "] not found");
 			if (log.isDebugEnabled()) {
@@ -113,11 +112,7 @@ public class SpringReleaser {
 			options.startFrom = "";
 			enforceFullRelease(options);
 		} else if (!options.taskNames.isEmpty()) {
-			log.info("Task names provided provided {}", options.taskNames);
-			options.taskNames = new ArrayList<>(options.taskNames)
-					.stream()
-					.map(this::removeQuotingChars)
-					.collect(Collectors.toList());
+			log.info("Task names provided {}", options.taskNames);
 			filteredProjects = filteredProjects.stream()
 					.filter(project -> options.taskNames.contains(project))
 					.collect(Collectors.toList());
@@ -126,13 +121,6 @@ public class SpringReleaser {
 		}
 		log.info("\n\n\nFor meta-release, will release the projects {}\n\n\n", filteredProjects);
 		return filteredProjects;
-	}
-
-	private String removeQuotingChars(String string) {
-		if (string.startsWith("'") && string.endsWith("'")) {
-			return string.substring(1, string.length() - 1);
-		}
-		return string;
 	}
 
 	protected void enforceFullRelease(Options options) {
