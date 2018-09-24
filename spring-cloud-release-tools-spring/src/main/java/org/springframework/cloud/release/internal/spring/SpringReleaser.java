@@ -71,9 +71,9 @@ public class SpringReleaser {
 
 	private void processProjectForMetaRelease(ReleaserProperties copy, Options options, String project) {
 		log.info("Original properties [\n\n{}\n\n]", copy);
-		this.updater.updateProperties(copy);
 		File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
-		updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
+		ReleaserProperties updatedProps = updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
+		this.updater.updateProperties(updatedProps);
 		log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
 		try {
 			processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
@@ -90,9 +90,9 @@ public class SpringReleaser {
 		return copy;
 	}
 
-	private void updatePropertiesIfCustomConfigPresent(ReleaserProperties copy,
+	private ReleaserProperties updatePropertiesIfCustomConfigPresent(ReleaserProperties copy,
 			File clonedProjectFromOrg) {
-		this.updater.updateProperties(copy, clonedProjectFromOrg);
+		return this.updater.updateProperties(copy, clonedProjectFromOrg);
 	}
 
 	private List<String> metaReleaseProjects(Options options) {

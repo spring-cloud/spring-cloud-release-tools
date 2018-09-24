@@ -28,10 +28,11 @@ class ReleaserPropertiesUpdater {
 		this.context = context;
 	}
 
-	void updateProperties(ReleaserProperties properties, File clonedProjectFromOrg) {
+	ReleaserProperties updateProperties(ReleaserProperties properties, File clonedProjectFromOrg) {
 		ReleaserProperties props = updatePropertiesFromFile(properties, clonedProjectFromOrg);
 		log.info("Updated properties [\n\n{}\n\n]", props);
 		updateProperties(props);
+		return props;
 	}
 
 	void updateProperties(ReleaserProperties props) {
