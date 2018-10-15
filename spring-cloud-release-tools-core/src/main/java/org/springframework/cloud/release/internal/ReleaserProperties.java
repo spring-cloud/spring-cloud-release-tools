@@ -114,6 +114,16 @@ public class ReleaserProperties {
 		public void setProjectsToSkip(List<String> projectsToSkip) {
 			this.projectsToSkip = projectsToSkip;
 		}
+
+		@Override
+		public String toString() {
+			return "MetaRelease{" +
+					"enabled=" + this.enabled +
+					", releaseTrainProjectName='" + this.releaseTrainProjectName + '\'' +
+					", gitOrgUrl='" + this.gitOrgUrl + '\'' +
+					", projectsToSkip=" + this.projectsToSkip +
+					'}';
+		}
 	}
 
 	public static class Git {
