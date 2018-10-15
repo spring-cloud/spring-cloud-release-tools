@@ -58,6 +58,7 @@ public class SpringReleaser {
 		if (options.metaRelease) {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
 			this.properties.getGit().setFetchVersionsFromGit(false);
+			this.properties.getMetaRelease().setEnabled(options.metaRelease);
 			ReleaserProperties original = clonePropertiesForProject(this.properties);
 			metaReleaseProjects(options)
 					.forEach(project -> processProjectForMetaRelease(clonePropertiesForProject(original), options, project));
