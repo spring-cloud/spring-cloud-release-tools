@@ -1,6 +1,7 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,16 +18,31 @@ import org.springframework.context.ApplicationContext;
 public class ReleaserPropertiesUpdaterTests {
 
 	ApplicationContext context = BDDMockito.mock(ApplicationContext.class);
+	File relaserUpdater;
+
+	public ReleaserPropertiesUpdaterTests() throws URISyntaxException {
+		this.relaserUpdater = new File(ReleaserPropertiesUpdaterTests.class
+				.getResource("/projects/releaser-updater/").toURI());
+	}
 
 	@Test public void should_update_properties() {
+		ReleaserProperties original = originalReleaserProperties();
 		Aware aware = new Aware();
 		BDDMockito.given(this.context.getBeansOfType(BDDMockito.any(Class.class)))
 				.willReturn(beansOfType(aware));
 		ReleaserPropertiesUpdater updater = new ReleaserPropertiesUpdater(this.context);
 
-		updater.updateProperties(new ReleaserProperties(), new File("."));
+		ReleaserProperties props = updater
+				.updateProperties(original, this.relaserUpdater);
 
 		BDDAssertions.then(aware.properties).isNotNull();
+		BDDAssertions.then(props.getMaven().getSystemProperties()).isEqualTo("-Dfoo=bar");
+	}
+
+	ReleaserProperties originalReleaserProperties() {
+		ReleaserProperties props = new ReleaserProperties();
+		props.getMaven().setSystemProperties("-Dfoo=bar");
+		return props;
 	}
 
 	private Map<String, Object> beansOfType(Aware aware) {
