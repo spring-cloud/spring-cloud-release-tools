@@ -120,6 +120,19 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_and_there_are_no_sys_props() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("echo foo {{systemProps}}");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("foo");
+	}
+
+	@Test
 	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_without_system_props() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo {{systemProps}}");
