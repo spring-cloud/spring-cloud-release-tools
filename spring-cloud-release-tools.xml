@@ -323,6 +323,12 @@ train depends on projects that got already released. We default this list to <li
 <simpara><literal>releaser.git.documentation-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal></simpara>
 </listitem>
 <listitem>
+<simpara><literal>releaser.git.update-documentation-repo</literal> - If <literal>true</literal> then will update documentation repository with the <literal>current</literal> URL. Defaults to <literal>true</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.update-spring-guides</literal> - If <literal>true</literal> then will update Spring Guides with the current release train. Defaults to <literal>true</literal></simpara>
+</listitem>
+<listitem>
 <simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
 </listitem>
 <listitem>
@@ -366,6 +372,9 @@ Example: <literal>"--releaser.pom.ignored-pom-regex=".*\\.git/.*$,.{asterisk}spr
 </listitem>
 <listitem>
 <simpara><literal>releaser.working-dir</literal> - By default Releaser assumes running the program from the current working directory.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.template.template-folder</literal> - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to <literal>cloud</literal></simpara>
 </listitem>
 </itemizedlist>
 <tip>
