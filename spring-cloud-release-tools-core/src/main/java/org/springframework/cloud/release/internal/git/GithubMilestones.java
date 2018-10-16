@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
  */
 class GithubMilestones {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(GithubMilestones.class);
 
 	private final Github github;
 	private final ReleaserProperties properties;

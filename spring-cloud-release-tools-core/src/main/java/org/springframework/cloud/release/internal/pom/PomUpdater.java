@@ -49,7 +49,7 @@ import static org.springframework.util.StringUtils.isEmpty;
  */
 class PomUpdater {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(PomUpdater.class);
 
 	private final PomReader pomReader = new PomReader();
 	private final PomWriter pomWriter = new PomWriter();
@@ -275,7 +275,7 @@ class ModelWrapper {
 
 class PomWriter {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(PomWriter.class);
 
 	void write(ModelWrapper wrapper, Versions versions, File pom) {
 		try {

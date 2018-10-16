@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
  */
 class GithubIssues {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(GithubIssues.class);
 	private static final String GITHUB_ISSUE_TITLE = "Spring Cloud Release took place";
 
 	private final Github github;

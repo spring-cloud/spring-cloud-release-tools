@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 class SCReleasePomParser {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(SCReleasePomParser.class);
 
 	private static final String STARTER_POM = "spring-cloud-starter-parent/pom.xml";
 	private static final String DEPENDENCIES_POM = "spring-cloud-dependencies/pom.xml";

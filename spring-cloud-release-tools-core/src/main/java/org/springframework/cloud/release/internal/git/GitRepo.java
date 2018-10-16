@@ -66,7 +66,7 @@ import com.jcraft.jsch.agentproxy.usocket.JNAUSocketFactory;
  */
 class GitRepo {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(GitRepo.class);
 
 	private final GitRepo.JGitFactory gitFactory;
 
@@ -333,7 +333,7 @@ class GitRepo {
 	 * {@link org.eclipse.jgit.api.CloneCommand} allowing for easier unit testing.
 	 */
 	static class JGitFactory {
-		private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+		private static final Logger log = LoggerFactory.getLogger(JGitFactory.class);
 
 		private final JschConfigSessionFactory factory = new JschConfigSessionFactory() {
 

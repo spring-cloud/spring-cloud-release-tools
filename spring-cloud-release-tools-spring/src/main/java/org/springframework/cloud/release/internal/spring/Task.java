@@ -13,7 +13,7 @@ class Task {
 
 	static StepSkipper stepSkipper = new ConsoleInputStepSkipper();
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(Task.class);
 	private static final String MSG = "\nPress 'q' to quit, 's' to skip, any key to continue\n\n";
 
 	final String name;

@@ -16,7 +16,7 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 class OptionsProcessor {
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(OptionsProcessor.class);
 
 	private final Releaser releaser;
 	private final ReleaserProperties properties;

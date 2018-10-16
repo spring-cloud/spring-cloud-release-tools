@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
  * @author Marcin Grzejszczak
  */
 public class Releaser {
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(Releaser.class);
 
 	private static boolean ASSERT_SNAPSHOTS = true;
 	private static boolean SKIP_SNAPSHOT_ASSERTION = false;

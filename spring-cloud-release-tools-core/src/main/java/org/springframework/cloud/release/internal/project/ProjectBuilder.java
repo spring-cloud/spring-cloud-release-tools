@@ -170,7 +170,7 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 }
 
 class ProcessExecutor implements ReleaserPropertiesAware {
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(ProcessExecutor.class);
 
 	private ReleaserProperties properties;
 

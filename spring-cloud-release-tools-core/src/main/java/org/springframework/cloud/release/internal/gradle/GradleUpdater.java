@@ -26,7 +26,7 @@ import org.springframework.cloud.release.internal.pom.Projects;
  */
 public class GradleUpdater implements ReleaserPropertiesAware {
 
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger log = LoggerFactory.getLogger(GradleUpdater.class);
 
 	private ReleaserProperties properties;
 
