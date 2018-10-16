@@ -43,7 +43,7 @@ class ReleaserPropertiesUpdater {
 
 	private ReleaserProperties updatePropertiesFromFile(ReleaserProperties copy,
 			File clonedProjectFromOrg) {
-		File releaserConfig = new File(clonedProjectFromOrg, "config/releaser.yml");
+		File releaserConfig = releaserConfig(clonedProjectFromOrg);
 		if (releaserConfig.exists()) {
 			try {
 				YamlPropertiesFactoryBean yamlProcessor = new YamlPropertiesFactoryBean();
@@ -71,5 +71,9 @@ class ReleaserPropertiesUpdater {
 		log.info("Updating working directory to [{}]", clonedProjectFromOrg.getAbsolutePath());
 		copy.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
 		return copy;
+	}
+
+	File releaserConfig(File clonedProjectFromOrg) {
+		return new File(clonedProjectFromOrg, "config/releaser.yml");
 	}
 }

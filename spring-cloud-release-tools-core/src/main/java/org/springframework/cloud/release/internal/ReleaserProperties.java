@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
@@ -517,5 +518,30 @@ public class ReleaserProperties {
 				+ ", pom=" + this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan="
 				+ this.sagan + ", fixedVersions=" + this.fixedVersions + ", metaRelease="
 				+ this.metaRelease + '}';
+	}
+
+	public ReleaserProperties copy() {
+		ReleaserProperties copy = new ReleaserProperties();
+		copy.setFixedVersions(new HashMap<>(this.fixedVersions));
+		copy.setWorkingDir(this.workingDir);
+		Git git = new Git();
+		BeanUtils.copyProperties(this.git, git);
+		copy.setGit(git);
+		Gradle gradle = new Gradle();
+		BeanUtils.copyProperties(this.gradle, gradle);
+		copy.setGradle(gradle);
+		Maven maven = new Maven();
+		BeanUtils.copyProperties(this.maven, maven);
+		copy.setMaven(maven);
+		MetaRelease metaRelease = new MetaRelease();
+		BeanUtils.copyProperties(this.metaRelease, metaRelease);
+		copy.setMetaRelease(metaRelease);
+		Pom pom = new Pom();
+		BeanUtils.copyProperties(this.pom, pom);
+		copy.setPom(pom);
+		Sagan sagan = new Sagan();
+		BeanUtils.copyProperties(this.sagan, sagan);
+		copy.setSagan(sagan);
+		return copy;
 	}
 }

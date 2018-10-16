@@ -1,6 +1,7 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,9 +60,11 @@ public class SpringReleaser {
 			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
 			this.properties.getGit().setFetchVersionsFromGit(false);
 			this.properties.getMetaRelease().setEnabled(options.metaRelease);
-			ReleaserProperties original = clonePropertiesForProject(this.properties);
+			ReleaserProperties original = this.properties.copy();
+			log.info("The following properties were found [{}]", original);
 			metaReleaseProjects(options)
-					.forEach(project -> processProjectForMetaRelease(clonePropertiesForProject(original), options, project));
+					.forEach(project ->
+							processProjectForMetaRelease(original.copy(), options, project));
 		} else {
 			log.info("Single project release picked. Will release only the current project");
 			File projectFolder = projectFolder();
@@ -70,11 +73,10 @@ public class SpringReleaser {
 		this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
 	}
 
-	private void processProjectForMetaRelease(ReleaserProperties copy, Options options, String project) {
+	void processProjectForMetaRelease(ReleaserProperties copy, Options options, String project) {
 		log.info("Original properties [\n\n{}\n\n]", copy);
 		File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
-		ReleaserProperties updatedProps = updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
-		this.updater.updateProperties(updatedProps);
+		updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
 		log.info("Successfully cloned the project [{}] to [{}]", project, clonedProjectFromOrg);
 		try {
 			processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
@@ -85,18 +87,12 @@ public class SpringReleaser {
 		}
 	}
 
-	private ReleaserProperties clonePropertiesForProject(ReleaserProperties from) {
-		ReleaserProperties copy = new ReleaserProperties();
-		BeanUtils.copyProperties(from, copy);
-		return copy;
-	}
-
 	private ReleaserProperties updatePropertiesIfCustomConfigPresent(ReleaserProperties copy,
 			File clonedProjectFromOrg) {
 		return this.updater.updateProperties(copy, clonedProjectFromOrg);
 	}
 
-	private List<String> metaReleaseProjects(Options options) {
+	List<String> metaReleaseProjects(Options options) {
 		List<String> projects = new ArrayList<>(this.properties.getFixedVersions().keySet());
 		log.info("List of projects that should not be cloned {}", this.properties.getMetaRelease().getProjectsToSkip());
 		List<String> filteredProjects = projects.stream()
@@ -187,7 +183,7 @@ public class SpringReleaser {
 		}
 	}
 
-	private ProjectsAndVersion processProject(Options options, File project, TaskType taskType) {
+	ProjectsAndVersion processProject(Options options, File project, TaskType taskType) {
 		ProjectsAndVersion projectsAndVersion = projects(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		final Args defaultArgs = new Args(this.releaser, project, projectsAndVersion.projectVersions,
