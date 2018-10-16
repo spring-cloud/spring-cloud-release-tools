@@ -102,7 +102,8 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 
 	private Template template(String template) {
 		try {
-			Handlebars handlebars = new Handlebars(new ClassPathTemplateLoader("/templates"));
+			Handlebars handlebars = new Handlebars(new ClassPathTemplateLoader("/templates/" +
+					this.props.getTemplate().getTemplateFolder()));
 			handlebars.registerHelper("replace", StringHelpers.replace);
 			handlebars.registerHelper("capitalizeFirst", StringHelpers.capitalizeFirst);
 			return handlebars.compile(template);

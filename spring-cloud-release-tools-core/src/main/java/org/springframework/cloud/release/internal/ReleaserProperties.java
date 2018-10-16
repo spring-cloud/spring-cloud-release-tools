@@ -53,6 +53,8 @@ public class ReleaserProperties implements Serializable {
 
 	private Sagan sagan = new Sagan();
 
+	private Template template = new Template();
+
 	/**
 	 * Project name to its version - overrides all versions
 	 * retrieved from a repository like Spring Cloud Release
@@ -485,6 +487,28 @@ public class ReleaserProperties implements Serializable {
 		}
 	}
 
+	public static class Template implements Serializable {
+		/**
+		 * Folder in which blog, email etc. templates are stored
+		 */
+		private String templateFolder = "cloud";
+
+		public String getTemplateFolder() {
+			return this.templateFolder;
+		}
+
+		public void setTemplateFolder(String templateFolder) {
+			this.templateFolder = templateFolder;
+		}
+
+		@Override
+		public String toString() {
+			return "Template{" +
+					"templateFolder='" + this.templateFolder + '\'' +
+					'}';
+		}
+	}
+
 	public String getWorkingDir() {
 		return StringUtils.hasText(this.workingDir) ?
 				this.workingDir : System.getProperty("user.dir");
@@ -550,11 +574,19 @@ public class ReleaserProperties implements Serializable {
 		this.sagan = sagan;
 	}
 
+	public Template getTemplate() {
+		return this.template;
+	}
+
+	public void setTemplate(Template template) {
+		this.template = template;
+	}
+
 	@Override public String toString() {
 		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git
 				+ ", pom=" + this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan="
 				+ this.sagan + ", fixedVersions=" + this.fixedVersions + ", metaRelease="
-				+ this.metaRelease + '}';
+				+ this.metaRelease + ", template=" + this.template + '}';
 	}
 
 	public ReleaserProperties copy() {

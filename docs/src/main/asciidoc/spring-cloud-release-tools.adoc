@@ -271,6 +271,8 @@ train depends on projects that got already released. We default this list to `[s
 - `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
 - `releaser.git.documentation-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-static`
 - `releaser.git.documentation-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`
+- `releaser.git.update-documentation-repo` - If `true` then will update documentation repository with the `current` URL. Defaults to `true`
+- `releaser.git.update-spring-guides` - If `true` then will update Spring Guides with the current release train. Defaults to `true`
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
 - `releaser.git.username` - Optional Git username. If not passed keys will be used for authentication.
 - `releaser.git.password` - Optional Git password. If not passed keys will be used for authentication.
@@ -290,6 +292,7 @@ be set there. Just provide a mapping for the `gradle-props-substition` looking l
 - `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.
 Example: `"--releaser.pom.ignored-pom-regex=".{asterisk}\\.git/.{asterisk}$,.\{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.{asterisk}$,.{asterisk}spring-cloud-contract-maven-plugin/target/.{asterisk}$,.{asterisk}samples/standalone/[a-z]+/.{asterisk}$"`
 - `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.
+- `releaser.template.template-folder` - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to `cloud`
 
 TIP: You can pass the options either via system properties or via application arguments.
 Example for system properties: `java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar`
