@@ -24,10 +24,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -62,10 +60,10 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	 * For the given root folder (typically the working directory) retrieves list of versions
 	 * for a given release version.
 	 */
-	public Projects retrieveVersionsFromSCRelease() {
-		File clonedScRelease = this.gitRepo.cloneScReleaseProject();
+	public Projects retrieveVersionsFromReleaseTrainBom() {
+		File clonedScRelease = this.gitRepo.cloneReleaseTrainProject();
 		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
-		SCReleasePomParser sCReleasePomParser = new SCReleasePomParser(clonedScRelease);
+		BomParser sCReleasePomParser = new BomParser(this.properties, clonedScRelease);
 		Versions versions = sCReleasePomParser.allVersions();
 		log.info("Will update the following versions manually [{}]", this.properties.getFixedVersions());
 		this.properties.getFixedVersions().forEach(versions::setVersion);

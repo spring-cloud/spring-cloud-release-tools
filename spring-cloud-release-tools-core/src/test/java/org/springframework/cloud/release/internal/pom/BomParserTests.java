@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitRepoTests;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -14,9 +16,10 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 /**
  * @author Marcin Grzejszczak
  */
-public class SCReleasePomParserTests {
+public class BomParserTests {
 
 	File springCloudReleaseProject;
+	ReleaserProperties properties = new ReleaserProperties();
 
 	@Before
 	public void setup() throws IOException, URISyntaxException {
@@ -25,7 +28,7 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_throw_exception_when_boot_pom_is_missing() {
-		SCReleasePomParser parser = new SCReleasePomParser(new File("."));
+		BomParser parser = new BomParser(this.properties, new File("."));
 
 		thenThrownBy(parser::bootVersion)
 				.isInstanceOf(IllegalStateException.class)
@@ -34,7 +37,9 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_throw_exception_when_null_is_passed_to_boot() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject, null, null);
+		this.properties.getPom().setPomWithBootStarterParent(null);
+		this.properties.getPom().setThisTrainBom(null);
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		thenThrownBy(parser::bootVersion)
 				.isInstanceOf(IllegalStateException.class)
@@ -43,7 +48,9 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_throw_exception_when_boot_version_is_missing_in_pom() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject, "pom.xml", null);
+		this.properties.getPom().setPomWithBootStarterParent("pom.xml");
+		this.properties.getPom().setThisTrainBom(null);
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		thenThrownBy(parser::bootVersion)
 				.isInstanceOf(IllegalStateException.class)
@@ -52,7 +59,7 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_populate_sc_release_version() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject);
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		String scReleaseVersion = parser.allVersions().versionForProject("spring-cloud-release");
 
@@ -61,7 +68,7 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_populate_boot_version() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject);
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		String bootVersion = parser.bootVersion().bootVersion;
 
@@ -70,7 +77,7 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_throw_exception_when_cloud_pom_is_missing() {
-		SCReleasePomParser parser = new SCReleasePomParser(new File("."));
+		BomParser parser = new BomParser(this.properties, new File("."));
 
 		thenThrownBy(parser::springCloudVersions)
 				.isInstanceOf(IllegalStateException.class)
@@ -79,7 +86,9 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_throw_exception_when_null_is_passed_to_cloud() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject, null, null);
+		this.properties.getPom().setPomWithBootStarterParent(null);
+		this.properties.getPom().setThisTrainBom(null);
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		thenThrownBy(parser::springCloudVersions)
 				.isInstanceOf(IllegalStateException.class)
@@ -88,7 +97,9 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_throw_exception_when_cloud_version_is_missing_in_pom() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject, null, "pom.xml");
+		this.properties.getPom().setPomWithBootStarterParent(null);
+		this.properties.getPom().setThisTrainBom("pom.xml");
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		thenThrownBy(parser::springCloudVersions)
 				.isInstanceOf(IllegalStateException.class)
@@ -97,7 +108,7 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_populate_cloud_version() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject);
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		Versions cloudVersions = parser.springCloudVersions();
 
@@ -107,7 +118,7 @@ public class SCReleasePomParserTests {
 
 	@Test
 	public void should_populate_boot_and_cloud_version() {
-		SCReleasePomParser parser = new SCReleasePomParser(this.springCloudReleaseProject);
+		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
 		Versions cloudVersions = parser.allVersions();
 

@@ -30,7 +30,7 @@ why this tool makes it easy to automate the release / dependency update process 
 For a single project
 
 - Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)
-- Modifies the project versions with values from SC-Release
+- Modifies the project versions with values from a BOM (e.g. for Spring Cloud it's Spring Cloud Release)
   * throws an exception when we bump versions to release and there's a SNAPSHOT version referenced in the POM
 - Performs the build and checks if the `docs` modules have properly created the documentation
   * throws an exception when in the `docs` module there's an unresolved tag in any HTML file
@@ -278,7 +278,7 @@ train depends on projects that got already released. We default this list to `[s
 
 - `releaser.git.fetch-versions-from-git` - If `true` then should fill the map of versions from Git. If `false` then picks fixed versions
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
-- `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
+- `releaser.git.release-train-bom-url` - URL to a project containing a BOM. Defaults to Spring Cloud Release Git repository: `https://github.com/spring-cloud/spring-cloud-release`
 - `releaser.git.documentation-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-static`
 - `releaser.git.documentation-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`
 - `releaser.git.update-documentation-repo` - If `true` then will update documentation repository with the `current` URL. Defaults to `true`
