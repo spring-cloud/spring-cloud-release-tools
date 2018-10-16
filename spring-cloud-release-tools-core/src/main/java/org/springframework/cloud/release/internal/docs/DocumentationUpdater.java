@@ -37,6 +37,7 @@ public class DocumentationUpdater {
 			return null;
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
+		log.debug("Cloning the doc project to [{}]", documentationProject);
 		String pathToIndexHtml = "current/index.html";
 		File indexHtml = new File(documentationProject, pathToIndexHtml);
 		if (!indexHtml.exists()) {

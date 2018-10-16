@@ -9,20 +9,20 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.*;
-
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -32,6 +32,7 @@ import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
+import org.springframework.cloud.release.internal.docs.TestDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
@@ -193,24 +194,66 @@ public class AcceptanceTests {
 	@Test
 	public void should_perform_a_meta_release_of_sc_release_and_consul() throws Exception {
 		// simulates an org
-		Map<String, String> versions = new HashMap<>();
-		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
-		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
-		SpringReleaser releaser = metaReleaser(versions);
+		SpringReleaser releaser = metaReleaser(edgwareSr5());
 
 		releaser.release(new OptionsBuilder().metaRelease(true).options());
 
-		then(this.nonAssertingGitHandler.clonedProjects).hasSize(2);
+		// consul, release, documentation
+		then(this.nonAssertingGitHandler.clonedProjects).hasSize(3);
+		// don't want to verify the docs
+		thenAllStepsWereExecutedForEachProject();
+		thenSaganWasCalled();
+		thenDocumentationWasUpdated();
+		BDDAssertions.then(clonedProject("spring-cloud-consul").tagList().call())
+				.extracting("name").contains("refs/tags/v1.3.5.RELEASE");
+	}
+
+	private Map<String, String> edgwareSr5() {
+		Map<String, String> versions = new LinkedHashMap<>();
+		versions.put("spring-boot", "1.5.16.RELEASE");
+		versions.put("spring-cloud-build", "1.3.11.RELEASE");
+		versions.put("spring-cloud-commons", "1.3.5.RELEASE");
+		versions.put("spring-cloud-stream", "Ditmars.SR4");
+		versions.put("spring-cloud-task", "1.2.3.RELEASE");
+		versions.put("spring-cloud-function", "1.0.1.RELEASE");
+		versions.put("spring-cloud-aws", "1.2.3.RELEASE");
+		versions.put("spring-cloud-bus", "1.3.4.RELEASE");
+		versions.put("spring-cloud-config", "1.4.5.RELEASE");
+		versions.put("spring-cloud-netflix", "1.4.6.RELEASE");
+		versions.put("spring-cloud-cloudfoundry", "1.1.2.RELEASE");
+		versions.put("spring-cloud-gateway", "1.0.2.RELEASE");
+		versions.put("spring-cloud-security", "1.2.3.RELEASE");
+		versions.put("spring-cloud-consul", "1.3.5.RELEASE");
+		versions.put("spring-cloud-zookeeper", "1.2.2.RELEASE");
+		versions.put("spring-cloud-sleuth", "1.3.5.RELEASE");
+		versions.put("spring-cloud-contract", "1.2.6.RELEASE");
+		versions.put("spring-cloud-vault", "1.1.2.RELEASE");
+		versions.put("spring-cloud-release", "Edgware.SR5");
+		return versions;
+	}
+
+	private Git clonedProject(String name) {
+		return GitTestUtils
+					.openGitProject(this.nonAssertingGitHandler.clonedProjects.stream()
+							.filter(file -> file.getName().contains(name))
+							.findFirst().get());
+	}
+
+	private void thenSaganWasCalled() {
+		BDDMockito.then(saganUpdater).should(BDDMockito.atLeastOnce())
+				.updateSagan(BDDMockito.anyString(),
+						BDDMockito.any(ProjectVersion.class), BDDMockito
+								.any(ProjectVersion.class));
+	}
+
+	private void thenAllStepsWereExecutedForEachProject() {
 		this.nonAssertingGitHandler.clonedProjects
+				.stream().filter(f -> !f.getName().contains("angel"))
 				.forEach(project -> {
 					then(Arrays.asList("spring-cloud-starter-build",
 							"spring-cloud-consul")).contains(pom(project).getArtifactId());
 					then(capture.toString()).contains("executed_build", "executed_deploy", "executed_docs");
 				});
-		BDDMockito.then(saganUpdater).should(BDDMockito.atLeastOnce()).updateSagan(BDDMockito.anyString(),
-				BDDMockito.any(ProjectVersion.class), BDDMockito.any(ProjectVersion.class));
-		BDDMockito.then(documentationUpdater).should()
-				.updateDocsRepo(BDDMockito.any(ProjectVersion.class), BDDMockito.anyString());
 	}
 
 	@Test
@@ -248,14 +291,12 @@ public class AcceptanceTests {
 					then(pom(project).getArtifactId()).isEqualTo("spring-cloud-consul");
 					then(capture.toString()).contains("executed_build", "executed_deploy", "executed_docs");
 				});
-		BDDMockito.then(saganUpdater).should(BDDMockito.atLeastOnce()).updateSagan(BDDMockito.anyString(),
-				BDDMockito.any(ProjectVersion.class), BDDMockito.any(ProjectVersion.class));
-		BDDMockito.then(documentationUpdater).should()
-				.updateDocsRepo(BDDMockito.any(ProjectVersion.class), BDDMockito.anyString());
+		thenSaganWasCalled();
+		thenDocumentationWasUpdated();
 	}
 
 	@Test
-	public void should_perform_a_meta_release_of_build_and_consul_only_when_task_names_got_passed() throws Exception {
+	public void should_perform_a_meta_release_of_consul_only_when_task_names_got_passed() throws Exception {
 		// simulates an org
 		Map<String, String> versions = new HashMap<>();
 		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
@@ -264,20 +305,25 @@ public class AcceptanceTests {
 		SpringReleaser releaser = metaReleaser(versions);
 
 		releaser.release(new OptionsBuilder().metaRelease(true)
-				.taskNames(Arrays.asList("spring-cloud-build", "spring-cloud-consul"))
+				.taskNames(Collections.singletonList("spring-cloud-consul"))
 				.options());
 
-		then(this.nonAssertingGitHandler.clonedProjects).hasSize(2);
+		then(this.nonAssertingGitHandler.clonedProjects).hasSize(1);
 		this.nonAssertingGitHandler.clonedProjects
 				.forEach(project -> {
-					then(Arrays.asList("spring-cloud-build",
-							"spring-cloud-consul")).contains(pom(project).getArtifactId());
-					then(capture.toString()).contains("executed_build", "executed_deploy", "executed_docs");
+					then(Collections.singletonList("spring-cloud-consul"))
+							.contains(pom(project).getArtifactId());
+					then(capture.toString()).contains("executed_build", "executed_deploy",
+							"executed_docs");
 				});
-		BDDMockito.then(saganUpdater).should(BDDMockito.atLeastOnce()).updateSagan(BDDMockito.anyString(),
-				BDDMockito.any(ProjectVersion.class), BDDMockito.any(ProjectVersion.class));
+		thenSaganWasCalled();
+		thenDocumentationWasUpdated();
+	}
+
+	private void thenDocumentationWasUpdated() {
 		BDDMockito.then(documentationUpdater).should()
-				.updateDocsRepo(BDDMockito.any(ProjectVersion.class), BDDMockito.anyString());
+				.updateDocsRepo(BDDMockito.any(ProjectVersion.class), BDDMockito
+						.anyString());
 	}
 
 	// issue #74
@@ -546,7 +592,7 @@ public class AcceptanceTests {
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
 		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient);
-		DocumentationUpdater documentationUpdater = new DocumentationUpdater(handler) {
+		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(handler, "Brixton.SR1") {
 			@Override public File updateDocsRepo(ProjectVersion currentProject,
 					String springCloudReleaseBranch) {
 				File file = super.updateDocsRepo(currentProject, springCloudReleaseBranch);
@@ -599,6 +645,13 @@ public class AcceptanceTests {
 
 	private ReleaserProperties metaReleaserProperties(Map<String, String> versions) throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
+		Arrays.asList("spring-cloud-build", "spring-cloud-commons", "spring-cloud-stream",
+				"spring-cloud-task", "spring-cloud-function", "spring-cloud-aws",
+				"spring-cloud-bus", "spring-cloud-config", "spring-cloud-netflix",
+				"spring-cloud-cloudfoundry", "spring-cloud-gateway", "spring-cloud-security",
+				"spring-cloud-zookeeper", "spring-cloud-sleuth",
+				"spring-cloud-contract", "spring-cloud-vault")
+				.forEach(s -> releaserProperties.getMetaRelease().getProjectsToSkip().add(s));
 		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static-angel/").toURI().toString());
 		releaserProperties.getMaven().setBuildCommand("echo executed_build");
 		releaserProperties.getMaven().setDeployCommand("echo executed_deploy");

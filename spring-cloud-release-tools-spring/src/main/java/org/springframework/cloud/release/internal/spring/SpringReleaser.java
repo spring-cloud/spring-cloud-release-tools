@@ -160,7 +160,7 @@ public class SpringReleaser {
 		} else {
 			ProjectVersion originalVersion = new ProjectVersion(project);
 			String fixedVersionForProject = this.properties.getFixedVersions()
-					.get(this.properties.getMetaRelease().getReleaseTrainProjectName());
+					.get(project.getName());
 			versionFromScRelease = StringUtils.hasText(fixedVersionForProject) ?
 					new ProjectVersion(originalVersion.projectName, fixedVersionForProject) :
 					new ProjectVersion(project);
@@ -189,6 +189,7 @@ public class SpringReleaser {
 		final Args defaultArgs = new Args(this.releaser, project, projectsAndVersion.projectVersions,
 				originalVersion, projectsAndVersion.versionFromScRelease, this.properties,
 				options.interactive, taskType);
+		log.debug("Processing project [{}] with args [{}]", project, defaultArgs);
 		this.optionsProcessor.processOptions(options, defaultArgs);
 		return projectsAndVersion;
 	}

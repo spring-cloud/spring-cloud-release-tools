@@ -60,4 +60,18 @@ class Args {
 		this.interactive = false;
 		this.taskType = taskType;
 	}
+
+	@Override
+	public String toString() {
+		return "Args{" +
+				"releaser=" + this.releaser +
+				", project=" + this.project +
+				", projects=" + this.projects +
+				", originalVersion=" + this.originalVersion +
+				", versionFromScRelease=" + this.versionFromScRelease +
+				", properties=" + this.properties +
+				", interactive=" + this.interactive +
+				", taskType=" + this.taskType +
+				'}';
+	}
 }
