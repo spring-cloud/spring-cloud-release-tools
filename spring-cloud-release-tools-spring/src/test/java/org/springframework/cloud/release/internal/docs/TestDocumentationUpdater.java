@@ -3,6 +3,7 @@ package org.springframework.cloud.release.internal.docs;
 import java.io.File;
 import java.io.IOException;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 
 /**
@@ -12,8 +13,9 @@ public class TestDocumentationUpdater extends DocumentationUpdater {
 
 	private final String version;
 
-	public TestDocumentationUpdater(ProjectGitHandler gitHandler, String version) {
-		super(gitHandler);
+	public TestDocumentationUpdater(ReleaserProperties properties,
+			ProjectGitHandler gitHandler, String version) {
+		super(properties, gitHandler);
 		this.version = version;
 	}
 

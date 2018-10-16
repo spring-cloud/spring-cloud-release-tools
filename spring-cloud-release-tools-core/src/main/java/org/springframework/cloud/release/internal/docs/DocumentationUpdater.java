@@ -6,6 +6,8 @@ import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
@@ -18,9 +20,12 @@ public class DocumentationUpdater {
 	private static final Logger log = LoggerFactory.getLogger(DocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
+	private final ReleaserProperties properties;
 
-	public DocumentationUpdater(ProjectGitHandler gitHandler) {
+	public DocumentationUpdater(ReleaserProperties properties,
+			ProjectGitHandler gitHandler) {
 		this.gitHandler = gitHandler;
+		this.properties = properties;
 	}
 
 	/**
@@ -32,6 +37,11 @@ public class DocumentationUpdater {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is used
 	 */
 	public File updateDocsRepo(ProjectVersion currentProject, String springCloudReleaseBranch) {
+		if (!properties.getGit().isUpdateDocumentationRepo()) {
+			log.info("Will not update documentation repository, since the switch to do so "
+					+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
+			return null;
+		}
 		if (!currentProject.isReleaseOrServiceRelease()) {
 			log.info("Will not update documentation repository for non release or service release [{}]", currentProject.version);
 			return null;

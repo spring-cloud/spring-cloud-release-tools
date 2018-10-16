@@ -150,6 +150,11 @@ public class ReleaserProperties implements Serializable {
 		private String documentationBranch = "gh-pages";
 
 		/**
+		 * If {@code false}, will not update the documentation repository.
+		 */
+		private boolean updateDocumentationRepo = true;
+
+		/**
 		 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
 		 */
 		private String cloneDestinationDir;
@@ -202,6 +207,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setDocumentationBranch(String documentationBranch) {
 			this.documentationBranch = documentationBranch;
+		}
+
+		public boolean isUpdateDocumentationRepo() {
+			return this.updateDocumentationRepo;
+		}
+
+		public void setUpdateDocumentationRepo(boolean updateDocumentationRepo) {
+			this.updateDocumentationRepo = updateDocumentationRepo;
 		}
 
 		public String getCloneDestinationDir() {

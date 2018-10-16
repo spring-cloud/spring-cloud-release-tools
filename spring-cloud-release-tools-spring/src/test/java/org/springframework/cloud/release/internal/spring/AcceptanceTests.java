@@ -592,7 +592,8 @@ public class AcceptanceTests {
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
 		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient);
-		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(handler, "Brixton.SR1") {
+		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(properties,
+				handler, "Brixton.SR1") {
 			@Override public File updateDocsRepo(ProjectVersion currentProject,
 					String springCloudReleaseBranch) {
 				File file = super.updateDocsRepo(currentProject, springCloudReleaseBranch);
@@ -613,7 +614,7 @@ public class AcceptanceTests {
 		TemplateGenerator templateGenerator = Mockito.spy(new TemplateGenerator(properties, handler));
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
 		SaganUpdater saganUpdater = Mockito.spy(new SaganUpdater(this.saganClient));
-		DocumentationUpdater documentationUpdater = Mockito.spy(new DocumentationUpdater(handler) {
+		DocumentationUpdater documentationUpdater = Mockito.spy(new DocumentationUpdater(properties, handler) {
 			@Override public File updateDocsRepo(ProjectVersion currentProject,
 					String springCloudReleaseBranch) {
 				File file = super.updateDocsRepo(currentProject, springCloudReleaseBranch);
