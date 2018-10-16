@@ -15,6 +15,7 @@
  */
 package org.springframework.cloud.release.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,15 +23,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.lang.SerializationUtils;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
 /**
+ * Since, we are making a deep copy of this object, remember to have all the
+ * nested classes to implement the Serializable interface.
+ *
  * @author Marcin Grzejszczak
  */
 @ConfigurationProperties("releaser")
-public class ReleaserProperties {
+public class ReleaserProperties implements Serializable {
 
 	/**
 	 * By default Releaser assumes running the program from the current working directory.
@@ -56,7 +61,7 @@ public class ReleaserProperties {
 
 	private MetaRelease metaRelease = new MetaRelease();
 
-	public static class MetaRelease {
+	public static class MetaRelease implements Serializable {
 		/**
 		 * Are we releasing the whole suite of apps or only one?
 		 */
@@ -127,7 +132,7 @@ public class ReleaserProperties {
 		}
 	}
 
-	public static class Git {
+	public static class Git implements Serializable {
 
 		/**
 		 * URL to Spring Cloud Release Git repository
@@ -257,7 +262,7 @@ public class ReleaserProperties {
 		}
 	}
 
-	public static class Pom {
+	public static class Pom implements Serializable {
 
 		/**
 		 * Which branch of Spring Cloud Release should be checked out. Defaults to {@code master}
@@ -297,7 +302,7 @@ public class ReleaserProperties {
 		}
 	}
 
-	public static class Maven {
+	public static class Maven implements Serializable {
 
 		/**
 		 * Command to be executed to build the project
@@ -381,7 +386,7 @@ public class ReleaserProperties {
 		}
 	}
 
-	public static class Gradle {
+	public static class Gradle implements Serializable {
 
 		/**
 		 * A mapping that should be applied to {@code gradle.properties} in order
@@ -429,7 +434,7 @@ public class ReleaserProperties {
 		}
 	}
 
-	public static class Sagan {
+	public static class Sagan implements Serializable {
 		/**
 		 * URL to the Sagan API
 		 */
@@ -521,27 +526,6 @@ public class ReleaserProperties {
 	}
 
 	public ReleaserProperties copy() {
-		ReleaserProperties copy = new ReleaserProperties();
-		copy.setFixedVersions(new HashMap<>(this.fixedVersions));
-		copy.setWorkingDir(this.workingDir);
-		Git git = new Git();
-		BeanUtils.copyProperties(this.git, git);
-		copy.setGit(git);
-		Gradle gradle = new Gradle();
-		BeanUtils.copyProperties(this.gradle, gradle);
-		copy.setGradle(gradle);
-		Maven maven = new Maven();
-		BeanUtils.copyProperties(this.maven, maven);
-		copy.setMaven(maven);
-		MetaRelease metaRelease = new MetaRelease();
-		BeanUtils.copyProperties(this.metaRelease, metaRelease);
-		copy.setMetaRelease(metaRelease);
-		Pom pom = new Pom();
-		BeanUtils.copyProperties(this.pom, pom);
-		copy.setPom(pom);
-		Sagan sagan = new Sagan();
-		BeanUtils.copyProperties(this.sagan, sagan);
-		copy.setSagan(sagan);
-		return copy;
+		return (ReleaserProperties) SerializationUtils.clone(this);
 	}
 }
