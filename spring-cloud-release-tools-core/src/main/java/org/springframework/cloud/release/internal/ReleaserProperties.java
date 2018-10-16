@@ -185,6 +185,11 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private Integer numberOfCheckedMilestones = 10;
 
+		/**
+		 * If set to {@code false}, will not update Spring Guides for a release train.
+		 */
+		private boolean updateSpringGuides = true;
+
 		public String getSpringCloudReleaseGitUrl() {
 			return this.springCloudReleaseGitUrl;
 		}
@@ -265,13 +270,27 @@ public class ReleaserProperties implements Serializable {
 			this.fetchVersionsFromGit = fetchVersionsFromGit;
 		}
 
-		@Override public String toString() {
-			return "Git{" + "springCloudReleaseGitUrl='" + this.springCloudReleaseGitUrl + '\''
-					+ ", documentationUrl='" + this.documentationUrl + '\''
-					+ ", documentationBranch='" + this.documentationBranch + '\''
-					+ ", cloneDestinationDir='" + this.cloneDestinationDir + '\''
-					+ ", fetchVersionsFromGit=" + this.fetchVersionsFromGit
-					+ ", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones + '}';
+		public boolean isUpdateSpringGuides() {
+			return this.updateSpringGuides;
+		}
+
+		public void setUpdateSpringGuides(boolean updateSpringGuides) {
+			this.updateSpringGuides = updateSpringGuides;
+		}
+
+		@Override
+		public String toString() {
+			return "Git{" +
+					"springCloudReleaseGitUrl='" + this.springCloudReleaseGitUrl + '\'' +
+					", documentationUrl='" + this.documentationUrl + '\'' +
+					", documentationBranch='" + this.documentationBranch + '\'' +
+					", updateDocumentationRepo=" + this.updateDocumentationRepo +
+					", cloneDestinationDir='" + this.cloneDestinationDir + '\'' +
+					", fetchVersionsFromGit=" + this.fetchVersionsFromGit +
+					", oauthToken='" + this.oauthToken + '\'' +
+					", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones +
+					", updateSpringGuides=" + this.updateSpringGuides +
+					'}';
 		}
 	}
 

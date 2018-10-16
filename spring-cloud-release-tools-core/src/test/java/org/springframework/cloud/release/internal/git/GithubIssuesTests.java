@@ -7,6 +7,7 @@ import java.util.Collections;
 import javax.json.Json;
 
 import com.jcabi.github.Coordinates;
+import com.jcabi.github.Github;
 import com.jcabi.github.Issue;
 import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
@@ -15,6 +16,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.BDDMockito;
+
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -41,13 +44,30 @@ public class GithubIssuesTests {
 
 	@Test
 	public void should_not_do_anything_for_non_release_train_version() throws IOException {
-		GithubIssues issues = new GithubIssues(this.github, withToken());
+		Github github = BDDMockito.mock(Github.class);
+		GithubIssues issues = new GithubIssues(github, withToken());
 
 		issues.fileIssue(new Projects(
 				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")
 				), new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
-		then(this.capture.toString()).contains("Guide issue creation will occur only");
+		BDDMockito.then(github).shouldHaveZeroInteractions();
+	}
+
+	@Test
+	public void should_not_do_anything_if_switch_is_not_set() throws IOException {
+		Github github = BDDMockito.mock(Github.class);
+		ReleaserProperties properties = withToken();
+		properties.getGit().setUpdateSpringGuides(false);
+		GithubIssues issues = new GithubIssues(github, properties);
+
+		issues.fileIssue(new Projects(
+				new ProjectVersion("foo", "1.0.0.RELEASE"),
+				new ProjectVersion("bar", "2.0.0.RELEASE"),
+				new ProjectVersion("baz", "3.0.0.RELEASE")
+		), new ProjectVersion("sc-release", "Edgware.RELEASE"));
+
+		BDDMockito.then(github).shouldHaveZeroInteractions();
 	}
 
 	@Test
