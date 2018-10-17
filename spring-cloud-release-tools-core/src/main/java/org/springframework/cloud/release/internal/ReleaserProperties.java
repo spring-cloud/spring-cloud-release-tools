@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -139,7 +140,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * URL to Spring Cloud Release Git repository
 		 */
-		private String springCloudReleaseGitUrl = "https://github.com/spring-cloud/spring-cloud-release";
+		private String releaseTrainBomUrl = "https://github.com/spring-cloud/spring-cloud-release";
 
 		/**
 		 * URL to the documentation Git repository
@@ -192,12 +193,12 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private boolean updateSpringGuides = true;
 
-		public String getSpringCloudReleaseGitUrl() {
-			return this.springCloudReleaseGitUrl;
+		public String getReleaseTrainBomUrl() {
+			return this.releaseTrainBomUrl;
 		}
 
-		public void setSpringCloudReleaseGitUrl(String springCloudReleaseGitUrl) {
-			this.springCloudReleaseGitUrl = springCloudReleaseGitUrl;
+		public void setReleaseTrainBomUrl(String releaseTrainBomUrl) {
+			this.releaseTrainBomUrl = releaseTrainBomUrl;
 		}
 
 		public String getDocumentationUrl() {
@@ -283,7 +284,7 @@ public class ReleaserProperties implements Serializable {
 		@Override
 		public String toString() {
 			return "Git{" +
-					"springCloudReleaseGitUrl='" + this.springCloudReleaseGitUrl + '\'' +
+					"releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\'' +
 					", documentationUrl='" + this.documentationUrl + '\'' +
 					", documentationBranch='" + this.documentationBranch + '\'' +
 					", updateDocumentationRepo=" + this.updateDocumentationRepo +
@@ -299,9 +300,24 @@ public class ReleaserProperties implements Serializable {
 	public static class Pom implements Serializable {
 
 		/**
-		 * Which branch of Spring Cloud Release should be checked out. Defaults to {@code master}
+		 * Which branch of release train BOM should be checked out. Defaults to {@code master}
 		 */
 		private String branch = "master";
+
+		/**
+		 * Subfolder of the pom that contains the {@code spring-boot-starer-parent} dependency
+		 */
+		private String pomWithBootStarterParent = "spring-cloud-starter-parent/pom.xml";
+
+		/**
+		 * Subfolder of the pom that contains the versions for the release train
+		 */
+		private String thisTrainBom = "spring-cloud-dependencies/pom.xml";
+
+		/**
+		 * The pattern to match a version property in a BOM
+		 */
+		private String bomVersionPattern = "^(spring-cloud-.*)\\.version$";
 
 		/**
 		 * List of regular expressions of ignored poms. Defaults to test projects and samples.
@@ -330,9 +346,39 @@ public class ReleaserProperties implements Serializable {
 			this.ignoredPomRegex = ignoredPomRegex;
 		}
 
-		@Override public String toString() {
-			return "Pom{" + "branch='" + this.branch + '\'' + ", ignoredPomRegex="
-					+ this.ignoredPomRegex + '}';
+		public String getPomWithBootStarterParent() {
+			return this.pomWithBootStarterParent;
+		}
+
+		public void setPomWithBootStarterParent(String pomWithBootStarterParent) {
+			this.pomWithBootStarterParent = pomWithBootStarterParent;
+		}
+
+		public String getThisTrainBom() {
+			return this.thisTrainBom;
+		}
+
+		public void setThisTrainBom(String thisTrainBom) {
+			this.thisTrainBom = thisTrainBom;
+		}
+
+		public String getBomVersionPattern() {
+			return this.bomVersionPattern;
+		}
+
+		public void setBomVersionPattern(String bomVersionPattern) {
+			this.bomVersionPattern = bomVersionPattern;
+		}
+
+		@Override
+		public String toString() {
+			return "Pom{" +
+					"branch='" + this.branch + '\'' +
+					", pomWithBootStarterParent='" + this.pomWithBootStarterParent + '\'' +
+					", thisTrainBom='" + this.thisTrainBom + '\'' +
+					", bomVersionPattern='" + this.bomVersionPattern + '\'' +
+					", ignoredPomRegex=" + this.ignoredPomRegex +
+					'}';
 		}
 	}
 

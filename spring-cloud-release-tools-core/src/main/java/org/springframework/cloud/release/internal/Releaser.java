@@ -1,7 +1,6 @@
 package org.springframework.cloud.release.internal;
 
 import java.io.File;
-import java.lang.invoke.MethodHandles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +50,7 @@ public class Releaser {
 	}
 
 	public Projects retrieveVersionsFromSCRelease() {
-		return this.projectPomUpdater.retrieveVersionsFromSCRelease();
+		return this.projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 	}
 
 	public Projects fixedVersions() {

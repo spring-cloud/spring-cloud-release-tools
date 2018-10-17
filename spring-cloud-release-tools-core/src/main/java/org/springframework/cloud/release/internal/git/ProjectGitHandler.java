@@ -1,9 +1,6 @@
 package org.springframework.cloud.release.internal.git;
 
 import java.io.File;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 
 import org.eclipse.jgit.transport.URIish;
@@ -67,8 +64,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		gitRepo.commit(message);
 	}
 
-	public File cloneScReleaseProject() {
-		return cloneProject(this.properties.getGit().getSpringCloudReleaseGitUrl());
+	public File cloneReleaseTrainProject() {
+		return cloneProject(this.properties.getGit().getReleaseTrainBomUrl());
 	}
 
 	public File cloneDocumentationProject() {

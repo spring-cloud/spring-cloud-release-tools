@@ -16,7 +16,6 @@
 package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
-import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,37 +29,36 @@ import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
+
 /**
- * Parses the poms for a given project and populates versions from Spring Cloud Release
+ * Parses the poms for a given project and populates versions from a release train
  *
  * @author Marcin Grzejszczak
  */
-class SCReleasePomParser {
+class BomParser {
 
-	private static final Logger log = LoggerFactory.getLogger(SCReleasePomParser.class);
+	private static final Logger log = LoggerFactory.getLogger(BomParser.class);
 
-	private static final String STARTER_POM = "spring-cloud-starter-parent/pom.xml";
-	private static final String DEPENDENCIES_POM = "spring-cloud-dependencies/pom.xml";
-	private static final Pattern SC_VERSION_PATTERN = Pattern.compile("^(spring-cloud-.*)\\.version$");
-
-	private final File springCloudReleaseDir;
-	private final String bootPom;
-	private final String dependenciesPomPath;
+	private final File thisProjectRoot;
+	private final String pomWithBootStarterParent;
+	private final String thisTrainBom;
 	private final PomReader pomReader = new PomReader();
+	private final Pattern versionPattern;
+	private final ReleaserProperties properties;
 
-	SCReleasePomParser(File springCloudReleaseDir) {
-		this(springCloudReleaseDir, STARTER_POM, DEPENDENCIES_POM);
-	}
 
-	SCReleasePomParser(File springCloudReleaseDir, String bootPom, String dependenciesPom) {
-		this.springCloudReleaseDir = springCloudReleaseDir;
-		this.bootPom = bootPom;
-		this.dependenciesPomPath = dependenciesPom;
+	BomParser(ReleaserProperties properties, File thisProjectRoot) {
+		this.thisProjectRoot = thisProjectRoot;
+		this.pomWithBootStarterParent = properties.getPom().getPomWithBootStarterParent();
+		this.thisTrainBom = properties.getPom().getThisTrainBom();
+		this.versionPattern = Pattern.compile(properties.getPom().getBomVersionPattern());
+		this.properties = properties;
 	}
 
 	Versions allVersions() {
 		Versions boot = bootVersion();
-		Versions cloud = springCloudVersions();
+		Versions cloud = versionsFromSpringCloudBom();
 		return new Versions(boot.bootVersion, cloud.scBuildVersion, allProjects(boot, cloud));
 	}
 
@@ -72,7 +70,7 @@ class SCReleasePomParser {
 	}
 
 	Versions bootVersion() {
-		Model model = pom(this.bootPom);
+		Model model = pom(this.pomWithBootStarterParent);
 		String bootArtifactId = model.getParent().getArtifactId();
 		log.debug("Boot artifact id is equal to [{}]", bootArtifactId);
 		if (!SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID.equals(bootArtifactId)) {
@@ -88,15 +86,16 @@ class SCReleasePomParser {
 		if (pom == null) {
 			throw new IllegalStateException("Pom is not present");
 		}
-		File pomFile = new File(this.springCloudReleaseDir, pom);
+		File pomFile = new File(this.thisProjectRoot, pom);
 		if (!pomFile.exists()) {
 			throw new IllegalStateException("Pom is not present");
 		}
 		return this.pomReader.readPom(pomFile);
 	}
 
-	Versions springCloudVersions() {
-		Model model = pom(this.dependenciesPomPath);
+	// the BOM contains all versions of projects and its parent MUST be Spring Cloud Dependencies Parent
+	Versions versionsFromSpringCloudBom() {
+		Model model = pom(this.thisTrainBom);
 		String buildArtifact = model.getParent().getArtifactId();
 		log.debug("[{}] artifact id is equal to [{}]", SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
 		if (!SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID.equals(buildArtifact)) {
@@ -110,18 +109,18 @@ class SCReleasePomParser {
 				.filter(propertyMatchesSCPattern())
 				.map(toProject())
 				.collect(Collectors.toSet());
-		String scReleaseVersion = model.getVersion();
-		projects.add(new Project("spring-cloud-release", scReleaseVersion));
+		String releaseTrainProjectVersion = model.getVersion();
+		projects.add(new Project(this.properties.getMetaRelease().getReleaseTrainProjectName(), releaseTrainProjectVersion));
 		return new Versions(buildVersion, projects);
 	}
 
 	private Predicate<Map.Entry<Object, Object>> propertyMatchesSCPattern() {
-		return entry -> SC_VERSION_PATTERN.matcher(entry.getKey().toString()).matches();
+		return entry -> this.versionPattern.matcher(entry.getKey().toString()).matches();
 	}
 
 	private Function<Map.Entry<Object, Object>, Project> toProject() {
 		return entry -> {
-			Matcher matcher = SC_VERSION_PATTERN.matcher(entry.getKey().toString());
+			Matcher matcher = this.versionPattern.matcher(entry.getKey().toString());
 			// you have to first match to get info about the group
 			matcher.matches();
 			String name = matcher.group(1);

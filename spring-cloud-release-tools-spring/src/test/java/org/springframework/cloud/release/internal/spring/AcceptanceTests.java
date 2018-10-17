@@ -633,7 +633,7 @@ public class AcceptanceTests {
 
 	private ReleaserProperties releaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
-		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().toString());
+		releaserProperties.getGit().setReleaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static-angel/").toURI().toString());
 		releaserProperties.getMaven().setBuildCommand("echo build");
 		releaserProperties.getMaven().setDeployCommand("echo deploy");
@@ -666,7 +666,7 @@ public class AcceptanceTests {
 
 	private ReleaserProperties snapshotScReleaseReleaserProperties(File project, String branch) throws URISyntaxException {
 		ReleaserProperties releaserProperties = releaserProperties(project, branch);
-		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release-with-snapshot/").toURI().toString());
+		releaserProperties.getGit().setReleaseTrainBomUrl(file("/projects/spring-cloud-release-with-snapshot/").toURI().toString());
 		releaserProperties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;
@@ -725,8 +725,8 @@ public class AcceptanceTests {
 			return "http://foo.bar.com/" + releaseVersion.toString();
 		}
 
-		@Override public File cloneScReleaseProject() {
-			File file = super.cloneScReleaseProject();
+		@Override public File cloneReleaseTrainProject() {
+			File file = super.cloneReleaseTrainProject();
 			this.clonedProjects.add(file);
 			return file;
 		}

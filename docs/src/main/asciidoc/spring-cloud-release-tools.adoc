@@ -20,7 +20,7 @@ why this tool makes it easy to automate the release / dependency update process 
 For a single project
 
 - Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)
-- Modifies the project versions with values from SC-Release
+- Modifies the project versions with values from a BOM (e.g. for Spring Cloud it's Spring Cloud Release)
   * throws an exception when we bump versions to release and there's a SNAPSHOT version referenced in the POM
 - Performs the build and checks if the `docs` modules have properly created the documentation
   * throws an exception when in the `docs` module there's an unresolved tag in any HTML file
@@ -260,39 +260,44 @@ the `spring-cloud-cli.version` to `1.0.0.RELEASE` regardless of what was set in 
 Use these properties to provide versions for the meta release.
 
 - `releaser.meta-release.enabled` - You have to turn it on to enable a meta release. Defaults to `false`
-- `releaser.meta-release.release-train-project-name` - Name of the project that represents the BOM of the release train. Defaults to `spring-cloud-release`
 - `releaser.meta-release.git-org-url` - The URL of the Git organization. We'll append each project's name to it.
 Defaults to `https://github.com/spring-cloud`
 - `releaser.meta-release.projects-to-skip` - List of projects that we should not clone and release. Spring Cloud release
 train depends on projects that got already released. We default this list to `[spring-boot, spring-cloud-stream, spring-cloud-task]`.
 
-- `releaser.git.fetch-versions-from-git` - If `true` then should fill the map of versions from Git. If `false` then picks fixed versions
-- `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory
-- `releaser.git.spring-cloud-release-git-url` - URL to Spring Cloud Release Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-release`
-- `releaser.git.documentation-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-static`
-- `releaser.git.documentation-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`
-- `releaser.git.update-documentation-repo` - If `true` then will update documentation repository with the `current` URL. Defaults to `true`
-- `releaser.git.update-spring-guides` - If `true` then will update Spring Guides with the current release train. Defaults to `true`
+The following properties are used for both meta release and a release of an individual module.
+
+- `releaser.meta-release.release-train-project-name` - Name of the project that represents the BOM of the release train. Defaults to `spring-cloud-release`.
+- `releaser.git.fetch-versions-from-git` - If `true` then should fill the map of versions from Git. If `false` then picks fixed versions.
+- `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory.
+- `releaser.git.release-train-bom-url` - URL to a project containing a BOM. Defaults to Spring Cloud Release Git repository: `https://github.com/spring-cloud/spring-cloud-release`.
+- `releaser.git.documentation-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-static`.
+- `releaser.git.documentation-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`.
+- `releaser.git.update-documentation-repo` - If `true` then will update documentation repository with the `current` URL. Defaults to `true`.
+- `releaser.git.update-spring-guides` - If `true` then will update Spring Guides with the current release train. Defaults to `true`.
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
 - `releaser.git.username` - Optional Git username. If not passed keys will be used for authentication.
 - `releaser.git.password` - Optional Git password. If not passed keys will be used for authentication.
 - `releaser.git.number-of-checked-milestones` - In order not to iterate endlessly over milestones we introduce a threshold of milestones that
-we will go through to find the matching milestone. Defaults to `10`
-- `releaser.maven.build-command` - Command to be executed to build the project. Defaults to `./mvnw clean install -Pdocs`
-- `releaser.maven.deploy-command` - Command to be executed to deploy a built project". Defaults to `./mvnw deploy -DskipTests -Pfast`
+we will go through to find the matching milestone. Defaults to `10`.
+- `releaser.maven.build-command` - Command to be executed to build the project. Defaults to `./mvnw clean install -Pdocs`.
+- `releaser.maven.deploy-command` - Command to be executed to deploy a built project". Defaults to `./mvnw deploy -DskipTests -Pfast`.
 - `releaser.maven.publish-docs-commands` - Command to be executed to deploy a built project. If present `{{version}}` will be replaced by the proper version.
 Defaults to the standard Spring Cloud wget and execution of ghpages.
 - `releaser.maven.system-properties` - Additional system properties that should be passed to any commands. If present `{{systemProps}}` will be replaced by the contents of this property.
-- `releaser.maven.wait-time-in-minutes` - Max wait time in minutes for the process to finish. Defaults to `20`
+- `releaser.maven.wait-time-in-minutes` - Max wait time in minutes for the process to finish. Defaults to `20`.
 - `releaser.gradle.gradle-props-substitution` - a map containing a `key` which is a property key inside `gradle.properties` and a `value` of
 a project name. E.g. in `gradle.properties` you have `foo=1.0.0.BUILD-SNAPSHOT` and you would like `spring-cloud-contract` version to
 be set there. Just provide a mapping for the `gradle-props-substition` looking like this `foo=spring-cloud-contract` and the result
-(e.g for sc-contract version `2.0.0.RELEASE`) will be an updated `gradle.properties` with entry `foo=2.0.0.RELEASE`
-- `releaser.pom.branch` - Which branch of Spring Cloud Release should be checked out. Defaults to "master",
+(e.g for sc-contract version `2.0.0.RELEASE`) will be an updated `gradle.properties` with entry `foo=2.0.0.RELEASE`.
+- `releaser.pom.branch` - Which branch of Spring Cloud Release should be checked out. Defaults to `master`.
+- `releaser.pom.pom-with-boot-starter-parent` - What is the location of the `pom.xml` that contains the `spring-boot-starter-parent` as its parent pom. Defaults to `spring-cloud-starter-parent/pom.xml`.
+- `releaser.pom.this-train-bom` - What is the location of the `pom.xml` that contains all the versions for the release train. Defaults to `spring-cloud-dependencies/pom.xml`.
+- `releaser.pom.bom-version-pattern` - Regular expression that will match the versions of projects in the BOM pom.xml. Defaults to `^(spring-cloud-.*)\.version$`.
 - `releaser.pom.ignored-pom-regex` - List of regular expressions of ignored poms. Defaults to test projects and samples.
-Example: `"--releaser.pom.ignored-pom-regex=".{asterisk}\\.git/.{asterisk}$,.\{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.{asterisk}$,.{asterisk}spring-cloud-contract-maven-plugin/target/.{asterisk}$,.{asterisk}samples/standalone/[a-z]+/.{asterisk}$"`
+Example: `"--releaser.pom.ignored-pom-regex=".{asterisk}\\.git/.{asterisk}$,.\{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.{asterisk}$,.{asterisk}spring-cloud-contract-maven-plugin/target/.{asterisk}$,.{asterisk}samples/standalone/[a-z]+/.{asterisk}$"`.
 - `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.
-- `releaser.template.template-folder` - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to `cloud`
+- `releaser.template.template-folder` - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to `cloud`.
 
 TIP: You can pass the options either via system properties or via application arguments.
 Example for system properties: `java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar`
@@ -303,7 +308,6 @@ IMPORTANT: For the GA release to be successful, it's important that if the `buil
  then *remember to pass all arguments of the script there too*. E.g. `./mvnw clean install ${@}`. That's because
  the releaser will pass any system properties to the `build` / `deploy` command, such as system properties
  with keys and we need them to be passed inside the command executed by the releaser.
-
 
 === Examples
 

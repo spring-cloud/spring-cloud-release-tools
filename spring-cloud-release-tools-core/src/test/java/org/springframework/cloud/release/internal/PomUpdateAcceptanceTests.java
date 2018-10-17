@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.HashSet;
 
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
@@ -42,7 +41,7 @@ public class PomUpdateAcceptanceTests {
 		ReleaserProperties releaserProperties = releaserProperties();
 		releaserProperties.getFixedVersions().put("checkstyle", "100.0.0.RELEASE");
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
-		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
 
 		projectPomUpdater
@@ -70,7 +69,7 @@ public class PomUpdateAcceptanceTests {
 	public void should_not_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version() throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
-		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		projects.add(new ProjectVersion("spring-cloud-sleuth-samples", "0.0.5.RELEASE"));
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property/spring-cloud-sleuth-samples");
 		addBuildSnapshotToChildPom(project);
@@ -89,7 +88,7 @@ public class PomUpdateAcceptanceTests {
 	public void should_not_fail_update_when_after_updating_a_release_version_there_still_is_a_snapshot_version_in_a_non_deployable_module() throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
-		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property");
 
 		BDDAssertions.thenThrownBy(() ->
@@ -102,7 +101,7 @@ public class PomUpdateAcceptanceTests {
 	public void should_update_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version_for_boot_snapshot_version() throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
-		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		projects.removeIf(projectVersion -> projectVersion.projectName.contains("spring-cloud-build"));
 		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.BUILD-SNAPSHOT"));
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
@@ -118,7 +117,7 @@ public class PomUpdateAcceptanceTests {
 		ReleaserProperties releaserProperties = releaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties);
 		File beforeProcessing = pom("/projects/project/");
-		Projects projects = projectPomUpdater.retrieveVersionsFromSCRelease();
+		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = tmpFile("/project/");
 
 		projectPomUpdater.updateProjectFromSCRelease(project, projects,
@@ -131,7 +130,7 @@ public class PomUpdateAcceptanceTests {
 
 	private ReleaserProperties releaserProperties() throws URISyntaxException {
 		ReleaserProperties releaserProperties = new ReleaserProperties();
-		releaserProperties.getGit().setSpringCloudReleaseGitUrl(file("/projects/spring-cloud-release/").toURI().toString());
+		releaserProperties.getGit().setReleaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 		return releaserProperties;
 	}
 
