@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-10-16</date>
+<date>2018-10-17</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -20,7 +20,7 @@ why this tool makes it easy to automate the release / dependency update process 
 <simpara>Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)</simpara>
 </listitem>
 <listitem>
-<simpara>Modifies the project versions with values from SC-Release</simpara>
+<simpara>Modifies the project versions with values from a BOM (e.g. for Spring Cloud it&#8217;s Spring Cloud Release)</simpara>
 <itemizedlist>
 <listitem>
 <simpara>throws an exception when we bump versions to release and there&#8217;s a SNAPSHOT version referenced in the POM</simpara>
@@ -297,9 +297,6 @@ Use these properties to provide versions for the meta release.</simpara>
 <simpara><literal>releaser.meta-release.enabled</literal> - You have to turn it on to enable a meta release. Defaults to <literal>false</literal></simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.meta-release.release-train-project-name</literal> - Name of the project that represents the BOM of the release train. Defaults to <literal>spring-cloud-release</literal></simpara>
-</listitem>
-<listitem>
 <simpara><literal>releaser.meta-release.git-org-url</literal> - The URL of the Git organization. We&#8217;ll append each project&#8217;s name to it.
 Defaults to <literal><link xl:href="https://github.com/spring-cloud">https://github.com/spring-cloud</link></literal></simpara>
 </listitem>
@@ -307,26 +304,32 @@ Defaults to <literal><link xl:href="https://github.com/spring-cloud">https://git
 <simpara><literal>releaser.meta-release.projects-to-skip</literal> - List of projects that we should not clone and release. Spring Cloud release
 train depends on projects that got already released. We default this list to <literal>[spring-boot, spring-cloud-stream, spring-cloud-task]</literal>.</simpara>
 </listitem>
+</itemizedlist>
+<simpara>The following properties are used for both meta release and a release of an individual module.</simpara>
+<itemizedlist>
 <listitem>
-<simpara><literal>releaser.git.fetch-versions-from-git</literal> - If <literal>true</literal> then should fill the map of versions from Git. If <literal>false</literal> then picks fixed versions</simpara>
+<simpara><literal>releaser.meta-release.release-train-project-name</literal> - Name of the project that represents the BOM of the release train. Defaults to <literal>spring-cloud-release</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.clone-destination-dir</literal> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory</simpara>
+<simpara><literal>releaser.git.fetch-versions-from-git</literal> - If <literal>true</literal> then should fill the map of versions from Git. If <literal>false</literal> then picks fixed versions.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.spring-cloud-release-git-url</literal> - URL to Spring Cloud Release Git repository. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-release">https://github.com/spring-cloud/spring-cloud-release</link></literal></simpara>
+<simpara><literal>releaser.git.clone-destination-dir</literal> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.documentation-url</literal> - URL to the documentation Git repository. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-static">https://github.com/spring-cloud/spring-cloud-static</link></literal></simpara>
+<simpara><literal>releaser.git.release-train-bom-url</literal> - URL to a project containing a BOM. Defaults to Spring Cloud Release Git repository: <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-release">https://github.com/spring-cloud/spring-cloud-release</link></literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.documentation-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal></simpara>
+<simpara><literal>releaser.git.documentation-url</literal> - URL to the documentation Git repository. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-static">https://github.com/spring-cloud/spring-cloud-static</link></literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.update-documentation-repo</literal> - If <literal>true</literal> then will update documentation repository with the <literal>current</literal> URL. Defaults to <literal>true</literal></simpara>
+<simpara><literal>releaser.git.documentation-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.update-spring-guides</literal> - If <literal>true</literal> then will update Spring Guides with the current release train. Defaults to <literal>true</literal></simpara>
+<simpara><literal>releaser.git.update-documentation-repo</literal> - If <literal>true</literal> then will update documentation repository with the <literal>current</literal> URL. Defaults to <literal>true</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.update-spring-guides</literal> - If <literal>true</literal> then will update Spring Guides with the current release train. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
@@ -339,13 +342,13 @@ train depends on projects that got already released. We default this list to <li
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.number-of-checked-milestones</literal> - In order not to iterate endlessly over milestones we introduce a threshold of milestones that
-we will go through to find the matching milestone. Defaults to <literal>10</literal></simpara>
+we will go through to find the matching milestone. Defaults to <literal>10</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.maven.build-command</literal> - Command to be executed to build the project. Defaults to <literal>./mvnw clean install -Pdocs</literal></simpara>
+<simpara><literal>releaser.maven.build-command</literal> - Command to be executed to build the project. Defaults to <literal>./mvnw clean install -Pdocs</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.maven.deploy-command</literal> - Command to be executed to deploy a built project". Defaults to <literal>./mvnw deploy -DskipTests -Pfast</literal></simpara>
+<simpara><literal>releaser.maven.deploy-command</literal> - Command to be executed to deploy a built project". Defaults to <literal>./mvnw deploy -DskipTests -Pfast</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.maven.publish-docs-commands</literal> - Command to be executed to deploy a built project. If present <literal>{{version}}</literal> will be replaced by the proper version.
@@ -355,26 +358,35 @@ Defaults to the standard Spring Cloud wget and execution of ghpages.</simpara>
 <simpara><literal>releaser.maven.system-properties</literal> - Additional system properties that should be passed to any commands. If present <literal>{{systemProps}}</literal> will be replaced by the contents of this property.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.maven.wait-time-in-minutes</literal> - Max wait time in minutes for the process to finish. Defaults to <literal>20</literal></simpara>
+<simpara><literal>releaser.maven.wait-time-in-minutes</literal> - Max wait time in minutes for the process to finish. Defaults to <literal>20</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.gradle.gradle-props-substitution</literal> - a map containing a <literal>key</literal> which is a property key inside <literal>gradle.properties</literal> and a <literal>value</literal> of
 a project name. E.g. in <literal>gradle.properties</literal> you have <literal>foo=1.0.0.BUILD-SNAPSHOT</literal> and you would like <literal>spring-cloud-contract</literal> version to
 be set there. Just provide a mapping for the <literal>gradle-props-substition</literal> looking like this <literal>foo=spring-cloud-contract</literal> and the result
-(e.g for sc-contract version <literal>2.0.0.RELEASE</literal>) will be an updated <literal>gradle.properties</literal> with entry <literal>foo=2.0.0.RELEASE</literal></simpara>
+(e.g for sc-contract version <literal>2.0.0.RELEASE</literal>) will be an updated <literal>gradle.properties</literal> with entry <literal>foo=2.0.0.RELEASE</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.pom.branch</literal> - Which branch of Spring Cloud Release should be checked out. Defaults to "master",</simpara>
+<simpara><literal>releaser.pom.branch</literal> - Which branch of Spring Cloud Release should be checked out. Defaults to <literal>master</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.pom.pom-with-boot-starter-parent</literal> - What is the location of the <literal>pom.xml</literal> that contains the <literal>spring-boot-starter-parent</literal> as its parent pom. Defaults to <literal>spring-cloud-starter-parent/pom.xml</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.pom.this-train-bom</literal> - What is the location of the <literal>pom.xml</literal> that contains all the versions for the release train. Defaults to <literal>spring-cloud-dependencies/pom.xml</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.pom.bom-version-pattern</literal> - Regular expression that will match the versions of projects in the BOM pom.xml. Defaults to <literal>^(spring-cloud-.*)\.version$</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.pom.ignored-pom-regex</literal> - List of regular expressions of ignored poms. Defaults to test projects and samples.
-Example: <literal>"--releaser.pom.ignored-pom-regex=".*\\.git/.*$,.{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.*$,.*spring-cloud-contract-maven-plugin/target/.*$,.*samples/standalone/[a-z]+/.*$"</literal></simpara>
+Example: <literal>"--releaser.pom.ignored-pom-regex=".*\\.git/.*$,.{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.*$,.*spring-cloud-contract-maven-plugin/target/.*$,.*samples/standalone/[a-z]+/.*$"</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.working-dir</literal> - By default Releaser assumes running the program from the current working directory.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.template.template-folder</literal> - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to <literal>cloud</literal></simpara>
+<simpara><literal>releaser.template.template-folder</literal> - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to <literal>cloud</literal>.</simpara>
 </listitem>
 </itemizedlist>
 <tip>
