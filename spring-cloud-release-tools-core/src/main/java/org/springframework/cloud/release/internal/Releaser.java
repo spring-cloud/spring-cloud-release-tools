@@ -196,4 +196,16 @@ public class Releaser {
 			log.warn("\nUnable to update documentation repository for branch ["+ releaseBranch + "]", e);
 		}
 	}
+
+	public void updateSpringProjectPage(Projects projects) {
+		try {
+			if (this.documentationUpdater.updateProjectRepo(projects) != null) {
+				log.info("\nSuccessfully updated Spring project page");
+			} else {
+				log.warn("\nFailed to update Spring Project page");
+			}
+		} catch (Exception e) {
+			log.warn("\nUnable to update Spring Project page", e);
+		}
+	}
 }

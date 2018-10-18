@@ -71,6 +71,12 @@ class Tasks {
 			args -> {
 				args.releaser.updateDocumentationRepository(args.properties, args.versionFromScRelease);
 	},TaskType.POST_RELEASE);
+	static Task UPDATE_SPRING_PROJECT_PAGE = task("updateSpringProjectPage", "up",
+			"UPDATE SPRING PROJECT PAGE",
+			"Updating Spring Project page",
+			args -> {
+				args.releaser.updateSpringProjectPage(args.projects);
+	},TaskType.POST_RELEASE);
 
 	static final List<Task> DEFAULT_TASKS_PER_PROJECT = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -87,7 +93,8 @@ class Tasks {
 	static final List<Task> DEFAULT_TASKS_PER_RELEASE = Stream.of(
 			Tasks.CREATE_TEMPLATES,
 			Tasks.UPDATE_GUIDES,
-			Tasks.UPDATE_DOCUMENTATION
+			Tasks.UPDATE_DOCUMENTATION,
+			Tasks.UPDATE_SPRING_PROJECT_PAGE
 	).collect(Collectors.toList());
 
 	static final List<Task> NON_COMPOSITE_TASKS = new ArrayList<Task>() {

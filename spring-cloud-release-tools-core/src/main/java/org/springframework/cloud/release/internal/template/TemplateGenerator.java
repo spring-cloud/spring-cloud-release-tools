@@ -12,6 +12,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.tech.HandlebarsHelper;
 
 /**
  * @author Marcin Grzejszczak
@@ -101,15 +102,7 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 	}
 
 	private Template template(String template) {
-		try {
-			Handlebars handlebars = new Handlebars(new ClassPathTemplateLoader("/templates/" +
-					this.props.getTemplate().getTemplateFolder()));
-			handlebars.registerHelper("replace", StringHelpers.replace);
-			handlebars.registerHelper("capitalizeFirst", StringHelpers.capitalizeFirst);
-			return handlebars.compile(template);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
+		return HandlebarsHelper.template(this.props.getTemplate().getTemplateFolder(), template);
 	}
 
 	@Override public void setReleaserProperties(ReleaserProperties properties) {

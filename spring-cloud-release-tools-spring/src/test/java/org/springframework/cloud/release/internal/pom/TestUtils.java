@@ -8,6 +8,7 @@ import org.eclipse.jgit.util.FileUtils;
 public class TestUtils {
 
 	public static void prepareLocalRepo() throws IOException {
+		prepareLocalRepo("target/test-classes/projects/", "spring-cloud");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-release");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-release-with-snapshot");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-consul");

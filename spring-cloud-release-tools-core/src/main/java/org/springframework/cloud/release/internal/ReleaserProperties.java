@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -148,9 +147,19 @@ public class ReleaserProperties implements Serializable {
 		private String documentationUrl = "https://github.com/spring-cloud/spring-cloud-static";
 
 		/**
+		 * URL to main release train project repository
+		 */
+		private String springProjectUrl = "https://github.com/spring-projects/spring-cloud";
+
+		/**
 		 * Branch to check out for the documentation project
 		 */
 		private String documentationBranch = "gh-pages";
+
+		/**
+		 * Branch to check out for the release train project
+		 */
+		private String springProjectBranch = "gh-pages";
 
 		/**
 		 * If {@code false}, will not update the documentation repository.
@@ -193,6 +202,12 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private boolean updateSpringGuides = true;
 
+		/**
+		 * If set to {@code false}, will not update the Spring Project for a release train.
+		 * E.g. for Spring Cloud will not update https://cloud.spring.io
+		 */
+		private boolean updateSpringProject = true;
+
 		public String getReleaseTrainBomUrl() {
 			return this.releaseTrainBomUrl;
 		}
@@ -209,12 +224,28 @@ public class ReleaserProperties implements Serializable {
 			this.documentationUrl = documentationUrl;
 		}
 
+		public String getSpringProjectUrl() {
+			return this.springProjectUrl;
+		}
+
+		public void setSpringProjectUrl(String springProjectUrl) {
+			this.springProjectUrl = springProjectUrl;
+		}
+
 		public String getDocumentationBranch() {
 			return this.documentationBranch;
 		}
 
 		public void setDocumentationBranch(String documentationBranch) {
 			this.documentationBranch = documentationBranch;
+		}
+
+		public String getSpringProjectBranch() {
+			return this.springProjectBranch;
+		}
+
+		public void setSpringProjectBranch(String springProjectBranch) {
+			this.springProjectBranch = springProjectBranch;
 		}
 
 		public boolean isUpdateDocumentationRepo() {
@@ -281,6 +312,14 @@ public class ReleaserProperties implements Serializable {
 			this.updateSpringGuides = updateSpringGuides;
 		}
 
+		public boolean isUpdateSpringProject() {
+			return this.updateSpringProject;
+		}
+
+		public void setUpdateSpringProject(boolean updateSpringProject) {
+			this.updateSpringProject = updateSpringProject;
+		}
+
 		@Override
 		public String toString() {
 			return "Git{" +
@@ -288,11 +327,14 @@ public class ReleaserProperties implements Serializable {
 					", documentationUrl='" + this.documentationUrl + '\'' +
 					", documentationBranch='" + this.documentationBranch + '\'' +
 					", updateDocumentationRepo=" + this.updateDocumentationRepo +
+					", springProjectUrl=" + this.springProjectUrl+
+					", springProjectBranch=" + this.springProjectBranch +
 					", cloneDestinationDir='" + this.cloneDestinationDir + '\'' +
 					", fetchVersionsFromGit=" + this.fetchVersionsFromGit +
 					", oauthToken='" + this.oauthToken + '\'' +
 					", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones +
 					", updateSpringGuides=" + this.updateSpringGuides +
+					", updateSpringProject=" + this.updateSpringProject +
 					'}';
 		}
 	}

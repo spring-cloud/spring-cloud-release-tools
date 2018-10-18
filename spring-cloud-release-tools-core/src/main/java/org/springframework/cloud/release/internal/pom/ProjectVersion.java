@@ -107,6 +107,34 @@ public class ProjectVersion {
 				splitThis[0].equals(splitThat[0]) && splitThis[1].equals(splitThat[1]);
 	}
 
+	public boolean isSameReleaseTrainName(String version) {
+		assertVersionSet();
+		String[] splitThis = this.version.split("\\.");
+		String[] splitThat = version.split("\\.");
+		return splitThis[0].compareToIgnoreCase(splitThat[0]) == 0;
+	}
+
+	private void assertVersionSet() {
+		if (this.version == null) {
+			throw new IllegalStateException("Version is not set");
+		}
+	}
+
+	public int compareToReleaseTrainName(String version) {
+		assertVersionSet();
+		String[] split = version.split("\\.");
+		String thatName = split[0];
+		String thatValue = split[1];
+		String[] thisSplit = this.version.split("\\.");
+		String thisName = thisSplit[0];
+		String thisValue = thisSplit[1];
+		int nameComparison = thisName.compareTo(thatName);
+		if (nameComparison != 0) {
+			return nameComparison;
+		}
+		return new VersionNumber(thisValue).compareTo(new VersionNumber(thatValue));
+	}
+
 	@Override public String toString() {
 		return this.version;
 	}
@@ -122,5 +150,27 @@ public class ProjectVersion {
 
 	@Override public int hashCode() {
 		return Objects.hash(this.projectName);
+	}
+}
+
+class VersionNumber implements Comparable<VersionNumber> {
+	private final String version;
+
+	VersionNumber(String version) {
+		this.version = version;
+	}
+
+	@Override
+	public int compareTo(VersionNumber o) {
+		char thisFirst = this.version.toLowerCase().charAt(0);
+		char thatFirst = o.version.toLowerCase().charAt(0);
+		// B < M < RC < R < S
+		int charComparison = Character.compare(thisFirst, thatFirst);
+		if (charComparison != 0) {
+			return charComparison;
+		}
+		Integer thisNumber = Integer.valueOf(this.version.replaceAll("\\D+",""));
+		Integer thatNumber = Integer.valueOf(o.version.replaceAll("\\D+",""));
+		return thisNumber.compareTo(thatNumber);
 	}
 }

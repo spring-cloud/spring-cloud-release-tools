@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import org.eclipse.jgit.transport.URIish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -25,10 +26,9 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	private static final String PRE_RELEASE_MSG = "Update SNAPSHOT to %s";
 	private static final String POST_RELEASE_MSG = "Going back to snapshots";
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
-
-	private ReleaserProperties properties;
 	private final GithubMilestones githubMilestones;
 	private final GithubIssues githubIssues;
+	private ReleaserProperties properties;
 
 	public ProjectGitHandler(ReleaserProperties properties) {
 		this.properties = properties;
@@ -41,7 +41,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		if (version.isSnapshot()) {
 			log.info("Snapshot version [{}] found. Will only commit the changed poms", version);
 			gitRepo.commit(MSG);
-		} else {
+		}
+		else {
 			log.info("NON-snapshot version [{}] found. Will commit the changed poms, tag the version and push the tag", version);
 			gitRepo.commit(String.format(PRE_RELEASE_MSG, version.version));
 			String tagName = "v" + version.version;
@@ -53,8 +54,10 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	public void commitAfterBumpingVersions(File project, ProjectVersion version) {
 		if (version.isSnapshot()) {
 			log.info("Snapshot version [{}] found. Will only commit the changed poms", version);
-			commit(project, String.format(POST_RELEASE_BUMP_MSG, version.bumpedVersion()));
-		} else {
+			commit(project, String
+					.format(POST_RELEASE_BUMP_MSG, version.bumpedVersion()));
+		}
+		else {
 			log.info("Non snapshot version [{}] found. Won't do anything", version);
 		}
 	}
@@ -69,8 +72,20 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	}
 
 	public File cloneDocumentationProject() {
-		File clonedProject = cloneProject(this.properties.getGit().getDocumentationUrl());
-		checkout(clonedProject, this.properties.getGit().getDocumentationBranch());
+		return cloneAndCheckOut(this.properties.getGit()
+				.getDocumentationUrl(), this.properties.getGit()
+				.getDocumentationBranch());
+	}
+
+	public File cloneSpringDocProject() {
+		return cloneAndCheckOut(this.properties.getGit()
+				.getSpringProjectUrl(), this.properties.getGit()
+				.getSpringProjectBranch());
+	}
+
+	private File cloneAndCheckOut(String springProjectUrl, String springProjectUrlBranch) {
+		File clonedProject = cloneProject(springProjectUrl);
+		checkout(clonedProject, springProjectUrlBranch);
 		return clonedProject;
 	}
 
@@ -115,7 +130,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 					new File(properties.getGit().getCloneDestinationDir()) :
 					Files.createTempDirectory("releaser").toFile();
 			return gitRepo(destinationDir).cloneProject(new URIish(url));
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
@@ -137,7 +153,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		if (splitVersion.length == 3) {
 			// [2,3,4] -> 2.3.x
 			return splitVersion[0] + "." + splitVersion[1] + ".x";
-		} else if (splitVersion.length == 1) {
+		}
+		else if (splitVersion.length == 1) {
 			// [Camden] -> [Camden.x]
 			return splitVersion[0];
 		}
@@ -178,7 +195,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		return new GitRepo(workingDir, this.properties);
 	}
 
-	@Override public void setReleaserProperties(ReleaserProperties properties) {
+	@Override
+	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties = properties;
 	}
 }

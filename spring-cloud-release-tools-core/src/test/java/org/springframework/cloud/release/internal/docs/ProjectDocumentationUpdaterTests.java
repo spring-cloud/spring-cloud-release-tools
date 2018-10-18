@@ -24,7 +24,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 /**
  * @author Marcin Grzejszczak
  */
-public class DocumentationUpdaterTests {
+public class ProjectDocumentationUpdaterTests {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	File project;
@@ -37,10 +37,10 @@ public class DocumentationUpdaterTests {
 	public void setup() throws IOException, URISyntaxException {
 		this.tmpFolder = this.tmp.newFolder();
 		this.project = new File(
-				DocumentationUpdaterTests.class.getResource("/projects/spring-cloud-static").toURI());
+				ProjectDocumentationUpdaterTests.class.getResource("/projects/spring-cloud-static").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects"), this.tmpFolder);
-		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
+		this.properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 		this.handler = new ProjectGitHandler(properties);
 		this.clonedDocProject = this.handler.cloneDocumentationProject();
 	}
@@ -54,7 +54,7 @@ public class DocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-release/").toURI().toString());
 
 		BDDAssertions.thenThrownBy(() ->
-				new DocumentationUpdater(properties, new ProjectGitHandler(properties))
+				new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties))
 						.updateDocsRepo(releaseTrainVersion, "vAngel.SR33"))
 			.isInstanceOf(IllegalStateException.class)
 			.hasMessageContaining("index.html is not present");
@@ -68,7 +68,7 @@ public class DocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 
 		BDDAssertions.thenThrownBy(() ->
-				new DocumentationUpdater(properties, new ProjectGitHandler(properties)) {
+				new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties)) {
 					@Override String readIndexHtmlContents(File indexHtml)
 							throws IOException {
 						return "";
@@ -83,7 +83,7 @@ public class DocumentationUpdaterTests {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "2.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
 
-		File updatedDocs = new DocumentationUpdater(properties, new ProjectGitHandler(properties))
+		File updatedDocs = new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "vAngel.M7");
 
 		then(updatedDocs).isNull();
@@ -96,7 +96,7 @@ public class DocumentationUpdaterTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
 
-		File updatedDocs = new DocumentationUpdater(properties, new ProjectGitHandler(properties))
+		File updatedDocs = new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "vAngel.SR33");
 
 		String indexHtmlContent = new String(Files.readAllBytes(
@@ -113,7 +113,7 @@ public class DocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
 
-		new DocumentationUpdater(properties, handler)
+		new ProjectDocumentationUpdater(properties, handler)
 				.updateDocsRepo(releaseTrainVersion, "vDalston.SR3");
 
 		BDDMockito.then(handler).should(BDDMockito.never())
@@ -127,7 +127,7 @@ public class DocumentationUpdaterTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = new DocumentationUpdater(properties, new ProjectGitHandler(properties))
+		File updatedDocs = new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "Angel.SR33");
 
 		String indexHtmlContent = new String(Files.readAllBytes(
@@ -143,7 +143,7 @@ public class DocumentationUpdaterTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = new DocumentationUpdater(properties, new ProjectGitHandler(properties))
+		File updatedDocs = new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "vFinchley.SR33");
 
 		String indexHtmlContent = new String(Files.readAllBytes(
@@ -159,7 +159,7 @@ public class DocumentationUpdaterTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = new DocumentationUpdater(properties, new ProjectGitHandler(properties))
+		File updatedDocs = new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "Finchley.SR33");
 
 		String indexHtmlContent = new String(Files.readAllBytes(
@@ -176,13 +176,13 @@ public class DocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 		properties.getGit().setUpdateDocumentationRepo(false);
 
-		File updatedDocs = new DocumentationUpdater(properties, new ProjectGitHandler(properties))
+		File updatedDocs = new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties))
 				.updateDocsRepo(releaseTrainVersion, "Finchley.SR33");
 
 		then(updatedDocs).isNull();
 	}
 
 	private File file(String relativePath) throws URISyntaxException {
-		return new File(DocumentationUpdaterTests.class.getResource(relativePath).toURI());
+		return new File(ProjectDocumentationUpdaterTests.class.getResource(relativePath).toURI());
 	}
 }

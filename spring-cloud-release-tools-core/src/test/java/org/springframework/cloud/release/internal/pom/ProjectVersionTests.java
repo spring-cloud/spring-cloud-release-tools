@@ -203,6 +203,64 @@ public class ProjectVersionTests {
 		then(projectVersion.groupId()).isEmpty();
 	}
 
+	@Test
+	public void should_return_true_when_release_train_names_are_the_same() {
+		String thisVersion = "Finchley.SR1";
+		String thatVersion = "Finchley.SR2";
+
+		then(projectVersion(thisVersion).isSameReleaseTrainName(thatVersion)).isTrue();
+	}
+
+	@Test
+	public void should_return_true_when_sr_has_two_digits() {
+		String thisVersion = "Finchley.SR1";
+		String thatVersion = "Finchley.SR10";
+
+		then(projectVersion(thatVersion).compareToReleaseTrainName(thisVersion)).isPositive();
+	}
+
+	@Test
+	public void should_return_false_when_release_train_name_are_different() {
+		String thisVersion = "Finchley.SR1";
+		String thatVersion = "Greenwich.SR1";
+
+		then(projectVersion(thisVersion).isSameReleaseTrainName(thatVersion)).isFalse();
+	}
+
+	@Test
+	public void should_return_positive_when_release_train_is_greater_than_the_other_one() {
+		String thisVersion = "Finchley.SR2";
+		String thatVersion = "Finchley.SR1";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isPositive();
+
+		thisVersion = "Greenwich.SR1";
+		thatVersion = "Finchley.SR2";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isPositive();
+	}
+
+	@Test
+	public void should_return_0_when_release_train_is_equal_than_the_other_one() {
+		String thisVersion = "Finchley.SR1";
+		String thatVersion = "Finchley.SR1";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isZero();
+	}
+
+	@Test
+	public void should_return_minus_1_when_release_train_is_smaller_than_the_other_one() {
+		String thisVersion = "Finchley.SR1";
+		String thatVersion = "Finchley.SR2";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isNegative();
+
+		thisVersion = "Finchley.SR2";
+		thatVersion = "Greenwich.SR1";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isNegative();
+	}
+
 	private ProjectVersion projectVersion(String version) {
 		return new ProjectVersion("foo", version);
 	}

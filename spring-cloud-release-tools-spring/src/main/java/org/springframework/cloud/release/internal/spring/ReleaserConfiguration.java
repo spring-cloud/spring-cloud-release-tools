@@ -76,8 +76,9 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	DocumentationUpdater documentationUpdater(ReleaserProperties properties, ProjectGitHandler handler) {
-		return new DocumentationUpdater(properties, handler);
+	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
+			ReleaserProperties properties) {
+		return new DocumentationUpdater(projectGitHandler, properties);
 	}
 
 	@Bean
