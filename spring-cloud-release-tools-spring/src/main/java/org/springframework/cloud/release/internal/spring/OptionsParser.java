@@ -66,8 +66,12 @@ class OptionsParser implements Parser {
 			Boolean interactive = options.valueOf(interactiveOpt);
 			Boolean fullRelease = options.has(fullReleaseOpt);
 			List<String> providedTaskNames = StringUtils.hasText(options.valueOf(taskNamesOpt)) ?
-					Arrays.asList(options.valueOf(taskNamesOpt).split(",")) :
+					Arrays.asList(removeQuotingChars(options.valueOf(taskNamesOpt)).split(",")) :
 					new ArrayList<>();
+			providedTaskNames = providedTaskNames.stream()
+					.map(this::removeQuotingChars)
+					.collect(Collectors.toList());
+			log.info("Passed tasks {} from command line", providedTaskNames);
 			List<String> allTaskNames = Tasks.NON_COMPOSITE_TASKS.stream()
 					.map(task -> task.name)
 					.collect(Collectors.toList());
@@ -98,6 +102,13 @@ class OptionsParser implements Parser {
 			printErrorMessage(e, parser);
 			throw e;
 		}
+	}
+
+	private String removeQuotingChars(String string) {
+		if (string.startsWith("'") && string.endsWith("'")) {
+			return string.substring(1, string.length() - 1);
+		}
+		return string;
 	}
 
 	private void printErrorMessage(Exception e, OptionParser parser) {
