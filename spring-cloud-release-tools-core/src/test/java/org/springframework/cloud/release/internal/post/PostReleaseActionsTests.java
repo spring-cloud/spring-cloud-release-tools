@@ -50,6 +50,17 @@ public class PostReleaseActionsTests {
 	}
 
 	@Test
+	public void should_do_nothing_when_the_switch_is_off() {
+		this.properties.getGit().setRunUpdatedSamples(false);
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.builder, this.properties);
+
+		actions.runUpdatedTests(currentGa());
+
+		BDDAssertions.then(clonedTestSamples).isNull();
+	}
+
+	@Test
 	public void should_update_project_and_run_tests() {
 		this.properties.getGit().setTestSamplesProjectUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setBuildCommand("touch build.log");
