@@ -27,6 +27,7 @@ class OptionsParser implements Parser {
 	public Options parse(String[] args) {
 		OptionParser parser = new OptionParser();
 		parser.allowsUnrecognizedOptions();
+		log.info("Got following args <{}>", args);
 		try {
 			ArgumentAcceptingOptionSpec<Boolean> metaReleaseOpt = parser
 					.acceptsAll(Arrays.asList("x", "meta-release"),
@@ -82,9 +83,8 @@ class OptionsParser implements Parser {
 				providedTaskNames.addAll(tasksFromOptions.isEmpty() && !metaRelease ?
 						allTaskNames : tasksFromOptions);
 			}
-			List<String> taskNames = allTaskNames.stream()
-					.filter(providedTaskNames::contains)
-					.collect(Collectors.toList());
+			List<String> taskNames = filterProvidedTaskNames(
+					providedTaskNames, allTaskNames, metaRelease);
 			String startFrom = options.valueOf(startFromOpt);
 			String range = options.valueOf(rangeOpt);
 			Options buildOptions = new OptionsBuilder()
@@ -102,6 +102,16 @@ class OptionsParser implements Parser {
 			printErrorMessage(e, parser);
 			throw e;
 		}
+	}
+
+	List<String> filterProvidedTaskNames(List<String> providedTaskNames,
+			List<String> allTaskNames, boolean metaRelease) {
+		if (metaRelease) {
+			return providedTaskNames;
+		}
+		return allTaskNames.stream()
+				.filter(providedTaskNames::contains)
+				.collect(Collectors.toList());
 	}
 
 	private String removeQuotingChars(String string) {
