@@ -1,9 +1,5 @@
 package org.springframework.cloud.release.internal;
 
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +23,10 @@ import org.springframework.cloud.release.internal.post.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
+
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
 
 /**
  * @author Marcin Grzejszczak
@@ -106,16 +106,16 @@ public class ReleaserTests {
 
 	@Test
 	public void should_not_generate_email_for_snapshot_version() throws Exception {
-		releaser().createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+		releaser().createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"), projects());
 
-		then(this.templateGenerator).should(never()).email();
+		then(this.templateGenerator).should(never()).email(any(Projects.class));
 	}
 
 	@Test
 	public void should_generate_email_for_release_version() throws Exception {
-		releaser().createEmail(new ProjectVersion("original", "1.0.0.RELEASE"));
+		releaser().createEmail(new ProjectVersion("original", "1.0.0.RELEASE"), projects());
 
-		then(this.templateGenerator).should().email();
+		then(this.templateGenerator).should().email(any(Projects.class));
 	}
 
 	@Test
@@ -133,6 +133,10 @@ public class ReleaserTests {
 						new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(this.projectGitHandler).should(never()).revertChangesIfApplicable(any(File.class), any(ProjectVersion.class));
+	}
+
+	Projects projects() {
+		return new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"));
 	}
 
 }

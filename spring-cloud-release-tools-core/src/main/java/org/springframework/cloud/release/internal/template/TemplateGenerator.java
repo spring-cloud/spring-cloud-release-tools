@@ -1,10 +1,5 @@
 package org.springframework.cloud.release.internal.template;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.helper.StringHelpers;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -13,6 +8,8 @@ import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.tech.HandlebarsHelper;
+
+import com.github.jknack.handlebars.Template;
 
 /**
  * @author Marcin Grzejszczak
@@ -48,9 +45,9 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 		this.handler = handler;
 	}
 
-	public File email() {
+	public File email(Projects projects) {
 		File emailOutput = file(this.emailOutput);
-		String releaseVersion = parsedVersion();
+		String releaseVersion = parsedVersion(projects);
 		Template template = template(EMAIL_TEMPLATE);
 		return new EmailTemplateGenerator(template, releaseVersion, emailOutput).email();
 	}
@@ -73,27 +70,30 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 
 	public File blog(Projects projects) {
 		File blogOutput = file(this.blogOutput);
-		String releaseVersion = parsedVersion();
+		String releaseVersion = parsedVersion(projects);
 		Template template = template(BLOG_TEMPLATE);
 		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects).blog();
 	}
 
-	public File tweet() {
+	public File tweet(Projects projects) {
 		File output = file(this.tweetOutput);
-		String releaseVersion = parsedVersion();
+		String releaseVersion = parsedVersion(projects);
 		Template template = template(TWITTER_TEMPLATE);
 		return new TwitterTemplateGenerator(template, releaseVersion, output).tweet();
 	}
 
 	public File releaseNotes(Projects projects) {
 		File output = file(this.releaseNotesOutput);
-		String releaseVersion = parsedVersion();
+		String releaseVersion = parsedVersion(projects);
 		Template template = template(RELEASE_NOTES_TEMPLATE);
 		return new ReleaseNotesTemplateGenerator(template, releaseVersion,
 				output, projects, this.handler).releseNotes();
 	}
 
-	private String parsedVersion() {
+	private String parsedVersion(Projects projects) {
+		if (this.props.getMetaRelease().isEnabled()) {
+			return projects.forName(this.props.getMetaRelease().getReleaseTrainProjectName()).version;
+		}
 		String version = this.props.getPom().getBranch();
 		if (version.startsWith("v")) {
 			return version.substring(1);

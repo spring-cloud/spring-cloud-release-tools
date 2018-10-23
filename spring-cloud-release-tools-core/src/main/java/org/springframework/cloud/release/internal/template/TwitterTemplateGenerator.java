@@ -1,15 +1,19 @@
 package org.springframework.cloud.release.internal.template;
 
-import com.github.jknack.handlebars.Template;
-
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.jknack.handlebars.Template;
 
 /**
  * @author Marcin Grzejszczak
  */
 class TwitterTemplateGenerator {
+	private static final Logger log = LoggerFactory.getLogger(TwitterTemplateGenerator.class);
+
 	private final Template template;
 	private final String releaseVersion;
 	private final File output;
@@ -26,8 +30,9 @@ class TwitterTemplateGenerator {
 			Files.write(this.output.toPath(), tweet.getBytes());
 			return this.output;
 		}
-		catch (IOException e) {
-			throw new IllegalStateException(e);
+		catch (Exception e) {
+			log.warn("Exception occurred while trying to generate a twitter template", e);
+			return null;
 		}
 	}
 }

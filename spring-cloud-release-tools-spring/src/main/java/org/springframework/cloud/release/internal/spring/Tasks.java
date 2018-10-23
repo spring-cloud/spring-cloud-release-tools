@@ -48,9 +48,9 @@ class Tasks {
 			"CREATING TEMPLATES",
 			"Create email / blog / tweet etc. templates",
 			args -> {
-				args.releaser.createEmail(args.versionFromScRelease);
+				args.releaser.createEmail(args.versionFromScRelease, args.projects);
 				args.releaser.createBlog(args.versionFromScRelease, args.projects);
-				args.releaser.createTweet(args.versionFromScRelease);
+				args.releaser.createTweet(args.versionFromScRelease, args.projects);
 				args.releaser.createReleaseNotes(args.versionFromScRelease, args.projects);
 	},TaskType.POST_RELEASE);
 	static Task UPDATE_GUIDES = task("updateGuides", "ug",

@@ -1,12 +1,12 @@
 package org.springframework.cloud.release.internal.template;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 
-import com.github.jknack.handlebars.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.jknack.handlebars.Template;
 
 /**
  * @author Marcin Grzejszczak
@@ -31,7 +31,7 @@ class EmailTemplateGenerator {
 			Files.write(this.emailOutput.toPath(), email.getBytes());
 			return this.emailOutput;
 		}
-		catch (IOException e) {
+		catch (Exception e) {
 			log.warn("Exception occurred while trying to generate an email template", e);
 			return null;
 		}

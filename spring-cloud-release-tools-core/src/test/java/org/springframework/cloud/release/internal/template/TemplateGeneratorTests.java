@@ -25,7 +25,7 @@ public class TemplateGeneratorTests {
 	public void should_generate_email_from_template_for_tag_with_v_prefix() {
 		this.props.getPom().setBranch("vDalston.RELEASE");
 
-		File generatedMail = new TemplateGenerator(this.props, this.handler).email();
+		File generatedMail = new TemplateGenerator(this.props, this.handler).email(new Projects());
 
 		then(generatedMail).hasContent(expectedEmail());
 	}
@@ -35,7 +35,7 @@ public class TemplateGeneratorTests {
 		this.props.getPom().setBranch("vDalston.RELEASE");
 
 		File generatedMail = new TemplateGenerator(this.props, new File("target/foo/bar/baz/template.txt"),
-				handler).email();
+				handler).email(new Projects());
 
 		then(generatedMail).hasContent(expectedEmail());
 	}
@@ -44,7 +44,7 @@ public class TemplateGeneratorTests {
 	public void should_generate_email_from_template_for_tag_without_v_prefix() {
 		this.props.getPom().setBranch("Dalston.RELEASE");
 
-		File generatedMail = new TemplateGenerator(this.props, this.handler).email();
+		File generatedMail = new TemplateGenerator(this.props, this.handler).email(new Projects());
 
 		then(generatedMail).hasContent(expectedEmail());
 	}
@@ -53,7 +53,7 @@ public class TemplateGeneratorTests {
 	public void should_generate_tweet_from_template_for_tag_with_v_prefix() {
 		this.props.getPom().setBranch("vDalston.RELEASE");
 
-		File generatedTweet = new TemplateGenerator(this.props, this.handler).tweet();
+		File generatedTweet = new TemplateGenerator(this.props, this.handler).tweet(new Projects());
 
 		then(generatedTweet).hasContent(expectedTweet());
 	}
@@ -62,7 +62,7 @@ public class TemplateGeneratorTests {
 	public void should_generate_tweet_from_template_for_tag_without_v_prefix() {
 		this.props.getPom().setBranch("Dalston.RELEASE");
 
-		File generatedTweet = new TemplateGenerator(this.props, this.handler).tweet();
+		File generatedTweet = new TemplateGenerator(this.props, this.handler).tweet(new Projects());
 
 		then(generatedTweet).hasContent(expectedTweet());
 	}

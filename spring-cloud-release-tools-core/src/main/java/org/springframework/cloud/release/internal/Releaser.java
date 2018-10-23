@@ -131,14 +131,14 @@ public class Releaser {
 		log.info("\nSuccessfully closed milestone");
 	}
 
-	public void createEmail(ProjectVersion releaseVersion) {
+	public void createEmail(ProjectVersion releaseVersion, Projects projects) {
 		Assert.notNull(releaseVersion, "You must provide a release version for your project");
 		Assert.notNull(releaseVersion.version, "You must provide a release version for your project");
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create email template for a SNAPSHOT version");
 			return;
 		}
-		File email = this.templateGenerator.email();
+		File email = this.templateGenerator.email(projects);
 		if (email != null) {
 			log.info("\nSuccessfully created email template at location [{}]", email);
 		} else {
@@ -169,12 +169,12 @@ public class Releaser {
 		log.info("\nSuccessfully updated Spring Guides issues");
 	}
 
-	public void createTweet(ProjectVersion releaseVersion) {
+	public void createTweet(ProjectVersion releaseVersion, Projects projects) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create tweet template for a SNAPSHOT version");
 			return;
 		}
-		File tweet = this.templateGenerator.tweet();
+		File tweet = this.templateGenerator.tweet(projects);
 		if (tweet != null) {
 			log.info("\nSuccessfully created tweet template at location [{}]", tweet);
 		} else {
