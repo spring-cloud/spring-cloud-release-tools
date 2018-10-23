@@ -139,7 +139,11 @@ public class Releaser {
 			return;
 		}
 		File email = this.templateGenerator.email();
-		log.info("\nSuccessfully created email template at location [{}]", email);
+		if (email != null) {
+			log.info("\nSuccessfully created email template at location [{}]", email);
+		} else {
+			log.warn("\nFailed to create an email template");
+		}
 	}
 
 	public void createBlog(ProjectVersion releaseVersion, Projects projects) {
@@ -148,7 +152,11 @@ public class Releaser {
 			return;
 		}
 		File blog = this.templateGenerator.blog(projects);
-		log.info("\nSuccessfully created blog template at location [{}]", blog);
+		if (blog != null) {
+			log.info("\nSuccessfully created blog template at location [{}]", blog);
+		} else {
+			log.warn("\nFailed to create a blog template");
+		}
 
 	}
 
@@ -166,8 +174,12 @@ public class Releaser {
 			log.info("\nWon't create tweet template for a SNAPSHOT version");
 			return;
 		}
-		File blog = this.templateGenerator.tweet();
-		log.info("\nSuccessfully created tweet template at location [{}]", blog);
+		File tweet = this.templateGenerator.tweet();
+		if (tweet != null) {
+			log.info("\nSuccessfully created tweet template at location [{}]", tweet);
+		} else {
+			log.warn("\nFailed to create a tweet template");
+		}
 	}
 
 	public void createReleaseNotes(ProjectVersion releaseVersion, Projects projects) {

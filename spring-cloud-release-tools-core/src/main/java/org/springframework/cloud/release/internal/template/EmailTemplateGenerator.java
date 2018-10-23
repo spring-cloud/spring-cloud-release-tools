@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import com.github.jknack.handlebars.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marcin Grzejszczak
  */
 class EmailTemplateGenerator {
+
+	private static final Logger log = LoggerFactory.getLogger(EmailTemplateGenerator.class);
 
 	private final Template template;
 	private final String releaseVersion;
@@ -28,7 +32,8 @@ class EmailTemplateGenerator {
 			return this.emailOutput;
 		}
 		catch (IOException e) {
-			throw new IllegalStateException(e);
+			log.warn("Exception occurred while trying to generate an email template", e);
+			return null;
 		}
 	}
 }

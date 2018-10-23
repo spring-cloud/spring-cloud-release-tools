@@ -2,6 +2,8 @@ package org.springframework.cloud.release.internal.template;
 
 import com.github.jknack.handlebars.Template;
 import com.google.common.collect.ImmutableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +23,8 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 class ReleaseNotesTemplateGenerator {
+
+	private static final Logger log = LoggerFactory.getLogger(ReleaseNotesTemplateGenerator.class);
 
 	private final Template template;
 	private final String releaseVersion;
@@ -49,7 +53,8 @@ class ReleaseNotesTemplateGenerator {
 			return this.blogOutput;
 		}
 		catch (IOException e) {
-			throw new IllegalStateException(e);
+			log.warn("Exception occurred while trying to generate release notes", e);
+			return null;
 		}
 	}
 

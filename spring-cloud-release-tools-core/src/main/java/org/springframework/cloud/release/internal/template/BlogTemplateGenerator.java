@@ -67,7 +67,8 @@ class BlogTemplateGenerator {
 			return this.blogOutput;
 		}
 		catch (IOException e) {
-			throw new IllegalStateException(e);
+			log.warn("Exception occurred while trying to create a blog entry", e);
+			return null;
 		}
 	}
 
