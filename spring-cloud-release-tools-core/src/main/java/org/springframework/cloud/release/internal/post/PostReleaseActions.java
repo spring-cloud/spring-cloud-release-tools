@@ -39,7 +39,8 @@ public class PostReleaseActions {
 	 * @param projects - set of project with versions to assert agains
 	 */
 	public void runUpdatedTests(Projects projects) {
-		if (!this.properties.getGit().isRunUpdatedSamples()) {
+		if (!this.properties.getGit().isRunUpdatedSamples() ||
+				!this.properties.getMetaRelease().isEnabled()) {
 			log.info("Will not update and run test samples, since the switch to do so "
 					+ "is off. Set [releaser.git.run-updated-samples] to [true] to change that");
 			return;

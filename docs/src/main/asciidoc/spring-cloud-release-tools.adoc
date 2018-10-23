@@ -44,7 +44,6 @@ After project release
 - For `GA`/ `SR` release will create an issue in Spring Guides under https://github.com/spring-guides/getting-started-guides/issues/
 - For `GA`/ `SR` release will update the links under https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current
 - Will update the release train project page (for Spring Cloud it will be `https://github.com/spring-projects/spring-cloud`)
-- Will update and run samples (for Spring Cloud it will be `https://github.com/spring-cloud/spring-cloud-core-tests`)
 
 ==== Meta-release
 
@@ -54,6 +53,7 @@ After project release
 ** for `spring-cloud-sleuth`'s `2.1.0.RELEASE` version will resolve `2.1.x` branch
 - Performs the release tasks per each project
 - Performs the post release tasks at the end of the release
+- Will update and run samples (for Spring Cloud it will be `https://github.com/spring-cloud/spring-cloud-core-tests`)
 
 IMPORTANT: For the meta-releaser to work we assume that the path to the
 custom configuration file for each project is always `config/releaser.yml`.
