@@ -32,24 +32,21 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 	private static final String VERSION_MUSTACHE = "{{version}}";
 
 	private ReleaserProperties properties;
-	private final ProcessExecutor executor;
 
 	public ProjectBuilder(ReleaserProperties properties) {
 		this.properties = properties;
-		this.executor = new ProcessExecutor(properties);
 	}
 
-	ProjectBuilder(ReleaserProperties properties, ProcessExecutor executor) {
-		this.properties = properties;
-		this.executor = executor;
+	public void build(ProjectVersion versionFromReleaseTrain) {
+		build(versionFromReleaseTrain, this.properties.getWorkingDir());
 	}
 
-	public void build(ProjectVersion versionFromScRelease) {
+	public void build(ProjectVersion versionFromReleaseTrain, String projectRoot) {
 		try {
 			String[] commands = commandWithSystemProps(this.properties.getMaven().getBuildCommand(),
-					versionFromScRelease).split(" ");
-			runCommand(commands);
-			assertNoHtmlFilesInDocsContainUnresolvedTags();
+					versionFromReleaseTrain).split(" ");
+			runCommand(projectRoot, commands);
+			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
 			log.info("No HTML files from docs contain unresolved tags");
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -78,8 +75,7 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		return trimmedCommand;
 	}
 
-	private void assertNoHtmlFilesInDocsContainUnresolvedTags() {
-		String workingDir = this.properties.getWorkingDir();
+	private void assertNoHtmlFilesInDocsContainUnresolvedTags(String workingDir) {
 		try {
 			File docs = new File(workingDir, "docs");
 			if (!docs.exists()) {
@@ -104,9 +100,17 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 	}
 
 	private void runCommand(String[] commands) {
+		runCommand(this.properties.getWorkingDir(), commands);
+	}
+
+	private void runCommand(String projectRoot, String[] commands) {
 		String[] substitutedCommands = substituteSystemProps(commands);
 		long waitTimeInMinutes = this.properties.getMaven().getWaitTimeInMinutes();
-		this.executor.runCommand(substitutedCommands, waitTimeInMinutes);
+		executor(projectRoot).runCommand(substitutedCommands, waitTimeInMinutes);
+	}
+
+	ProcessExecutor executor(String workDir) {
+		return new ProcessExecutor(workDir);
 	}
 
 	public void publishDocs(String version) {
@@ -165,22 +169,21 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 
 	@Override public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties = properties;
-		this.executor.setReleaserProperties(properties);
 	}
 }
 
 class ProcessExecutor implements ReleaserPropertiesAware {
 	private static final Logger log = LoggerFactory.getLogger(ProcessExecutor.class);
 
-	private ReleaserProperties properties;
+	private String workingDir;
 
-	ProcessExecutor(ReleaserProperties properties) {
-		this.properties = properties;
+	ProcessExecutor(String workingDir) {
+		this.workingDir = workingDir;
 	}
 
 	void runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
-			String workingDir = this.properties.getWorkingDir();
+			String workingDir = this.workingDir;
 			log.debug("Will run the build from [{}] via {} and wait for result for [{}] minutes",
 					workingDir, commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
@@ -211,7 +214,7 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	}
 
 	@Override public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
+		this.workingDir = properties.getWorkingDir();
 	}
 }
 

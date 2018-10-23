@@ -23,6 +23,7 @@ import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.post.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
@@ -40,6 +41,7 @@ public class ReleaserTests {
 	@Mock GradleUpdater gradleUpdater;
 	@Mock SaganUpdater saganUpdater;
 	@Mock DocumentationUpdater documentationUpdater;
+	@Mock PostReleaseActions postReleaseActions;
 	@Rule public OutputCapture outputCapture = new OutputCapture();
 	File pom;
 
@@ -52,7 +54,7 @@ public class ReleaserTests {
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
 				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater) {
+				this.saganUpdater, this.documentationUpdater, this.postReleaseActions) {
 			@Override ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
 			}
@@ -62,7 +64,7 @@ public class ReleaserTests {
 	Releaser releaser() {
 		return new Releaser(this.projectPomUpdater, this.projectBuilder,
 				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater);
+				this.saganUpdater, this.documentationUpdater, this.postReleaseActions);
 	}
 
 	@Test

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
+import org.springframework.cloud.release.internal.post.PostReleaseActions;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
@@ -31,11 +32,12 @@ public class Releaser {
 	private final GradleUpdater gradleUpdater;
 	private final SaganUpdater saganUpdater;
 	private final DocumentationUpdater documentationUpdater;
+	private final PostReleaseActions postReleaseActions;
 
 	public Releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
 			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
 			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
-			DocumentationUpdater documentationUpdater) {
+			DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions) {
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectBuilder = projectBuilder;
 		this.projectGitHandler = projectGitHandler;
@@ -43,6 +45,7 @@ public class Releaser {
 		this.gradleUpdater = gradleUpdater;
 		this.saganUpdater = saganUpdater;
 		this.documentationUpdater = documentationUpdater;
+		this.postReleaseActions = postReleaseActions;
 	}
 
 	public File clonedProjectFromOrg(String projectName) {
@@ -64,7 +67,7 @@ public class Releaser {
 
 	private void updateProjectFromScRelease(File project, Projects versions,
 			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
-		this.projectPomUpdater.updateProjectFromSCRelease(project, versions,
+		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
 				versionFromScRelease, assertSnapshots);
 		this.gradleUpdater.updateProjectFromSCRelease(project, versions,
 				versionFromScRelease, assertSnapshots);
@@ -206,6 +209,15 @@ public class Releaser {
 			}
 		} catch (Exception e) {
 			log.warn("\nUnable to update Spring Project page", e);
+		}
+	}
+
+	public void runUpdatedSamples(Projects projects) {
+		try {
+			this.postReleaseActions.runUpdatedTests(projects);
+			log.info("\nSuccessfully updated and ran samples");
+		} catch (Exception e) {
+			log.warn("\nUnable to update and run samples", e);
 		}
 	}
 }

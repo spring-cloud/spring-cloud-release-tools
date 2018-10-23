@@ -19,7 +19,6 @@ import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.util.FileSystemUtils;
 
@@ -40,14 +39,36 @@ public class ProjectBuilderTests {
 		FileSystemUtils.copyRecursively(file("/projects"), this.temporaryFolder);
 	}
 
+	ProjectBuilder projectBuilder(ReleaserProperties properties) {
+		return new ProjectBuilder(properties) {
+			@Override
+			ProcessExecutor executor(String workingDir) {
+				return testExecutor(workingDir);
+			}
+		};
+	}
+
 	@Test
 	public void should_successfully_execute_a_command_when_after_running_there_is_no_html_file_with_unresolved_tag() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("resolved.log");
+	}
+
+	@Test
+	public void should_successfully_execute_a_command_when_path_is_provided_explicitly() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setBuildCommand("ls -al");
+		properties.setWorkingDir(new File("/foo/bar").getAbsolutePath());
+		ProjectBuilder builder = projectBuilder(properties);
+
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"), tmpFile("/builder/resolved").getPath());
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
@@ -58,7 +79,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.M1"));
 
@@ -71,7 +92,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.RC1"));
 
@@ -84,7 +105,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.RELEASE"));
 
@@ -97,7 +118,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.SR1"));
 
@@ -111,7 +132,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setBuildCommand("echo {{systemProps}}");
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -124,7 +145,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo {{systemProps}}");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -138,7 +159,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setBuildCommand("echo {{systemProps}}");
 		properties.getMaven().setSystemProperties("hello=world foo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -152,7 +173,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setBuildCommand("echo {{systemProps}} bar");
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -166,7 +187,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setBuildCommand("echo bar");
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -179,7 +200,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
 				.hasMessageContaining("contains a tag that wasn't resolved properly");
@@ -191,7 +212,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setBuildCommand("sleep 1");
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
 				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
@@ -202,7 +223,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("ls -al");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -215,7 +236,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.deploy(new ProjectVersion("foo", "1.0.0.M1"));
 
@@ -228,7 +249,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.deploy(new ProjectVersion("foo", "1.0.0.RC1"));
 
@@ -241,7 +262,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.deploy(new ProjectVersion("foo", "1.0.0.RELEASE"));
 
@@ -254,7 +275,7 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.deploy(new ProjectVersion("foo", "1.0.0.SR1"));
 
@@ -268,7 +289,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setDeployCommand("echo \"{{systemProps}}\"");
 		properties.getMaven().setSystemProperties("-Dhello=hello-world");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -282,7 +303,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setDeployCommand("echo ");
 		properties.getMaven().setSystemProperties("-Dhello=hello-world");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
@@ -296,7 +317,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setDeployCommand("sleep 1");
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		thenThrownBy(() -> builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
 				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
@@ -307,8 +328,13 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setPublishDocsCommands(new String[] { "ls -al", "ls -al" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		TestProcessExecutor executor = executor(properties);
-		ProjectBuilder builder = new ProjectBuilder(properties, executor);
+		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		ProjectBuilder builder = new ProjectBuilder(properties) {
+			@Override
+			ProcessExecutor executor(String workingDir) {
+				return executor;
+			}
+		};
 
 		builder.publishDocs("");
 
@@ -323,8 +349,13 @@ public class ProjectBuilderTests {
 		properties.getMaven().setPublishDocsCommands(new String[] { "echo {{systemProps}} 1", "echo {{systemProps}} 2" });
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		TestProcessExecutor executor = executor(properties);
-		ProjectBuilder builder = new ProjectBuilder(properties, executor);
+		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		ProjectBuilder builder = new ProjectBuilder(properties) {
+			@Override
+			ProcessExecutor executor(String workingDir) {
+				return executor;
+			}
+		};
 
 		builder.publishDocs("");
 
@@ -338,8 +369,13 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setPublishDocsCommands(new String[] { "echo '{{version}}'" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		TestProcessExecutor executor = executor(properties);
-		ProjectBuilder builder = new ProjectBuilder(properties, executor);
+		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		ProjectBuilder builder = new ProjectBuilder(properties) {
+			@Override
+			ProcessExecutor executor(String workingDir) {
+				return executor;
+			}
+		};
 
 		builder.publishDocs("1.1.0.RELEASE");
 
@@ -353,7 +389,7 @@ public class ProjectBuilderTests {
 		properties.getMaven().setPublishDocsCommands(new String[] { "sleep 1", "sleep 1" });
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, executor(properties));
+		ProjectBuilder builder = projectBuilder(properties);
 
 		thenThrownBy(() -> builder.publishDocs("")).hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
@@ -363,11 +399,16 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("exit 1");
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties, new ProcessExecutor(properties) {
-			@Override Process startProcess(ProcessBuilder builder) throws IOException {
-				return processWithInvalidExitCode();
+		ProjectBuilder builder = new ProjectBuilder(properties) {
+			@Override
+			ProcessExecutor executor(String workingDir) {
+				return new ProcessExecutor(properties.getWorkingDir()) {
+					@Override Process startProcess(ProcessBuilder builder) throws IOException {
+						return processWithInvalidExitCode();
+					}
+				};
 			}
-		});
+		};
 
 		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
 				.hasMessageContaining("The process has exited with exit code [1]");
@@ -401,16 +442,16 @@ public class ProjectBuilderTests {
 		};
 	}
 
-	private TestProcessExecutor executor(ReleaserProperties properties) {
-		return new TestProcessExecutor(properties);
+	private TestProcessExecutor testExecutor(String workingDir) {
+		return new TestProcessExecutor(workingDir);
 	}
 
 	class TestProcessExecutor extends ProcessExecutor {
 
 		int counter = 0;
 
-		TestProcessExecutor(ReleaserProperties properties) {
-			super(properties);
+		TestProcessExecutor(String workingDir) {
+			super(workingDir);
 		}
 
 		@Override ProcessBuilder builder(String[] commands, String workingDir) {

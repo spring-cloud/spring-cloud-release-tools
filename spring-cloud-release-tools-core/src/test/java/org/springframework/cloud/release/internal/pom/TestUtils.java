@@ -9,6 +9,7 @@ public class TestUtils {
 
 	public static void prepareLocalRepo() throws IOException {
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud");
+		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-core-tests");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-release");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-consul");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-static");

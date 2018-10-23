@@ -77,6 +77,12 @@ class Tasks {
 			args -> {
 				args.releaser.updateSpringProjectPage(args.projects);
 	},TaskType.POST_RELEASE);
+	static Task RUN_UPDATED_SAMPLES = task("runUpdatedSample", "ru",
+			"UPDATE AND RUN SAMPLES",
+			"Updates the sample project with versions and runs samples",
+			args -> {
+				args.releaser.runUpdatedSamples(args.projects);
+	},TaskType.POST_RELEASE);
 
 	static final List<Task> DEFAULT_TASKS_PER_PROJECT = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -94,7 +100,8 @@ class Tasks {
 			Tasks.CREATE_TEMPLATES,
 			Tasks.UPDATE_GUIDES,
 			Tasks.UPDATE_DOCUMENTATION,
-			Tasks.UPDATE_SPRING_PROJECT_PAGE
+			Tasks.UPDATE_SPRING_PROJECT_PAGE,
+			Tasks.RUN_UPDATED_SAMPLES
 	).collect(Collectors.toList());
 
 	static final List<Task> NON_COMPOSITE_TASKS = new ArrayList<Task>() {

@@ -152,6 +152,11 @@ public class ReleaserProperties implements Serializable {
 		private String springProjectUrl = "https://github.com/spring-projects/spring-cloud";
 
 		/**
+		 * URL to test samples
+		 */
+		private String testSamplesProjectUrl = "https://github.com/spring-cloud/spring-cloud-core-tests";
+
+		/**
 		 * Branch to check out for the documentation project
 		 */
 		private String documentationBranch = "gh-pages";
@@ -160,6 +165,11 @@ public class ReleaserProperties implements Serializable {
 		 * Branch to check out for the release train project
 		 */
 		private String springProjectBranch = "gh-pages";
+
+		/**
+		 * Branch to check out for the test samples
+		 */
+		private String testSamplesBranch = "master";
 
 		/**
 		 * If {@code false}, will not update the documentation repository.
@@ -230,6 +240,22 @@ public class ReleaserProperties implements Serializable {
 
 		public void setSpringProjectUrl(String springProjectUrl) {
 			this.springProjectUrl = springProjectUrl;
+		}
+
+		public String getTestSamplesProjectUrl() {
+			return this.testSamplesProjectUrl;
+		}
+
+		public void setTestSamplesProjectUrl(String testSamplesProjectUrl) {
+			this.testSamplesProjectUrl = testSamplesProjectUrl;
+		}
+
+		public String getTestSamplesBranch() {
+			return this.testSamplesBranch;
+		}
+
+		public void setTestSamplesBranch(String testSamplesBranch) {
+			this.testSamplesBranch = testSamplesBranch;
 		}
 
 		public String getDocumentationBranch() {

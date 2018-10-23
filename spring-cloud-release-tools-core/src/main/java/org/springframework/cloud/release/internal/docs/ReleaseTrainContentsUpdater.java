@@ -38,7 +38,7 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 		this.properties = properties;
 		this.handler = new ReleaseTrainContentsGitHandler(handler);
 		this.parser = new ReleaseTrainContentsParser();
-		this.generator = new ReleaseTrainContentsGenerator(this.properties);
+		this.generator = new ReleaseTrainContentsGenerator(properties);
 	}
 
 	/**

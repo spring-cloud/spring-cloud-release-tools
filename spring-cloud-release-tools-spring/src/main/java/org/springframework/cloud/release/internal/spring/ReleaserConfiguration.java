@@ -24,6 +24,7 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.options.Parser;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.post.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
@@ -76,6 +77,12 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
+	PostReleaseActions postReleaseActions(ProjectGitHandler handler, ProjectPomUpdater pomUpdater,
+			ProjectBuilder projectBuilder, ReleaserProperties releaserProperties) {
+		return new PostReleaseActions(handler, pomUpdater, projectBuilder, releaserProperties);
+	}
+
+	@Bean
 	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
 			ReleaserProperties properties) {
 		return new DocumentationUpdater(projectGitHandler, properties);
@@ -85,9 +92,9 @@ class ReleaserConfiguration {
 	Releaser releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
 			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
 			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
-			DocumentationUpdater documentationUpdater) {
+			DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions) {
 		return new Releaser(projectPomUpdater, projectBuilder, projectGitHandler,
-				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater);
+				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater, postReleaseActions);
 	}
 
 	@Bean

@@ -88,20 +88,22 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 
 	/**
 	 * For the given root folder (typically the working directory) performs the whole
-	 * flow of updating {@code pom.xml} with values from Spring Cloud Release project.
+	 * flow of updating {@code pom.xml} with values from release train
+	 * (e.g. Spring Cloud Release project.)
 	 * @param projectRoot - root folder with project to update
 	 * @param projects - versions of projects used to update poms
-	 * @param versionFromScRelease - version for the built project taken from Spring Cloud Release project
+	 * @param versionFromReleaseTrain - version for the built project taken
+	 *                                  from release train (e.g. Spring Cloud Release project)
 	 * @param assertSnapshots - should snapshots present be asserted
 	 */
-	public void updateProjectFromSCRelease(File projectRoot, Projects projects,
-			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
+			ProjectVersion versionFromReleaseTrain, boolean assertSnapshots) {
 		Versions versions = new Versions(projects);
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
 			log.info("Skipping project updating");
 			return;
 		}
-		updatePoms(projectRoot, projects, versionFromScRelease, assertSnapshots);
+		updatePoms(projectRoot, projects, versionFromReleaseTrain, assertSnapshots);
 	}
 
 	private void updatePoms(File projectRoot, Projects projects,

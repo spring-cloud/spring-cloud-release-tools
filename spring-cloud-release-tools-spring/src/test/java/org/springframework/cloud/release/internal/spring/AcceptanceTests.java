@@ -43,6 +43,7 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
+import org.springframework.cloud.release.internal.post.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.sagan.Project;
 import org.springframework.cloud.release.internal.sagan.Release;
@@ -73,6 +74,7 @@ public class AcceptanceTests {
 	DocumentationUpdater documentationUpdater;
 	ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
 	ReleaserPropertiesUpdater updater = new ReleaserPropertiesUpdater(this.applicationContext);
+	PostReleaseActions postReleaseActions = Mockito.mock(PostReleaseActions.class);
 
 	@Before
 	public void setup() throws Exception {
@@ -190,6 +192,7 @@ public class AcceptanceTests {
 		then(text(new File(this.documentationFolder, "current/index.html")))
 				.doesNotContain("Angel.SR3")
 				.contains("Camden.SR5");
+		thenRunUpdatedTestsWereCalled();
 	}
 
 	@Test
@@ -209,6 +212,12 @@ public class AcceptanceTests {
 				.extracting("name").contains("refs/tags/v1.3.5.RELEASE");
 		BDDAssertions.then(gitProject(this.cloudProjectFolder).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [Edgware.SR10]");
+		thenRunUpdatedTestsWereCalled();
+	}
+
+	private void thenRunUpdatedTestsWereCalled() {
+		BDDMockito.then(this.postReleaseActions).should()
+				.runUpdatedTests(BDDMockito.any(Projects.class));
 	}
 
 	private Map<String, String> edgwareSr10() {
@@ -615,7 +624,7 @@ public class AcceptanceTests {
 			}
 		};
 		Releaser releaser = new Releaser(pomUpdater, projectBuilder, handler,
-				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater);
+				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater, postReleaseActions);
 		this.gitHandler = handler;
 		return releaser;
 	}
@@ -645,7 +654,7 @@ public class AcceptanceTests {
 			}
 		});
 		Releaser releaser = Mockito.spy(new Releaser(pomUpdater, projectBuilder, handler,
-				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater));
+				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater, postReleaseActions));
 		this.nonAssertingGitHandler = handler;
 		this.templateGenerator = templateGenerator;
 		this.saganUpdater = saganUpdater;

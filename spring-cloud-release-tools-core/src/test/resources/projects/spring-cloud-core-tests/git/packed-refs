@@ -1,0 +1,17 @@
+# pack-refs with: peeled fully-peeled sorted 
+2be8e90fa02e558ecb8d89ff17c2d5ab76960aa3 refs/remotes/origin/1.0.0.RELEASE
+b4a600945cfe3cc5630115eb26fd810dadc9ce63 refs/remotes/origin/1.0.1.RELEASE
+4e988c2b5828eb218026ab8fe2ff2d0087e69681 refs/remotes/origin/1.0.2.RELEASE
+c95f64b4d1ea75ed82537f556e1d2c956f9e7a55 refs/remotes/origin/1.0.x
+f2687f19f859dd30bfda2d269c0d1e2985ab0323 refs/remotes/origin/Angel.SR3
+0027898cbc369b8d0c300a9be0e5f9e7bdf51612 refs/remotes/origin/Brixton
+5b4e5d515f759fc055406a665be3f3beb089876a refs/remotes/origin/Dalston
+842c21a49c3046652010289640e11b3ee545b2a7 refs/remotes/origin/Edgware
+299e7d86d27d116781ecbe7bb4650db8deac47bb refs/remotes/origin/Finchley
+b1d3c22fa3ddfe6e2a60dcdb37350bbb484d8e61 refs/remotes/origin/feature/boot-next
+6b833ad3b334f1ccf60e0bd27ff5781e618e79aa refs/remotes/origin/master
+67375cfdc3e8c9fb0e4f9dd024bc1cd8ad8162ee refs/tags/v1.0.0.RC2
+4862ebec4b17927829e202881d6f29eccec04581 refs/tags/v1.0.0.RC3
+2be8e90fa02e558ecb8d89ff17c2d5ab76960aa3 refs/tags/v1.0.0.RELEASE
+b4a600945cfe3cc5630115eb26fd810dadc9ce63 refs/tags/v1.0.1.RELEASE
+12da8ef168216a719630aa4b66a035e7c6c54b88 refs/tags/vBrixton.RELEASE
