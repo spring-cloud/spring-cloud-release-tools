@@ -344,6 +344,9 @@ train depends on projects that got already released. We default this list to <li
 <simpara><literal>releaser.git.test-samples-project-branch</literal> - Branch to check out for test samples. Defaults to <literal>master</literal>.</simpara>
 </listitem>
 <listitem>
+<simpara><literal>releaser.git.run-updated-samples</literal> - If <literal>true</literal> then will update samples and run the the build. Defaults to <literal>true</literal>.</simpara>
+</listitem>
+<listitem>
 <simpara><literal>releaser.git.update-documentation-repo</literal> - If <literal>true</literal> then will update documentation repository with the <literal>current</literal> URL. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
