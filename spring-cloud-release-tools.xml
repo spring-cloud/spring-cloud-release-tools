@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-10-19</date>
+<date>2018-10-23</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -330,6 +330,12 @@ train depends on projects that got already released. We default this list to <li
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.spring-project-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.test-samples-project-url</literal> - URL to the test samples to be checked against the given release train. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-core-tests">https://github.com/spring-cloud/spring-cloud-core-tests</link></literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.test-samples-project-branch</literal> - Branch to check out for test samples. Defaults to <literal>master</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.update-documentation-repo</literal> - If <literal>true</literal> then will update documentation repository with the <literal>current</literal> URL. Defaults to <literal>true</literal>.</simpara>
