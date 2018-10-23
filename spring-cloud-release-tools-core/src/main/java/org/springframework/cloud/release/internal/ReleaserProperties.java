@@ -218,6 +218,11 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private boolean updateSpringProject = true;
 
+		/**
+		 * If set to {@code false}, will not update the test samples
+		 */
+		private boolean runUpdatedSamples = true;
+
 		public String getReleaseTrainBomUrl() {
 			return this.releaseTrainBomUrl;
 		}
@@ -280,6 +285,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setUpdateDocumentationRepo(boolean updateDocumentationRepo) {
 			this.updateDocumentationRepo = updateDocumentationRepo;
+		}
+
+		public boolean isRunUpdatedSamples() {
+			return this.runUpdatedSamples;
+		}
+
+		public void setRunUpdatedSamples(boolean runUpdatedSamples) {
+			this.runUpdatedSamples = runUpdatedSamples;
 		}
 
 		public String getCloneDestinationDir() {
