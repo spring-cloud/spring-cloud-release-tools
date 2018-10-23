@@ -81,6 +81,12 @@ otherwise the application will fail to start</simpara>
 <listitem>
 <simpara>For <literal>GA</literal>/ <literal>SR</literal> release will update the links under <link xl:href="https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current">https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current</link></simpara>
 </listitem>
+<listitem>
+<simpara>Will update the release train project page (for Spring Cloud it will be <literal><link xl:href="https://github.com/spring-projects/spring-cloud">https://github.com/spring-projects/spring-cloud</link></literal>)</simpara>
+</listitem>
+<listitem>
+<simpara>Will update and run samples (for Spring Cloud it will be <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-core-tests">https://github.com/spring-cloud/spring-cloud-core-tests</link></literal>)</simpara>
+</listitem>
 </itemizedlist>
 </section>
 <section xml:id="_meta_release">
