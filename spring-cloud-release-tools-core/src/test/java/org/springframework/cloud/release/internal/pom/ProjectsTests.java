@@ -56,7 +56,7 @@ public class ProjectsTests {
 	@Test
 	public void should_create_project_with_bumped_original_version_and_original_parent_versions() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
-		ProjectVersion build = new ProjectVersion("spring-cloud-build", "1.0.0");
+		ProjectVersion build = new ProjectVersion("spring-cloud-build", "1.0.0.RELEASE");
 		projectVersions.add(build);
 		ProjectVersion boot = new ProjectVersion("spring-boot-starter", "2.0.0");
 		projectVersions.add(boot);
@@ -68,7 +68,6 @@ public class ProjectsTests {
 
 		Projects forRollback = Projects.forRollback(projects, original);
 
-		then(forRollback.forName("spring-cloud-build").version).isEqualTo("1.0.0");
 		then(forRollback.forName("spring-boot-starter").version).isEqualTo("2.0.0");
 		then(forRollback.forName("spring-boot-dependencies").version).isEqualTo("2.0.0");
 		then(forRollback.forName("spring-cloud-starter-foo").version).isEqualTo("3.0.1.BUILD-SNAPSHOT");

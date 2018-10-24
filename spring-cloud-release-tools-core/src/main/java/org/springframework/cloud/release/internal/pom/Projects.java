@@ -28,7 +28,6 @@ public class Projects extends HashSet<ProjectVersion> {
 		Projects newProjects = new Projects();
 		newProjects.add(new ProjectVersion(originalVersion.projectName, originalVersion.bumpedVersion()));
 		newProjects.addAll(projects.forNameStartingWith(SpringCloudConstants.SPRING_BOOT));
-		newProjects.add(projects.forName(SpringCloudConstants.BUILD_ARTIFACT_ID));
 		return newProjects;
 	}
 
