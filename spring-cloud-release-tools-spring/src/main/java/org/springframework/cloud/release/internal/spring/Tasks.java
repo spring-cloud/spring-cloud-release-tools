@@ -97,11 +97,12 @@ class Tasks {
 	).collect(Collectors.toList());
 
 	static final List<Task> DEFAULT_TASKS_PER_RELEASE = Stream.of(
+			Tasks.RUN_UPDATED_SAMPLES,
 			Tasks.CREATE_TEMPLATES,
 			Tasks.UPDATE_GUIDES,
+			// Generate docs
 			Tasks.UPDATE_DOCUMENTATION,
-			Tasks.UPDATE_SPRING_PROJECT_PAGE,
-			Tasks.RUN_UPDATED_SAMPLES
+			Tasks.UPDATE_SPRING_PROJECT_PAGE
 	).collect(Collectors.toList());
 
 	static final List<Task> NON_COMPOSITE_TASKS = new ArrayList<Task>() {
