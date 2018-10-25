@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-10-24</date>
+<date>2018-10-25</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -332,10 +332,16 @@ train depends on projects that got already released. We default this list to <li
 <simpara><literal>releaser.git.documentation-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
 </listitem>
 <listitem>
+<simpara><literal>releaser.git.update-documentation-repo</literal> - If <literal>true</literal> then will update documentation repository with the <literal>current</literal> URL. Defaults to <literal>true</literal>.</simpara>
+</listitem>
+<listitem>
 <simpara><literal>releaser.git.spring-project-url</literal> - URL to the documentation Git repository. Defaults to <literal><link xl:href="https://github.com/spring-projects/spring-cloud">https://github.com/spring-projects/spring-cloud</link></literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.spring-project-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.update-spring-project</literal> - If <literal>true</literal> then will update Spring Project page with the current release train values. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.test-samples-project-url</literal> - URL to the test samples to be checked against the given release train. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-core-tests">https://github.com/spring-cloud/spring-cloud-core-tests</link></literal>.</simpara>
@@ -347,13 +353,16 @@ train depends on projects that got already released. We default this list to <li
 <simpara><literal>releaser.git.run-updated-samples</literal> - If <literal>true</literal> then will update samples and run the the build. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.update-documentation-repo</literal> - If <literal>true</literal> then will update documentation repository with the <literal>current</literal> URL. Defaults to <literal>true</literal>.</simpara>
+<simpara><literal>releaser.git.release-train-docs-url</literal> - URL to the release train documentation. Defaults to <literal><link xl:href="https://github.com/spring-cloud-sample/scripts">https://github.com/spring-cloud-sample/scripts</link></literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.release-train-docs-branch</literal> - Branch to check out for release train documentation. Defaults to <literal>master</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.update-release-train-docs</literal> - If <literal>true</literal> then will update the release train documentation project and run the generation. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.update-spring-guides</literal> - If <literal>true</literal> then will update Spring Guides with the current release train. Defaults to <literal>true</literal>.</simpara>
-</listitem>
-<listitem>
-<simpara><literal>releaser.git.update-spring-project</literal> - If <literal>true</literal> then will update Spring Project page with the current release train values. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
