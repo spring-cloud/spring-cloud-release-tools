@@ -36,7 +36,7 @@ public class PostReleaseActions {
 	/**
 	 * Clones the test project, updates it and runs tests
 	 *
-	 * @param projects - set of project with versions to assert agains
+	 * @param projects - set of project with versions to assert against
 	 */
 	public void runUpdatedTests(Projects projects) {
 		if (!this.properties.getGit().isRunUpdatedSamples() ||
@@ -47,16 +47,40 @@ public class PostReleaseActions {
 		}
 		File file = this.projectGitHandler.cloneTestSamplesProject();
 		ProjectVersion projectVersion = new ProjectVersion(file);
-		Projects newProjects = addVersionForTestsProject(projects, projectVersion);
+		String releaseTrainVersion  =
+				projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()).version;
+		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
 		this.projectPomUpdater
 				.updateProjectFromReleaseTrain(file, newProjects, projectVersion, false);
 		this.projectBuilder.build(projectVersion, file.getAbsolutePath());
 	}
 
-	private Projects addVersionForTestsProject(Projects projects, ProjectVersion projectVersion) {
+	/**
+	 * Clones the release train documentation project
+	 *
+	 * @param projects - set of project with versions to assert against
+	 */
+	public void generateReleaseTrainDocumentation(Projects projects) {
+		if (!this.properties.getGit().isUpdateReleaseTrainDocs() ||
+				!this.properties.getMetaRelease().isEnabled()) {
+			log.info("Will not update the release train documentation, since the switch to do so "
+					+ "is off. Set [releaser.git.update-release-train-docs] to [true] to change that");
+			return;
+		}
+		File file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
+		ProjectVersion projectVersion = new ProjectVersion(file);
+		String releaseTrainVersion  =
+				projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()).version;
+		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
+		this.projectPomUpdater
+				.updateProjectFromReleaseTrain(file, newProjects, projectVersion, false);
+		this.projectBuilder.generateReleaseTrainDocs(releaseTrainVersion, file.getAbsolutePath());
+	}
+
+	private Projects addVersionForTestsProject(Projects projects, ProjectVersion projectVersion,
+			String releaseTrainVersion) {
 		Projects newProjects = new Projects(projects);
-		newProjects.add(new ProjectVersion(projectVersion.projectName,
-				projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()).version));
+		newProjects.add(new ProjectVersion(projectVersion.projectName, releaseTrainVersion));
 		return newProjects;
 	}
 }

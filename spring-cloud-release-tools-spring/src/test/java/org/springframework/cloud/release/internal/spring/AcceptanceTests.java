@@ -213,11 +213,17 @@ public class AcceptanceTests {
 		BDDAssertions.then(gitProject(this.cloudProjectFolder).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [Edgware.SR10]");
 		thenRunUpdatedTestsWereCalled();
+		thenUpdateReleaseTrainDocsWasCalled();
 	}
 
 	private void thenRunUpdatedTestsWereCalled() {
 		BDDMockito.then(this.postReleaseActions).should()
 				.runUpdatedTests(BDDMockito.any(Projects.class));
+	}
+
+	private void thenUpdateReleaseTrainDocsWasCalled() {
+		BDDMockito.then(this.postReleaseActions).should()
+				.generateReleaseTrainDocumentation(BDDMockito.any(Projects.class));
 	}
 
 	private Map<String, String> edgwareSr10() {
@@ -777,6 +783,13 @@ public class AcceptanceTests {
 		@Override
 		public File cloneSpringDocProject() {
 			File file = super.cloneSpringDocProject();
+			this.clonedProjects.add(file);
+			return file;
+		}
+
+		@Override
+		public File cloneReleaseTrainDocumentationProject() {
+			File file = super.cloneReleaseTrainDocumentationProject();
 			this.clonedProjects.add(file);
 			return file;
 		}

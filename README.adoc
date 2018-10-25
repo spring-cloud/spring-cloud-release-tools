@@ -285,14 +285,17 @@ The following properties are used for both meta release and a release of an indi
 - `releaser.git.release-train-bom-url` - URL to a project containing a BOM. Defaults to Spring Cloud Release Git repository: `https://github.com/spring-cloud/spring-cloud-release`.
 - `releaser.git.documentation-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-static`.
 - `releaser.git.documentation-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`.
+- `releaser.git.update-documentation-repo` - If `true` then will update documentation repository with the `current` URL. Defaults to `true`.
 - `releaser.git.spring-project-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-projects/spring-cloud`.
 - `releaser.git.spring-project-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`.
+- `releaser.git.update-spring-project` - If `true` then will update Spring Project page with the current release train values. Defaults to `true`.
 - `releaser.git.test-samples-project-url` - URL to the test samples to be checked against the given release train. Defaults to `https://github.com/spring-cloud/spring-cloud-core-tests`.
 - `releaser.git.test-samples-project-branch` - Branch to check out for test samples. Defaults to `master`.
 - `releaser.git.run-updated-samples` - If `true` then will update samples and run the the build. Defaults to `true`.
-- `releaser.git.update-documentation-repo` - If `true` then will update documentation repository with the `current` URL. Defaults to `true`.
+- `releaser.git.release-train-docs-url` - URL to the release train documentation. Defaults to `https://github.com/spring-cloud-sample/scripts`.
+- `releaser.git.release-train-docs-branch` - Branch to check out for release train documentation. Defaults to `master`.
+- `releaser.git.update-release-train-docs` - If `true` then will update the release train documentation project and run the generation. Defaults to `true`.
 - `releaser.git.update-spring-guides` - If `true` then will update Spring Guides with the current release train. Defaults to `true`.
-- `releaser.git.update-spring-project` - If `true` then will update Spring Project page with the current release train values. Defaults to `true`.
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
 - `releaser.git.username` - Optional Git username. If not passed keys will be used for authentication.
 - `releaser.git.password` - Optional Git password. If not passed keys will be used for authentication.

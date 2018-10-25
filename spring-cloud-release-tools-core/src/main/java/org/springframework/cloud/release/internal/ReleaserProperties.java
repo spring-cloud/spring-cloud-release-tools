@@ -157,6 +157,11 @@ public class ReleaserProperties implements Serializable {
 		private String testSamplesProjectUrl = "https://github.com/spring-cloud/spring-cloud-core-tests";
 
 		/**
+		 * URL to the release train documentation
+		 */
+		private String releaseTrainDocsUrl = "https://github.com/spring-cloud-samples/scripts";
+
+		/**
 		 * Branch to check out for the documentation project
 		 */
 		private String documentationBranch = "gh-pages";
@@ -172,9 +177,9 @@ public class ReleaserProperties implements Serializable {
 		private String testSamplesBranch = "master";
 
 		/**
-		 * If {@code false}, will not update the documentation repository.
+		 * Branch to check out for the release train docs
 		 */
-		private boolean updateDocumentationRepo = true;
+		private String releaseTrainDocsBranch = "master";
 
 		/**
 		 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
@@ -208,6 +213,11 @@ public class ReleaserProperties implements Serializable {
 		private Integer numberOfCheckedMilestones = 10;
 
 		/**
+		 * If {@code false}, will not update the documentation repository.
+		 */
+		private boolean updateDocumentationRepo = true;
+
+		/**
 		 * If set to {@code false}, will not update Spring Guides for a release train.
 		 */
 		private boolean updateSpringGuides = true;
@@ -222,6 +232,11 @@ public class ReleaserProperties implements Serializable {
 		 * If set to {@code false}, will not update the test samples
 		 */
 		private boolean runUpdatedSamples = true;
+
+		/**
+		 * If set to {@code false}, will not update the release train docs
+		 */
+		private boolean updateReleaseTrainDocs = true;
 
 		public String getReleaseTrainBomUrl() {
 			return this.releaseTrainBomUrl;
@@ -359,6 +374,30 @@ public class ReleaserProperties implements Serializable {
 			this.updateSpringProject = updateSpringProject;
 		}
 
+		public String getReleaseTrainDocsUrl() {
+			return releaseTrainDocsUrl;
+		}
+
+		public void setReleaseTrainDocsUrl(String releaseTrainDocsUrl) {
+			this.releaseTrainDocsUrl = releaseTrainDocsUrl;
+		}
+
+		public String getReleaseTrainDocsBranch() {
+			return releaseTrainDocsBranch;
+		}
+
+		public void setReleaseTrainDocsBranch(String releaseTrainDocsBranch) {
+			this.releaseTrainDocsBranch = releaseTrainDocsBranch;
+		}
+
+		public boolean isUpdateReleaseTrainDocs() {
+			return updateReleaseTrainDocs;
+		}
+
+		public void setUpdateReleaseTrainDocs(boolean updateReleaseTrainDocs) {
+			this.updateReleaseTrainDocs = updateReleaseTrainDocs;
+		}
+
 		@Override
 		public String toString() {
 			return "Git{" +
@@ -486,6 +525,11 @@ public class ReleaserProperties implements Serializable {
 				"./target/gh-pages.sh -v {{version}} -c"
 		};
 
+		/**
+		 * Command to be executed to generate release train documentation
+		 */
+		private String generateReleaseTrainDocsCommand = "./release_train.sh --retrieveversions --version {{version}} --ghpages --auto";
+
 		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
 
 		/**
@@ -527,6 +571,14 @@ public class ReleaserProperties implements Serializable {
 			return this.publishDocsCommands;
 		}
 
+		public String getGenerateReleaseTrainDocsCommand() {
+			return this.generateReleaseTrainDocsCommand;
+		}
+
+		public void setGenerateReleaseTrainDocsCommand(String generateReleaseTrainDocsCommand) {
+			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
+		}
+
 		public void setPublishDocsCommands(String[] publishDocsCommands) {
 			this.publishDocsCommands = publishDocsCommands;
 		}
@@ -542,8 +594,9 @@ public class ReleaserProperties implements Serializable {
 		@Override public String toString() {
 			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='"
 					+ this.deployCommand + '\'' + ", publishDocsCommands=" + Arrays
-					.toString(this.publishDocsCommands) + ", waitTimeInMinutes="
-					+ this.waitTimeInMinutes + '}';
+					.toString(this.publishDocsCommands) +
+					"generateReleaseTrainDocsCommand='" + this.generateReleaseTrainDocsCommand + '\'' +
+					", waitTimeInMinutes=" + this.waitTimeInMinutes + '}';
 		}
 	}
 

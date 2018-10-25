@@ -53,6 +53,18 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		}
 	}
 
+	public void generateReleaseTrainDocs(String version, String projectRoot) {
+		try {
+			String updatedCommand =
+					this.properties.getMaven().getGenerateReleaseTrainDocsCommand().replace(VERSION_MUSTACHE, version);
+			runCommand(projectRoot, updatedCommand.split(" "));
+			assertNoHtmlFilesInDocsContainUnresolvedTags(this.properties.getWorkingDir());
+			log.info("No HTML files from docs contain unresolved tags");
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
 	private String commandWithSystemProps(String command,
 			ProjectVersion version) {
 		if (command.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
@@ -184,13 +196,13 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	void runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
 			String workingDir = this.workingDir;
-			log.debug("Will run the build from [{}] via {} and wait for result for [{}] minutes",
+			log.debug("Will run the command from [{}] via {} and wait for result for [{}] minutes",
 					workingDir, commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
 			Process process = startProcess(builder);
 			boolean finished = process.waitFor(waitTimeInMinutes, TimeUnit.MINUTES);
 			if (!finished) {
-				log.error("The build hasn't managed to finish in [{}] minutes", waitTimeInMinutes);
+				log.error("The command hasn't managed to finish in [{}] minutes", waitTimeInMinutes);
 				process.destroyForcibly();
 				throw new IllegalStateException("Process waiting time of [" + waitTimeInMinutes + "] minutes exceeded");
 			}

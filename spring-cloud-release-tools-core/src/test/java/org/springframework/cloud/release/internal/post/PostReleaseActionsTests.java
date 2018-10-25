@@ -31,12 +31,18 @@ public class PostReleaseActionsTests {
 	File temporaryFolder;
 	TestPomReader testPomReader = new TestPomReader();
 	ReleaserProperties properties = new ReleaserProperties();
-	File clonedTestSamples;
+	File cloned;
 	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties) {
 		@Override
 		public File cloneTestSamplesProject() {
-			clonedTestSamples = super.cloneTestSamplesProject();
-			return clonedTestSamples;
+			cloned = super.cloneTestSamplesProject();
+			return cloned;
+		}
+
+		@Override
+		public File cloneReleaseTrainDocumentationProject() {
+			cloned = super.cloneTestSamplesProject();
+			return cloned;
 		}
 	};
 	ProjectPomUpdater updater = new ProjectPomUpdater(this.properties);
@@ -50,29 +56,29 @@ public class PostReleaseActionsTests {
 	}
 
 	@Test
-	public void should_do_nothing_when_is_not_meta_release() {
+	public void should_do_nothing_when_is_not_meta_release_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
 				this.updater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
-		BDDAssertions.then(clonedTestSamples).isNull();
+		BDDAssertions.then(cloned).isNull();
 	}
 
 	@Test
-	public void should_do_nothing_when_the_switch_for_sample_check_is_off() {
+	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_update_test_is_called() {
 		this.properties.getGit().setRunUpdatedSamples(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
 				this.updater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
-		BDDAssertions.then(clonedTestSamples).isNull();
+		BDDAssertions.then(cloned).isNull();
 	}
 
 	@Test
-	public void should_update_project_and_run_tests() {
+	public void should_update_project_and_run_tests_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().setTestSamplesProjectUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setBuildCommand("touch build.log");
@@ -81,15 +87,54 @@ public class PostReleaseActionsTests {
 
 		actions.runUpdatedTests(currentGa());
 
-		Model rootPom = this.testPomReader.readPom(new File(clonedTestSamples, "pom.xml"));
+		Model rootPom = this.testPomReader.readPom(new File(cloned, "pom.xml"));
 		BDDAssertions.then(rootPom.getVersion()).isEqualTo("Finchley.SR1");
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
-		BDDAssertions.then(new File(clonedTestSamples, "build.log")).exists();
+		BDDAssertions.then(new File(cloned, "build.log")).exists();
+	}
+
+	@Test
+	public void should_do_nothing_when_is_not_meta_release_and_release_train_docs_generation_is_called() {
+		this.properties.getMetaRelease().setEnabled(false);
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.builder, this.properties);
+
+		actions.generateReleaseTrainDocumentation(currentGa());
+
+		BDDAssertions.then(cloned).isNull();
+	}
+
+	@Test
+	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_release_train_docs_generation_is_called() {
+		this.properties.getGit().setUpdateReleaseTrainDocs(false);
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.builder, this.properties);
+
+		actions.generateReleaseTrainDocumentation(currentGa());
+
+		BDDAssertions.then(cloned).isNull();
+	}
+
+	@Test
+	public void should_update_project_and_run_tests_and_release_train_docs_generation_is_called() {
+		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setReleaseTrainDocsUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
+		this.properties.getMaven().setGenerateReleaseTrainDocsCommand("touch generate.log");
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.builder, this.properties);
+
+		actions.generateReleaseTrainDocumentation(currentGa());
+
+		Model rootPom = this.testPomReader.readPom(new File(cloned, "pom.xml"));
+		BDDAssertions.then(rootPom.getVersion()).isEqualTo("Finchley.SR1");
+		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
+		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
+		BDDAssertions.then(new File(cloned, "generate.log")).exists();
 	}
 
 	private String sleuthParentPomVersion() {
-		return this.testPomReader.readPom(new File(clonedTestSamples, "sleuth/pom.xml"))
+		return this.testPomReader.readPom(new File(cloned, "sleuth/pom.xml"))
 				.getParent().getVersion();
 	}
 

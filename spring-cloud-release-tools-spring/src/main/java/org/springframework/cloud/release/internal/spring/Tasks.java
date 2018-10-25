@@ -83,6 +83,12 @@ class Tasks {
 			args -> {
 				args.releaser.runUpdatedSamples(args.projects);
 	},TaskType.POST_RELEASE);
+	static Task UPDATE_RELEASE_TRAIN_DOCUMENTATION = task("updateReleaseTrainDocs", "ur",
+			"UPDATE RELEASE TRAIN DOCS",
+			"Update release train documentation",
+			args -> {
+				args.releaser.generateReleaseTrainDocumentation(args.projects);
+	},TaskType.POST_RELEASE);
 
 	static final List<Task> DEFAULT_TASKS_PER_PROJECT = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -100,7 +106,7 @@ class Tasks {
 			Tasks.RUN_UPDATED_SAMPLES,
 			Tasks.CREATE_TEMPLATES,
 			Tasks.UPDATE_GUIDES,
-			// Generate docs
+			Tasks.UPDATE_RELEASE_TRAIN_DOCUMENTATION,
 			Tasks.UPDATE_DOCUMENTATION,
 			Tasks.UPDATE_SPRING_PROJECT_PAGE
 	).collect(Collectors.toList());

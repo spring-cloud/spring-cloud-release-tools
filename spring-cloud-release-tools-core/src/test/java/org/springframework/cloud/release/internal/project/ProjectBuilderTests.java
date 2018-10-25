@@ -384,6 +384,26 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
+	public void should_successfully_execute_an_update_docs_command_and_substitute_the_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setGenerateReleaseTrainDocsCommand("echo '{{version}}'");
+		File resolved = tmpFile("/builder/resolved");
+		properties.setWorkingDir(resolved.getPath());
+		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		ProjectBuilder builder = new ProjectBuilder(properties) {
+			@Override
+			ProcessExecutor executor(String workingDir) {
+				return executor;
+			}
+		};
+
+		builder.generateReleaseTrainDocs("1.1.0.RELEASE", resolved.getAbsolutePath());
+
+		then(asString(tmpFile("/builder/resolved/resolved.log")))
+				.contains("1.1.0.RELEASE");
+	}
+
+	@Test
 	public void should_throw_exception_when_publish_docs_command_took_too_long_to_execute() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setPublishDocsCommands(new String[] { "sleep 1", "sleep 1" });

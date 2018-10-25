@@ -232,4 +232,13 @@ public class Releaser {
 			log.warn("\nUnable to update and run samples", e);
 		}
 	}
+
+	public void generateReleaseTrainDocumentation(Projects projects) {
+		try {
+			this.postReleaseActions.generateReleaseTrainDocumentation(projects);
+			log.info("\nSuccessfully updated and generated release train documentation");
+		} catch (Exception e) {
+			log.warn("\nUnable to update and generate release train documentation", e);
+		}
+	}
 }
