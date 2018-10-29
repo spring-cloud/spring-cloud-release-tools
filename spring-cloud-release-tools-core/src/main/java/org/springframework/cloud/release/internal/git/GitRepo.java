@@ -146,7 +146,11 @@ class GitRepo {
 		try(Git git = this.gitFactory.open(file(this.basedir))) {
 			List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL)
 					.call();
-			return refs.stream().anyMatch(ref -> branch.equals(nameOfBranch(ref.getName())));
+			boolean present = refs.stream().anyMatch(ref -> branch.equals(nameOfBranch(ref.getName())));
+			if (log.isDebugEnabled()) {
+				log.debug("Branch [{}] is present [{}]", branch, present);
+			}
+			return present;
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}

@@ -89,6 +89,12 @@ class Tasks {
 			args -> {
 				args.releaser.generateReleaseTrainDocumentation(args.projects);
 	},TaskType.POST_RELEASE);
+	static Task UPDATE_ALL_SAMPLES = task("updateAllSamples", "ua",
+			"UPDATE ALL SAMPLES WITH RELEASE TRAIN BUMPED VERSIONS",
+			"Update all samples with release train bumped versions",
+			args -> {
+				args.releaser.updateAllSamples(args.projects);
+	},TaskType.POST_RELEASE);
 
 	static final List<Task> DEFAULT_TASKS_PER_PROJECT = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -108,7 +114,8 @@ class Tasks {
 			Tasks.UPDATE_GUIDES,
 			Tasks.UPDATE_RELEASE_TRAIN_DOCUMENTATION,
 			Tasks.UPDATE_DOCUMENTATION,
-			Tasks.UPDATE_SPRING_PROJECT_PAGE
+			Tasks.UPDATE_SPRING_PROJECT_PAGE,
+			Tasks.UPDATE_ALL_SAMPLES
 	).collect(Collectors.toList());
 
 	static final List<Task> NON_COMPOSITE_TASKS = new ArrayList<Task>() {

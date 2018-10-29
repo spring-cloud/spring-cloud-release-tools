@@ -38,6 +38,24 @@ public class Projects extends HashSet<ProjectVersion> {
 		return super.add(projectVersion);
 	}
 
+	public Projects filter(List<String> projectsToSkip) {
+		return this.stream()
+				.filter(v -> !projectsToSkip.contains(v.projectName))
+				.collect(Collectors.toCollection(Projects::new));
+	}
+
+	public Projects postReleaseSnapshotVersion(List<String> projectsToSkip) {
+		Projects projects = this.stream()
+				.filter(v -> projectsToSkip.contains(v.projectName))
+				.collect(Collectors.toCollection(Projects::new));
+		Projects bumped = this.stream()
+				.map(v -> new ProjectVersion(v.projectName, v.postReleaseSnapshotVersion()))
+				.collect(Collectors.toCollection(Projects::new));
+		Projects merged = new Projects(projects);
+		merged.addAll(bumped);
+		return merged;
+	}
+
 	public void remove(String projectName) {
 		ProjectVersion projectVersion = forName(projectName);
 		remove(projectVersion);

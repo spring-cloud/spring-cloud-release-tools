@@ -5,6 +5,7 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -102,6 +103,41 @@ public class ProjectsTests {
 		Projects projects = new Projects(projectVersions);
 
 		then(projects.containsSnapshots()).isFalse();
+	}
+
+	@Test
+	public void should_return_filtered_project() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
+		projectVersions.add(new ProjectVersion("bar", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		Projects filtered = projects.filter(Collections.singletonList("foo"));
+		then(filtered).hasSize(1);
+		then(filtered.forName("bar").version).isEqualTo("1.0.0");
+	}
+
+	@Test
+	public void should_return_projects_with_bumped_versions() {
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("dont_touch", "2.0.0.RELEASE"));
+		projectVersions.add(new ProjectVersion("foo", "1.0.0.RELEASE"));
+		projectVersions.add(new ProjectVersion("bar", "1.0.1.M1"));
+		projectVersions.add(new ProjectVersion("baz", "1.0.2.BUILD-SNAPSHOT"));
+		projectVersions.add(new ProjectVersion("foo2", "1.0.0.SR1"));
+		projectVersions.add(new ProjectVersion("foo3", "Finchley.BUILD-SNAPSHOT"));
+		projectVersions.add(new ProjectVersion("foo4", "Finchley.SR4"));
+		Projects projects = new Projects(projectVersions);
+
+		Projects bumped = projects.postReleaseSnapshotVersion(Collections.singletonList("dont_touch"));
+
+		then(bumped.forName("dont_touch").version).isEqualTo("2.0.0.RELEASE");
+		then(bumped.forName("foo").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(bumped.forName("bar").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(bumped.forName("baz").version).isEqualTo("1.0.2.BUILD-SNAPSHOT");
+		then(bumped.forName("foo2").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(bumped.forName("foo3").version).isEqualTo("Finchley.BUILD-SNAPSHOT");
+		then(bumped.forName("foo4").version).isEqualTo("Finchley.BUILD-SNAPSHOT");
 	}
 
 	@Test

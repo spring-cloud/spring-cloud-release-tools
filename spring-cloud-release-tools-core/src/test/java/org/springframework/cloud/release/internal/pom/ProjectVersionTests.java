@@ -90,6 +90,49 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_throw_exception_if_version_is_not_long_enough_when_bumping_snapshots() {
+		String version = "1.0";
+
+		thenThrownBy(() -> projectVersion(version).postReleaseSnapshotVersion())
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("Version is invalid");
+	}
+
+	@Test
+	public void should_not_bump_version_by_patch_version_when_non_ga_or_sr() {
+		then(projectVersion("1.0.1.BUILD-SNAPSHOT").postReleaseSnapshotVersion()).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1.M1").postReleaseSnapshotVersion()).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1.RC1").postReleaseSnapshotVersion()).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(projectVersion("Finchley.SR1").postReleaseSnapshotVersion()).isEqualTo("Finchley.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_bump_version_by_patch_version_when_bumping_snapshots_for_ga() {
+		then(projectVersion("1.0.1.RELEASE").postReleaseSnapshotVersion()).isEqualTo("1.0.2.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_return_the_previous_version_for_release_train_version_when_bumping_snapshots() {
+		String version = "Edgware.BUILD-SNAPSHOT";
+
+		then(projectVersion(version).postReleaseSnapshotVersion()).isEqualTo("Edgware.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_bump_version_by_patch_version_when_bumping_releases() {
+		String version = "1.0.1.RELEASE";
+
+		then(projectVersion(version).postReleaseSnapshotVersion()).isEqualTo("1.0.2.BUILD-SNAPSHOT");
+	}
+
+	@Test
+	public void should_return_the_previous_version_for_release_train_version_when_bumping_releases() {
+		String version = "Edgware.RELEASE";
+
+		then(projectVersion(version).postReleaseSnapshotVersion()).isEqualTo("Edgware.BUILD-SNAPSHOT");
+	}
+
+	@Test
 	public void should_return_true_for_snapshot_version() {
 		String version = "1.0.1.BUILD-SNAPSHOT";
 

@@ -2,6 +2,7 @@ package org.springframework.cloud.release.internal.git;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Arrays;
 
 import org.eclipse.jgit.transport.URIish;
 import org.slf4j.Logger;
@@ -119,14 +120,44 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		if (StringUtils.isEmpty(version)) {
 			throw new IllegalStateException("You haven't provided a version for project [" + projectName + "]");
 		}
-		String branchFromVersion = branchFromVersion(version);
-		boolean branchExists = gitRepo(clonedProject).hasBranch(branchFromVersion);
-		if (!branchExists) {
-			log.info("Branch [{}] does not exist. Assuming that should work with master branch", branchFromVersion);
+		return findAndCheckOutBranchForVersion(clonedProject, new String[] { version });
+	}
+
+
+	/**
+	 * From the version analyzes the branch and checks it out. E.g.
+	 * - for spring-cloud-release’s `Finchley.RELEASE version will resolve either Finchley
+	 * branch or will fallback to master if there’s no Finchley branch
+	 * - for spring-cloud-sleuth’s `2.1.0.RELEASE version will resolve 2.1.x branch
+	 *
+	 * @param url - of project to clone
+	 * @param versions - list of versions to check against, if none matches, will fallback to master
+	 * @return location of the cloned project
+	 */
+	public File cloneAndGuessBranch(String url, String... versions) {
+		File clonedProject = cloneProject(url);
+		if (log.isDebugEnabled()) {
+			log.debug("Successfully cloned the project to [{}]", clonedProject);
+		}
+		return findAndCheckOutBranchForVersion(clonedProject, versions);
+	}
+
+	private File findAndCheckOutBranchForVersion(File clonedProject, String[] versions) {
+		if (log.isDebugEnabled()) {
+			log.debug("Checking versions {} for project [{}]", versions, clonedProject);
+		}
+		String branchToCheckout = Arrays.stream(versions)
+				.map(this::branchFromVersion)
+				.map(version -> gitRepo(clonedProject).hasBranch(version) ? version : "")
+				.filter(StringUtils::hasText)
+				.findFirst()
+				.orElse("master");
+		if ("master".equals(branchToCheckout)) {
+			log.info("None of the versions {} matches a branch. Assuming that should work with master branch", (Object) versions);
 			return clonedProject;
 		}
-		log.info("Branch [{}] exists. Will check it out", branchFromVersion);
-		checkout(clonedProject, branchFromVersion);
+		log.info("Branch [{}] exists. Will check it out", branchToCheckout);
+		checkout(clonedProject, branchToCheckout);
 		return clonedProject;
 	}
 

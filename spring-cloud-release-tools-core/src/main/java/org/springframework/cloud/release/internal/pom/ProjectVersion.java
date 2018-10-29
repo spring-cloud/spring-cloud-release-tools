@@ -41,6 +41,19 @@ public class ProjectVersion {
 	}
 
 	public String bumpedVersion() {
+		return bumpedVersion(assertVersion());
+	}
+
+	private String bumpedVersion(String[] splitVersion) {
+		if (splitVersion.length == 2 && !isNumeric(splitVersion[0])) {
+			return this.version;
+		}
+		Integer incrementedPatch = Integer.valueOf(splitVersion[2]) + 1;
+		return String.format("%s.%s.%s.%s", splitVersion[0], splitVersion[1], incrementedPatch, splitVersion[3]);
+	}
+
+
+	private String[] assertVersion() {
 		if (this.version == null) {
 			throw new IllegalStateException("Version can't be null!");
 		}
@@ -49,11 +62,26 @@ public class ProjectVersion {
 		if (splitVersion.length < 4 && isNumeric(splitVersion[0])) {
 			throw new IllegalStateException("Version is invalid. Should be of format [1.2.3.A]");
 		}
-		if (splitVersion.length == 2 && !isNumeric(splitVersion[0])) {
-			return this.version;
+		return splitVersion;
+	}
+
+	/**
+	 * For GA and SR will bump the snapshots
+	 * in the rest of cases will return snapshot of the current version
+	 * @return
+	 */
+	public String postReleaseSnapshotVersion() {
+		String[] strings = assertVersion();
+		if (isReleaseOrServiceRelease()) {
+			String bumpedVersion = bumpedVersion(strings);
+			return appendBuildSnapshot(bumpedVersion);
 		}
-		Integer incrementedPatch = Integer.valueOf(splitVersion[2]) + 1;
-		return String.format("%s.%s.%s.%s", splitVersion[0], splitVersion[1], incrementedPatch, splitVersion[3]);
+		return appendBuildSnapshot(this.version);
+	}
+
+	private String appendBuildSnapshot(String bumpedVersion) {
+		int lastIndexOfDot = bumpedVersion.lastIndexOf(".");
+		return bumpedVersion.substring(0, lastIndexOfDot) + ".BUILD-SNAPSHOT";
 	}
 
 	private boolean isNumeric(String string) {

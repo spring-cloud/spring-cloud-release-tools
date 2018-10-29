@@ -238,6 +238,25 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private boolean updateReleaseTrainDocs = true;
 
+		/**
+		 * If set to {@code false}, will not clone and update the samples for all projects
+		 */
+		private boolean updateAllTestSamples = true;
+
+		private Map<String, List<String>> allTestSampleUrls = new HashMap<String, List<String>>() {
+			{
+				this.put("spring-cloud-sleuth" , Arrays.asList(
+						"https://github.com/spring-cloud-samples/sleuth-issues/",
+						"https://github.com/spring-cloud-samples/sleuth-documentation-apps/")
+				);
+				this.put("spring-cloud-contract" , Arrays.asList(
+						"https://github.com/spring-cloud-samples/spring-cloud-contract-samples/",
+						"https://github.com/spring-cloud-samples/the-legacy-app/",
+						"https://github.com/spring-cloud-samples/sc-contract-car-rental/")
+				);
+			}
+		};
+
 		public String getReleaseTrainBomUrl() {
 			return this.releaseTrainBomUrl;
 		}
@@ -304,6 +323,14 @@ public class ReleaserProperties implements Serializable {
 
 		public boolean isRunUpdatedSamples() {
 			return this.runUpdatedSamples;
+		}
+
+		public boolean isUpdateAllTestSamples() {
+			return this.updateAllTestSamples;
+		}
+
+		public void setUpdateAllTestSamples(boolean updateAllTestSamples) {
+			this.updateAllTestSamples = updateAllTestSamples;
 		}
 
 		public void setRunUpdatedSamples(boolean runUpdatedSamples) {
@@ -398,6 +425,14 @@ public class ReleaserProperties implements Serializable {
 			this.updateReleaseTrainDocs = updateReleaseTrainDocs;
 		}
 
+		public Map<String, List<String>> getAllTestSampleUrls() {
+			return this.allTestSampleUrls;
+		}
+
+		public void setAllTestSampleUrls(Map<String, List<String>> allTestSampleUrls) {
+			this.allTestSampleUrls = allTestSampleUrls;
+		}
+
 		@Override
 		public String toString() {
 			return "Git{" +
@@ -413,6 +448,7 @@ public class ReleaserProperties implements Serializable {
 					", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones +
 					", updateSpringGuides=" + this.updateSpringGuides +
 					", updateSpringProject=" + this.updateSpringProject +
+					", sampleUrlsSize=" + this.allTestSampleUrls.size() +
 					'}';
 		}
 	}
@@ -612,7 +648,14 @@ public class ReleaserProperties implements Serializable {
 		 * version. Then it's enough to do the mapping like this for this Releaser's property:
 		 * {@code verifierVersion=spring-cloud-contract}
 		 */
-		private Map<String, String> gradlePropsSubstitution = new HashMap<>();
+		private Map<String, String> gradlePropsSubstitution = new HashMap<String, String>() {
+			{
+				this.put("bootVersion", "spring-boot");
+				this.put("BOOT_VERSION", "spring-boot");
+				this.put("bomVersion", "spring-cloud-release");
+				this.put("BOM_VERSION", "spring-cloud-release");
+			}
+		};
 
 		/**
 		 * List of regular expressions of ignored gradle props.

@@ -106,7 +106,7 @@ public class ProjectGitHandlerTests {
 
 		this.updater.cloneProjectFromOrg("spring-cloud-sleuth");
 
-		then(this.gitRepo).should(never()).checkout(anyString());
+		then(this.gitRepo).should(never()).checkout("2.3.x");
 	}
 
 	@Test
@@ -128,6 +128,47 @@ public class ProjectGitHandlerTests {
 
 		this.updater.cloneProjectFromOrg("spring-cloud-release");
 
+		then(this.gitRepo).should().checkout("Finchley");
+	}
+
+	@Test
+	public void should_not_check_out_a_branch_if_it_does_not_exist_when_cloning_and_guessing_branch() {
+		given(this.gitRepo.hasBranch(anyString())).willReturn(true);
+		given(this.gitRepo.hasBranch("2.3.x")).willReturn(false);
+
+		this.updater.cloneAndGuessBranch(new File(".").getAbsolutePath(), "2.3.4.RELEASE");
+
+		then(this.gitRepo).should(never()).checkout("2.3.x");
+	}
+
+	@Test
+	public void should_check_out_a_branch_if_it_exists_when_cloning_and_guessing_branch() {
+		given(this.gitRepo.hasBranch(anyString())).willReturn(false);
+		given(this.gitRepo.hasBranch("2.3.x")).willReturn(true);
+
+		this.updater.cloneAndGuessBranch(new File(".").getAbsolutePath(), "2.3.4.RELEASE");
+
+		then(this.gitRepo).should().checkout("2.3.x");
+	}
+
+	@Test
+	public void should_check_out_a_branch_if_it_exists_when_cloning_and_guessing_release_train_branch() {
+		given(this.gitRepo.hasBranch(anyString())).willReturn(false);
+		given(this.gitRepo.hasBranch("Finchley")).willReturn(true);
+
+		this.updater.cloneAndGuessBranch(new File(".").getAbsolutePath(),  "Finchley.SR6");
+
+		then(this.gitRepo).should().checkout("Finchley");
+	}
+
+	@Test
+	public void should_check_out_a_branch_if_one_of_it_exists() {
+		given(this.gitRepo.hasBranch(anyString())).willReturn(false);
+		given(this.gitRepo.hasBranch("Finchley")).willReturn(true);
+
+		this.updater.cloneAndGuessBranch(new File(".").getAbsolutePath(),  "2.0.0.RELEASE", "Finchley.SR6");
+
+		then(this.gitRepo).should(never()).checkout("2.0.0");
 		then(this.gitRepo).should().checkout("Finchley");
 	}
 

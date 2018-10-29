@@ -2,9 +2,17 @@ package org.springframework.cloud.release.internal.post;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,6 +20,7 @@ import org.junit.rules.TemporaryFolder;
 
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -20,6 +29,7 @@ import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.LinkedMultiValueMap;
 
 /**
  * @author Marcin Grzejszczak
@@ -32,6 +42,7 @@ public class PostReleaseActionsTests {
 	TestPomReader testPomReader = new TestPomReader();
 	ReleaserProperties properties = new ReleaserProperties();
 	File cloned;
+	LinkedMultiValueMap<String, File> clonedTestProjects = new LinkedMultiValueMap<>();
 	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties) {
 		@Override
 		public File cloneTestSamplesProject() {
@@ -43,6 +54,13 @@ public class PostReleaseActionsTests {
 		public File cloneReleaseTrainDocumentationProject() {
 			cloned = super.cloneTestSamplesProject();
 			return cloned;
+		}
+
+		@Override
+		public File cloneAndGuessBranch(String url, String... versions) {
+			File file = super.cloneAndGuessBranch(url, versions);
+			clonedTestProjects.add(url, file);
+			return file;
 		}
 	};
 	ProjectPomUpdater updater = new ProjectPomUpdater(this.properties);
@@ -131,6 +149,55 @@ public class PostReleaseActionsTests {
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(new File(cloned, "generate.log")).exists();
+	}
+
+	@Test
+	public void should_do_nothing_when_is_not_meta_release_and_test_samples_update_is_called() {
+		this.properties.getMetaRelease().setEnabled(false);
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.builder, this.properties);
+
+		actions.updateAllTestSamples(currentGa());
+
+		BDDAssertions.then(cloned).isNull();
+	}
+
+	@Test
+	public void should_do_nothing_when_the_switch_for_test_samples_update_check_is_off_and_test_samples_update_is_called() {
+		this.properties.getGit().setUpdateReleaseTrainDocs(false);
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.builder, this.properties);
+
+		actions.updateAllTestSamples(currentGa());
+
+		BDDAssertions.then(cloned).isNull();
+	}
+
+	@Test
+	public void should_update_test_sample_projects_when_test_samples_update_is_called() throws Exception {
+		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().getAllTestSampleUrls().clear();
+		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
+				Collections.singletonList(tmpFile("spring-cloud-core-tests/")
+						.getAbsolutePath() + "/"));
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.builder, this.properties);
+
+		actions.updateAllTestSamples(currentGa());
+
+		Map.Entry<String, List<File>> entry = clonedTestProjects.entrySet()
+				.stream()
+				.filter(s -> s.getKey().contains("spring-cloud-core-tests"))
+				.findFirst().orElseThrow(() -> new IllegalStateException("Not found"));
+		File clonedFile = entry.getValue().get(0);
+		Model pomWithCloud = this.testPomReader.readPom(new File(clonedFile, "zuul-proxy-eureka/pom.xml"));
+		Git git = GitTestUtils.openGitProject(clonedFile);
+		BDDAssertions.then(pomWithCloud.getProperties().getProperty("spring-cloud.version")).isEqualTo("Finchley.BUILD-SNAPSHOT");
+		BDDAssertions.then(pomWithCloud.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
+		Iterator<RevCommit> iterator = git.log().call().iterator();
+		RevCommit commit = iterator.next();
+		BDDAssertions.then(commit.getShortMessage())
+				.isEqualTo("Updated versions after [Finchley.SR1] release train and [2.0.1.RELEASE] [spring-cloud-sleuth] project release");
 	}
 
 	private String sleuthParentPomVersion() {

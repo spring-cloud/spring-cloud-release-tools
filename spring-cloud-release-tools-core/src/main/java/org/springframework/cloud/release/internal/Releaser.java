@@ -241,4 +241,13 @@ public class Releaser {
 			log.warn("\nUnable to update and generate release train documentation", e);
 		}
 	}
+
+	public void updateAllSamples(Projects projects) {
+		try {
+			this.postReleaseActions.updateAllTestSamples(projects);
+			log.info("\nSuccessfully updated all samples");
+		} catch (Exception e) {
+			log.warn("\nUnable to update all samples", e);
+		}
+	}
 }
