@@ -45,7 +45,10 @@ class GithubMilestones {
 
 	void closeMilestone(ProjectVersion version) {
 		Assert.hasText(this.properties.getGit().getOauthToken(),
-				"You have to pass Github OAuth token for milestone closing to be operational");
+				"You must set the value of the OAuth token. You can do it "
+						+ "either via the command line [--releaser.git.oauth-token=...] "
+						+ "or put it as an env variable in [~/.bashrc] or "
+						+ "[~/.zshrc] e.g. [export RELEASER_GIT_OAUTH_TOKEN=...]");
 		String tagVersion = version.version;
 		Milestone.Smart foundMilestone = matchingMilestone(tagVersion, openMilestones(version));
 		if (foundMilestone != null) {

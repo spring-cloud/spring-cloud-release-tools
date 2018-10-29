@@ -229,7 +229,7 @@ public class GithubMilestonesTests {
 
 		thenThrownBy(() -> milestones.closeMilestone(nonGaSleuthProject()))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("You have to pass Github OAuth token for milestone closing to be operational");
+				.hasMessageContaining("You must set the value of the OAuth token");
 	}
 
 	ReleaserProperties withToken() {
