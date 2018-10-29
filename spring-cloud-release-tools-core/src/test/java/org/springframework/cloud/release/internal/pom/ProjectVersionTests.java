@@ -90,12 +90,46 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_return_true_for_a_valid_version() {
+		then(projectVersion("1.0.1.BUILD-SNAPSHOT").isValid()).isTrue();
+		then(projectVersion("1.0.3.RC1").isValid()).isTrue();
+		then(projectVersion("1.0.4.M1").isValid()).isTrue();
+		then(projectVersion("Finchley.BUILD-SNAPSHOT").isValid()).isTrue();
+		then(projectVersion("Finchley.SR1").isValid()).isTrue();
+	}
+
+	@Test
+	public void should_return_false_for_an_invalid_version() {
+		then(projectVersion("1").isValid()).isFalse();
+		then(projectVersion("1.").isValid()).isFalse();
+		then(projectVersion("1.0.4.").isValid()).isFalse();
+		then(projectVersion("Some random text").isValid()).isFalse();
+	}
+
+	@Test
 	public void should_throw_exception_if_version_is_not_long_enough_when_bumping_snapshots() {
 		String version = "1.0";
 
 		thenThrownBy(() -> projectVersion(version).postReleaseSnapshotVersion())
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Version is invalid");
+	}
+
+	@Test
+	public void should_throw_exception_when_trying_to_get_major_from_invalid_version() {
+		String version = "1.0";
+
+		thenThrownBy(() -> projectVersion(version).major())
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("Version is invalid");
+	}
+
+	@Test
+	public void should_get_major_from_version() {
+		then(projectVersion("2.0.1.BUILD-SNAPSHOT").major()).isEqualTo("2");
+		then(projectVersion("2.0.1.M1").major()).isEqualTo("2");
+		then(projectVersion("2.0.1.RC1").major()).isEqualTo("2");
+		then(projectVersion("Finchley.SR1").major()).isEqualTo("Finchley");
 	}
 
 	@Test

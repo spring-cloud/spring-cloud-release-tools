@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import com.github.jknack.handlebars.Template;
@@ -19,6 +20,7 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.tech.HandlebarsHelper;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.StringUtils;
 
 /**
@@ -33,10 +35,12 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 	private final ReleaseTrainContentsGitHandler handler;
 	private final ReleaseTrainContentsParser parser;
 	private final ReleaseTrainContentsGenerator generator;
+	private final TemplateGenerator templateGenerator;
 
-	ReleaseTrainContentsUpdater(ReleaserProperties properties, ProjectGitHandler handler) {
+	ReleaseTrainContentsUpdater(ReleaserProperties properties, ProjectGitHandler handler, TemplateGenerator templateGenerator) {
 		this.properties = properties;
 		this.handler = new ReleaseTrainContentsGitHandler(handler);
+		this.templateGenerator = templateGenerator;
 		this.parser = new ReleaseTrainContentsParser();
 		this.generator = new ReleaseTrainContentsGenerator(properties);
 	}
@@ -55,7 +59,7 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 		}
 		File releaseTrainProject = this.handler.cloneSpringDocProject();
 		File index = new File(releaseTrainProject, "index.html");
-		ReleaseTrainContents contents = this.parser.parse(index);
+		ReleaseTrainContents contents = this.parser.parseProjectPage(index);
 		String newContents = this.generator.releaseTrainContents(contents, projects);
 		if (StringUtils.isEmpty(newContents)) {
 			log.info("No changes to commit to the Spring Project page.");
@@ -77,6 +81,94 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Clones the test project, updates it and runs tests
+	 *
+	 * @param projects - set of project with versions to assert against
+	 */
+	File updateReleaseTrainWiki(Projects projects) {
+		if (!this.properties.getGit().isUpdateReleaseTrainWiki() ||
+				!this.properties.getMetaRelease().isEnabled()) {
+			log.info("Will not clone and update the release train wiki, since the switch to do so "
+					+ "is off or it's not a meta-release. Set [releaser.git.update-release-train-wiki] to [true] to change that");
+			return null;
+		}
+		File releaseTrainWiki = this.handler.cloneReleaseTrainWiki();
+		ProjectVersion releaseTrain = projects.releaseTrain(this.properties);
+		String releaseTrainName = releaseTrain.major();
+		String wikiPagePrefix = this.properties.getGit().getReleaseTrainWikiPagePrefix();
+		String releaseTrainDocFileName = releaseTrainDocFileName(releaseTrainName, wikiPagePrefix);
+		log.info("Reading the file [{}] for the current release train", releaseTrainDocFileName);
+		File releaseTrainDocFile = releaseTrainDocFile(releaseTrainWiki, releaseTrainDocFileName);
+		String releaseVersionFromCurrentFile = this.parser.latestReleaseTrainFromWiki(releaseTrainDocFile);
+		log.info("Latest release train version in the file is [{}]", releaseVersionFromCurrentFile);
+		if (!isThisReleaseTrainVersionNewer(releaseTrain, releaseVersionFromCurrentFile)) {
+			log.info("Current release train version [{}] is not "
+							+ "newer than the version taken from the wiki [{}]",
+					releaseTrain.version, releaseVersionFromCurrentFile);
+			return releaseTrainWiki;
+		}
+		return generateNewWikiEntry(projects, releaseTrainWiki, releaseTrain,
+				releaseTrainName, releaseTrainDocFile, releaseVersionFromCurrentFile);
+	}
+
+	private File generateNewWikiEntry(Projects projects, File releaseTrainWiki, ProjectVersion releaseTrain, String releaseTrainName, File releaseTrainDocFile, String releaseVersionFromCurrentFile) {
+		File releaseNotes = this.templateGenerator.releaseNotes(projects);
+		try {
+			List<String> lines = Files.readAllLines(releaseTrainDocFile.toPath());
+			int lineIndex;
+			for (lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
+				if (lines.get(lineIndex).contains(releaseVersionFromCurrentFile)) {
+					break;
+				}
+			}
+			return insertNewWikiContentBeforeTheLatestRelease(releaseTrainWiki, releaseTrain,
+					releaseTrainName, releaseTrainDocFile, releaseNotes, lines, lineIndex);
+		}
+		catch (IOException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	private File insertNewWikiContentBeforeTheLatestRelease(File releaseTrainWiki, ProjectVersion releaseTrain, String releaseTrainName, File releaseTrainDocFile, File releaseNotes, List<String> lines, int lineIndex) throws IOException {
+		String newContent = new StringJoiner("\n")
+				.add(String.join("\n", lines.subList(0, lineIndex)))
+				.add("\n").add(new String(Files.readAllBytes(releaseNotes.toPath())))
+				.add(String.join("\n", lines.subList(lineIndex, lines.size())))
+				.toString();
+		Files.write(releaseTrainDocFile.toPath(), newContent.getBytes());
+		log.info("Successfully stored new wiki contents for release train [{}]", releaseTrainName);
+		this.handler.commitAndPushChanges(releaseTrainWiki, releaseTrain);
+		return releaseTrainWiki;
+	}
+
+	private String releaseTrainDocFileName(String releaseTrainName, String wikiPagePrefix) {
+		return new StringJoiner("-")
+				.add(wikiPagePrefix).add(releaseTrainName).add("Release-Notes.md").toString();
+	}
+
+	private boolean isThisReleaseTrainVersionNewer(ProjectVersion releaseTrain, String releaseVersionFromCurrentFile) {
+		if (StringUtils.hasText(releaseVersionFromCurrentFile)) {
+			return releaseTrain.compareToReleaseTrainName(releaseVersionFromCurrentFile) > 0;
+		}
+		return true;
+	}
+
+	private File releaseTrainDocFile(File releaseTrainWiki, String releaseTrainDocFileName) {
+		File releaseTrainDocFile = new File(releaseTrainWiki, releaseTrainDocFileName);
+		if (!releaseTrainDocFile.exists()) {
+			try {
+				if (!releaseTrainDocFile.createNewFile()) {
+					throw new IllegalStateException("Failed to create releae train doc file");
+				}
+			}
+			catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+		return releaseTrainDocFile;
 	}
 
 	@Override
@@ -121,7 +213,7 @@ class ReleaseTrainContentsGenerator implements ReleaserPropertiesAware {
 	}
 
 	ProjectVersion currentReleaseTrainProject(Projects projects) {
-		return projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName());
+		return projects.releaseTrain(this.properties);
 	}
 
 	private String generate(File contentOutput, Template template, ReleaseTrainContents releaseTrainContents) {
@@ -205,9 +297,12 @@ class ReleaseTrainContentsGitHandler {
 		this.handler = handler;
 	}
 
-	// clones the project and checks out the branch
 	File cloneSpringDocProject() {
 		return this.handler.cloneSpringDocProject();
+	}
+
+	File cloneReleaseTrainWiki() {
+		return this.handler.cloneReleaseTrainWiki();
 	}
 
 	void commitAndPushChanges(File repo, ProjectVersion releaseTrain) {
@@ -223,7 +318,7 @@ class ReleaseTrainContentsParser {
 	private static final Logger log = LoggerFactory
 			.getLogger(ReleaseTrainContentsParser.class);
 
-	ReleaseTrainContents parse(File rawHtml) {
+	ReleaseTrainContents parseProjectPage(File rawHtml) {
 		try {
 			String contents = new String(Files.readAllBytes(rawHtml.toPath()));
 			String[] split = contents.split("<!-- (BEGIN|END) COMPONENTS -->");
@@ -241,6 +336,20 @@ class ReleaseTrainContentsParser {
 				rows.add(new Row(splitRow));
 			}
 			return new ReleaseTrainContents(title, rows);
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	String latestReleaseTrainFromWiki(File rawMd) {
+		try {
+			return Files.readAllLines(rawMd.toPath()).stream()
+					.filter(s -> s.trim().startsWith("#"))
+					.map(s -> s.substring(1).trim())
+					.filter(s -> new ProjectVersion("foo", s).isValid())
+					.findFirst()
+					.orElse("");
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);

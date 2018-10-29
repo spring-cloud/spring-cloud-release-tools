@@ -73,6 +73,10 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 				this.properties.getGit().getTestSamplesBranch());
 	}
 
+	public File cloneReleaseTrainWiki() {
+		return cloneProject(this.properties.getGit().getReleaseTrainWikiUrl());
+	}
+
 	public File cloneReleaseTrainProject() {
 		return cloneProject(this.properties.getGit().getReleaseTrainBomUrl());
 	}

@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
 /**
  * @author Marcin Grzejszczak
@@ -19,8 +20,8 @@ public class TestDocumentationUpdater extends DocumentationUpdater {
 
 	public static class TestReleaseContentsUpdater extends ReleaseTrainContentsUpdater {
 
-		public TestReleaseContentsUpdater(ReleaserProperties properties, ProjectGitHandler handler) {
-			super(properties, handler);
+		public TestReleaseContentsUpdater(ReleaserProperties properties, ProjectGitHandler handler, TemplateGenerator templateGenerator) {
+			super(properties, handler, templateGenerator);
 		}
 
 		@Override

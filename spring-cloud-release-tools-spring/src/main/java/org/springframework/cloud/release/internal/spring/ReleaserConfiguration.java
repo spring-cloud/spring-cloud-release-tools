@@ -84,8 +84,8 @@ class ReleaserConfiguration {
 
 	@Bean
 	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
-			ReleaserProperties properties) {
-		return new DocumentationUpdater(projectGitHandler, properties);
+			ReleaserProperties properties, TemplateGenerator templateGenerator) {
+		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator);
 	}
 
 	@Bean

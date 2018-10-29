@@ -7,6 +7,7 @@ import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
 /**
  * @author Marcin Grzejszczak
@@ -17,10 +18,12 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	private final ReleaseTrainContentsUpdater releaseTrainContentsUpdater;
 	private ReleaserProperties properties;
 
-	public DocumentationUpdater(ProjectGitHandler gitHandler, ReleaserProperties properties) {
+	public DocumentationUpdater(ProjectGitHandler gitHandler, ReleaserProperties properties,
+			TemplateGenerator templateGenerator) {
 		this.properties = properties;
 		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(this.properties, gitHandler);
-		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(this.properties, gitHandler);
+		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(this.properties, gitHandler,
+				templateGenerator);
 	}
 
 	DocumentationUpdater(ReleaserProperties properties, ProjectDocumentationUpdater updater,
@@ -52,6 +55,16 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	 */
 	public File updateProjectRepo(Projects projects) {
 		return this.releaseTrainContentsUpdater.updateProjectRepo(projects);
+	}
+
+	/**
+	 * Updates the release train wiki page
+	 *
+	 * @param projects
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is used or the switch is turned off
+	 */
+	public File updateReleaseTrainWiki(Projects projects) {
+		return this.releaseTrainContentsUpdater.updateReleaseTrainWiki(projects);
 	}
 
 	@Override

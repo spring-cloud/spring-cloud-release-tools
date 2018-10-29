@@ -250,4 +250,13 @@ public class Releaser {
 			log.warn("\nUnable to update all samples", e);
 		}
 	}
+
+	public void updateReleaseTrainWiki(Projects projects) {
+		try {
+			this.documentationUpdater.updateReleaseTrainWiki(projects);
+			log.info("\nSuccessfully updated project wiki");
+		} catch (Exception e) {
+			log.warn("\nUnable to update project wiki", e);
+		}
+	}
 }

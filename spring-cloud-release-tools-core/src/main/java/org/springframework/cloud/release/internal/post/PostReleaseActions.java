@@ -59,8 +59,7 @@ public class PostReleaseActions implements Closeable {
 		}
 		File file = this.projectGitHandler.cloneTestSamplesProject();
 		ProjectVersion projectVersion = new ProjectVersion(file);
-		String releaseTrainVersion  =
-				projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()).version;
+		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
 		this.projectPomUpdater
 				.updateProjectFromReleaseTrain(file, newProjects, projectVersion, false);
@@ -180,8 +179,7 @@ public class PostReleaseActions implements Closeable {
 		}
 		File file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
 		ProjectVersion projectVersion = new ProjectVersion(file);
-		String releaseTrainVersion  =
-				projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()).version;
+		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
 		this.projectPomUpdater
 				.updateProjectFromReleaseTrain(file, newProjects, projectVersion, false);

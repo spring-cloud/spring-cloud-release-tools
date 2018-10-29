@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
@@ -32,6 +33,8 @@ class ReleaseNotesTemplateGenerator {
 	private final Projects projects;
 	private final NotesGenerator notesGenerator;
 
+	static final Map<String, File> CACHE = new ConcurrentHashMap<>();
+
 	ReleaseNotesTemplateGenerator(Template template, String releaseVersion,
 			File blogOutput, Projects projects, ProjectGitHandler handler) {
 		this.template = template;
@@ -41,7 +44,13 @@ class ReleaseNotesTemplateGenerator {
 		this.notesGenerator = new NotesGenerator(handler);
 	}
 
-	File releseNotes() {
+	File releaseNotes() {
+		File cached = CACHE.get(this.releaseVersion);
+		if (cached != null) {
+			log.info("Found an existing entry [{}] in the cache "
+					+ "for version [{}]", cached, this.releaseVersion);
+			return cached;
+		}
 		try {
 			Map<String, Object> map = ImmutableMap.<String, Object>builder()
 					.put("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
@@ -50,7 +59,9 @@ class ReleaseNotesTemplateGenerator {
 					.build();
 			String blog = this.template.apply(map);
 			Files.write(this.blogOutput.toPath(), blog.getBytes());
-			return this.blogOutput;
+			File output = this.blogOutput;
+			CACHE.put(this.releaseVersion, output);
+			return output;
 		}
 		catch (IOException e) {
 			log.warn("Exception occurred while trying to generate release notes", e);

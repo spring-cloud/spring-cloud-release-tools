@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
+
 /**
  * @author Marcin Grzejszczak
  */
@@ -169,6 +171,30 @@ public class ProjectsTests {
 		Projects projects = new Projects(projectVersions);
 
 		then(projects.forNameStartingWith("asd")).isEmpty();
+	}
+
+	@Test
+	public void should_return_version_for_release_train() {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMetaRelease().setReleaseTrainProjectName("release-train");
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("release-train", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		then(projects.releaseTrain(properties).version).isEqualTo("1.0.0");
+	}
+
+	@Test
+	public void should_throw_exception_when_release_train_project() {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMetaRelease().setReleaseTrainProjectName("release-train");
+		Set<ProjectVersion> projectVersions = new HashSet<>();
+		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
+		Projects projects = new Projects(projectVersions);
+
+		thenThrownBy(() -> projects.releaseTrain(properties))
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("Project with name [release-train] is not present");
 	}
 
 	private File file(String relativePath) {

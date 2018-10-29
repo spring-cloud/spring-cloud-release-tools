@@ -29,7 +29,7 @@ public class SpringCloudGhPagesParserTests {
 	@Test
 	public void should_parse_the_components_table() {
 		ReleaseTrainContents contents = new ReleaseTrainContentsParser()
-				.parse(this.rawHtml);
+				.parseProjectPage(this.rawHtml);
 
 		BDDAssertions.then(contents).isNotNull();
 		BDDAssertions.then(contents.title).isEqualTo(
@@ -60,7 +60,7 @@ public class SpringCloudGhPagesParserTests {
 	@Test
 	public void should_not_parse_the_components_table_when_markers_are_not_found() {
 		ReleaseTrainContents contents = new ReleaseTrainContentsParser()
-				.parse(this.wrongHtml);
+				.parseProjectPage(this.wrongHtml);
 
 		BDDAssertions.then(contents).isNull();
 		BDDAssertions.then(capture.toString())

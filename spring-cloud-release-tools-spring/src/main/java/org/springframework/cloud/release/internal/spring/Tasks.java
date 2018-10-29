@@ -95,6 +95,12 @@ class Tasks {
 			args -> {
 				args.releaser.updateAllSamples(args.projects);
 	},TaskType.POST_RELEASE);
+	static Task UPDATE_RELEASE_TRAIN_WIKI = task("updateReleaseTrainWiki", "uw",
+			"UPDATE RELEASE TRAIN WIKI",
+			"Update release train wiki page",
+			args -> {
+				args.releaser.updateReleaseTrainWiki(args.projects);
+	},TaskType.POST_RELEASE);
 
 	static final List<Task> DEFAULT_TASKS_PER_PROJECT = Stream.of(
 			Tasks.UPDATING_POMS,
@@ -115,6 +121,7 @@ class Tasks {
 			Tasks.UPDATE_RELEASE_TRAIN_DOCUMENTATION,
 			Tasks.UPDATE_DOCUMENTATION,
 			Tasks.UPDATE_SPRING_PROJECT_PAGE,
+			Tasks.UPDATE_RELEASE_TRAIN_WIKI,
 			Tasks.UPDATE_ALL_SAMPLES
 	).collect(Collectors.toList());
 

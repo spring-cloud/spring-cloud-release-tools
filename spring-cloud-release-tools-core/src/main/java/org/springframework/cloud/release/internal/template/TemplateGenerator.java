@@ -87,12 +87,12 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(RELEASE_NOTES_TEMPLATE);
 		return new ReleaseNotesTemplateGenerator(template, releaseVersion,
-				output, projects, this.handler).releseNotes();
+				output, projects, this.handler).releaseNotes();
 	}
 
 	private String parsedVersion(Projects projects) {
 		if (this.props.getMetaRelease().isEnabled()) {
-			return projects.forName(this.props.getMetaRelease().getReleaseTrainProjectName()).version;
+			return projects.releaseTrain(this.props).version;
 		}
 		String version = this.props.getPom().getBranch();
 		if (version.startsWith("v")) {

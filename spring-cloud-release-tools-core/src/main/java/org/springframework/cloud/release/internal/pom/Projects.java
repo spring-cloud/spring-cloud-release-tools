@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
+
 /**
  * Abstraction over collection of projects
  *
@@ -29,6 +31,10 @@ public class Projects extends HashSet<ProjectVersion> {
 		newProjects.add(new ProjectVersion(originalVersion.projectName, originalVersion.bumpedVersion()));
 		newProjects.addAll(projects.forNameStartingWith(SpringCloudConstants.SPRING_BOOT));
 		return newProjects;
+	}
+
+	public ProjectVersion releaseTrain(ReleaserProperties properties) {
+		return this.forName(properties.getMetaRelease().getReleaseTrainProjectName());
 	}
 
 	@Override public boolean add(ProjectVersion projectVersion) {

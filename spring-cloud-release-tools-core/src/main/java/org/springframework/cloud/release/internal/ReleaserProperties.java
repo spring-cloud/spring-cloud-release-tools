@@ -162,6 +162,11 @@ public class ReleaserProperties implements Serializable {
 		private String releaseTrainDocsUrl = "https://github.com/spring-cloud-samples/scripts";
 
 		/**
+		 * URL to the release train wiki
+		 */
+		private String releaseTrainWikiUrl = "https://github.com/spring-projects/spring-cloud.wiki.git";
+
+		/**
 		 * Branch to check out for the documentation project
 		 */
 		private String documentationBranch = "gh-pages";
@@ -180,6 +185,12 @@ public class ReleaserProperties implements Serializable {
 		 * Branch to check out for the release train docs
 		 */
 		private String releaseTrainDocsBranch = "master";
+
+		/**
+		 * Page prefix for the release train wiki. E.g. for [Spring-Cloud-Finchley-Release-Notes]
+		 * it would be [Spring-Cloud].
+		 */
+		private String releaseTrainWikiPagePrefix = "Spring-Cloud";
 
 		/**
 		 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
@@ -237,6 +248,11 @@ public class ReleaserProperties implements Serializable {
 		 * If set to {@code false}, will not update the release train docs
 		 */
 		private boolean updateReleaseTrainDocs = true;
+
+		/**
+		 * If set to {@code false}, will not clone and update the release train wiki
+		 */
+		private boolean updateReleaseTrainWiki = true;
 
 		/**
 		 * If set to {@code false}, will not clone and update the samples for all projects
@@ -433,15 +449,41 @@ public class ReleaserProperties implements Serializable {
 			this.allTestSampleUrls = allTestSampleUrls;
 		}
 
+		public String getReleaseTrainWikiUrl() {
+			return this.releaseTrainWikiUrl;
+		}
+
+		public void setReleaseTrainWikiUrl(String releaseTrainWikiUrl) {
+			this.releaseTrainWikiUrl = releaseTrainWikiUrl;
+		}
+
+		public boolean isUpdateReleaseTrainWiki() {
+			return this.updateReleaseTrainWiki;
+		}
+
+		public void setUpdateReleaseTrainWiki(boolean updateReleaseTrainWiki) {
+			this.updateReleaseTrainWiki = updateReleaseTrainWiki;
+		}
+
+		public String getReleaseTrainWikiPagePrefix() {
+			return this.releaseTrainWikiPagePrefix;
+		}
+
+		public void setReleaseTrainWikiPagePrefix(String releaseTrainWikiPagePrefix) {
+			this.releaseTrainWikiPagePrefix = releaseTrainWikiPagePrefix;
+		}
+
 		@Override
 		public String toString() {
 			return "Git{" +
 					"releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\'' +
 					", documentationUrl='" + this.documentationUrl + '\'' +
 					", documentationBranch='" + this.documentationBranch + '\'' +
+					", releaseTrainWikiUrl='" + this.releaseTrainWikiUrl + '\'' +
 					", updateDocumentationRepo=" + this.updateDocumentationRepo +
 					", springProjectUrl=" + this.springProjectUrl+
 					", springProjectBranch=" + this.springProjectBranch +
+					", releaseTrainWikiPagePrefix=" + this.releaseTrainWikiPagePrefix +
 					", cloneDestinationDir='" + this.cloneDestinationDir + '\'' +
 					", fetchVersionsFromGit=" + this.fetchVersionsFromGit +
 					", oauthToken='" + this.oauthToken + '\'' +

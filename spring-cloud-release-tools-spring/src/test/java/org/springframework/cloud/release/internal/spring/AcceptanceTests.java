@@ -49,6 +49,7 @@ import org.springframework.cloud.release.internal.sagan.Project;
 import org.springframework.cloud.release.internal.sagan.Release;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
+import org.springframework.cloud.release.internal.template.ReleaseNotesTemplateGeneratorCacheClearer;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.FileSystemUtils;
@@ -85,6 +86,7 @@ public class AcceptanceTests {
 		BDDMockito.given(this.saganClient.getProject(anyString()))
 				.willReturn(newProject());
 		Task.stepSkipper = () -> false;
+		ReleaseNotesTemplateGeneratorCacheClearer.clear();
 	}
 
 	@After
@@ -287,6 +289,7 @@ public class AcceptanceTests {
 		SpringReleaser releaser = metaReleaser(versions);
 		this.releaserProperties.getMetaRelease().getProjectsToSkip().add("spring-cloud-release");
 		this.releaserProperties.getMetaRelease().getProjectsToSkip().add("spring-cloud-consul");
+		this.releaserProperties.getGit().setUpdateReleaseTrainWiki(false);
 		File temporaryDestination = tmp.newFolder();
 		this.releaserProperties.getGit().setCloneDestinationDir(temporaryDestination.getAbsolutePath());
 
@@ -318,6 +321,7 @@ public class AcceptanceTests {
 				});
 		thenSaganWasCalled();
 		thenDocumentationWasUpdated();
+		thenWikiPageWasUpdated();
 	}
 
 	@Test
@@ -345,12 +349,18 @@ public class AcceptanceTests {
 				});
 		thenSaganWasCalled();
 		thenDocumentationWasUpdated();
+		thenWikiPageWasUpdated();
 	}
 
 	private void thenDocumentationWasUpdated() {
 		BDDMockito.then(documentationUpdater).should()
 				.updateDocsRepo(BDDMockito.any(ProjectVersion.class), BDDMockito
 						.anyString());
+	}
+
+	private void thenWikiPageWasUpdated() {
+		BDDMockito.then(documentationUpdater).should()
+				.updateReleaseTrainWiki(BDDMockito.any(Projects.class));
 	}
 
 	// issue #74
@@ -621,7 +631,7 @@ public class AcceptanceTests {
 		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient);
 		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(properties,
 				new TestDocumentationUpdater.TestProjectDocumentationUpdater(properties, handler, "Brixton.SR1"),
-				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties, handler)) {
+				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties, handler, templateGenerator)) {
 			@Override public File updateDocsRepo(ProjectVersion currentProject,
 					String springCloudReleaseBranch) {
 				File file = super.updateDocsRepo(currentProject, springCloudReleaseBranch);
@@ -644,7 +654,7 @@ public class AcceptanceTests {
 		SaganUpdater saganUpdater = Mockito.spy(new SaganUpdater(this.saganClient));
 		DocumentationUpdater documentationUpdater = Mockito.spy(new TestDocumentationUpdater(properties,
 				new TestDocumentationUpdater.TestProjectDocumentationUpdater(properties, handler, "Brixton.SR1"),
-				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties, handler) {
+				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties, handler, templateGenerator) {
 					@Override
 					public File updateProjectRepo(Projects projects) {
 						File file = super.updateProjectRepo(projects);
@@ -681,6 +691,8 @@ public class AcceptanceTests {
 		releaserProperties.getPom().setBranch(branch);
 		releaserProperties.getGit().setSpringProjectUrl(
 				tmpFile("spring-cloud").getAbsolutePath() + "/");
+		releaserProperties.getGit().setReleaseTrainWikiUrl(
+				tmpFile("spring-cloud-wiki").getAbsolutePath() + "/");
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}
@@ -702,6 +714,8 @@ public class AcceptanceTests {
 		releaserProperties.getMetaRelease().setEnabled(true);
 		releaserProperties.getGit().setSpringProjectUrl(
 				tmpFile("spring-cloud").getAbsolutePath() + "/");
+		releaserProperties.getGit().setReleaseTrainWikiUrl(
+				tmpFile("spring-cloud-wiki").getAbsolutePath() + "/");
 		releaserProperties.setFixedVersions(versions);
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;

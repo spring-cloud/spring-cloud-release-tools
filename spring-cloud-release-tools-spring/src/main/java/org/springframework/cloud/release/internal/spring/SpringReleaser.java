@@ -134,7 +134,7 @@ public class SpringReleaser {
 		Projects projects = projectsAndVersion == null ?
 				projectsToUpdateForFixedVersions() : projectsAndVersion.projectVersions;
 		ProjectVersion version = projects.containsProject(this.properties.getMetaRelease().getReleaseTrainProjectName()) ?
-				projects.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()) : versionFromBranch();
+				projects.releaseTrain(this.properties) : versionFromBranch();
 		if (options.metaRelease) {
 			this.properties.getPom().setBranch(version.version);
 		}

@@ -59,7 +59,8 @@ public class ProjectVersion {
 		}
 		// 1.0.0.BUILD-SNAPSHOT
 		String[] splitVersion = this.version.split("\\.");
-		if (splitVersion.length < 4 && isNumeric(splitVersion[0])) {
+		if (splitVersion.length < 4 && isNumeric(splitVersion[0]) ||
+				splitVersion.length == 1 && !isNumeric(splitVersion[0])) {
 			throw new IllegalStateException("Version is invalid. Should be of format [1.2.3.A]");
 		}
 		return splitVersion;
@@ -99,6 +100,19 @@ public class ProjectVersion {
 			return this.model.getParent().getGroupId();
 		}
 		return "";
+	}
+
+	public boolean isValid() {
+		try {
+			assertVersion();
+			return true;
+		} catch (IllegalStateException e) {
+			return false;
+		}
+	}
+
+	public String major() {
+		return this.assertVersion()[0];
 	}
 
 	public boolean isSnapshot() {
