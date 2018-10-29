@@ -110,7 +110,10 @@ otherwise the application will fail to start</simpara>
 <simpara>Performs the post release tasks at the end of the release</simpara>
 </listitem>
 <listitem>
-<simpara>Will update and run samples (for Spring Cloud it will be <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-core-tests">https://github.com/spring-cloud/spring-cloud-core-tests</link></literal>)</simpara>
+<simpara>Will update and run smoke test samples (for Spring Cloud it will be <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-core-tests">https://github.com/spring-cloud/spring-cloud-core-tests</link></literal>)</simpara>
+</listitem>
+<listitem>
+<simpara>Will clone provided test samples and will update all versions to the latest ones</simpara>
 </listitem>
 </itemizedlist>
 <important>
@@ -351,6 +354,14 @@ train depends on projects that got already released. We default this list to <li
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.run-updated-samples</literal> - If <literal>true</literal> then will update samples and run the the build. Defaults to <literal>true</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.all-test-samples-urls</literal> - URLs to the test samples to be cloned and updated with proper snapshot versions.
+E.g. <literal>"--releaser.git.all-test-samples-urls[spring-cloud-sleuth]=https://github.com/spring-cloud-samples/sleuth-issues/,https://github.com/spring-cloud-samples/sleuth-documentation-apps/"</literal>.
+Defaults to Sleuth and Contract samples.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.update-all-test-samples</literal> - If <literal>true</literal> then will update samples and run the the build. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.release-train-docs-url</literal> - URL to the release train documentation. Defaults to <literal><link xl:href="https://github.com/spring-cloud-sample/scripts">https://github.com/spring-cloud-sample/scripts</link></literal>.</simpara>
