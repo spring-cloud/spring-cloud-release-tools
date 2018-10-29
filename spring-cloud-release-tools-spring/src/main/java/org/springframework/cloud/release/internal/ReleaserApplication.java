@@ -32,9 +32,14 @@ public class ReleaserApplication implements CommandLineRunner {
 	private static final Logger log = LoggerFactory.getLogger(ReleaserApplication.class);
 
 	public static void main(String[] args) {
-		SpringApplication application = new SpringApplication(ReleaserApplication.class);
-		application.setWebApplicationType(WebApplicationType.NONE);
-		application.run(args);
+		try {
+			SpringApplication application = new SpringApplication(ReleaserApplication.class);
+			application.setWebApplicationType(WebApplicationType.NONE);
+			application.run(args);
+		} catch (Throwable e) {
+			log.error("Exception occurred for the releaser", e);
+			throw e;
+		}
 	}
 
 	@Autowired SpringReleaser releaser;
@@ -44,8 +49,8 @@ public class ReleaserApplication implements CommandLineRunner {
 		Options options = this.parser.parse(strings);
 		try {
 			this.releaser.release(options);
-		} catch (Exception e) {
-			log.error("Exception occurred for the releaser. Picked options were [" + options + "]", e);
+		} catch (Throwable e) {
+			log.error("Exception occurred for the releaser. Picked options were [" + options + "]");
 			throw e;
 		}
 		System.exit(0);

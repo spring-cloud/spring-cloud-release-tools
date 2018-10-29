@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.util.StringUtils;
 
@@ -32,13 +34,15 @@ class BlogTemplateGenerator {
 	private final String releaseVersion;
 	private final File blogOutput;
 	private final Projects projects;
+	private final NotesGenerator notesGenerator;
 
 	BlogTemplateGenerator(Template template, String releaseVersion, File blogOutput,
-			Projects projects) {
+			Projects projects, ProjectGitHandler handler) {
 		this.template = template;
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;
 		this.projects = projects;
+		this.notesGenerator = new NotesGenerator(handler);
 	}
 
 	File blog() {
@@ -59,7 +63,7 @@ class BlogTemplateGenerator {
 					.put("releaseName", releaseName)
 					.put("releaseLink", releaseLink)
 					.put("releaseVersion", this.releaseVersion)
-					.put("projects", fromProjects())
+					.put("projects", this.notesGenerator.fromProjects(this.projects))
 					.put("nonRelease", nonRelease)
 					.build();
 			String blog = this.template.apply(map);
@@ -70,16 +74,6 @@ class BlogTemplateGenerator {
 			log.warn("Exception occurred while trying to create a blog entry", e);
 			return null;
 		}
-	}
-
-	private Set<BlogTuple> fromProjects() {
-		return this.projects.stream().map(projectVersion -> {
-			String name = projectVersion.projectName;
-			String version = projectVersion.version;
-			String convertedName = Arrays.stream(name.split("-")).map(
-					StringUtils::capitalize).collect(Collectors.joining(" "));
-			return new BlogTuple(convertedName, version);
-		}).collect(Collectors.toSet());
 	}
 
 	private String parsedReleaseName(String version) {
@@ -119,40 +113,5 @@ class BlogTemplateGenerator {
 			return "[Spring Milestone](https://repo.spring.io/milestone/) repository";
 		}
 		return "[Maven Central](http://repo1.maven.org/maven2/org/springframework/cloud/spring-cloud-dependencies/" + this.releaseVersion + "/)";
-	}
-}
-
-class BlogTuple {
-	private final String name;
-	private final String version;
-
-	BlogTuple(String name, String version) {
-		this.name = name;
-		this.version = version;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	@Override public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		BlogTuple blogTuple = (BlogTuple) o;
-		if (name != null ? !name.equals(blogTuple.name) : blogTuple.name != null)
-			return false;
-		return version != null ? version.equals(blogTuple.version) : blogTuple.version == null;
-	}
-
-	@Override public int hashCode() {
-		int result = name != null ? name.hashCode() : 0;
-		result = 31 * result + (version != null ? version.hashCode() : 0);
-		return result;
 	}
 }

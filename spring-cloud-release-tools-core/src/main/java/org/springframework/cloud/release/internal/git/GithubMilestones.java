@@ -12,12 +12,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -28,6 +30,7 @@ class GithubMilestones {
 
 	private final Github github;
 	private final ReleaserProperties properties;
+	static final Map<ProjectVersion, String> CACHE = new ConcurrentHashMap<>();
 
 	GithubMilestones(ReleaserProperties properties) {
 		this.github = new RtGithub(new RtGithub(
@@ -88,15 +91,20 @@ class GithubMilestones {
 	}
 
 	String milestoneUrl(ProjectVersion version) {
+		String cachedUrl = CACHE.get(version);
+		if (StringUtils.hasText(cachedUrl)) {
+			return cachedUrl;
+		}
 		Assert.hasText(this.properties.getGit().getOauthToken(),
 				"You have to pass Github OAuth token for milestone closing to be operational");
 		String tagVersion = version.version;
 		Milestone.Smart foundMilestone = matchingMilestone(tagVersion, closedMilestones(version));
+		String foundUrl = "";
 		if (foundMilestone != null) {
 			try {
 				URL url = foundMilestoneUrl(foundMilestone);
 				log.info("Found a matching milestone with issues URL [{}]", url);
-				return url.toString()
+				foundUrl = url.toString()
 						.replace("https://api.github.com/repos", "https://github.com")
 						.replace("milestones", "milestone")+ "?closed=1";
 			}
@@ -105,10 +113,10 @@ class GithubMilestones {
 			}
 			catch (Exception e) {
 				log.error("Exception occurred while trying to find milestone", e);
-				return "";
 			}
 		}
-		return "";
+		CACHE.put(version, foundUrl);
+		return foundUrl;
 	}
 
 	private String numericVersion(String version) {
@@ -151,12 +159,16 @@ class GithubMilestones {
 	private Map<String, String> openMilestones() {
 		Map<String, String> params = new HashMap<>();
 		params.put("state", "open");
+		params.put("sort", "due_on");
+		params.put("direction", "desc");
 		return params;
 	}
 
 	private Map<String, String> closedMilestones() {
 		Map<String, String> params = new HashMap<>();
 		params.put("state", "closed");
+		params.put("sort", "due_on");
+		params.put("direction", "desc");
 		return params;
 	}
 }

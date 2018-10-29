@@ -72,7 +72,7 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 		File blogOutput = file(this.blogOutput);
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(BLOG_TEMPLATE);
-		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects).blog();
+		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects, handler).blog();
 	}
 
 	public File tweet(Projects projects) {

@@ -30,7 +30,7 @@ class ReleaseNotesTemplateGenerator {
 	private final String releaseVersion;
 	private final File blogOutput;
 	private final Projects projects;
-	private final ProjectGitHandler handler;
+	private final NotesGenerator notesGenerator;
 
 	ReleaseNotesTemplateGenerator(Template template, String releaseVersion,
 			File blogOutput, Projects projects, ProjectGitHandler handler) {
@@ -38,7 +38,7 @@ class ReleaseNotesTemplateGenerator {
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;
 		this.projects = projects;
-		this.handler = handler;
+		this.notesGenerator = new NotesGenerator(handler);
 	}
 
 	File releseNotes() {
@@ -46,7 +46,7 @@ class ReleaseNotesTemplateGenerator {
 			Map<String, Object> map = ImmutableMap.<String, Object>builder()
 					.put("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
 					.put("releaseVersion", this.releaseVersion)
-					.put("projects", fromProjects())
+					.put("projects", this.notesGenerator.fromProjects(this.projects))
 					.build();
 			String blog = this.template.apply(map);
 			Files.write(this.blogOutput.toPath(), blog.getBytes());
@@ -56,61 +56,5 @@ class ReleaseNotesTemplateGenerator {
 			log.warn("Exception occurred while trying to generate release notes", e);
 			return null;
 		}
-	}
-
-	private Set<Notes> fromProjects() {
-		return this.projects.stream().filter(projectVersion ->
-			!projectVersion.projectName.toLowerCase().contains("boot")
-		).map(projectVersion -> {
-			String name = projectVersion.projectName;
-			String version = projectVersion.version;
-			String closedMilestoneUrl = this.handler.milestoneUrl(projectVersion);
-			String convertedName = Arrays.stream(name.split("-"))
-					.map(StringUtils::capitalize).collect(Collectors.joining(" "));
-			return new Notes(convertedName, version, closedMilestoneUrl);
-		}).collect(Collectors.toSet());
-	}
-}
-
-class Notes {
-	private final String name;
-	private final String version;
-	private final String closedMilestoneUrl;
-
-	Notes(String name, String version, String closedMilestoneUrl) {
-		this.name = name;
-		this.version = version;
-		this.closedMilestoneUrl = closedMilestoneUrl;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public String getClosedMilestoneUrl() {
-		return closedMilestoneUrl;
-	}
-
-	@Override public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		Notes notes = (Notes) o;
-		if (name != null ? !name.equals(notes.name) : notes.name != null)
-			return false;
-		return version != null ?
-				version.equals(notes.version) :
-				notes.version == null;
-	}
-
-	@Override public int hashCode() {
-		int result = name != null ? name.hashCode() : 0;
-		result = 31 * result + (version != null ? version.hashCode() : 0);
-		return result;
 	}
 }

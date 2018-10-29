@@ -210,7 +210,7 @@ public class ReleaserProperties implements Serializable {
 		 * In order not to iterate endlessly over milestones we introduce a threshold of milestones
 		 * that we will go through to find the matching milestone
 		 */
-		private Integer numberOfCheckedMilestones = 10;
+		private Integer numberOfCheckedMilestones = 50;
 
 		/**
 		 * If {@code false}, will not update the documentation repository.

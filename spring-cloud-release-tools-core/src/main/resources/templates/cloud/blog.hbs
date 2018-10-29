@@ -9,9 +9,9 @@ Some text related to project
 
 The following modules were updated as part of {{ releaseVersion }}:
 
-| Module	| Version	|
-|---	|---	|
-{{#each projects}}| {{name}}        	| {{version}}  	|
+| Module	| Version	| Issues
+|---	|---	|---	|---
+{{#each projects}}| {{name}}	| {{version}}	| {{#if closedMilestoneUrl}}([issues]({{{ closedMilestoneUrl }}})){{/if}}
 {{/each}}
 
 As always, we welcome feedback on [GitHub](https://github.com/spring-cloud/), on [Gitter](https://gitter.im/spring-cloud/spring-cloud), on [Stack Overflow](http://stackoverflow.com/questions/tagged/spring-cloud), or on [Twitter](https://twitter.com/SpringCloud).

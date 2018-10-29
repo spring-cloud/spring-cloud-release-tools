@@ -122,6 +122,16 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
+	public void should_fetch_url_of_a_closed_matching_milestone_from_cache() throws IOException {
+		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
+		GithubMilestones.CACHE.put(gaSleuthProject(), "https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
+
+		String url = milestones.milestoneUrl(gaSleuthProject());
+
+		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
+	}
+
+	@Test
 	public void should_return_null_if_no_matching_milestone_was_found() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
