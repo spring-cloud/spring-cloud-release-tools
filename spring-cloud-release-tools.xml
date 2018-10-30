@@ -385,7 +385,7 @@ Defaults to Sleuth and Contract samples.</simpara>
 <simpara><literal>releaser.git.documentation-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.sagan.update-sagan</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
+<simpara><literal>releaser.sagan.update-sagan</literal> - If <literal>true</literal> then will update project sagan with information about this project. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.oauth-token</literal> - GitHub OAuth token to be used to interact with GitHub repo.</simpara>
