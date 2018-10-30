@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-10-29</date>
+<date>2018-10-30</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -114,6 +114,9 @@ otherwise the application will fail to start</simpara>
 </listitem>
 <listitem>
 <simpara>Will clone provided test samples and will update all versions to the latest ones</simpara>
+</listitem>
+<listitem>
+<simpara>Will clone the release train wiki and update it with the latest release versions (for Spring Cloud it will be <literal><link xl:href="https://github.com/spring-projects/spring-cloud.wiki.git">https://github.com/spring-projects/spring-cloud.wiki.git</link></literal>)</simpara>
 </listitem>
 </itemizedlist>
 <important>
@@ -344,13 +347,22 @@ train depends on projects that got already released. We default this list to <li
 <simpara><literal>releaser.git.spring-project-branch</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><literal>releaser.git.update-spring-project</literal> - If <literal>true</literal> then will update Spring Project page with the current release train values. Defaults to <literal>true</literal>.</simpara>
+<simpara><literal>releaser.sagan.update-sagan</literal> - Branch to check out for the documentation project. Defaults to <literal>gh-pages</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.update-spring-project</literal> - If <literal>true</literal> then will update Project Sagan with the current release train values. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.test-samples-project-url</literal> - URL to the test samples to be checked against the given release train. Defaults to <literal><link xl:href="https://github.com/spring-cloud/spring-cloud-core-tests">https://github.com/spring-cloud/spring-cloud-core-tests</link></literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.test-samples-project-branch</literal> - Branch to check out for test samples. Defaults to <literal>master</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.release-train-wiki-url</literal> - URL to the project&#8217;s release train wiki page. Defaults to <literal><link xl:href="https://github.com/spring-projects/spring-cloud.wiki.git">https://github.com/spring-projects/spring-cloud.wiki.git</link></literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.git.update-release-train-wiki</literal> - If <literal>true</literal> then will update the release train wiki page with the current release train values. Defaults to <literal>true</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.run-updated-samples</literal> - If <literal>true</literal> then will update samples and run the the build. Defaults to <literal>true</literal>.</simpara>
