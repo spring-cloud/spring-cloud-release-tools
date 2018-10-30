@@ -734,6 +734,12 @@ public class ReleaserProperties implements Serializable {
 	}
 
 	public static class Sagan implements Serializable {
+
+		/**
+		 * If set to {@code false} will not update Sagan
+		 */
+		private boolean updateSagan = true;
+
 		/**
 		 * URL to the Sagan API
 		 */
@@ -745,6 +751,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setBaseUrl(String baseUrl) {
 			this.baseUrl = baseUrl;
+		}
+
+		public boolean isUpdateSagan() {
+			return this.updateSagan;
+		}
+
+		public void setUpdateSagan(boolean updateSagan) {
+			this.updateSagan = updateSagan;
 		}
 
 		@Override public String toString() {

@@ -63,7 +63,9 @@ After project release
 ** for `spring-cloud-sleuth`'s `2.1.0.RELEASE` version will resolve `2.1.x` branch
 - Performs the release tasks per each project
 - Performs the post release tasks at the end of the release
-- Will update and run samples (for Spring Cloud it will be `https://github.com/spring-cloud/spring-cloud-core-tests`)
+- Will update and run smoke test samples (for Spring Cloud it will be `https://github.com/spring-cloud/spring-cloud-core-tests`)
+- Will clone provided test samples and will update all versions to the latest ones
+- Will clone the release train wiki and update it with the latest release versions (for Spring Cloud it will be `https://github.com/spring-projects/spring-cloud.wiki.git`)
 
 IMPORTANT: For the meta-releaser to work we assume that the path to the
 custom configuration file for each project is always `config/releaser.yml`.
@@ -288,10 +290,17 @@ The following properties are used for both meta release and a release of an indi
 - `releaser.git.update-documentation-repo` - If `true` then will update documentation repository with the `current` URL. Defaults to `true`.
 - `releaser.git.spring-project-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-projects/spring-cloud`.
 - `releaser.git.spring-project-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`.
-- `releaser.git.update-spring-project` - If `true` then will update Spring Project page with the current release train values. Defaults to `true`.
+- `releaser.sagan.update-sagan` - Branch to check out for the documentation project. Defaults to `gh-pages`.
+- `releaser.git.update-spring-project` - If `true` then will update Project Sagan with the current release train values. Defaults to `true`.
 - `releaser.git.test-samples-project-url` - URL to the test samples to be checked against the given release train. Defaults to `https://github.com/spring-cloud/spring-cloud-core-tests`.
 - `releaser.git.test-samples-project-branch` - Branch to check out for test samples. Defaults to `master`.
+- `releaser.git.release-train-wiki-url` - URL to the project's release train wiki page. Defaults to `https://github.com/spring-projects/spring-cloud.wiki.git`.
+- `releaser.git.update-release-train-wiki` - If `true` then will update the release train wiki page with the current release train values. Defaults to `true`.
 - `releaser.git.run-updated-samples` - If `true` then will update samples and run the the build. Defaults to `true`.
+- `releaser.git.all-test-samples-urls` - URLs to the test samples to be cloned and updated with proper snapshot versions.
+E.g. `"--releaser.git.all-test-samples-urls[spring-cloud-sleuth]=https://github.com/spring-cloud-samples/sleuth-issues/,https://github.com/spring-cloud-samples/sleuth-documentation-apps/"`.
+Defaults to Sleuth and Contract samples.
+- `releaser.git.update-all-test-samples` - If `true` then will update samples and run the the build. Defaults to `true`.
 - `releaser.git.release-train-docs-url` - URL to the release train documentation. Defaults to `https://github.com/spring-cloud-sample/scripts`.
 - `releaser.git.release-train-docs-branch` - Branch to check out for release train documentation. Defaults to `master`.
 - `releaser.git.update-release-train-docs` - If `true` then will update the release train documentation project and run the generation. Defaults to `true`.

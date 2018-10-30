@@ -628,7 +628,7 @@ public class AcceptanceTests {
 				expectedVersion, projectName);
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
-		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient);
+		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient, releaserProperties);
 		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(properties,
 				new TestDocumentationUpdater.TestProjectDocumentationUpdater(properties, handler, "Brixton.SR1"),
 				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties, handler, templateGenerator)) {
@@ -651,7 +651,7 @@ public class AcceptanceTests {
 		NonAssertingTestProjectGitHandler handler = new NonAssertingTestProjectGitHandler(properties);
 		TemplateGenerator templateGenerator = Mockito.spy(new TemplateGenerator(properties, handler));
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
-		SaganUpdater saganUpdater = Mockito.spy(new SaganUpdater(this.saganClient));
+		SaganUpdater saganUpdater = Mockito.spy(new SaganUpdater(this.saganClient, releaserProperties));
 		DocumentationUpdater documentationUpdater = Mockito.spy(new TestDocumentationUpdater(properties,
 				new TestDocumentationUpdater.TestProjectDocumentationUpdater(properties, handler, "Brixton.SR1"),
 				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties, handler, templateGenerator) {

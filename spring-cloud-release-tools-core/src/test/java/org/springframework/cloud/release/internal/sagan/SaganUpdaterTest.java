@@ -3,16 +3,13 @@ package org.springframework.cloud.release.internal.sagan;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
 import static org.mockito.BDDMockito.then;
@@ -22,11 +19,11 @@ import static org.mockito.Mockito.never;
 /**
  * @author Marcin Grzejszczak
  */
-@RunWith(MockitoJUnitRunner.class)
 public class SaganUpdaterTest {
 
-	@Mock SaganClient saganClient;
-	@InjectMocks SaganUpdater saganUpdater;
+	SaganClient saganClient = Mockito.mock(SaganClient.class);
+	ReleaserProperties properties = new ReleaserProperties();
+	SaganUpdater saganUpdater = new SaganUpdater(this.saganClient, this.properties);
 
 	@Before
 	public void setup() {
@@ -45,6 +42,14 @@ public class SaganUpdaterTest {
 		release.version = version;
 		release.current = true;
 		return release;
+	}
+
+	@Test public void should_not_update_sagan_when_switch_is_off() throws Exception {
+		this.properties.getSagan().setUpdateSagan(false);
+
+		this.saganUpdater.updateSagan("master", version("1.0.0.M1"), version("1.0.0.M1"));
+
+		then(this.saganClient).shouldHaveZeroInteractions();
 	}
 
 	@Test public void should_update_sagan_for_milestone() throws Exception {

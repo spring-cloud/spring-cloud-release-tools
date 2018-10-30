@@ -72,8 +72,8 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	SaganUpdater saganUpdater(SaganClient saganClient) {
-		return new SaganUpdater(saganClient);
+	SaganUpdater saganUpdater(SaganClient saganClient, ReleaserProperties releaserProperties) {
+		return new SaganUpdater(saganClient, releaserProperties);
 	}
 
 	@Bean

@@ -4,6 +4,8 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -16,12 +18,19 @@ public class SaganUpdater {
 	private static final Logger log = LoggerFactory.getLogger(SaganUpdater.class);
 
 	private final SaganClient saganClient;
+	private final ReleaserProperties releaserProperties;
 
-	public SaganUpdater(SaganClient saganClient) {
+	public SaganUpdater(SaganClient saganClient, ReleaserProperties releaserProperties) {
 		this.saganClient = saganClient;
+		this.releaserProperties = releaserProperties;
 	}
 
 	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
+		if (!releaserProperties.getSagan().isUpdateSagan()) {
+			log.info("Will not update sagan, since the switch to do so "
+					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
+			return;
+		}
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, version);
 		updateSaganForNonSnapshot(branch, originalVersion, version);
 		log.info("Updating Sagan with \n\n{}", update);
