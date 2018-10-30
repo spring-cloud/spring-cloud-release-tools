@@ -294,7 +294,7 @@ The following properties are used for both meta release and a release of an indi
 - `releaser.git.release-train-bom-url` - URL to a project containing a BOM. Defaults to Spring Cloud Release Git repository: `https://github.com/spring-cloud/spring-cloud-release`.
 - `releaser.git.documentation-url` - URL to the documentation Git repository. Defaults to `https://github.com/spring-cloud/spring-cloud-static`.
 - `releaser.git.documentation-branch` - Branch to check out for the documentation project. Defaults to `gh-pages`.
-- `releaser.sagan.update-sagan` - Branch to check out for the documentation project. Defaults to `gh-pages`.
+- `releaser.sagan.update-sagan` - If `true` then will update project sagan with information about this project. Defaults to `true`.
 - `releaser.git.oauth-token` - GitHub OAuth token to be used to interact with GitHub repo.
 - `releaser.git.username` - Optional Git username. If not passed keys will be used for authentication.
 - `releaser.git.password` - Optional Git password. If not passed keys will be used for authentication.
