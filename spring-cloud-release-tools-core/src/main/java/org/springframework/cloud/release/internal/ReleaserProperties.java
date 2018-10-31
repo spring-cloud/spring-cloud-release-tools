@@ -264,16 +264,20 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private boolean updateAllTestSamples = true;
 
+		/**
+		 * Project to urls mapping. For each project will clone the test project and will
+		 * update its versions.
+		 */
 		private Map<String, List<String>> allTestSampleUrls = new HashMap<String, List<String>>() {
 			{
 				this.put("spring-cloud-sleuth" , Arrays.asList(
-						"https://github.com/spring-cloud-samples/sleuth-issues/",
-						"https://github.com/spring-cloud-samples/sleuth-documentation-apps/")
+						"https://github.com/spring-cloud-samples/sleuth-issues",
+						"https://github.com/spring-cloud-samples/sleuth-documentation-apps")
 				);
 				this.put("spring-cloud-contract" , Arrays.asList(
-						"https://github.com/spring-cloud-samples/spring-cloud-contract-samples/",
-						"https://github.com/spring-cloud-samples/the-legacy-app/",
-						"https://github.com/spring-cloud-samples/sc-contract-car-rental/")
+						"https://github.com/spring-cloud-samples/spring-cloud-contract-samples",
+						"https://github.com/spring-cloud-samples/the-legacy-app",
+						"https://github.com/spring-cloud-samples/sc-contract-car-rental")
 				);
 			}
 		};

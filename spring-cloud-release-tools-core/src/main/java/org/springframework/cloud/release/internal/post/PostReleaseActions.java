@@ -22,6 +22,7 @@ import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.core.NestedExceptionUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -92,8 +93,8 @@ public class PostReleaseActions implements Closeable {
 		log.info("Updated all samples!");
 		List<String> exceptionMessages = projectAndExceptions.stream()
 				.filter(ProjectAndException::hasException)
-				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] has exception [" + Arrays
-						.toString(e.ex.getStackTrace()) + "]")
+				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] "
+						+ "has exception [" + NestedExceptionUtils.getMostSpecificCause(e.ex) + "]")
 				.collect(Collectors.toList());
 		if (!exceptionMessages.isEmpty()) {
 			log.warn("Exceptions were found while updating samples");
@@ -140,6 +141,7 @@ public class PostReleaseActions implements Closeable {
 				.commit(file, "Updated versions after [" + releaseTrainVersion + "] "
 						+ "release train and [" + projectVersionForReleaseTrain.version + "] ["
 						+ key + "] project release");
+		this.projectGitHandler.pushCurrentBranch(file);
 	}
 
 	private ProjectAndFuture run(String key, String url, Runnable runnable) {
