@@ -68,10 +68,8 @@ public class PomReaderTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_file_is_missing() {
-		thenThrownBy(() -> this.pomReader.readPom(new File("foo/bar")))
-				.hasMessageStartingWith("Failed to read file: ")
-				.hasCauseInstanceOf(IOException.class);
+	public void should_return_null_when_file_is_missing() {
+		then(this.pomReader.readPom(new File("foo/bar"))).isNull();
 	}
 
 	@Test

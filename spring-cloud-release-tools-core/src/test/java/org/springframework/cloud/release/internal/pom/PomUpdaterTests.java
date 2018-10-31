@@ -82,6 +82,14 @@ public class PomUpdaterTests {
 	}
 
 	@Test
+	public void should_not_update_pom_when_project_is_on_the_versions_list_but_there_is_no_pom() throws Exception {
+		File springCloudSleuthPom = file("/projects/spring-cloud-sleuth/empty-folder");
+
+		BDDAssertions
+				.then(this.pomUpdater.shouldProjectBeUpdated(springCloudSleuthPom, this.versions)).isFalse();
+	}
+
+	@Test
 	public void should_not_update_the_pom_if_no_changes_were_made() throws Exception {
 		File originalPom = pom("/projects/project");
 		File pomInTemp = tmpFile("/project/pom.xml");

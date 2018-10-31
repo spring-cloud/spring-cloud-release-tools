@@ -68,6 +68,10 @@ class PomUpdater {
 			return false;
 		}
 		Model model = this.pomReader.readPom(rootPom);
+		if (model == null) {
+			log.info("Failed to read the model");
+			return false;
+		}
 		String artifactId =  artifactId(model);
 		if (!versions.shouldBeUpdated(artifactId)) {
 			log.info("Skipping project [{}] since it's not on the list of projects to update", model.getArtifactId());

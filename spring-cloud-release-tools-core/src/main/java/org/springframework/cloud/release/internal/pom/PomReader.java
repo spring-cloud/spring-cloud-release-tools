@@ -38,6 +38,9 @@ class PomReader {
 		if (file.isDirectory()) {
 			pom = new File(file,"pom.xml");
 		}
+		if (!pom.exists()) {
+			return null;
+		}
 		String fileText = "";
 		try(Reader reader = new FileReader(pom)) {
 			if (file.isFile()) {
