@@ -55,11 +55,19 @@ public class SpringReleaser {
 
 	public void release(Options options) {
 		ProjectsAndVersion projectsAndVersion = null;
-		// if meta release, first clone, then continue as usual
 		if (options.metaRelease) {
-			log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
-			this.properties.getGit().setFetchVersionsFromGit(false);
-			this.properties.getMetaRelease().setEnabled(options.metaRelease);
+			prepareForMetaRelease(options);
+		}
+		if (this.properties.isPostReleaseTasksOnly()) {
+			log.info("Skipping release process and moving only to post release");
+			this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
+			return;
+		}
+		performReleaseAndPostRelease(options, projectsAndVersion);
+	}
+
+	private void performReleaseAndPostRelease(Options options, ProjectsAndVersion projectsAndVersion) {
+		if (options.metaRelease) {
 			ReleaserProperties original = this.properties.copy();
 			log.debug("The following properties were found [{}]", original);
 			metaReleaseProjects(options)
@@ -71,6 +79,12 @@ public class SpringReleaser {
 			projectsAndVersion = processProject(options, projectFolder, TaskType.RELEASE);
 		}
 		this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
+	}
+
+	private void prepareForMetaRelease(Options options) {
+		log.info("Meta Release picked. Will iterate over all projects and perform release of each one");
+		this.properties.getGit().setFetchVersionsFromGit(false);
+		this.properties.getMetaRelease().setEnabled(options.metaRelease);
 	}
 
 	void processProjectForMetaRelease(ReleaserProperties copy, Options options, String project) {

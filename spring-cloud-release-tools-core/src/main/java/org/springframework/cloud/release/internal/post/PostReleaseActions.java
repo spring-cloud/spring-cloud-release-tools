@@ -3,6 +3,7 @@ package org.springframework.cloud.release.internal.post;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,8 @@ public class PostReleaseActions implements Closeable {
 		log.info("Updated all samples!");
 		List<String> exceptionMessages = projectAndExceptions.stream()
 				.filter(ProjectAndException::hasException)
-				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] has exception [" + e.ex + "]")
+				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] has exception [" + Arrays
+						.toString(e.ex.getStackTrace()) + "]")
 				.collect(Collectors.toList());
 		if (!exceptionMessages.isEmpty()) {
 			log.warn("Exceptions were found while updating samples");
@@ -110,7 +112,7 @@ public class PostReleaseActions implements Closeable {
 			Projects postRelease = projects
 					.postReleaseSnapshotVersion(this.properties.getMetaRelease().getProjectsToSkip());
 			log.info("Versions to update the samples with \n" + postRelease.stream()
-					.map(v -> "[" + v.projectName + ":" + v.version + "]")
+					.map(v -> "[" + v.projectName + " => " + v.version + "]")
 					.collect(Collectors.joining("\n")));
 			return value.stream()
 					.map(url -> run(key, url, () ->

@@ -87,6 +87,23 @@ public class SpringReleaserTests {
 		assertBuildCommand(this.aware2.properties);
 	}
 
+	@Test
+	public void should_only_call_post_release() {
+		SpringReleaser releaser = stubbedSpringReleaser();
+		this.properties.setPostReleaseTasksOnly(true);
+
+		releaser.release(new OptionsBuilder().metaRelease(false).options());
+
+		thenOnlyCallsPostRelease();
+	}
+
+	private void thenOnlyCallsPostRelease() {
+		BDDMockito.then(this.optionsProcessor).should().postReleaseOptions(
+				BDDMockito.any(Options.class), BDDMockito.any(Args.class));
+		BDDMockito.then(this.optionsProcessor).should(BDDMockito.never())
+				.processOptions(BDDMockito.any(Options.class), BDDMockito.any(Args.class));
+	}
+
 	private void assertBuildCommand(Queue<ReleaserProperties> properties) {
 		BDDAssertions.then(properties.poll().getMaven().getBuildCommand())
 				.isEqualTo("./scripts/noIntegration.sh");

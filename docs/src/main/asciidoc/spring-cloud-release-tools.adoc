@@ -288,6 +288,7 @@ Defaults to Sleuth and Contract samples.
 
 The following properties are used for both meta release and a release of an individual module.
 
+- `releaser.post-release-tasks-only` - If set to `true` will run only post release tasks. Defaults to `false`.
 - `releaser.meta-release.release-train-project-name` - Name of the project that represents the BOM of the release train. Defaults to `spring-cloud-release`.
 - `releaser.git.fetch-versions-from-git` - If `true` then should fill the map of versions from Git. If `false` then picks fixed versions.
 - `releaser.git.clone-destination-dir` - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory.

@@ -43,6 +43,11 @@ public class ReleaserProperties implements Serializable {
 	 */
 	private String workingDir;
 
+	/**
+	 * If set to {@code true} will run only post release tasks
+	 */
+	private boolean postReleaseTasksOnly = false;
+
 	private Git git = new Git();
 
 	private Pom pom = new Pom();
@@ -858,6 +863,14 @@ public class ReleaserProperties implements Serializable {
 
 	public void setTemplate(Template template) {
 		this.template = template;
+	}
+
+	public boolean isPostReleaseTasksOnly() {
+		return this.postReleaseTasksOnly;
+	}
+
+	public void setPostReleaseTasksOnly(boolean postReleaseTasksOnly) {
+		this.postReleaseTasksOnly = postReleaseTasksOnly;
 	}
 
 	@Override public String toString() {
