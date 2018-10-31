@@ -78,8 +78,8 @@ class ReleaserConfiguration {
 
 	@Bean
 	PostReleaseActions postReleaseActions(ProjectGitHandler handler, ProjectPomUpdater pomUpdater,
-			ProjectBuilder projectBuilder, ReleaserProperties releaserProperties) {
-		return new PostReleaseActions(handler, pomUpdater, projectBuilder, releaserProperties);
+			GradleUpdater gradleUpdater, ProjectBuilder projectBuilder, ReleaserProperties releaserProperties) {
+		return new PostReleaseActions(handler, pomUpdater, gradleUpdater, projectBuilder, releaserProperties);
 	}
 
 	@Bean

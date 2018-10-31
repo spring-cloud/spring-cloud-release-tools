@@ -2,9 +2,7 @@ package org.springframework.cloud.release.internal.post;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,11 +15,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.BDDMockito;
 
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
@@ -40,6 +40,7 @@ public class PostReleaseActionsTests {
 	public TemporaryFolder tmp = new TemporaryFolder();
 	File temporaryFolder;
 	TestPomReader testPomReader = new TestPomReader();
+	GradleUpdater gradleUpdater = BDDMockito.mock(GradleUpdater.class);
 	ReleaserProperties properties = new ReleaserProperties();
 	File cloned;
 	LinkedMultiValueMap<String, File> clonedTestProjects = new LinkedMultiValueMap<>();
@@ -77,22 +78,24 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
 		BDDAssertions.then(cloned).isNull();
+		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_update_test_is_called() {
 		this.properties.getGit().setRunUpdatedSamples(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
 		BDDAssertions.then(cloned).isNull();
+		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
@@ -101,7 +104,7 @@ public class PostReleaseActionsTests {
 		this.properties.getGit().setTestSamplesProjectUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setBuildCommand("touch build.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
@@ -110,13 +113,19 @@ public class PostReleaseActionsTests {
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(new File(cloned, "build.log")).exists();
+		thenGradleUpdaterWasCalled();
+	}
+
+	private void thenGradleUpdaterWasCalled() {
+		BDDMockito.then(gradleUpdater).should().updateProjectFromBom(BDDMockito.any(File.class),
+				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class), BDDMockito.eq(false));
 	}
 
 	@Test
 	public void should_do_nothing_when_is_not_meta_release_and_release_train_docs_generation_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -127,7 +136,7 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_release_train_docs_generation_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -140,7 +149,7 @@ public class PostReleaseActionsTests {
 		this.properties.getGit().setReleaseTrainDocsUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setGenerateReleaseTrainDocsCommand("touch generate.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -149,28 +158,31 @@ public class PostReleaseActionsTests {
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(new File(cloned, "generate.log")).exists();
+		thenGradleUpdaterWasCalled();
 	}
 
 	@Test
 	public void should_do_nothing_when_is_not_meta_release_and_test_samples_update_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.updateAllTestSamples(currentGa());
 
 		BDDAssertions.then(cloned).isNull();
+		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void should_do_nothing_when_the_switch_for_test_samples_update_check_is_off_and_test_samples_update_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.updateAllTestSamples(currentGa());
 
 		BDDAssertions.then(cloned).isNull();
+		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
@@ -181,7 +193,7 @@ public class PostReleaseActionsTests {
 				Collections.singletonList(tmpFile("spring-cloud-core-tests/")
 						.getAbsolutePath() + "/"));
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.builder, this.properties);
+				this.updater, gradleUpdater, this.builder, this.properties);
 
 		actions.updateAllTestSamples(currentGa());
 
@@ -198,6 +210,7 @@ public class PostReleaseActionsTests {
 		RevCommit commit = iterator.next();
 		BDDAssertions.then(commit.getShortMessage())
 				.isEqualTo("Updated versions after [Finchley.SR1] release train and [2.0.1.RELEASE] [spring-cloud-sleuth] project release");
+		thenGradleUpdaterWasCalled();
 	}
 
 	private String sleuthParentPomVersion() {

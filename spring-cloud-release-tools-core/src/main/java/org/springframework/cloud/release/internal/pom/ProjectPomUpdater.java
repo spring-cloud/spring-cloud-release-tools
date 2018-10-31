@@ -56,6 +56,11 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 		this.gitRepo = new ProjectGitHandler(properties);
 	}
 
+	ProjectPomUpdater(ReleaserProperties properties, ProjectGitHandler gitRepo) {
+		this.properties = properties;
+		this.gitRepo = gitRepo;
+	}
+
 	/**
 	 * For the given root folder (typically the working directory) retrieves list of versions
 	 * for a given release version.
@@ -109,6 +114,10 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	private void updatePoms(File projectRoot, Projects projects,
 			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
 		File rootPom = new File(projectRoot, "pom.xml");
+		if (!rootPom.exists()) {
+			log.info("No pom.xml present, skipping!");
+			return;
+		}
 		ModelWrapper rootPomModel = this.pomUpdater.readModel(rootPom);
 		processAllPoms(projectRoot, new PomWalker(rootPomModel, projects, this.pomUpdater,
 				this.properties, versionFromScRelease, assertSnapshots));

@@ -60,16 +60,16 @@ public class Releaser {
 		return this.projectPomUpdater.fixedVersions();
 	}
 
-	public void updateProjectFromScRelease(File project, Projects versions,
+	public void updateProjectFromBom(File project, Projects versions,
 			ProjectVersion versionFromScRelease) {
-		updateProjectFromScRelease(project, versions, versionFromScRelease, ASSERT_SNAPSHOTS);
+		updateProjectFromBom(project, versions, versionFromScRelease, ASSERT_SNAPSHOTS);
 	}
 
-	private void updateProjectFromScRelease(File project, Projects versions,
+	private void updateProjectFromBom(File project, Projects versions,
 			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
 		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
 				versionFromScRelease, assertSnapshots);
-		this.gradleUpdater.updateProjectFromSCRelease(project, versions,
+		this.gradleUpdater.updateProjectFromBom(project, versions,
 				versionFromScRelease, assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
@@ -105,7 +105,7 @@ public class Releaser {
 		log.info("Original project version is [{}]", originalVersion);
 		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
 			Projects newProjects = Projects.forRollback(projects, originalVersion);
-			updateProjectFromScRelease(project, newProjects, originalVersion, SKIP_SNAPSHOT_ASSERTION);
+			updateProjectFromBom(project, newProjects, originalVersion, SKIP_SNAPSHOT_ASSERTION);
 			this.projectGitHandler.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 		} else {

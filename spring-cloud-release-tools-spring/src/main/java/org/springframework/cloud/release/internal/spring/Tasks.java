@@ -15,7 +15,7 @@ class Tasks {
 	static Task UPDATING_POMS = task("updatePoms", "u",
 			"UPDATING POMS",
 			"Update poms with versions from Spring Cloud Release",
-			args -> args.releaser.updateProjectFromScRelease(args.project, args.projects, args.versionFromScRelease));
+			args -> args.releaser.updateProjectFromBom(args.project, args.projects, args.versionFromScRelease));
 	static Task BUILD_PROJECT = task("build", "b",
 			"BUILD PROJECT",
 			"Build the project",

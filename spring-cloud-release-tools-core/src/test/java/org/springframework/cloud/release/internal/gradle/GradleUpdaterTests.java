@@ -46,7 +46,7 @@ public class GradleUpdaterTests {
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0")
 		);
 
-		new GradleUpdater(properties).updateProjectFromSCRelease(projectRoot,
+		new GradleUpdater(properties).updateProjectFromBom(projectRoot,
 				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
 
 		then(asString(tmpFile("gradleproject/gradle.properties")))
@@ -69,7 +69,7 @@ public class GradleUpdaterTests {
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0")
 		);
 
-		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromSCRelease(projectRoot,
+		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromBom(projectRoot,
 				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true))
 		.hasMessageContaining("contains a SNAPSHOT version for a non snapshot release in line number");
 	}

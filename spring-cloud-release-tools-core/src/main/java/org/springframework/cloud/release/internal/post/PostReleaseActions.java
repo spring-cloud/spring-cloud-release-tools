@@ -3,7 +3,6 @@ package org.springframework.cloud.release.internal.post;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
@@ -35,14 +35,16 @@ public class PostReleaseActions implements Closeable {
 
 	private final ProjectGitHandler projectGitHandler;
 	private final ProjectPomUpdater projectPomUpdater;
+	private final GradleUpdater gradleUpdater;
 	private final ProjectBuilder projectBuilder;
 	private final ReleaserProperties properties;
 
 	public PostReleaseActions(ProjectGitHandler projectGitHandler,
-			ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
+			ProjectPomUpdater projectPomUpdater, GradleUpdater gradleUpdater, ProjectBuilder projectBuilder,
 			ReleaserProperties properties) {
 		this.projectGitHandler = projectGitHandler;
 		this.projectPomUpdater = projectPomUpdater;
+		this.gradleUpdater = gradleUpdater;
 		this.projectBuilder = projectBuilder;
 		this.properties = properties;
 	}
@@ -63,8 +65,7 @@ public class PostReleaseActions implements Closeable {
 		ProjectVersion projectVersion = new ProjectVersion(file);
 		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
-		this.projectPomUpdater
-				.updateProjectFromReleaseTrain(file, newProjects, projectVersion, false);
+		updateWithVersions(file, newProjects);
 		this.projectBuilder.build(projectVersion, file.getAbsolutePath());
 	}
 
@@ -134,14 +135,20 @@ public class PostReleaseActions implements Closeable {
 				.cloneAndGuessBranch(url, releaseTrainVersion, projectVersion);
 		Projects newPostRelease = new Projects(postRelease);
 		newPostRelease.add(new ProjectVersion(file));
-		this.projectPomUpdater
-				.updateProjectFromReleaseTrain(file, newPostRelease,
-						new ProjectVersion(file), false);
+		updateWithVersions(file, newPostRelease);
 		this.projectGitHandler
 				.commit(file, "Updated versions after [" + releaseTrainVersion + "] "
 						+ "release train and [" + projectVersionForReleaseTrain.version + "] ["
 						+ key + "] project release");
 		this.projectGitHandler.pushCurrentBranch(file);
+	}
+
+	private void updateWithVersions(File file, Projects newPostRelease) {
+		this.projectPomUpdater
+				.updateProjectFromReleaseTrain(file, newPostRelease,
+						new ProjectVersion(file), false);
+		this.gradleUpdater.updateProjectFromBom(file, newPostRelease,
+				new ProjectVersion(file), false);
 	}
 
 	private ProjectAndFuture run(String key, String url, Runnable runnable) {
@@ -185,8 +192,7 @@ public class PostReleaseActions implements Closeable {
 		ProjectVersion projectVersion = new ProjectVersion(file);
 		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
-		this.projectPomUpdater
-				.updateProjectFromReleaseTrain(file, newProjects, projectVersion, false);
+		updateWithVersions(file, newProjects);
 		this.projectBuilder.generateReleaseTrainDocs(releaseTrainVersion, file.getAbsolutePath());
 	}
 

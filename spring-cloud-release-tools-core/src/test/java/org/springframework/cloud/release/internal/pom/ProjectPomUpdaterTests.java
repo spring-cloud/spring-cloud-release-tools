@@ -1,11 +1,15 @@
 package org.springframework.cloud.release.internal.pom;
 
+import java.io.File;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
+import org.mockito.BDDMockito;
+
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 
 import static org.junit.Assert.*;
 
@@ -53,5 +57,16 @@ public class ProjectPomUpdaterTests {
 				.containsEntry("spring-cloud-dependencies", "2.0.3.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud-release", "Finchley.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud", "Finchley.BUILD-SNAPSHOT");
+	}
+
+	@Test public void should_skip_any_steps_if_there_is_no_pom_xml() {
+		ReleaserProperties properties = new ReleaserProperties();
+		ProjectGitHandler handler = BDDMockito.mock(ProjectGitHandler.class);
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, handler);
+
+		updater.updateProjectFromReleaseTrain(
+				new File("target"), new Projects(), new ProjectVersion("foo", "1.0.0.RELEASE"), false);
+
+		BDDMockito.then(handler).shouldHaveZeroInteractions();
 	}
 }

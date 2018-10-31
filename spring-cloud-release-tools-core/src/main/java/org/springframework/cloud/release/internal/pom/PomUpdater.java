@@ -64,6 +64,9 @@ class PomUpdater {
 	 */
 	boolean shouldProjectBeUpdated(File rootFolder, Versions versions) {
 		File rootPom = rootPom(rootFolder);
+		if (!rootPom.exists()) {
+			return false;
+		}
 		Model model = this.pomReader.readPom(rootPom);
 		String artifactId =  artifactId(model);
 		if (!versions.shouldBeUpdated(artifactId)) {

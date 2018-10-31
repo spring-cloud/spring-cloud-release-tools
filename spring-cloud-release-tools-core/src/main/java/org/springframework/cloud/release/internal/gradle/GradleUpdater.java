@@ -36,17 +36,17 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 
 	/**
 	 * For the given root folder (typically the working directory) performs the whole
-	 * flow of updating {@code gradle.properties} with values from Spring Cloud Release project.
+	 * flow of updating {@code gradle.properties} with values from BOM project.
 	 * Remember to pass the mapping from a property name inside {@code gradle.properties} to
 	 * the project name via {@link ReleaserProperties.Gradle#gradlePropsSubstitution}
 	 * @param projectRoot - root folder with project to update
 	 * @param projects - versions of projects used to update poms
-	 * @param versionFromScRelease - version for the project from Spring Cloud Release
+	 * @param versionFromBom - version for the project from Spring Cloud Release
 	 * @param assertSnapshots - should snapshots presence be asserted
 	 */
-	public void updateProjectFromSCRelease(File projectRoot, Projects projects,
-			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
-		processAllGradleProps(projectRoot, projects, versionFromScRelease, assertSnapshots);
+	public void updateProjectFromBom(File projectRoot, Projects projects,
+			ProjectVersion versionFromBom, boolean assertSnapshots) {
+		processAllGradleProps(projectRoot, projects, versionFromBom, assertSnapshots);
 	}
 
 	private void processAllGradleProps(File projectRoot, Projects projects,
