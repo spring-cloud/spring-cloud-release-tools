@@ -486,7 +486,6 @@ public class ReleaserProperties implements Serializable {
 					", releaseTrainWikiPagePrefix=" + this.releaseTrainWikiPagePrefix +
 					", cloneDestinationDir='" + this.cloneDestinationDir + '\'' +
 					", fetchVersionsFromGit=" + this.fetchVersionsFromGit +
-					", oauthToken='" + this.oauthToken + '\'' +
 					", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones +
 					", updateSpringGuides=" + this.updateSpringGuides +
 					", updateSpringProject=" + this.updateSpringProject +

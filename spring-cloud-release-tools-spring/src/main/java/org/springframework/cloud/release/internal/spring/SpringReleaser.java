@@ -61,7 +61,7 @@ public class SpringReleaser {
 			this.properties.getGit().setFetchVersionsFromGit(false);
 			this.properties.getMetaRelease().setEnabled(options.metaRelease);
 			ReleaserProperties original = this.properties.copy();
-			log.info("The following properties were found [{}]", original);
+			log.debug("The following properties were found [{}]", original);
 			metaReleaseProjects(options)
 					.forEach(project ->
 							processProjectForMetaRelease(original.copy(), options, project));
