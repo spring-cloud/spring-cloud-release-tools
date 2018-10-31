@@ -367,6 +367,9 @@ Defaults to Sleuth and Contract samples.</simpara>
 <simpara>The following properties are used for both meta release and a release of an individual module.</simpara>
 <itemizedlist>
 <listitem>
+<simpara><literal>releaser.post-release-tasks-only</literal> - If set to <literal>true</literal> will run only post release tasks. Defaults to <literal>false</literal>.</simpara>
+</listitem>
+<listitem>
 <simpara><literal>releaser.meta-release.release-train-project-name</literal> - Name of the project that represents the BOM of the release train. Defaults to <literal>spring-cloud-release</literal>.</simpara>
 </listitem>
 <listitem>
