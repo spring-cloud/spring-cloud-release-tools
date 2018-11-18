@@ -60,6 +60,10 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 		File releaseTrainProject = this.handler.cloneSpringDocProject();
 		File index = new File(releaseTrainProject, "index.html");
 		ReleaseTrainContents contents = this.parser.parseProjectPage(index);
+		if (contents == null) {
+			log.warn("There are no markers for the index.html page - I don't really know what to do, so I'll back away");
+			return null;
+		}
 		String newContents = this.generator.releaseTrainContents(contents, projects);
 		if (StringUtils.isEmpty(newContents)) {
 			log.info("No changes to commit to the Spring Project page.");
