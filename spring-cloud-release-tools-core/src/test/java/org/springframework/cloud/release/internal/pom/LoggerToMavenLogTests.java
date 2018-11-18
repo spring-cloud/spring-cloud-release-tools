@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
-import org.springframework.cloud.release.internal.pom.LoggerToMavenLog;
 
 import static org.mockito.BDDMockito.then;
 
@@ -39,7 +38,7 @@ public class LoggerToMavenLogTests {
 	}
 
 	@Test public void debug2() throws Exception {
-		this.loggerToMavenLog.debug(exception);
+		this.loggerToMavenLog.debug(this.exception);
 
 		then(this.logger).should().debug("Exception occurred", this.exception);
 	}
@@ -63,7 +62,7 @@ public class LoggerToMavenLogTests {
 	}
 
 	@Test public void info2() throws Exception {
-		this.loggerToMavenLog.info(exception);
+		this.loggerToMavenLog.info(this.exception);
 
 		then(this.logger).should().info("Exception occurred", this.exception);
 	}
@@ -87,7 +86,7 @@ public class LoggerToMavenLogTests {
 	}
 
 	@Test public void warn2() throws Exception {
-		this.loggerToMavenLog.warn(exception);
+		this.loggerToMavenLog.warn(this.exception);
 
 		then(this.logger).should().warn("Exception occurred", this.exception);
 	}
@@ -111,7 +110,7 @@ public class LoggerToMavenLogTests {
 	}
 
 	@Test public void error2() throws Exception {
-		this.loggerToMavenLog.error(exception);
+		this.loggerToMavenLog.error(this.exception);
 
 		then(this.logger).should().error("Exception occurred", this.exception);
 	}

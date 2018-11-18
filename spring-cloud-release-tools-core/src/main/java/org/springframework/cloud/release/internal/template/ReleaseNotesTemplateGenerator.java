@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.jknack.handlebars.Template;
 import com.google.common.collect.ImmutableMap;
@@ -29,8 +28,6 @@ class ReleaseNotesTemplateGenerator {
 	private final Projects projects;
 	private final NotesGenerator notesGenerator;
 
-	static final Map<String, File> CACHE = new ConcurrentHashMap<>();
-
 	ReleaseNotesTemplateGenerator(Template template, String releaseVersion,
 			File blogOutput, Projects projects, ProjectGitHandler handler) {
 		this.template = template;
@@ -41,12 +38,6 @@ class ReleaseNotesTemplateGenerator {
 	}
 
 	File releaseNotes() {
-		File cached = CACHE.get(this.releaseVersion);
-		if (cached != null && fileSize(cached) > 0) {
-			log.info("Found an existing entry [{}] in the cache "
-					+ "for version [{}] with size [{}]", cached, this.releaseVersion, fileSize(cached));
-			return cached;
-		}
 		try {
 			Map<String, Object> map = ImmutableMap.<String, Object>builder()
 					.put("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
@@ -55,9 +46,7 @@ class ReleaseNotesTemplateGenerator {
 					.build();
 			String blog = this.template.apply(map);
 			Files.write(this.blogOutput.toPath(), blog.getBytes());
-			File output = this.blogOutput;
-			CACHE.put(this.releaseVersion, output);
-			return output;
+			return this.blogOutput;
 		}
 		catch (IOException e) {
 			log.warn("Exception occurred while trying to generate release notes", e);

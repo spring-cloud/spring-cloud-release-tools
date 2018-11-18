@@ -45,15 +45,15 @@ class Notes {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public String getVersion() {
-		return version;
+		return this.version;
 	}
 
 	public String getClosedMilestoneUrl() {
-		return closedMilestoneUrl;
+		return this.closedMilestoneUrl;
 	}
 
 	@Override public boolean equals(Object o) {
@@ -62,16 +62,16 @@ class Notes {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		Notes notes = (Notes) o;
-		if (name != null ? !name.equals(notes.name) : notes.name != null)
+		if (this.name != null ? !this.name.equals(notes.name) : notes.name != null)
 			return false;
-		return version != null ?
-				version.equals(notes.version) :
+		return this.version != null ?
+				this.version.equals(notes.version) :
 				notes.version == null;
 	}
 
 	@Override public int hashCode() {
-		int result = name != null ? name.hashCode() : 0;
-		result = 31 * result + (version != null ? version.hashCode() : 0);
+		int result = this.name != null ? this.name.hashCode() : 0;
+		result = 31 * result + (this.version != null ? this.version.hashCode() : 0);
 		return result;
 	}
 }

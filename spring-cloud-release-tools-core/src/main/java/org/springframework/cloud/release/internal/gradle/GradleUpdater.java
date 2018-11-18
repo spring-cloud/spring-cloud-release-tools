@@ -141,7 +141,7 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return assertSnapshots &&
+			return this.assertSnapshots &&
 					this.properties.getGradle().getIgnoredGradleRegex().stream().anyMatch(path::matches);
 		}
 

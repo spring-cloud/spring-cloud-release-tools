@@ -237,6 +237,6 @@ class ProjectAndException {
 	}
 
 	boolean hasException() {
-		return ex != null;
+		return this.ex != null;
 	}
 }

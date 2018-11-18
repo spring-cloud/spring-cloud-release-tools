@@ -50,10 +50,10 @@ class Task {
 			if (interactive) {
 				boolean skipStep = stepSkipper.skipStep();
 				if (!skipStep) {
-					consumer.accept(args);
+					this.consumer.accept(args);
 				}
 			} else {
-				consumer.accept(args);
+				this.consumer.accept(args);
 			}
 		} catch (Exception e) {
 			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for task <" +
@@ -63,6 +63,6 @@ class Task {
 	}
 
 	private void printLog(boolean interactive) {
-			log.info("\n\n\n=== {} ===\n\n{} {}\n\n", header, description, interactive ? MSG : "");
+			log.info("\n\n\n=== {} ===\n\n{} {}\n\n", this.header, this.description, interactive ? MSG : "");
 	}
 }

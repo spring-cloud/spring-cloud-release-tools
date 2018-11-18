@@ -38,7 +38,7 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is used
 	 */
 	File updateDocsRepo(ProjectVersion currentProject, String springCloudReleaseBranch) {
-		if (!properties.getGit().isUpdateDocumentationRepo()) {
+		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
 			log.info("Will not update documentation repository, since the switch to do so "
 					+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
 			return null;

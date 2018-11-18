@@ -40,7 +40,7 @@ public class TemplateGeneratorTests {
 		this.props.getPom().setBranch("vDalston.RELEASE");
 
 		File generatedMail = new TemplateGenerator(this.props, new File("target/foo/bar/baz/template.txt"),
-				handler).email(new Projects());
+				this.handler).email(new Projects());
 
 		then(generatedMail).hasContent(expectedEmail());
 	}

@@ -41,7 +41,7 @@ public class ProjectDocumentationUpdaterTests {
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects"), this.tmpFolder);
 		this.properties.getGit().setDocumentationUrl(file("/projects/spring-cloud-static/").toURI().toString());
-		this.handler = new ProjectGitHandler(properties);
+		this.handler = new ProjectGitHandler(this.properties);
 		this.clonedDocProject = this.handler.cloneDocumentationProject();
 	}
 

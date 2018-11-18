@@ -272,7 +272,7 @@ public class GitRepoTests {
 
 	@Test
 	public void should_not_revert_changes_when_commit_message_is_not_related_to_updating_snapshots() throws Exception {
-		File project = new GitRepo(tmpFolder)
+		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 
 		BDDAssertions.thenThrownBy(

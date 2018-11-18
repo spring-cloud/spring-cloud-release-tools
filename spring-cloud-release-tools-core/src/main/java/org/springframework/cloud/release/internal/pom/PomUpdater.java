@@ -381,7 +381,7 @@ class PropertyStorer {
 	void setPropertyVersionIfApplicable(Project project) {
 		String propertyName = propertyName(project);
 		if (setPropertyVersion(propertyName, project.version)) {
-			log.info("Updating property [" + propertyName + "] to version [" + project.version + "]");
+			this.log.info("Updating property [" + propertyName + "] to version [" + project.version + "]");
 		}
 	}
 

@@ -427,7 +427,7 @@ public class ReleaserProperties implements Serializable {
 		}
 
 		public String getReleaseTrainDocsUrl() {
-			return releaseTrainDocsUrl;
+			return this.releaseTrainDocsUrl;
 		}
 
 		public void setReleaseTrainDocsUrl(String releaseTrainDocsUrl) {
@@ -435,7 +435,7 @@ public class ReleaserProperties implements Serializable {
 		}
 
 		public String getReleaseTrainDocsBranch() {
-			return releaseTrainDocsBranch;
+			return this.releaseTrainDocsBranch;
 		}
 
 		public void setReleaseTrainDocsBranch(String releaseTrainDocsBranch) {
@@ -443,7 +443,7 @@ public class ReleaserProperties implements Serializable {
 		}
 
 		public boolean isUpdateReleaseTrainDocs() {
-			return updateReleaseTrainDocs;
+			return this.updateReleaseTrainDocs;
 		}
 
 		public void setUpdateReleaseTrainDocs(boolean updateReleaseTrainDocs) {
@@ -646,7 +646,7 @@ public class ReleaserProperties implements Serializable {
 		}
 
 		public String getDeployCommand() {
-			return deployCommand;
+			return this.deployCommand;
 		}
 
 		public void setDeployCommand(String deployCommand) {

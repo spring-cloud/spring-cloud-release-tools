@@ -29,11 +29,11 @@ public class OptionsProcessorTests {
 	FirstConsumer first = new FirstConsumer();
 	SecondConsumer second = new SecondConsumer();
 	ThirdConsumer third = new ThirdConsumer();
-	Task firstTask = task("first", "1", "", "", first);
+	Task firstTask = task("first", "1", "", "", this.first);
 	List<Task> tasks = Arrays.asList(new Task[] {
-			firstTask,
-			task("second", "2", "", "", second),
-			task("third", "3", "", "", third)
+			this.firstTask,
+			task("second", "2", "", "", this.second),
+			task("third", "3", "", "", this.third)
 	});
 
 	OptionsProcessor optionsProcessor;
@@ -214,7 +214,7 @@ public class OptionsProcessorTests {
 	public void should_execute_full_release() throws Exception {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override Task releaseTask() {
-				return firstTask;
+				return OptionsProcessorTests.this.firstTask;
 			}
 
 			@Override String chosenOption() {
@@ -234,7 +234,7 @@ public class OptionsProcessorTests {
 	public void should_execute_full_verbose_release() throws Exception {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override Task releaseVerboseTask() {
-				return firstTask;
+				return OptionsProcessorTests.this.firstTask;
 			}
 
 			@Override String chosenOption() {

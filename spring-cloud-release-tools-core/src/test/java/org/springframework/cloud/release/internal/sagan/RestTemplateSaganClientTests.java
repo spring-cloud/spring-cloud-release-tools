@@ -35,7 +35,7 @@ public class RestTemplateSaganClientTests {
 	public void setup() {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setOauthToken("foo");
-		properties.getSagan().setBaseUrl("http://localhost:" + saganPort);
+		properties.getSagan().setBaseUrl("http://localhost:" + this.saganPort);
 		this.client = saganClient(properties);
 	}
 

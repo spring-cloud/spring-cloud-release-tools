@@ -22,10 +22,10 @@ public class Project {
 	public Boolean aggregator;
 
 	@Override public String toString() {
-		return "Project{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", repoUrl='"
-				+ repoUrl + '\'' + ", siteUrl='" + siteUrl + '\'' + ", category='"
-				+ category + '\'' + ", stackOverflowTags='" + stackOverflowTags + '\''
-				+ ", projectReleases=" + projectReleases + ", stackOverflowTagList="
-				+ stackOverflowTagList + ", aggregator=" + aggregator + '}';
+		return "Project{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", repoUrl='"
+				+ this.repoUrl + '\'' + ", siteUrl='" + this.siteUrl + '\'' + ", category='"
+				+ this.category + '\'' + ", stackOverflowTags='" + this.stackOverflowTags + '\''
+				+ ", projectReleases=" + this.projectReleases + ", stackOverflowTagList="
+				+ this.stackOverflowTagList + ", aggregator=" + this.aggregator + '}';
 	}
 }

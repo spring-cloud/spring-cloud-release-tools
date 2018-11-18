@@ -63,7 +63,7 @@ public class SpringCloudGhPagesParserTests {
 				.parseProjectPage(this.wrongHtml);
 
 		BDDAssertions.then(contents).isNull();
-		BDDAssertions.then(capture.toString())
+		BDDAssertions.then(this.capture.toString())
 				.contains("The page is missing the components table markers");
 	}
 }

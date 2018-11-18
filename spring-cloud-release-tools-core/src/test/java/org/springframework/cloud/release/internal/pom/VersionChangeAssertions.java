@@ -40,7 +40,7 @@ class VersionChangeAssert extends
 
 	VersionChangeAssert newParentVersionIsEqualTo(String groupId, String artifactId, String newVersion) {
 		boolean matches = false;
-		for (VersionChange change : actual.changes) {
+		for (VersionChange change : this.actual.changes) {
 			if (newVersion.equals(change.getNewVersion())
 					&& groupId.equals(change.getGroupId())
 					&& artifactId.equals(change.getArtifactId())) {

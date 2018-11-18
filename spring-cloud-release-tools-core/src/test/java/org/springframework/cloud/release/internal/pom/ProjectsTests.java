@@ -26,7 +26,7 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("spring-cloud-starter-build", "1.0.0"));
 		Projects projects = new Projects(projectVersions);
 
-		then(projects.forFile(springCloudReleasePom).version).isEqualTo("1.0.0");
+		then(projects.forFile(this.springCloudReleasePom).version).isEqualTo("1.0.0");
 	}
 
 	@Test
@@ -148,7 +148,7 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
 		Projects projects = new Projects(projectVersions);
 
-		thenThrownBy(() -> projects.forFile(springCloudReleasePom))
+		thenThrownBy(() -> projects.forFile(this.springCloudReleasePom))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Project with name [spring-cloud-starter-build] is not present");
 	}

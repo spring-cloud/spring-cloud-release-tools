@@ -47,20 +47,20 @@ public class PostReleaseActionsTests {
 	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties) {
 		@Override
 		public File cloneTestSamplesProject() {
-			cloned = super.cloneTestSamplesProject();
-			return cloned;
+			PostReleaseActionsTests.this.cloned = super.cloneTestSamplesProject();
+			return PostReleaseActionsTests.this.cloned;
 		}
 
 		@Override
 		public File cloneReleaseTrainDocumentationProject() {
-			cloned = super.cloneTestSamplesProject();
-			return cloned;
+			PostReleaseActionsTests.this.cloned = super.cloneTestSamplesProject();
+			return PostReleaseActionsTests.this.cloned;
 		}
 
 		@Override
 		public File cloneAndGuessBranch(String url, String... versions) {
 			File file = super.cloneAndGuessBranch(url, versions);
-			clonedTestProjects.add(url, file);
+			PostReleaseActionsTests.this.clonedTestProjects.add(url, file);
 			return file;
 		}
 	};
@@ -78,24 +78,24 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
-		BDDAssertions.then(cloned).isNull();
-		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
+		BDDAssertions.then(this.cloned).isNull();
+		BDDMockito.then(this.gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_update_test_is_called() {
 		this.properties.getGit().setRunUpdatedSamples(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
-		BDDAssertions.then(cloned).isNull();
-		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
+		BDDAssertions.then(this.cloned).isNull();
+		BDDMockito.then(this.gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
@@ -104,20 +104,20 @@ public class PostReleaseActionsTests {
 		this.properties.getGit().setTestSamplesProjectUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setBuildCommand("touch build.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.runUpdatedTests(currentGa());
 
-		Model rootPom = this.testPomReader.readPom(new File(cloned, "pom.xml"));
+		Model rootPom = this.testPomReader.readPom(new File(this.cloned, "pom.xml"));
 		BDDAssertions.then(rootPom.getVersion()).isEqualTo("Finchley.SR1");
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
-		BDDAssertions.then(new File(cloned, "build.log")).exists();
+		BDDAssertions.then(new File(this.cloned, "build.log")).exists();
 		thenGradleUpdaterWasCalled();
 	}
 
 	private void thenGradleUpdaterWasCalled() {
-		BDDMockito.then(gradleUpdater).should().updateProjectFromBom(BDDMockito.any(File.class),
+		BDDMockito.then(this.gradleUpdater).should().updateProjectFromBom(BDDMockito.any(File.class),
 				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class), BDDMockito.eq(false));
 	}
 
@@ -125,22 +125,22 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_release_train_docs_generation_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
-		BDDAssertions.then(cloned).isNull();
+		BDDAssertions.then(this.cloned).isNull();
 	}
 
 	@Test
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_release_train_docs_generation_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
-		BDDAssertions.then(cloned).isNull();
+		BDDAssertions.then(this.cloned).isNull();
 	}
 
 	@Test
@@ -149,15 +149,15 @@ public class PostReleaseActionsTests {
 		this.properties.getGit().setReleaseTrainDocsUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setGenerateReleaseTrainDocsCommand("touch generate.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
-		Model rootPom = this.testPomReader.readPom(new File(cloned, "pom.xml"));
+		Model rootPom = this.testPomReader.readPom(new File(this.cloned, "pom.xml"));
 		BDDAssertions.then(rootPom.getVersion()).isEqualTo("Finchley.SR1");
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
-		BDDAssertions.then(new File(cloned, "generate.log")).exists();
+		BDDAssertions.then(new File(this.cloned, "generate.log")).exists();
 		thenGradleUpdaterWasCalled();
 	}
 
@@ -165,24 +165,24 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_test_samples_update_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.updateAllTestSamples(currentGa());
 
-		BDDAssertions.then(cloned).isNull();
-		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
+		BDDAssertions.then(this.cloned).isNull();
+		BDDMockito.then(this.gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void should_do_nothing_when_the_switch_for_test_samples_update_check_is_off_and_test_samples_update_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.updateAllTestSamples(currentGa());
 
-		BDDAssertions.then(cloned).isNull();
-		BDDMockito.then(gradleUpdater).shouldHaveZeroInteractions();
+		BDDAssertions.then(this.cloned).isNull();
+		BDDMockito.then(this.gradleUpdater).shouldHaveZeroInteractions();
 	}
 
 	@Test
@@ -193,11 +193,11 @@ public class PostReleaseActionsTests {
 				Collections.singletonList(tmpFile("spring-cloud-core-tests/")
 						.getAbsolutePath() + "/"));
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties);
 
 		actions.updateAllTestSamples(currentGa());
 
-		Map.Entry<String, List<File>> entry = clonedTestProjects.entrySet()
+		Map.Entry<String, List<File>> entry = this.clonedTestProjects.entrySet()
 				.stream()
 				.filter(s -> s.getKey().contains("spring-cloud-core-tests"))
 				.findFirst().orElseThrow(() -> new IllegalStateException("Not found"));
@@ -214,7 +214,7 @@ public class PostReleaseActionsTests {
 	}
 
 	private String sleuthParentPomVersion() {
-		return this.testPomReader.readPom(new File(cloned, "sleuth/pom.xml"))
+		return this.testPomReader.readPom(new File(this.cloned, "sleuth/pom.xml"))
 				.getParent().getVersion();
 	}
 

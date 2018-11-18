@@ -2,13 +2,12 @@ package org.springframework.cloud.release.internal.sagan;
 
 import java.util.stream.Collectors;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * @author Marcin Grzejszczak
@@ -26,7 +25,7 @@ public class SaganUpdater {
 	}
 
 	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
-		if (!releaserProperties.getSagan().isUpdateSagan()) {
+		if (!this.releaserProperties.getSagan().isUpdateSagan()) {
 			log.info("Will not update sagan, since the switch to do so "
 					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
 			return;

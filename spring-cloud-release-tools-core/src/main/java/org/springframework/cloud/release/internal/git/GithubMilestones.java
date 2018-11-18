@@ -1,21 +1,20 @@
 package org.springframework.cloud.release.internal.git;
 
-import com.jcabi.github.Coordinates;
-import com.jcabi.github.Github;
-import com.jcabi.github.Milestone;
-import com.jcabi.github.RtGithub;
-import com.jcabi.http.wire.RetryWire;
-
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.jcabi.github.Coordinates;
+import com.jcabi.github.Github;
+import com.jcabi.github.Milestone;
+import com.jcabi.github.RtGithub;
+import com.jcabi.http.wire.RetryWire;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.util.Assert;
@@ -30,7 +29,8 @@ class GithubMilestones {
 
 	private final Github github;
 	private final ReleaserProperties properties;
-	static final Map<ProjectVersion, String> CACHE = new ConcurrentHashMap<>();
+	static final Map<ProjectVersion, String> MILESTONE_URL_CACHE = new ConcurrentHashMap<>();
+	static final Map<ProjectVersion, Milestone.Smart> MILESTONE_CACHE = new ConcurrentHashMap<>();
 
 	GithubMilestones(ReleaserProperties properties) {
 		this.github = new RtGithub(new RtGithub(
@@ -49,8 +49,14 @@ class GithubMilestones {
 						+ "either via the command line [--releaser.git.oauth-token=...] "
 						+ "or put it as an env variable in [~/.bashrc] or "
 						+ "[~/.zshrc] e.g. [export RELEASER_GIT_OAUTH_TOKEN=...]");
+		Milestone.Smart foundMilestone = MILESTONE_CACHE.get(version);
 		String tagVersion = version.version;
-		Milestone.Smart foundMilestone = matchingMilestone(tagVersion, openMilestones(version));
+		if (foundMilestone == null) {
+			foundMilestone = matchingMilestone(tagVersion, openMilestones(version));
+			if (foundMilestone != null) {
+				MILESTONE_CACHE.put(version, foundMilestone);
+			}
+		}
 		if (foundMilestone != null) {
 			try {
 				log.info("Found a matching milestone - closing it");
@@ -94,7 +100,7 @@ class GithubMilestones {
 	}
 
 	String milestoneUrl(ProjectVersion version) {
-		String cachedUrl = CACHE.get(version);
+		String cachedUrl = MILESTONE_URL_CACHE.get(version);
 		if (StringUtils.hasText(cachedUrl)) {
 			return cachedUrl;
 		}
@@ -118,7 +124,7 @@ class GithubMilestones {
 				log.error("Exception occurred while trying to find milestone", e);
 			}
 		}
-		CACHE.put(version, foundUrl);
+		MILESTONE_URL_CACHE.put(version, foundUrl);
 		return foundUrl;
 	}
 

@@ -35,7 +35,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	};
 	TemplateGenerator templateGenerator = new TemplateGenerator(this.properties, this.projectGitHandler);
 	ReleaseTrainContentsUpdater updater = new ReleaseTrainContentsUpdater(this.properties,
-			this.projectGitHandler, templateGenerator);
+			this.projectGitHandler, this.templateGenerator);
 	File springCloudRepo;
 	File wikiRepo;
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();

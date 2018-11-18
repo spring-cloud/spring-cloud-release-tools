@@ -1,18 +1,19 @@
 package org.springframework.cloud.release.internal.git;
 
-import com.jcabi.github.Milestone;
-import com.jcabi.github.Repo;
-import com.jcabi.github.mock.MkGithub;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import javax.json.Json;
 
+import com.jcabi.github.Milestone;
+import com.jcabi.github.Repo;
+import com.jcabi.github.mock.MkGithub;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
@@ -40,7 +41,7 @@ public class GithubMilestonesTests {
 	public void should_close_milestone_if_there_is_one() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -48,7 +49,7 @@ public class GithubMilestonesTests {
 				return "0.2.0.BUILD-SNAPSHOT";
 			}
 		};
-		repo.milestones().create("0.2.0.BUILD-SNAPSHOT");
+		this.repo.milestones().create("0.2.0.BUILD-SNAPSHOT");
 
 		milestones.closeMilestone(nonGaSleuthProject());
 
@@ -59,7 +60,7 @@ public class GithubMilestonesTests {
 	public void should_close_milestone_when_the_milestone_contains_numeric_version_only_and_version_is_ga() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -67,7 +68,7 @@ public class GithubMilestonesTests {
 				return "0.2.0";
 			}
 		};
-		repo.milestones().create("0.2.0");
+		this.repo.milestones().create("0.2.0");
 
 		milestones.closeMilestone(gaSleuthProject());
 
@@ -82,7 +83,7 @@ public class GithubMilestonesTests {
 	public void should_not_close_milestone_when_the_milestone_contains_numeric_version_only() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -90,7 +91,7 @@ public class GithubMilestonesTests {
 				return "0.2.0";
 			}
 		};
-		repo.milestones().create("0.2.0");
+		this.repo.milestones().create("0.2.0");
 
 		milestones.closeMilestone(nonGaSleuthProject());
 
@@ -101,7 +102,7 @@ public class GithubMilestonesTests {
 	public void should_fetch_url_of_a_closed_matching_milestone() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -114,7 +115,7 @@ public class GithubMilestonesTests {
 				return new URL("https://api.github.com/repos/spring-cloud/spring-cloud-sleuth/milestones/33");
 			}
 		};
-		repo.milestones().create("0.2.0.RELEASE");
+		this.repo.milestones().create("0.2.0.RELEASE");
 
 		String url = milestones.milestoneUrl(gaSleuthProject());
 
@@ -124,7 +125,7 @@ public class GithubMilestonesTests {
 	@Test
 	public void should_fetch_url_of_a_closed_matching_milestone_from_cache() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
-		GithubMilestones.CACHE.put(gaSleuthProject(), "https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
+		GithubMilestones.MILESTONE_URL_CACHE.put(gaSleuthProject(), "https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
 
 		String url = milestones.milestoneUrl(gaSleuthProject());
 
@@ -135,7 +136,7 @@ public class GithubMilestonesTests {
 	public void should_return_null_if_no_matching_milestone_was_found() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -158,7 +159,7 @@ public class GithubMilestonesTests {
 	public void should_return_null_if_no_matching_milestone_was_found_within_threshold() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withThreshold()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -166,7 +167,7 @@ public class GithubMilestonesTests {
 				return "0.2.0";
 			}
 		};
-		repo.milestones().create("0.2.0");
+		this.repo.milestones().create("0.2.0");
 
 		milestones.closeMilestone(gaSleuthProject());
 
@@ -181,7 +182,7 @@ public class GithubMilestonesTests {
 	public void should_throw_exception_when_there_is_no_matching_milestone() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -189,7 +190,7 @@ public class GithubMilestonesTests {
 				return "0.1.0.BUILD-SNAPSHOT";
 			}
 		};
-		repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
+		this.repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
 		milestones.closeMilestone(nonGaSleuthProject());
 		then(this.capture.toString()).contains("No matching milestone was found");
@@ -199,7 +200,7 @@ public class GithubMilestonesTests {
 	public void should_print_that_no_milestones_were_found_when_io_problems_occurred() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
-				return repo.coordinates().user();
+				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
 			@Override String milestoneTitle(Milestone.Smart milestone)
@@ -207,7 +208,7 @@ public class GithubMilestonesTests {
 				throw new IOException("foo");
 			}
 		};
-		repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
+		this.repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
 		milestones.closeMilestone(nonGaSleuthProject());
 

@@ -14,7 +14,7 @@ public class Repository {
 	public Boolean snapshotsEnabled;
 
 	@Override public String toString() {
-		return "Repository{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", url='"
-				+ url + '\'' + ", snapshotsEnabled=" + snapshotsEnabled + '}';
+		return "Repository{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", url='"
+				+ this.url + '\'' + ", snapshotsEnabled=" + this.snapshotsEnabled + '}';
 	}
 }

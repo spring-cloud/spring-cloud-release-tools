@@ -62,7 +62,7 @@ public class SpringReleaserTests {
 				if (this.counter == 0) {
 					log.info("First run");
 					this.counter = this.counter + 1;
-					return releaserUpdater;
+					return SpringReleaserTests.this.releaserUpdater;
 				}
 				log.info("Second run");
 				return new File("does/not/exist");
