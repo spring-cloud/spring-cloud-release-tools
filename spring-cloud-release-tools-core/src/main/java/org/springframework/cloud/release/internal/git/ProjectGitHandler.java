@@ -171,8 +171,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 
 	File cloneProject(String url) {
 		try {
-			File destinationDir = properties.getGit().getCloneDestinationDir() != null ?
-					new File(properties.getGit().getCloneDestinationDir()) :
+			File destinationDir = this.properties.getGit().getCloneDestinationDir() != null ?
+					new File(this.properties.getGit().getCloneDestinationDir()) :
 					Files.createTempDirectory("releaser").toFile();
 			return gitRepo(destinationDir).cloneProject(new URIish(url));
 		}

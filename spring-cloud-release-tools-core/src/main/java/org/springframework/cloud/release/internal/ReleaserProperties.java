@@ -169,7 +169,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * URL to the release train wiki
 		 */
-		private String releaseTrainWikiUrl = "https://github.com/spring-projects/spring-cloud.wiki.git";
+		private String releaseTrainWikiUrl = "https://github.com/spring-projects/spring-cloud.wiki";
 
 		/**
 		 * Branch to check out for the documentation project
