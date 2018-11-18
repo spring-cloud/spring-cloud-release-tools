@@ -704,6 +704,7 @@ public class ReleaserProperties implements Serializable {
 				this.put("BOOT_VERSION", "spring-boot");
 				this.put("bomVersion", "spring-cloud-release");
 				this.put("BOM_VERSION", "spring-cloud-release");
+				this.put("springCloudBuildVersion", "spring-cloud-build");
 			}
 		};
 
