@@ -7,8 +7,6 @@ import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
 import org.mockito.BDDMockito;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Marcin Grzejszczak
  */
@@ -19,7 +17,7 @@ public class ReleaseNotesTemplateGeneratorTests {
 		Template template = BDDMockito.mock(Template.class);
 		ReleaseNotesTemplateGenerator generator =
 				new ReleaseNotesTemplateGenerator(template, "Foo.RELEASE", null, null, null);
-		ReleaseNotesTemplateGenerator.CACHE.put("Foo.RELEASE", new File("."));
+		ReleaseNotesTemplateGenerator.CACHE.put("Foo.RELEASE", new File("pom.xml"));
 
 		BDDAssertions.then(generator.releaseNotes()).isNotNull();
 

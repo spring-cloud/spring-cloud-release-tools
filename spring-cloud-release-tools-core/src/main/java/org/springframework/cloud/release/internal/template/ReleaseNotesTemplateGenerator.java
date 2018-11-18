@@ -1,24 +1,20 @@
 package org.springframework.cloud.release.internal.template;
 
-import com.github.jknack.handlebars.Template;
-import com.google.common.collect.ImmutableMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+
+import com.github.jknack.handlebars.Template;
+import com.google.common.collect.ImmutableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -46,9 +42,9 @@ class ReleaseNotesTemplateGenerator {
 
 	File releaseNotes() {
 		File cached = CACHE.get(this.releaseVersion);
-		if (cached != null) {
+		if (cached != null && fileSize(cached) > 0) {
 			log.info("Found an existing entry [{}] in the cache "
-					+ "for version [{}]", cached, this.releaseVersion);
+					+ "for version [{}] with size [{}]", cached, this.releaseVersion, fileSize(cached));
 			return cached;
 		}
 		try {
@@ -66,6 +62,20 @@ class ReleaseNotesTemplateGenerator {
 		catch (IOException e) {
 			log.warn("Exception occurred while trying to generate release notes", e);
 			return null;
+		}
+	}
+
+	private int fileSize(File cached) {
+		try {
+			int length = Files.readAllBytes(cached.toPath()).length;
+			if (length == 0) {
+				log.warn("Cached file has no contents!");
+			}
+			return length;
+		}
+		catch (IOException e) {
+			log.warn("Exception [" + e + "] occurred while trying to retrieve file length - will assume it's empty");
+			return 0;
 		}
 	}
 }
