@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Release Tools</title>
-<date>2018-11-18</date>
+<date>2018-11-19</date>
 </info>
 <chapter xml:id="_spring_cloud_release_tools">
 <title>Spring Cloud Release Tools</title>
@@ -371,6 +371,9 @@ Defaults to Sleuth and Contract samples.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.meta-release.release-train-project-name</literal> - Name of the project that represents the BOM of the release train. Defaults to <literal>spring-cloud-release</literal>.</simpara>
+</listitem>
+<listitem>
+<simpara><literal>releaser.meta-release.release-train-dependency-names</literal> - Names of the projects that should be updated with the version of the release train. Defaults to <literal>[spring-cloud, spring-cloud-dependencies, spring-cloud-starter]</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara><literal>releaser.git.fetch-versions-from-git</literal> - If <literal>true</literal> then should fill the map of versions from Git. If <literal>false</literal> then picks fixed versions.</simpara>
