@@ -52,6 +52,7 @@ class Notes {
 		return this.version;
 	}
 
+	@SuppressWarnings("unused")
 	public String getClosedMilestoneUrl() {
 		return this.closedMilestoneUrl;
 	}

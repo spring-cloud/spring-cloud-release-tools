@@ -44,7 +44,7 @@ public class SaganUpdaterTest {
 		return release;
 	}
 
-	@Test public void should_not_update_sagan_when_switch_is_off() throws Exception {
+	@Test public void should_not_update_sagan_when_switch_is_off() {
 		this.properties.getSagan().setUpdateSagan(false);
 
 		this.saganUpdater.updateSagan("master", version("1.0.0.M1"), version("1.0.0.M1"));
@@ -52,7 +52,7 @@ public class SaganUpdaterTest {
 		then(this.saganClient).shouldHaveZeroInteractions();
 	}
 
-	@Test public void should_update_sagan_for_milestone() throws Exception {
+	@Test public void should_update_sagan_for_milestone() {
 		this.saganUpdater.updateSagan("master", version("1.0.0.M1"), version("1.0.0.M1"));
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
@@ -60,7 +60,7 @@ public class SaganUpdaterTest {
 						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
 
-	@Test public void should_update_sagan_for_rc() throws Exception {
+	@Test public void should_update_sagan_for_rc() {
 		this.saganUpdater.updateSagan("master", version("1.0.0.RC1"), version("1.0.0.RC1"));
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
@@ -72,7 +72,7 @@ public class SaganUpdaterTest {
 		return new ProjectVersion("foo", version);
 	}
 
-	@Test public void should_update_sagan_from_master() throws Exception {
+	@Test public void should_update_sagan_from_master() {
 		ProjectVersion projectVersion = version("1.0.0.BUILD-SNAPSHOT");
 
 		this.saganUpdater.updateSagan("master", projectVersion, projectVersion);
@@ -82,7 +82,7 @@ public class SaganUpdaterTest {
 						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
-	@Test public void should_update_sagan_from_release_version() throws Exception {
+	@Test public void should_update_sagan_from_release_version() {
 		ProjectVersion projectVersion = version("1.0.0.RELEASE");
 
 		this.saganUpdater.updateSagan("master", projectVersion, projectVersion);
@@ -98,7 +98,7 @@ public class SaganUpdaterTest {
 						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
-	@Test public void should_update_sagan_from_non_master() throws Exception {
+	@Test public void should_update_sagan_from_non_master() {
 		ProjectVersion projectVersion = version("1.1.0.BUILD-SNAPSHOT");
 
 		this.saganUpdater.updateSagan("1.1.x", projectVersion, projectVersion);

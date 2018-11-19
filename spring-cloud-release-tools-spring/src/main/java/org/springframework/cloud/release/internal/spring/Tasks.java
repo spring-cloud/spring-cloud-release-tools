@@ -1,10 +1,17 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.jakewharton.fliptables.FlipTableConverters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.util.StringUtils;
 
 /**
  * All tasks that can be executed by the releaser
@@ -135,23 +142,22 @@ class Tasks {
 	static Task RELEASE = Tasks.task("release", "fr",
 			"FULL RELEASE",
 			"Perform a full release of this project without interruptions",
-			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
+			args -> new CompositeConsumer(DEFAULT_TASKS_PER_PROJECT).accept(args));
 	static Task POST_RELEASE = Tasks.task("postRelease", "pr",
 			"POST RELEASE TASKS",
 			"Perform post release tasks for this release without interruptions",
-			args -> DEFAULT_TASKS_PER_RELEASE.forEach(task -> task.execute(args)),
+			args -> new CompositeConsumer(DEFAULT_TASKS_PER_RELEASE).accept(args),
 			TaskType.POST_RELEASE);
 	static Task RELEASE_VERBOSE = Tasks.task("releaseVerbose", "r",
 			"FULL VERBOSE RELEASE",
 			"Perform a full release of this project in interactive mode (you'll be asked about skipping steps)",
-			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> task.execute(args)));
+			args -> new CompositeConsumer(DEFAULT_TASKS_PER_PROJECT).accept(args));
 	static Task META_RELEASE = Tasks.task("metaRelease", "x",
 			"META RELEASE",
 			"Perform a meta release of projects",
-			args -> DEFAULT_TASKS_PER_PROJECT.forEach(task -> {
-				args.properties.getMetaRelease().setEnabled(true);
-				task.execute(args);
-			}));
+			args -> new CompositeConsumer(DEFAULT_TASKS_PER_PROJECT,
+					(args1 -> args.properties.getMetaRelease().setEnabled(true)))
+					.accept(args));
 
 	static final List<Task> COMPOSITE_TASKS = Stream.of(
 			RELEASE,
@@ -187,4 +193,83 @@ class Tasks {
 
 enum TaskType {
 	RELEASE, POST_RELEASE
+}
+
+class CompositeConsumer implements Consumer<Args> {
+
+	private static final Logger log = LoggerFactory.getLogger(CompositeConsumer.class);
+
+	private final List<Task> tasks;
+	private final Consumer<Args> setup;
+
+	CompositeConsumer(List<Task> tasks) {
+		this.tasks = tasks;
+		this.setup = args -> {};
+	}
+
+	CompositeConsumer(List<Task> tasks, Consumer<Args> setup) {
+		this.tasks = tasks;
+		this.setup = setup;
+	}
+
+	@Override
+	public void accept(Args args) {
+		this.setup.accept(args);
+		List<Table> table = this.tasks.stream()
+				.map(task -> new Table(task.execute(args)))
+				.collect(Collectors.toList());
+		String string = "\n\n***** BUILD REPORT *****\n\n"
+				+ FlipTableConverters.fromIterable(table, Table.class)
+				+ "\n\n***** BUILD REPORT *****\n\n";
+		List<Table> brokenTasks = table.stream()
+				.filter(table1 -> StringUtils.hasText(table1.thrownException))
+				.collect(Collectors.toList());
+		if (!brokenTasks.isEmpty()) {
+			String brokenBuilds = "\n\n[BUILD UNSTABLE] One of the tasks is failing!\n\n" +
+					FlipTableConverters.fromIterable(brokenTasks, Table.class) + "\n\n";
+			log.info(string + brokenBuilds);
+			throw new IllegalStateException("[BUILD UNSTABLE] One of the tasks is failing! + \n\n\n" + brokenBuilds);
+		} else {
+			log.info(string);
+		}
+	}
+
+
+}
+
+class Table {
+	final String taskCaption;
+	final String taskDescription;
+	final String taskState;
+	final String thrownException;
+
+	Table(TaskAndException tae) {
+		this.taskCaption = tae.task.name;
+		this.taskDescription = tae.task.description;
+		this.taskState = tae.taskState.name().toLowerCase();
+		this.thrownException = tae.exception == null ? "" : Arrays
+				.stream(tae.exception.getStackTrace())
+				.map(s -> {
+					String[] strings = s.toString().split("\\.");
+					return strings[strings.length - 3] + "." + strings[strings.length - 2] + "." + strings[strings.length - 1];
+				})
+				.limit(15)
+				.collect(Collectors.joining("\n"));
+	}
+
+	public String getTaskCaption() {
+		return this.taskCaption;
+	}
+
+	public String getTaskDescription() {
+		return this.taskDescription;
+	}
+
+	public String getTaskState() {
+		return this.taskState;
+	}
+
+	public String getThrownException() {
+		return this.thrownException;
+	}
 }

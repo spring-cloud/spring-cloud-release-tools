@@ -32,8 +32,7 @@ class EmailTemplateGenerator {
 			return this.emailOutput;
 		}
 		catch (Exception e) {
-			log.warn("Exception occurred while trying to generate an email template", e);
-			return null;
+			throw new IllegalStateException("Exception occurred while trying to generate an email template", e);
 		}
 	}
 }

@@ -68,7 +68,7 @@ public class ReleaserTests {
 	}
 
 	@Test
-	public void should_not_bump_versions_for_original_release_project() throws Exception {
+	public void should_not_bump_versions_for_original_release_project() {
 		releaser(() -> new ProjectVersion("original", "1.0.0.RELEASE"))
 				.rollbackReleaseVersion(this.pom,
 				new Projects(new ProjectVersion("changed", "1.0.0.RELEASE")),
@@ -79,7 +79,7 @@ public class ReleaserTests {
 	}
 
 	@Test
-	public void should_not_bump_versions_for_original_snapshot_project_and_current_snapshot() throws Exception {
+	public void should_not_bump_versions_for_original_snapshot_project_and_current_snapshot() {
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
 				.rollbackReleaseVersion(this.pom,
 						new Projects(new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT")),
@@ -90,7 +90,7 @@ public class ReleaserTests {
 	}
 
 	@Test
-	public void should_bump_versions_for_original_snapshot_project() throws Exception {
+	public void should_bump_versions_for_original_snapshot_project() {
 		ProjectVersion scReleaseVersion = new ProjectVersion("changed", "1.0.0.RELEASE");
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
 				.rollbackReleaseVersion(this.pom,
@@ -105,28 +105,28 @@ public class ReleaserTests {
 	}
 
 	@Test
-	public void should_not_generate_email_for_snapshot_version() throws Exception {
+	public void should_not_generate_email_for_snapshot_version() {
 		releaser().createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"), projects());
 
 		then(this.templateGenerator).should(never()).email(any(Projects.class));
 	}
 
 	@Test
-	public void should_generate_email_for_release_version() throws Exception {
+	public void should_generate_email_for_release_version() {
 		releaser().createEmail(new ProjectVersion("original", "1.0.0.RELEASE"), projects());
 
 		then(this.templateGenerator).should().email(any(Projects.class));
 	}
 
 	@Test
-	public void should_not_close_milestone_for_snapshots() throws Exception {
+	public void should_not_close_milestone_for_snapshots() {
 		releaser().closeMilestone(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(this.projectGitHandler).should(never()).closeMilestone(any(ProjectVersion.class));
 	}
 
 	@Test
-	public void should_not_rollback_for_snapshots() throws Exception {
+	public void should_not_rollback_for_snapshots() {
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
 				.rollbackReleaseVersion(null,
 						new Projects(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")),

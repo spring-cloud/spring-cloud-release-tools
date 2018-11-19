@@ -32,7 +32,7 @@ public class GithubMilestonesTests {
 	@Rule public OutputCapture capture = new OutputCapture();
 
 	@Before
-	public void setup() throws URISyntaxException, IOException  {
+	public void setup() throws IOException  {
 		this.github = new MkGithub();
 		this.repo = createSleuthRepo(this.github);
 	}
@@ -44,8 +44,7 @@ public class GithubMilestonesTests {
 				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
-			@Override String milestoneTitle(Milestone.Smart milestone)
-					throws IOException {
+			@Override String milestoneTitle(Milestone.Smart milestone) {
 				return "0.2.0.BUILD-SNAPSHOT";
 			}
 		};
@@ -63,8 +62,7 @@ public class GithubMilestonesTests {
 				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
-			@Override String milestoneTitle(Milestone.Smart milestone)
-					throws IOException {
+			@Override String milestoneTitle(Milestone.Smart milestone) {
 				return "0.2.0";
 			}
 		};
@@ -86,8 +84,7 @@ public class GithubMilestonesTests {
 				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
-			@Override String milestoneTitle(Milestone.Smart milestone)
-					throws IOException {
+			@Override String milestoneTitle(Milestone.Smart milestone) {
 				return "0.2.0";
 			}
 		};
@@ -105,8 +102,7 @@ public class GithubMilestonesTests {
 				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
-			@Override String milestoneTitle(Milestone.Smart milestone)
-					throws IOException {
+			@Override String milestoneTitle(Milestone.Smart milestone) {
 				return "0.2.0.RELEASE";
 			}
 
@@ -123,7 +119,7 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_fetch_url_of_a_closed_matching_milestone_from_cache() throws IOException {
+	public void should_fetch_url_of_a_closed_matching_milestone_from_cache() {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
 		GithubMilestones.MILESTONE_URL_CACHE.put(gaSleuthProject(), "https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
 
@@ -133,14 +129,13 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_return_null_if_no_matching_milestone_was_found() throws IOException {
+	public void should_return_null_if_no_matching_milestone_was_found() {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override String org() {
 				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
-			@Override String milestoneTitle(Milestone.Smart milestone)
-					throws IOException {
+			@Override String milestoneTitle(Milestone.Smart milestone) {
 				return "0.9.0.RELEASE";
 			}
 
@@ -162,8 +157,7 @@ public class GithubMilestonesTests {
 				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
-			@Override String milestoneTitle(Milestone.Smart milestone)
-					throws IOException {
+			@Override String milestoneTitle(Milestone.Smart milestone) {
 				return "0.2.0";
 			}
 		};
@@ -185,8 +179,7 @@ public class GithubMilestonesTests {
 				return GithubMilestonesTests.this.repo.coordinates().user();
 			}
 
-			@Override String milestoneTitle(Milestone.Smart milestone)
-					throws IOException {
+			@Override String milestoneTitle(Milestone.Smart milestone) {
 				return "0.1.0.BUILD-SNAPSHOT";
 			}
 		};

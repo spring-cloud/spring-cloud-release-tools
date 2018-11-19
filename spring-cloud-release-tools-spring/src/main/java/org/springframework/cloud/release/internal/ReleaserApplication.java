@@ -45,7 +45,7 @@ public class ReleaserApplication implements CommandLineRunner {
 	@Autowired SpringReleaser releaser;
 	@Autowired Parser parser;
 
-	@Override public void run(String... strings) throws Exception {
+	@Override public void run(String... strings) {
 		Options options = this.parser.parse(strings);
 		try {
 			this.releaser.release(options);

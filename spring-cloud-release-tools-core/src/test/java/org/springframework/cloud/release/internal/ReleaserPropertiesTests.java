@@ -14,7 +14,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public class ReleaserPropertiesTests {
 	@Test
-	public void should_return_provided_working_dir_when_it_was_set() throws Exception {
+	public void should_return_provided_working_dir_when_it_was_set() {
 		String workingDir = "foo";
 		ReleaserProperties properties = new ReleaserProperties();
 
@@ -24,14 +24,14 @@ public class ReleaserPropertiesTests {
 	}
 
 	@Test
-	public void should_return_current_working_dir_when_it_was_not_previously_set() throws Exception {
+	public void should_return_current_working_dir_when_it_was_not_previously_set() {
 		ReleaserProperties properties = new ReleaserProperties();
 
 		then(properties.getWorkingDir()).isNotEmpty();
 	}
 
 	@Test
-	public void should_return_a_copy_of_properties() throws Exception {
+	public void should_return_a_copy_of_properties() {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.setWorkingDir("foo");
 		properties.setFixedVersions(map());

@@ -2,7 +2,6 @@ package org.springframework.cloud.release.internal.post;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -84,7 +83,7 @@ public class PostReleaseActions implements Closeable {
 					+ "is off. Set [releaser.git.update-all-test-samples] to [true] to change that");
 			return;
 		}
-		List<ProjectAndException> projectAndExceptions = this.properties.getGit()
+		List<ProjectUrlAndException> projectUrlAndExceptions = this.properties.getGit()
 				.getAllTestSampleUrls()
 				.entrySet()
 				.stream()
@@ -93,22 +92,21 @@ public class PostReleaseActions implements Closeable {
 				.flatMap(Collection::stream)
 				.collect(Collectors.toList());
 		log.info("Updated all samples!");
-		List<String> exceptionMessages = projectAndExceptions.stream()
-				.filter(ProjectAndException::hasException)
+		List<String> exceptionMessages = projectUrlAndExceptions.stream()
+				.filter(ProjectUrlAndException::hasException)
 				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] "
 						+ "has exception [" + Arrays
 						.toString(NestedExceptionUtils.getMostSpecificCause(e.ex)
 								.getStackTrace()) + "]")
 				.collect(Collectors.toList());
 		if (!exceptionMessages.isEmpty()) {
-			log.warn("Exceptions were found while updating samples");
-			log.warn(String.join("\n", exceptionMessages));
+			throw new IllegalStateException("Exceptions were found while updating samples\n" + String.join("\n", exceptionMessages));
 		} else {
 			log.info("No exceptions were found while updating the samples");
 		}
 	}
 
-	private Future<List<ProjectAndException>> updateAllProjects(Projects projects, Map.Entry<String, List<String>> e) {
+	private Future<List<ProjectUrlAndException>> updateAllProjects(Projects projects, Map.Entry<String, List<String>> e) {
 		return SERVICE.submit(() -> {
 			String key = e.getKey();
 			List<String> value = e.getValue();
@@ -162,7 +160,7 @@ public class PostReleaseActions implements Closeable {
 		return new ProjectAndFuture(key, url, SERVICE.submit(runnable));
 	}
 
-	private ProjectAndException getResult(ProjectAndFuture projectAndFuture) {
+	private ProjectUrlAndException getResult(ProjectAndFuture projectAndFuture) {
 		Exception e = null;
 		try {
 			projectAndFuture.future.get(10, TimeUnit.MINUTES);
@@ -171,10 +169,10 @@ public class PostReleaseActions implements Closeable {
 		catch (Exception ex) {
 			e = ex;
 		}
-		return new ProjectAndException(projectAndFuture.key, projectAndFuture.url, e);
+		return new ProjectUrlAndException(projectAndFuture.key, projectAndFuture.url, e);
 	}
 
-	private List<ProjectAndException> getResult(Future<List<ProjectAndException>> future) {
+	private List<ProjectUrlAndException> getResult(Future<List<ProjectUrlAndException>> future) {
 		try {
 			return future.get(10, TimeUnit.MINUTES);
 		}
@@ -211,7 +209,7 @@ public class PostReleaseActions implements Closeable {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		SERVICE.shutdown();
 	}
 }
@@ -229,12 +227,12 @@ class ProjectAndFuture {
 	}
 }
 
-class ProjectAndException {
+class ProjectUrlAndException {
 	final String key;
 	final String url;
 	final Exception ex;
 
-	ProjectAndException(String key, String url, Exception ex) {
+	ProjectUrlAndException(String key, String url, Exception ex) {
 		this.key = key;
 		this.url = url;
 		this.ex = ex;

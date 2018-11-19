@@ -22,7 +22,7 @@ public class BomParserTests {
 	ReleaserProperties properties = new ReleaserProperties();
 
 	@Before
-	public void setup() throws IOException, URISyntaxException {
+	public void setup() throws URISyntaxException {
 		this.springCloudReleaseProject = new File(GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 	}
 

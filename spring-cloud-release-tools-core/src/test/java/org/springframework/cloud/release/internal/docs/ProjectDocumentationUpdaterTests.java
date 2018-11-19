@@ -67,8 +67,7 @@ public class ProjectDocumentationUpdaterTests {
 
 		BDDAssertions.thenThrownBy(() ->
 				new ProjectDocumentationUpdater(properties, new ProjectGitHandler(properties)) {
-					@Override String readIndexHtmlContents(File indexHtml)
-							throws IOException {
+					@Override String readIndexHtmlContents(File indexHtml) {
 						return "";
 					}
 				}.updateDocsRepo(releaseTrainVersion, "vAngel.SR33"))
@@ -104,8 +103,7 @@ public class ProjectDocumentationUpdaterTests {
 	}
 
 	@Test
-	public void should_not_commit_if_the_same_version_is_already_there()
-			throws URISyntaxException {
+	public void should_not_commit_if_the_same_version_is_already_there() {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "1.3.4.SR10");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
@@ -120,7 +118,7 @@ public class ProjectDocumentationUpdaterTests {
 
 	@Test
 	public void should_not_update_current_version_in_the_docs_if_current_release_starts_with_lower_letter_than_the_stored_release()
-			throws URISyntaxException, IOException {
+			throws IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "1.3.4.SR10");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
@@ -136,7 +134,7 @@ public class ProjectDocumentationUpdaterTests {
 
 	@Test
 	public void should_update_current_version_in_the_docs_if_current_release_starts_with_v_and_then_higher_letter_than_the_stored_release()
-			throws URISyntaxException, IOException {
+			throws IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "2.0.0.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
@@ -152,7 +150,7 @@ public class ProjectDocumentationUpdaterTests {
 
 	@Test
 	public void should_update_current_version_in_the_docs_if_current_release_starts_with_higher_letter_than_the_stored_release()
-			throws URISyntaxException, IOException {
+			throws IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "2.0.0.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
@@ -167,8 +165,7 @@ public class ProjectDocumentationUpdaterTests {
 	}
 
 	@Test
-	public void should_not_update_current_version_in_the_docs_if_switch_is_off()
-			throws URISyntaxException, IOException {
+	public void should_not_update_current_version_in_the_docs_if_switch_is_off() {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth", "2.0.0.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());

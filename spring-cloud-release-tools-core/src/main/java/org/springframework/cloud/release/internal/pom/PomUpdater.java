@@ -346,7 +346,7 @@ class PropertyVersionChanger extends AbstractVersionChanger {
 		this.propertyStorer = propertyStorer;
 	}
 
-	@Override public void apply(final VersionChange versionChange) throws XMLStreamException {
+	@Override public void apply(final VersionChange versionChange) {
 		this.versions.projects
 				.stream()
 				.filter(project -> {

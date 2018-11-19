@@ -56,7 +56,7 @@ public class GradleUpdaterTests {
 	}
 
 	@Test
-	public void should_throw_exception_if_snapshots_remain() throws IOException {
+	public void should_throw_exception_if_snapshots_remain() {
 		File projectRoot = tmpFile("gradleproject");
 		ReleaserProperties properties = new ReleaserProperties();
 		Map<String, String> props = new HashMap<String, String>() {{

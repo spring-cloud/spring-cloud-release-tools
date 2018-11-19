@@ -43,7 +43,7 @@ public class TaskTests {
 		then(someBool.get()).isTrue();
 		then(this.capture.toString())
 				.contains("BUILD FAILED!!!")
-				.contains("Exception occurred for task <foo>")
+				.contains("Exception occurred for project <> task <foo>")
 				.contains("with description <descr>");
 	}
 }

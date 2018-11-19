@@ -37,11 +37,11 @@ class Task {
 		this.taskType = taskType;
 	}
 
-	void execute(Args args) {
+	TaskAndException execute(Args args) {
 		if (args.taskType != this.taskType) {
 			log.info("Skipping [{}] since task type is [{}] and should be [{}]]",
 					this.name, this.taskType, args.taskType);
-			return;
+			return TaskAndException.skipped(this);
 		}
 		try {
 			boolean interactive = args.interactive;
@@ -49,16 +49,26 @@ class Task {
 			if (interactive) {
 				boolean skipStep = stepSkipper.skipStep();
 				if (!skipStep) {
-					this.consumer.accept(args);
+					return runTask(args);
 				}
+				return TaskAndException.skipped(this);
 			} else {
-				this.consumer.accept(args);
+				return runTask(args);
 			}
 		} catch (Exception e) {
-			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for task <" +
+			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for project <" +
+					(args.project != null ? args.project.getName() : "") + "> task <" +
 					this.name + "> \n\nwith description <" + this.description + ">\n\n", e);
-			throw e;
+			if (this.taskType == TaskType.RELEASE) {
+				throw e;
+			}
+			return TaskAndException.failure(this, e);
 		}
+	}
+
+	private TaskAndException runTask(Args args) {
+		this.consumer.accept(args);
+		return TaskAndException.success(this);
 	}
 
 	private void printLog(boolean interactive) {

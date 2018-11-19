@@ -50,7 +50,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_an_invalid_option_was_picked() throws Exception {
+	public void should_throw_exception_when_an_invalid_option_was_picked() {
 		Options options = nonInteractiveOpts().options();
 
 		thenThrownBy(() -> this.optionsProcessor.processOptions(options, args()))
@@ -58,7 +58,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_only_tasks_after_the_provided_one_using_full_name() throws Exception {
+	public void should_execute_only_tasks_after_the_provided_one_using_full_name() {
 		Options options = nonInteractiveOpts().startFrom("second").options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -70,7 +70,7 @@ public class OptionsProcessorTests {
 
 
 	@Test
-	public void should_execute_only_tasks_after_the_provided_one_using_short_name() throws Exception {
+	public void should_execute_only_tasks_after_the_provided_one_using_short_name() {
 		Options options = nonInteractiveOpts().startFrom("2").options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -81,7 +81,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_only_tasks_from_range_using_full_name() throws Exception {
+	public void should_execute_only_tasks_from_range_using_full_name() {
 		Options options = nonInteractiveOpts().range("second-third").options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -92,7 +92,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_only_tasks_from_range_using_short_name() throws Exception {
+	public void should_execute_only_tasks_from_range_using_short_name() {
 		Options options = nonInteractiveOpts().range("2-3").options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -103,7 +103,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_only_tasks_from_range_using_full_name_with_same_range() throws Exception {
+	public void should_execute_only_tasks_from_range_using_full_name_with_same_range() {
 		Options options = nonInteractiveOpts().range("second-second").options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -114,7 +114,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_only_tasks_from_range_using_short_name_with_same_range() throws Exception {
+	public void should_execute_only_tasks_from_range_using_short_name_with_same_range() {
 		Options options = nonInteractiveOpts().range("2-2").options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -125,7 +125,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_only_tasks_from_multi_using_full_name() throws Exception {
+	public void should_execute_only_tasks_from_multi_using_full_name() {
 		Options options = nonInteractiveOpts().taskNames(list("first", "third")).options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -136,7 +136,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_only_tasks_from_multi_using_short_name() throws Exception {
+	public void should_execute_only_tasks_from_multi_using_short_name() {
 		Options options = nonInteractiveOpts().taskNames(list("1", "3")).options();
 
 		this.optionsProcessor.processOptions(options, args());
@@ -147,7 +147,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_interactively_only_single_task() throws Exception {
+	public void should_execute_interactively_only_single_task() {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override String chosenOption() {
 				return "0";
@@ -163,7 +163,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_interactively_range_of_tasks() throws Exception {
+	public void should_execute_interactively_range_of_tasks() {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override String chosenOption() {
 				return "0-1";
@@ -179,7 +179,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_interactively_start_from() throws Exception {
+	public void should_execute_interactively_start_from() {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override String chosenOption() {
 				return "1-";
@@ -195,7 +195,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_interactively_multi() throws Exception {
+	public void should_execute_interactively_multi() {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override String chosenOption() {
 				return "0,2";
@@ -211,7 +211,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_full_release() throws Exception {
+	public void should_execute_full_release() {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override Task releaseTask() {
 				return OptionsProcessorTests.this.firstTask;
@@ -231,7 +231,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_execute_full_verbose_release() throws Exception {
+	public void should_execute_full_verbose_release() {
 		this.optionsProcessor = new OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks) {
 			@Override Task releaseVerboseTask() {
 				return OptionsProcessorTests.this.firstTask;
@@ -251,7 +251,7 @@ public class OptionsProcessorTests {
 	}
 
 	@Test
-	public void should_remove_single_quotes() throws Exception {
+	public void should_remove_single_quotes() {
 		Options options = interactiveOpts().fullRelease(true)
 				.range("'1-2'")
 				.startFrom("'c'")

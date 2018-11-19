@@ -54,7 +54,7 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_there_is_no_repo() throws IOException, URISyntaxException {
+	public void should_throw_exception_when_there_is_no_repo() {
 		thenThrownBy(() -> this.gitRepo
 				.cloneProject(new URIish(GitRepoTests.class.getResource("/projects/").toURI().toURL())))
 				.isInstanceOf(IllegalStateException.class)
@@ -62,7 +62,7 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_throw_an_exception_when_failed_to_initialize_the_repo() throws IOException {
+	public void should_throw_an_exception_when_failed_to_initialize_the_repo() {
 		thenThrownBy(() ->  new GitRepo(this.tmpFolder,
 				new ExceptionThrowingJGitFactory()).cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL())))
 				.isInstanceOf(IllegalStateException.class)

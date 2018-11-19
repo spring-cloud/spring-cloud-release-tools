@@ -196,7 +196,7 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_after_running_there_is_an_html_file_with_unresolved_tag() throws Exception {
+	public void should_throw_exception_when_after_running_there_is_an_html_file_with_unresolved_tag() {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
@@ -207,7 +207,7 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_command_took_too_long_to_execute() throws Exception {
+	public void should_throw_exception_when_command_took_too_long_to_execute() {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("sleep 1");
 		properties.getMaven().setWaitTimeInMinutes(0);
@@ -312,7 +312,7 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_deploy_command_took_too_long_to_execute() throws Exception {
+	public void should_throw_exception_when_deploy_command_took_too_long_to_execute() {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("sleep 1");
 		properties.getMaven().setWaitTimeInMinutes(0);
@@ -404,7 +404,7 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_publish_docs_command_took_too_long_to_execute() throws Exception {
+	public void should_throw_exception_when_publish_docs_command_took_too_long_to_execute() {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setPublishDocsCommands(new String[] { "sleep 1", "sleep 1" });
 		properties.getMaven().setWaitTimeInMinutes(0);
@@ -415,7 +415,7 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_process_exits_with_invalid_code() throws Exception {
+	public void should_throw_exception_when_process_exits_with_invalid_code() {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("exit 1");
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
@@ -423,7 +423,7 @@ public class ProjectBuilderTests {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return new ProcessExecutor(properties.getWorkingDir()) {
-					@Override Process startProcess(ProcessBuilder builder) throws IOException {
+					@Override Process startProcess(ProcessBuilder builder) {
 						return processWithInvalidExitCode();
 					}
 				};
@@ -448,7 +448,7 @@ public class ProjectBuilderTests {
 				return null;
 			}
 
-			@Override public int waitFor() throws InterruptedException {
+			@Override public int waitFor() {
 				return 0;
 			}
 

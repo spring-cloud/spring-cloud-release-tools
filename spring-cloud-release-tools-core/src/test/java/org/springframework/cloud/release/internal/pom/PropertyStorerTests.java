@@ -21,7 +21,7 @@ public class PropertyStorerTests {
 	@Mock ModifiedPomXMLEventReader pom;
 	@InjectMocks PropertyStorer propertyStorer;
 
-	@Test public void should_not_set_a_version_when_its_empty() throws Exception {
+	@Test public void should_not_set_a_version_when_its_empty() {
 		this.propertyStorer.setPropertyVersionIfApplicable(new Project("foo", ""));
 
 		then(this.log).should().warn(containsWarnMsgAboutEmptyVersion());

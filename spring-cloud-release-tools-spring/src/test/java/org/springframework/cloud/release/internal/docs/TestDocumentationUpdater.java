@@ -40,7 +40,7 @@ public class TestDocumentationUpdater extends DocumentationUpdater {
 		}
 
 		@Override
-		String readIndexHtmlContents(File indexHtml) throws IOException {
+		String readIndexHtmlContents(File indexHtml) {
 			return response();
 		}
 

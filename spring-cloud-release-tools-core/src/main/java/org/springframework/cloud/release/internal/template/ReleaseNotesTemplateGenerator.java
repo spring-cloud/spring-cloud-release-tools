@@ -49,22 +49,7 @@ class ReleaseNotesTemplateGenerator {
 			return this.blogOutput;
 		}
 		catch (IOException e) {
-			log.warn("Exception occurred while trying to generate release notes", e);
-			return null;
-		}
-	}
-
-	private int fileSize(File cached) {
-		try {
-			int length = Files.readAllBytes(cached.toPath()).length;
-			if (length == 0) {
-				log.warn("Cached file has no contents!");
-			}
-			return length;
-		}
-		catch (IOException e) {
-			log.warn("Exception [" + e + "] occurred while trying to retrieve file length - will assume it's empty");
-			return 0;
+			throw new IllegalStateException("Exception occurred while trying to generate release notes", e);
 		}
 	}
 }

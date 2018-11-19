@@ -526,7 +526,7 @@ public class AcceptanceTests {
 		return this.testPomReader.readPom(new File(dir, "pom.xml"));
 	}
 
-	private File emailTemplate() throws URISyntaxException {
+	private File emailTemplate() {
 		return new File("target/email.txt");
 	}
 
@@ -534,15 +534,15 @@ public class AcceptanceTests {
 		return new String(Files.readAllBytes(emailTemplate().toPath()));
 	}
 
-	private File blogTemplate() throws URISyntaxException {
+	private File blogTemplate() {
 		return new File("target/blog.md");
 	}
 
-	private File tweetTemplate() throws URISyntaxException {
+	private File tweetTemplate() {
 		return new File("target/tweet.txt");
 	}
 
-	private File releaseNotesTemplate() throws URISyntaxException {
+	private File releaseNotesTemplate() {
 		return new File("target/notes.md");
 	}
 
@@ -620,7 +620,7 @@ public class AcceptanceTests {
 	}
 
 	private Releaser defaultReleaser(String expectedVersion, String projectName,
-			ReleaserProperties properties) throws Exception {
+			ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
 		TestProjectGitHandler handler = new TestProjectGitHandler(properties,
@@ -644,7 +644,7 @@ public class AcceptanceTests {
 		return releaser;
 	}
 
-	private Releaser defaultMetaReleaser(ReleaserProperties properties) throws Exception {
+	private Releaser defaultMetaReleaser(ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
 		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
 		NonAssertingTestProjectGitHandler handler = new NonAssertingTestProjectGitHandler(properties);

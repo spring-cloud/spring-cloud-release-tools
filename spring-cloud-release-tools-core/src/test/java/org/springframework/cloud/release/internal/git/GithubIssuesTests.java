@@ -35,13 +35,13 @@ public class GithubIssuesTests {
 	@Rule public OutputCapture capture = new OutputCapture();
 
 	@Before
-	public void setup() throws URISyntaxException, IOException  {
+	public void setup() throws IOException  {
 		this.github = new MkGithub("spring-guides");
 		this.repo = createGettingStartedGuides(this.github);
 	}
 
 	@Test
-	public void should_not_do_anything_for_non_release_train_version() throws IOException {
+	public void should_not_do_anything_for_non_release_train_version() {
 		Github github = BDDMockito.mock(Github.class);
 		GithubIssues issues = new GithubIssues(github, withToken());
 
@@ -53,7 +53,7 @@ public class GithubIssuesTests {
 	}
 
 	@Test
-	public void should_not_do_anything_if_switch_is_not_set() throws IOException {
+	public void should_not_do_anything_if_switch_is_not_set() {
 		Github github = BDDMockito.mock(Github.class);
 		ReleaserProperties properties = withToken();
 		properties.getGit().setUpdateSpringGuides(false);
