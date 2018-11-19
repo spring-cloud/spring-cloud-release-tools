@@ -2,7 +2,6 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
 
-import org.apache.commons.validator.Arg;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;

@@ -11,8 +11,6 @@ import org.mockito.BDDMockito;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Marcin Grzejszczak
  */

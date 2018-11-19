@@ -80,6 +80,14 @@ public class ReleaserProperties implements Serializable {
 		private String releaseTrainProjectName = "spring-cloud-release";
 
 		/**
+		 * All the names of dependencies that should be updated with the release
+		 * train project version
+		 */
+		private List<String> releaseTrainDependencyNames = Arrays.asList(
+				"spring-cloud", "spring-cloud-dependencies", "spring-cloud-starter"
+		);
+
+		/**
 		 * The URL of the Git organization. We'll append each project's
 		 * name to it
 		 */
@@ -118,6 +126,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setReleaseTrainProjectName(String releaseTrainProjectName) {
 			this.releaseTrainProjectName = releaseTrainProjectName;
+		}
+
+		public List<String> getReleaseTrainDependencyNames() {
+			return this.releaseTrainDependencyNames;
+		}
+
+		public void setReleaseTrainDependencyNames(List<String> releaseTrainDependencyNames) {
+			this.releaseTrainDependencyNames = releaseTrainDependencyNames;
 		}
 
 		public List<String> getProjectsToSkip() {

@@ -52,7 +52,7 @@ public class Projects extends HashSet<ProjectVersion> {
 
 	public Projects postReleaseSnapshotVersion(List<String> projectsToSkip) {
 		Projects projects = this.stream()
-				.filter(v -> projectsToSkip.contains(v.projectName))
+				.filter(v -> projectsToSkip(projectsToSkip, v))
 				.collect(Collectors.toCollection(Projects::new));
 		Projects bumped = this.stream()
 				.map(v -> new ProjectVersion(v.projectName, v.postReleaseSnapshotVersion()))
@@ -60,6 +60,10 @@ public class Projects extends HashSet<ProjectVersion> {
 		Projects merged = new Projects(projects);
 		merged.addAll(bumped);
 		return merged;
+	}
+
+	private boolean projectsToSkip(List<String> projectsToSkip, ProjectVersion version) {
+		return projectsToSkip.stream().anyMatch(version.projectName::startsWith);
 	}
 
 	public void remove(String projectName) {

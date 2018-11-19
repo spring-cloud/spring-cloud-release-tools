@@ -88,7 +88,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 		if (log.isDebugEnabled()) {
 			log.debug("Will apply the following fixed versions {}", projectVersions);
 		}
-		return new Versions(projectVersions).toProjectVersions();
+		return new Versions(projectVersions, this.properties).toProjectVersions();
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	 */
 	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
 			ProjectVersion versionFromReleaseTrain, boolean assertSnapshots) {
-		Versions versions = new Versions(projects);
+		Versions versions = new Versions(projects, this.properties);
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
 			log.info("Skipping project updating");
 			return;
@@ -151,7 +151,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 				ReleaserProperties properties, ProjectVersion versionFromScRelease,
 				boolean assertSnapshots) {
 			this.rootPom = rootPom;
-			this.versions = new Versions(projects);
+			this.versions = new Versions(projects, properties);
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
 			this.snapshotVersion = !assertSnapshots || versionFromScRelease.isSnapshot();

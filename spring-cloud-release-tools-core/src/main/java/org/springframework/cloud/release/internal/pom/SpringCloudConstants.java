@@ -21,15 +21,11 @@ package org.springframework.cloud.release.internal.pom;
  */
 final class SpringCloudConstants {
 	static final String SPRING_BOOT = "spring-boot";
-	static final String CLOUD_DEPENDENCIES_ARTIFACT_ID = "spring-cloud-dependencies";
 	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter";
 	static final String BOOT_STARTER_PARENT_ARTIFACT_ID = BOOT_STARTER_ARTIFACT_ID + "-parent";
 	static final String BOOT_DEPENDENCIES_ARTIFACT_ID = "spring-boot-dependencies";
 	static final String CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID = "spring-cloud-dependencies-parent";
 	static final String BUILD_ARTIFACT_ID = "spring-cloud-build";
-	static final String SPRING_CLOUD_RELEASE = "spring-cloud-release";
-	static final String SPRING_CLOUD = "spring-cloud";
-	static final String SPRING_CLOUD_STARTER = "spring-cloud-starter";
 
 	private SpringCloudConstants() {
 		throw new IllegalStateException("Don't instantiate a utility class");

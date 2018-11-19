@@ -58,7 +58,7 @@ class BomParser {
 
 	Versions allVersions() {
 		Versions boot = bootVersion();
-		Versions cloud = versionsFromSpringCloudBom();
+		Versions cloud = versionsFromBom();
 		return new Versions(boot.bootVersion, cloud.scBuildVersion, allProjects(boot, cloud));
 	}
 
@@ -71,6 +71,9 @@ class BomParser {
 
 	Versions bootVersion() {
 		Model model = pom(this.pomWithBootStarterParent);
+		if (model == null) {
+			return Versions.EMPTY_VERSION;
+		}
 		String bootArtifactId = model.getParent().getArtifactId();
 		log.debug("Boot artifact id is equal to [{}]", bootArtifactId);
 		if (!SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID.equals(bootArtifactId)) {
@@ -94,8 +97,11 @@ class BomParser {
 	}
 
 	// the BOM contains all versions of projects and its parent MUST be Spring Cloud Dependencies Parent
-	Versions versionsFromSpringCloudBom() {
+	Versions versionsFromBom() {
 		Model model = pom(this.thisTrainBom);
+		if (model == null) {
+			return Versions.EMPTY_VERSION;
+		}
 		String buildArtifact = model.getParent().getArtifactId();
 		log.debug("[{}] artifact id is equal to [{}]", SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
 		if (!SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID.equals(buildArtifact)) {

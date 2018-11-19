@@ -114,8 +114,7 @@ public class PostReleaseActions implements Closeable {
 			List<String> value = e.getValue();
 			log.info("Running version update for project [{}] and samples {}", key, value);
 			ProjectVersion projectVersionForReleaseTrain = projects.forName(key);
-			Projects postRelease = projects
-					.postReleaseSnapshotVersion(this.properties.getMetaRelease().getProjectsToSkip());
+			Projects postRelease = getPostReleaseProjects(projects);
 			log.info("Versions to update the samples with \n" + postRelease.stream()
 					.map(v -> "[" + v.projectName + " => " + v.version + "]")
 					.collect(Collectors.joining("\n")));
@@ -125,6 +124,11 @@ public class PostReleaseActions implements Closeable {
 					.map(this::getResult)
 					.collect(Collectors.toList());
 		});
+	}
+
+	Projects getPostReleaseProjects(Projects projects) {
+		return projects
+				.postReleaseSnapshotVersion(this.properties.getMetaRelease().getProjectsToSkip());
 	}
 
 	private void commitUpdatedProject(Projects projects, String key, ProjectVersion projectVersionForReleaseTrain, Projects postRelease, String url) {

@@ -1,11 +1,9 @@
 package org.springframework.cloud.release.internal;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
 

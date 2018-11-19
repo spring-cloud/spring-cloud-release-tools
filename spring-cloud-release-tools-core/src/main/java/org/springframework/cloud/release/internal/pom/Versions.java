@@ -15,19 +15,20 @@
  */
 package org.springframework.cloud.release.internal.pom;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
+
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.BUILD_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_ARTIFACT_ID;
 import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD;
-import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD_RELEASE;
-import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.SPRING_CLOUD_STARTER;
 
 /**
  * Represents versions taken out from Spring Cloud Release pom
@@ -42,40 +43,60 @@ class Versions {
 	String bootVersion;
 	String scBuildVersion;
 	Set<Project> projects = new HashSet<>();
+	ReleaserProperties properties;
 
 	Versions(String bootVersion) {
 		this.bootVersion = bootVersion;
-		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
-		this.projects.add(new Project(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion));
-		this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion));
+		add(SPRING_BOOT_PROJECT_NAME, bootVersion);
+		add(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion);
+		add(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion);
+		this.properties = new ReleaserProperties();
 	}
 
 	Versions(String scBuildVersion, Set<Project> projects) {
 		this.scBuildVersion = scBuildVersion;
-		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
-		this.projects.add(new Project(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, scBuildVersion));
-		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
+		add(BUILD_ARTIFACT_ID, scBuildVersion);
+		add(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, scBuildVersion);
 		this.projects.addAll(projects);
+		this.properties = new ReleaserProperties();
 	}
 
 	Versions(String bootVersion, String scBuildVersion, Set<Project> projects) {
+		this(new ReleaserProperties(), bootVersion, scBuildVersion, projects);
+	}
+
+	Versions(ReleaserProperties properties, String bootVersion, String scBuildVersion, Set<Project> projects) {
+		this.properties = properties;
 		this.bootVersion = bootVersion;
 		this.scBuildVersion = scBuildVersion;
-		this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, bootVersion));
-		this.projects.add(new Project(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion));
-		this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion));
-		this.projects.add(new Project(BUILD_ARTIFACT_ID, scBuildVersion));
-		this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, scBuildVersion));
-		this.projects.add(new Project(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, scBuildVersion));
+		add(SPRING_BOOT_PROJECT_NAME, bootVersion);
+		add(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion);
+		add(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion);
+		add(BUILD_ARTIFACT_ID, scBuildVersion);
+		add(dependenciesParentArtifactId(), scBuildVersion);
 		this.projects.addAll(projects);
 	}
 
-	Versions(Set<ProjectVersion> versions) {
+	Versions(Set<ProjectVersion> versions, ReleaserProperties properties) {
+		this.properties = properties;
 		this.bootVersion = versions.stream().filter(projectVersion -> SPRING_BOOT_PROJECT_NAME.equals(projectVersion.projectName))
 				.findFirst().orElse(new ProjectVersion(SPRING_BOOT_PROJECT_NAME, "")).version;
 		this.scBuildVersion = versions.stream().filter(projectVersion -> BUILD_ARTIFACT_ID.equals(projectVersion.projectName))
 				.findFirst().orElse(new ProjectVersion(BUILD_ARTIFACT_ID, "")).version;
 		versions.forEach(projectVersion -> setVersion(projectVersion.projectName, projectVersion.version));
+	}
+
+	private String bomProjectName() {
+		return this.properties.getMetaRelease().getReleaseTrainProjectName();
+	}
+
+	private String dependenciesArtifactId() {
+		String artifactId = this.properties.getPom().getThisTrainBom();
+		return artifactId.split(File.separator)[0];
+	}
+
+	private String dependenciesParentArtifactId() {
+		return dependenciesArtifactId() + "-parent";
 	}
 
 	String versionForProject(String projectName) {
@@ -99,18 +120,33 @@ class Versions {
 	Projects toProjectVersions() {
 		return this.projects.stream()
 				.map(project -> new ProjectVersion(project.name, project.version))
-				.distinct().collect(Collectors.toCollection(Projects::new));
+				.collect(Collectors.toCollection(Projects::new));
 	}
 
+	/**
+	 * The only exception is spring-cloud-dependencies (e.g. Greenwich.RELEASE) and
+	 * spring-cloud-dependencies-parent (e.g. 2.1.0.RELEASE)
+	 */
 	private boolean nameMatches(String projectName, Project project) {
 		if (project.name.equals(projectName)) {
 			return true;
 		}
-		boolean parent = nameWithSuffix(projectName, "-parent", project);
-		return parent || nameWithSuffix(projectName, "-dependencies", project);
+		boolean parent = matchesNameWithSuffix(projectName, "-parent", project);
+		boolean bomArtifactId = comparisonOfBomArtifactAndParent(projectName, project);
+		return !bomArtifactId &&
+				(parent || matchesNameWithSuffix(projectName, "-dependencies", project));
 	}
 
-	private boolean nameWithSuffix(String projectName, String suffix, Project project) {
+	private boolean comparisonOfBomArtifactAndParent(String projectName, Project project) {
+		return artifactOrParent(projectName, project.name) || artifactOrParent(project.name, projectName);
+	}
+
+	private boolean artifactOrParent(String projectName, String otherProjectName) {
+		return projectName.equals(dependenciesArtifactId()) &&
+				otherProjectName.equals(dependenciesParentArtifactId());
+	}
+
+	private boolean matchesNameWithSuffix(String projectName, String suffix, Project project) {
 		boolean containsSuffix = projectName.endsWith(suffix);
 		if (!containsSuffix) {
 			return false;
@@ -124,40 +160,57 @@ class Versions {
 			case SPRING_BOOT_PROJECT_NAME:
 			case BOOT_STARTER_PARENT_ARTIFACT_ID:
 			case BOOT_DEPENDENCIES_ARTIFACT_ID:
-				this.bootVersion = version;
-				remove(SPRING_BOOT_PROJECT_NAME);
-				remove(BOOT_DEPENDENCIES_ARTIFACT_ID);
-				remove(BOOT_STARTER_PARENT_ARTIFACT_ID);
-				this.projects.add(new Project(SPRING_BOOT_PROJECT_NAME, version));
-				this.projects.add(new Project(BOOT_STARTER_PARENT_ARTIFACT_ID, version));
-				this.projects.add(new Project(BOOT_DEPENDENCIES_ARTIFACT_ID, version));
+				updateBootVersions(version);
 				break;
 			case BUILD_ARTIFACT_ID:
-			case CLOUD_DEPENDENCIES_ARTIFACT_ID:
 			case CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID:
-				this.scBuildVersion = version;
-				remove(BUILD_ARTIFACT_ID);
-				remove(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID);
-				remove(CLOUD_DEPENDENCIES_ARTIFACT_ID);
-				this.projects.add(new Project(BUILD_ARTIFACT_ID, version));
-				this.projects.add(new Project(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, version));
-				this.projects.add(new Project(CLOUD_DEPENDENCIES_ARTIFACT_ID, version));
-				break;
-			case SPRING_CLOUD_RELEASE:
-			case SPRING_CLOUD:
-			case SPRING_CLOUD_STARTER:
-				remove(SPRING_CLOUD_RELEASE);
-				remove(SPRING_CLOUD);
-				remove(SPRING_CLOUD_STARTER);
-				this.projects.add(new Project(SPRING_CLOUD_RELEASE, version));
-				this.projects.add(new Project(SPRING_CLOUD, version));
-				this.projects.add(new Project(SPRING_CLOUD_STARTER, version));
+				updateBuildVersions(version);
 				break;
 			default:
-				remove(projectName);
-				this.projects.add(new Project(projectName, version));
+				if (bomVersionProjectNames().contains(projectName)) {
+					updateBomVersions(version);
+				} else {
+					remove(projectName);
+					add(projectName, version);
+				}
 		}
 		return this;
+	}
+
+	private List<String> bomVersionProjectNames() {
+		List<String> names = new ArrayList<>(this.properties.getMetaRelease()
+				.getReleaseTrainDependencyNames());
+		names.add(this.properties.getMetaRelease().getReleaseTrainProjectName());
+		return names;
+	}
+
+	private void updateBuildVersions(String version) {
+		this.scBuildVersion = version;
+		remove(BUILD_ARTIFACT_ID);
+		remove(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID);
+		add(BUILD_ARTIFACT_ID, version);
+		add(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, version);
+	}
+
+	private void updateBootVersions(String version) {
+		this.bootVersion = version;
+		remove(SPRING_BOOT_PROJECT_NAME);
+		remove(BOOT_DEPENDENCIES_ARTIFACT_ID);
+		remove(BOOT_STARTER_PARENT_ARTIFACT_ID);
+		add(SPRING_BOOT_PROJECT_NAME, version);
+		add(BOOT_STARTER_PARENT_ARTIFACT_ID, version);
+		add(BOOT_DEPENDENCIES_ARTIFACT_ID, version);
+	}
+
+	private void updateBomVersions(String version) {
+		remove(bomProjectName());
+		bomVersionProjectNames().forEach(this::remove);
+		add(bomProjectName(), version);
+		bomVersionProjectNames().forEach(s -> add(s, version));
+	}
+
+	private void add(String key, String value) {
+		this.projects.add(new Project(key, value));
 	}
 
 	private void remove(String expectedProjectName) {

@@ -2,22 +2,17 @@ package org.springframework.cloud.release.internal.template;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
+import com.github.jknack.handlebars.Template;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.util.StringUtils;
-
-import com.github.jknack.handlebars.Template;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * @author Marcin Grzejszczak

@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
+
 import org.springframework.boot.test.rule.OutputCapture;
 
 import static org.assertj.core.api.BDDAssertions.then;

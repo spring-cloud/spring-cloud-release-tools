@@ -122,7 +122,8 @@ public class ProjectsTests {
 	@Test
 	public void should_return_projects_with_bumped_versions() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
-		projectVersions.add(new ProjectVersion("dont_touch", "2.0.0.RELEASE"));
+		projectVersions.add(new ProjectVersion("spring-boot-dependencies", "2.0.0.RELEASE"));
+		projectVersions.add(new ProjectVersion("spring-boot-starter", "2.0.0.RELEASE"));
 		projectVersions.add(new ProjectVersion("foo", "1.0.0.RELEASE"));
 		projectVersions.add(new ProjectVersion("bar", "1.0.1.M1"));
 		projectVersions.add(new ProjectVersion("baz", "1.0.2.BUILD-SNAPSHOT"));
@@ -131,9 +132,10 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("foo4", "Finchley.SR4"));
 		Projects projects = new Projects(projectVersions);
 
-		Projects bumped = projects.postReleaseSnapshotVersion(Collections.singletonList("dont_touch"));
+		Projects bumped = projects.postReleaseSnapshotVersion(Collections.singletonList("spring-boot"));
 
-		then(bumped.forName("dont_touch").version).isEqualTo("2.0.0.RELEASE");
+		then(bumped.forName("spring-boot-dependencies").version).isEqualTo("2.0.0.RELEASE");
+		then(bumped.forName("spring-boot-starter").version).isEqualTo("2.0.0.RELEASE");
 		then(bumped.forName("foo").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
 		then(bumped.forName("bar").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
 		then(bumped.forName("baz").version).isEqualTo("1.0.2.BUILD-SNAPSHOT");

@@ -1,16 +1,12 @@
 package org.springframework.cloud.release.internal.git;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.jcabi.github.Coordinates;
 import com.jcabi.github.Github;
 import com.jcabi.github.Issue;
-import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
 import com.jcabi.github.RtGithub;
 import com.jcabi.http.wire.RetryWire;

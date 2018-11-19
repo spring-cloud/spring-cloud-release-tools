@@ -79,7 +79,7 @@ public class BomParserTests {
 	public void should_throw_exception_when_cloud_pom_is_missing() {
 		BomParser parser = new BomParser(this.properties, new File("."));
 
-		thenThrownBy(parser::versionsFromSpringCloudBom)
+		thenThrownBy(parser::versionsFromBom)
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
@@ -90,7 +90,7 @@ public class BomParserTests {
 		this.properties.getPom().setThisTrainBom(null);
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::versionsFromSpringCloudBom)
+		thenThrownBy(parser::versionsFromBom)
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
@@ -101,7 +101,7 @@ public class BomParserTests {
 		this.properties.getPom().setThisTrainBom("pom.xml");
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::versionsFromSpringCloudBom)
+		thenThrownBy(parser::versionsFromBom)
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("The pom doesn't have a [spring-cloud-dependencies-parent] artifact id");
 	}
@@ -110,7 +110,7 @@ public class BomParserTests {
 	public void should_populate_cloud_version() {
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		Versions cloudVersions = parser.versionsFromSpringCloudBom();
+		Versions cloudVersions = parser.versionsFromBom();
 
 		then(cloudVersions.scBuildVersion).isEqualTo("1.3.1.BUILD-SNAPSHOT");
 		then(cloudVersions.projects).contains(allProjects());

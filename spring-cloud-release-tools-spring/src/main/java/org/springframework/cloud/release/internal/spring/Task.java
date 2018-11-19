@@ -1,6 +1,5 @@
 package org.springframework.cloud.release.internal.spring;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;

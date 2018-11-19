@@ -8,8 +8,6 @@ import org.junit.Test;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Marcin Grzejszczak
  */

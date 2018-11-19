@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
@@ -192,8 +193,15 @@ public class PostReleaseActionsTests {
 		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
 				Collections.singletonList(tmpFile("spring-cloud-core-tests/")
 						.getAbsolutePath() + "/"));
+		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties) {
+			@Override
+			Projects getPostReleaseProjects(Projects projects) {
+				postReleaseProjects.set(super.getPostReleaseProjects(projects));
+				return postReleaseProjects.get();
+			}
+		};
 
 		actions.updateAllTestSamples(currentGa());
 
@@ -211,6 +219,8 @@ public class PostReleaseActionsTests {
 		BDDAssertions.then(commit.getShortMessage())
 				.isEqualTo("Updated versions after [Finchley.SR1] release train and [2.0.1.RELEASE] [spring-cloud-sleuth] project release");
 		thenGradleUpdaterWasCalled();
+		BDDAssertions.then(postReleaseProjects.get()
+				.forName("spring-boot-dependencies").version).isEqualTo("2.0.4.RELEASE");
 	}
 
 	private String sleuthParentPomVersion() {
@@ -234,6 +244,8 @@ public class PostReleaseActionsTests {
 				new ProjectVersion("spring-cloud-stream", "Elmhurst.SR1"),
 				new ProjectVersion("spring-cloud-zookeeper", "2.0.0.RELEASE"),
 				new ProjectVersion("spring-boot", "2.0.4.RELEASE"),
+				new ProjectVersion("spring-boot-dependencies", "2.0.4.RELEASE"),
+				new ProjectVersion("spring-boot-starter", "2.0.4.RELEASE"),
 				new ProjectVersion("spring-cloud-task", "2.0.0.RELEASE"),
 				new ProjectVersion("spring-cloud-release", "Finchley.SR1"),
 				new ProjectVersion("spring-cloud-vault", "2.0.1.RELEASE"),

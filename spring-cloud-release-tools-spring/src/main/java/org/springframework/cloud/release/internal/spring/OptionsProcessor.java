@@ -1,6 +1,5 @@
 package org.springframework.cloud.release.internal.spring;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
