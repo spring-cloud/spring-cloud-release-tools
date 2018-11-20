@@ -11,6 +11,7 @@ import com.jakewharton.fliptables.FlipTableConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -225,10 +226,17 @@ class CompositeConsumer implements Consumer<Args> {
 				.filter(table1 -> StringUtils.hasText(table1.thrownException))
 				.collect(Collectors.toList());
 		if (!brokenTasks.isEmpty()) {
-			String brokenBuilds = "\n\n[BUILD UNSTABLE] One of the tasks is failing!\n\n" +
-					FlipTableConverters.fromIterable(brokenTasks, Table.class) + "\n\n";
-			log.info(string + brokenBuilds);
-			throw new IllegalStateException("[BUILD UNSTABLE] One of the tasks is failing! + \n\n\n" + brokenBuilds);
+			String brokenBuilds = "\n\n[BUILD UNSTABLE] The following post release tasks are failing!\n\n" +
+					brokenTasks.stream()
+							.map(table1 ->
+									String.format("***** Task Caption: <%s> ***** \nTask Description <%s>\nException Stacktrace \n\n%s",
+											table1.taskCaption, table1.taskDescription, Arrays
+													.stream(table1.exception.getStackTrace())
+													.map(StackTraceElement::toString)
+													.collect(Collectors.joining("\n"))))
+					.collect(Collectors.joining("\n\n"));
+			log.warn(string + brokenBuilds);
+			throw new IllegalStateException(brokenBuilds);
 		} else {
 			log.info(string);
 		}
@@ -242,19 +250,15 @@ class Table {
 	final String taskDescription;
 	final String taskState;
 	final String thrownException;
+	Exception exception;
 
 	Table(TaskAndException tae) {
 		this.taskCaption = tae.task.name;
 		this.taskDescription = tae.task.description;
 		this.taskState = tae.taskState.name().toLowerCase();
-		this.thrownException = tae.exception == null ? "" : Arrays
-				.stream(tae.exception.getStackTrace())
-				.map(s -> {
-					String[] strings = s.toString().split("\\.");
-					return strings[strings.length - 3] + "." + strings[strings.length - 2] + "." + strings[strings.length - 1];
-				})
-				.limit(15)
-				.collect(Collectors.joining("\n"));
+		this.thrownException = tae.exception == null ? "" :
+				NestedExceptionUtils.getMostSpecificCause(tae.exception).toString();
+		this.exception = tae.exception;
 	}
 
 	public String getTaskCaption() {

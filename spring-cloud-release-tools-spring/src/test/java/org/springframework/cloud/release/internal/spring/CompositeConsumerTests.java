@@ -46,6 +46,8 @@ public class CompositeConsumerTests {
 				new Task("foo", "foo", "foo", "foo",
 						(args -> {}), TaskType.POST_RELEASE),
 				new Task("bar", "bar", "bar", "bar",
+						(args -> { throw new MyException(); }), TaskType.POST_RELEASE),
+				new Task("baz", "baz", "baz", "baz",
 						(args -> { throw new MyException(); }), TaskType.POST_RELEASE)
 		));
 
