@@ -194,69 +194,41 @@ public class Releaser {
 	public void updateSagan(File project, ProjectVersion releaseVersion) {
 		String currentBranch = this.projectGitHandler.currentBranch(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
-		try {
-			this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
-			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
-		} catch (Exception e) {
-			log.warn("\nUnable to update Sagan for branch ["+ currentBranch + "]", e);
-		}
+		this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
+		log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 	}
 
 	public void updateDocumentationRepository(ReleaserProperties properties, ProjectVersion releaseVersion) {
 		String releaseBranch = properties.getPom().getBranch();
-		try {
-			this.documentationUpdater.updateDocsRepo(releaseVersion, releaseBranch);
-			log.info("\nSuccessfully updated documentation repository for branch [{}]", releaseBranch);
-		} catch (Exception e) {
-			log.warn("\nUnable to update documentation repository for branch ["+ releaseBranch + "]", e);
-		}
+		this.documentationUpdater.updateDocsRepo(releaseVersion, releaseBranch);
+		log.info("\nSuccessfully updated documentation repository for branch [{}]", releaseBranch);
 	}
 
 	public void updateSpringProjectPage(Projects projects) {
-		try {
-			if (this.documentationUpdater.updateProjectRepo(projects) != null) {
-				log.info("\nSuccessfully updated Spring project page");
-			} else {
-				log.warn("\nFailed to update Spring Project page");
-			}
-		} catch (Exception e) {
-			log.warn("\nUnable to update Spring Project page", e);
+		if (this.documentationUpdater.updateProjectRepo(projects) != null) {
+			log.info("\nSuccessfully updated Spring project page");
+		} else {
+			log.warn("\nFailed to update Spring Project page");
 		}
 	}
 
 	public void runUpdatedSamples(Projects projects) {
-		try {
-			this.postReleaseActions.runUpdatedTests(projects);
-			log.info("\nSuccessfully updated and ran samples");
-		} catch (Exception e) {
-			log.warn("\nUnable to update and run samples", e);
-		}
+		this.postReleaseActions.runUpdatedTests(projects);
+		log.info("\nSuccessfully updated and ran samples");
 	}
 
 	public void generateReleaseTrainDocumentation(Projects projects) {
-		try {
-			this.postReleaseActions.generateReleaseTrainDocumentation(projects);
-			log.info("\nSuccessfully updated and generated release train documentation");
-		} catch (Exception e) {
-			log.warn("\nUnable to update and generate release train documentation", e);
-		}
+		this.postReleaseActions.generateReleaseTrainDocumentation(projects);
+		log.info("\nSuccessfully updated and generated release train documentation");
 	}
 
 	public void updateAllSamples(Projects projects) {
-		try {
-			this.postReleaseActions.updateAllTestSamples(projects);
-			log.info("\nSuccessfully updated all samples");
-		} catch (Exception e) {
-			log.warn("\nUnable to update all samples", e);
-		}
+		this.postReleaseActions.updateAllTestSamples(projects);
+		log.info("\nSuccessfully updated all samples");
 	}
 
 	public void updateReleaseTrainWiki(Projects projects) {
-		try {
-			this.documentationUpdater.updateReleaseTrainWiki(projects);
-			log.info("\nSuccessfully updated project wiki");
-		} catch (Exception e) {
-			log.warn("\nUnable to update project wiki", e);
-		}
+		this.documentationUpdater.updateReleaseTrainWiki(projects);
+		log.info("\nSuccessfully updated project wiki");
 	}
 }

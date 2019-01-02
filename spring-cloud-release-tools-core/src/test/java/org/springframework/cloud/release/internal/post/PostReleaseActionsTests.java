@@ -54,7 +54,7 @@ public class PostReleaseActionsTests {
 
 		@Override
 		public File cloneReleaseTrainDocumentationProject() {
-			PostReleaseActionsTests.this.cloned = super.cloneTestSamplesProject();
+			PostReleaseActionsTests.this.cloned = super.cloneReleaseTrainDocumentationProject();
 			return PostReleaseActionsTests.this.cloned;
 		}
 
