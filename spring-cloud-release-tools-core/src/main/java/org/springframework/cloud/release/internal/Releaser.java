@@ -194,8 +194,12 @@ public class Releaser {
 	public void updateSagan(File project, ProjectVersion releaseVersion) {
 		String currentBranch = this.projectGitHandler.currentBranch(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
-		this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
-		log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
+		try {
+			this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
+			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
+		} catch (Exception ex) {
+			log.error("\n\n[BUILD UNSTABLE] WARNING! FAILED TO UPDATE SAGAN, DUE TO THE FOLLOWING EXCEPTION", ex);
+		}
 	}
 
 	public void updateDocumentationRepository(ReleaserProperties properties, ProjectVersion releaseVersion) {
