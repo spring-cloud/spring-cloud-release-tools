@@ -49,6 +49,7 @@ import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -76,6 +77,7 @@ public class AcceptanceTests {
 	ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
 	ReleaserPropertiesUpdater updater = new ReleaserPropertiesUpdater(this.applicationContext);
 	PostReleaseActions postReleaseActions = Mockito.mock(PostReleaseActions.class);
+	ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
 	@Before
 	public void setup() throws Exception {
@@ -572,7 +574,7 @@ public class AcceptanceTests {
 	private SpringReleaser releaserWithFullDeployment(String expectedVersion,
 			String projectName, ReleaserProperties properties) throws Exception {
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
-		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties) {
+		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties, this.applicationEventPublisher) {
 			@Override String chosenOption() {
 				return "0";
 			}
@@ -581,12 +583,12 @@ public class AcceptanceTests {
 				options.interactive = false;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		}, this.updater);
+		}, this.updater, this.applicationEventPublisher);
 	}
 
 	private SpringReleaser metaReleaserWithFullDeployment(ReleaserProperties properties) throws Exception {
 		Releaser releaser = defaultMetaReleaser(properties);
-		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties) {
+		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties, this.applicationEventPublisher) {
 			@Override String chosenOption() {
 				return "0";
 			}
@@ -595,7 +597,7 @@ public class AcceptanceTests {
 				options.interactive = false;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		}, this.updater);
+		}, this.updater, this.applicationEventPublisher);
 	}
 
 	private SpringReleaser releaserWithSnapshotScRelease(File projectFile, String projectName,
@@ -607,7 +609,7 @@ public class AcceptanceTests {
 	private SpringReleaser templateOnlyReleaser(File projectFile, String projectName, String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
-		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties) {
+		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser, properties, this.applicationEventPublisher) {
 			@Override String chosenOption() {
 				return "13";
 			}
@@ -616,7 +618,7 @@ public class AcceptanceTests {
 				options.interactive = true;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		}, this.updater);
+		}, this.updater, this.applicationEventPublisher);
 	}
 
 	private Releaser defaultReleaser(String expectedVersion, String projectName,

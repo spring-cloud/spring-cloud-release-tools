@@ -39,22 +39,6 @@ public class CompositeConsumerTests {
 				compositeConsumer.accept(new Args(TaskType.RELEASE)))
 				.isInstanceOf(MyException.class);
 	}
-
-	@Test
-	public void should_throw_exception_for_a_post_release_task_after_creating_a_report() {
-		CompositeConsumer compositeConsumer = new CompositeConsumer(Arrays.asList(
-				new Task("foo", "foo", "foo", "foo",
-						(args -> {}), TaskType.POST_RELEASE),
-				new Task("bar", "bar", "bar", "bar",
-						(args -> { throw new MyException(); }), TaskType.POST_RELEASE),
-				new Task("baz", "baz", "baz", "baz",
-						(args -> { throw new MyException(); }), TaskType.POST_RELEASE)
-		));
-
-		BDDAssertions.thenThrownBy(() ->
-				compositeConsumer.accept(new Args(TaskType.POST_RELEASE)))
-				.isInstanceOf(IllegalStateException.class);
-	}
 }
 
 class MyException extends RuntimeException {}

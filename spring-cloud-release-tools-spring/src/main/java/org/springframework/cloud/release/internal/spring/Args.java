@@ -2,15 +2,22 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Marcin Grzejszczak
  */
 class Args {
+	private static final Logger log = LoggerFactory.getLogger(Args.class);
+
 	final Releaser releaser;
 	final File project;
 	final Projects projects;
@@ -19,10 +26,11 @@ class Args {
 	final ReleaserProperties properties;
 	final boolean interactive;
 	final TaskType taskType;
+	final ApplicationEventPublisher applicationEventPublisher;
 
 	Args(Releaser releaser, File project, Projects projects, ProjectVersion originalVersion,
 			ProjectVersion versionFromScRelease, ReleaserProperties properties,
-			boolean interactive, TaskType taskType) {
+			boolean interactive, TaskType taskType, ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.project = project;
 		this.projects = projects;
@@ -31,13 +39,14 @@ class Args {
 		this.properties = properties;
 		this.interactive = interactive;
 		this.taskType = taskType;
+		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
 	// Used by meta-release task
 	Args(Releaser releaser, Projects projects,
 			ProjectVersion versionFromScRelease,
 			ReleaserProperties properties,
-			boolean interactive) {
+			boolean interactive, ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.project = null;
 		this.projects = projects;
@@ -46,6 +55,7 @@ class Args {
 		this.properties = properties;
 		this.interactive = interactive;
 		this.taskType = TaskType.POST_RELEASE;
+		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
 	// Used for tests
@@ -58,6 +68,19 @@ class Args {
 		this.properties = null;
 		this.interactive = false;
 		this.taskType = taskType;
+		this.applicationEventPublisher = null;
+	}
+
+	String projectName() {
+		return this.project != null ? this.project.getName() : "";
+	}
+
+	void publishEvent(ApplicationEvent applicationEvent) {
+		if (this.applicationEventPublisher == null) {
+			log.warn("Application Event Publisher not present");
+			return;
+		}
+		this.applicationEventPublisher.publishEvent(applicationEvent);
 	}
 
 	@Override

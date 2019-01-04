@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013-2017 the original author or authors.
+ *  Copyright 2013-2019 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,9 +42,15 @@ class ReleaserConfiguration {
 	ReleaserProperties properties;
 
 	@Bean
+	TaskCollector taskCollector() {
+		return new TaskCollector();
+	}
+
+	@Bean
 	SpringReleaser springReleaser(Releaser releaser,
-			ReleaserPropertiesUpdater updater) {
-		return new SpringReleaser(releaser, this.properties, updater);
+			ReleaserPropertiesUpdater updater,
+			ApplicationEventPublisher applicationEventPublisher) {
+		return new SpringReleaser(releaser, this.properties, updater, applicationEventPublisher);
 	}
 
 	@Bean

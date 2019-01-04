@@ -272,7 +272,7 @@ public class OptionsProcessorTests {
 	}
 
 	private Args args() {
-		return new Args(null, null, null, null, null, null, false, TaskType.RELEASE);
+		return new Args(null, null, null, null, null, null, false, TaskType.RELEASE, null);
 	}
 
 	private List<String> list(String... list) {

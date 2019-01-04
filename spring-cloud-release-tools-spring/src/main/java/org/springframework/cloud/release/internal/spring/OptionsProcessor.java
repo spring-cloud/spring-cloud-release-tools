@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.StringUtils;
 
 /**
@@ -20,15 +21,24 @@ class OptionsProcessor {
 	private final Releaser releaser;
 	private final ReleaserProperties properties;
 	private final List<Task> allTasks;
+	private final ApplicationEventPublisher applicationEventPublisher;
 
-	OptionsProcessor(Releaser releaser, ReleaserProperties properties) {
-		this(releaser, properties, Tasks.ALL_TASKS_PER_PROJECT);
+	OptionsProcessor(Releaser releaser, ReleaserProperties properties, ApplicationEventPublisher applicationEventPublisher) {
+		this(releaser, properties, applicationEventPublisher, Tasks.ALL_TASKS_PER_PROJECT);
+	}
+
+	OptionsProcessor(Releaser releaser, ReleaserProperties properties, ApplicationEventPublisher applicationEventPublisher, List<Task> allTasks) {
+		this.releaser = releaser;
+		this.properties = properties;
+		this.allTasks = allTasks;
+		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
 	OptionsProcessor(Releaser releaser, ReleaserProperties properties, List<Task> allTasks) {
 		this.releaser = releaser;
 		this.properties = properties;
 		this.allTasks = allTasks;
+		this.applicationEventPublisher = null;
 	}
 
 	void processOptions(Options options, Args defaultArgs) {
@@ -191,7 +201,7 @@ class OptionsProcessor {
 		List<String> tasksFromInput = Arrays.asList(input.split(","));
 		List<String> taskNames = new ArrayList<>();
 		for (String task : tasksFromInput) {
-			Integer taskIndex = Integer.valueOf(task);
+			int taskIndex = Integer.parseInt(task);
 			taskNames.add(tasks.get(taskIndex).name);
 		}
 		tasks(tasks, taskNames, defaultArgs);
@@ -212,7 +222,7 @@ class OptionsProcessor {
 	private Args args(Args defaultArgs, boolean interactive) {
 		return new Args(this.releaser, defaultArgs.project, defaultArgs.projects,
 				defaultArgs.originalVersion, defaultArgs.versionFromScRelease,
-				this.properties, interactive, defaultArgs.taskType);
+				this.properties, interactive, defaultArgs.taskType, this.applicationEventPublisher);
 	}
 
 	String chosenOption() {

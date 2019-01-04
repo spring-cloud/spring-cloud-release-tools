@@ -1,18 +1,10 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.jakewharton.fliptables.FlipTableConverters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.core.NestedExceptionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * All tasks that can be executed by the releaser
@@ -198,8 +190,6 @@ enum TaskType {
 
 class CompositeConsumer implements Consumer<Args> {
 
-	private static final Logger log = LoggerFactory.getLogger(CompositeConsumer.class);
-
 	private final List<Task> tasks;
 	private final Consumer<Args> setup;
 
@@ -216,64 +206,7 @@ class CompositeConsumer implements Consumer<Args> {
 	@Override
 	public void accept(Args args) {
 		this.setup.accept(args);
-		List<Table> table = this.tasks.stream()
-				.map(task -> new Table(task.execute(args)))
-				.collect(Collectors.toList());
-		String string = "\n\n***** BUILD REPORT *****\n\n"
-				+ FlipTableConverters.fromIterable(table, Table.class)
-				+ "\n\n***** BUILD REPORT *****\n\n";
-		List<Table> brokenTasks = table.stream()
-				.filter(table1 -> StringUtils.hasText(table1.thrownException))
-				.collect(Collectors.toList());
-		if (!brokenTasks.isEmpty()) {
-			String brokenBuilds = "\n\n[BUILD UNSTABLE] The following post release tasks are failing!\n\n" +
-					brokenTasks.stream()
-							.map(table1 ->
-									String.format("***** Task Caption: <%s> ***** \nTask Description <%s>\nException Stacktrace \n\n%s",
-											table1.taskCaption, table1.taskDescription, Arrays
-													.stream(table1.exception.getStackTrace())
-													.map(StackTraceElement::toString)
-													.collect(Collectors.joining("\n"))))
-					.collect(Collectors.joining("\n\n"));
-			log.warn(string + brokenBuilds);
-			throw new IllegalStateException(brokenBuilds);
-		} else {
-			log.info(string);
-		}
+		this.tasks.forEach(task -> task.execute(args));
 	}
 
-
-}
-
-class Table {
-	final String taskCaption;
-	final String taskDescription;
-	final String taskState;
-	final String thrownException;
-	Exception exception;
-
-	Table(TaskAndException tae) {
-		this.taskCaption = tae.task.name;
-		this.taskDescription = tae.task.description;
-		this.taskState = tae.taskState.name().toLowerCase();
-		this.thrownException = tae.exception == null ? "" :
-				NestedExceptionUtils.getMostSpecificCause(tae.exception).toString();
-		this.exception = tae.exception;
-	}
-
-	public String getTaskCaption() {
-		return this.taskCaption;
-	}
-
-	public String getTaskDescription() {
-		return this.taskDescription;
-	}
-
-	public String getTaskState() {
-		return this.taskState;
-	}
-
-	public String getThrownException() {
-		return this.thrownException;
-	}
 }

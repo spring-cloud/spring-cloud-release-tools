@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
+
 /**
  * @author Marcin Grzejszczak
  */
@@ -38,6 +40,13 @@ class Task {
 	}
 
 	TaskAndException execute(Args args) {
+		TaskAndException taskAndException = doExecute(args);
+		args.publishEvent(new TaskCompleted(this,
+				args.projectName(), taskAndException));
+		return taskAndException;
+	}
+
+	private TaskAndException doExecute(Args args) {
 		if (args.taskType != this.taskType) {
 			log.info("Skipping [{}] since task type is [{}] and should be [{}]]",
 					this.name, this.taskType, args.taskType);
@@ -55,15 +64,24 @@ class Task {
 			} else {
 				return runTask(args);
 			}
-		} catch (Exception e) {
-			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for project <" +
-					(args.project != null ? args.project.getName() : "") + "> task <" +
-					this.name + "> \n\nwith description <" + this.description + ">\n\n", e);
+		}
+		catch (MakeBuildUnstableException atTheEnd) {
+			logError("TASK FAILED - WILL MARK THE BUILD UNSTABLE AT THE END!!!", args, atTheEnd);
+			return TaskAndException.failure(this, atTheEnd);
+		}
+		catch (Exception e) {
+			logError("BUILD FAILED!!!", args, e);
 			if (this.taskType == TaskType.RELEASE) {
 				throw e;
 			}
 			return TaskAndException.failure(this, e);
 		}
+	}
+
+	private void logError(String prefix, Args args, Exception e) {
+		log.error("\n\n\n" + prefix + "\n\nException occurred for project <" +
+				(args.project != null ? args.project.getName() : "") + "> task <" +
+				this.name + "> \n\nwith description <" + this.description + ">\n\n", e);
 	}
 
 	private TaskAndException runTask(Args args) {

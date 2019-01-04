@@ -25,6 +25,7 @@ import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Marcin Grzejszczak
@@ -41,6 +42,7 @@ public class SpringReleaserTests {
 	Aware1 aware1 = new Aware1();
 	Aware2 aware2 = new Aware2();
 	ReleaserPropertiesUpdater updater;
+	@Mock ApplicationEventPublisher applicationEventPublisher;
 	File releaserUpdater = new File(ReleaserPropertiesUpdaterTests.class
 			.getResource("/projects/releaser-updater/config/releaser.yml").toURI());
 
@@ -113,7 +115,7 @@ public class SpringReleaserTests {
 
 	private SpringReleaser stubbedSpringReleaser() {
 		return new SpringReleaser(this.releaser, this.properties,
-				this.optionsProcessor, this.updater) {
+				this.optionsProcessor, this.updater, applicationEventPublisher) {
 
 			@Override
 			Args postReleaseOptionsAgs(Options options, ProjectsAndVersion projectsAndVersion) {

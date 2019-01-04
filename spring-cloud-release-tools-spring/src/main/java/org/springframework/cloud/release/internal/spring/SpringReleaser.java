@@ -14,6 +14,7 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.StringUtils;
 
 /**
@@ -28,21 +29,25 @@ public class SpringReleaser {
 	private final ReleaserProperties properties;
 	private final OptionsProcessor optionsProcessor;
 	private final ReleaserPropertiesUpdater updater;
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 	public SpringReleaser(Releaser releaser, ReleaserProperties properties,
-			ReleaserPropertiesUpdater updater) {
+			ReleaserPropertiesUpdater updater, ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.properties = properties;
 		this.updater = updater;
-		this.optionsProcessor = new OptionsProcessor(releaser, properties);
+		this.applicationEventPublisher = applicationEventPublisher;
+		this.optionsProcessor = new OptionsProcessor(releaser, properties, applicationEventPublisher);
 	}
 
 	SpringReleaser(Releaser releaser, ReleaserProperties properties,
-			OptionsProcessor optionsProcessor, ReleaserPropertiesUpdater updater) {
+			OptionsProcessor optionsProcessor, ReleaserPropertiesUpdater updater,
+			ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.properties = properties;
 		this.optionsProcessor = optionsProcessor;
 		this.updater = updater;
+		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
 	/**
@@ -60,9 +65,15 @@ public class SpringReleaser {
 		if (this.properties.isPostReleaseTasksOnly()) {
 			log.info("Skipping release process and moving only to post release");
 			this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(options, projectsAndVersion));
+			buildCompleted();
 			return;
 		}
 		performReleaseAndPostRelease(options, projectsAndVersion);
+		buildCompleted();
+	}
+
+	private void buildCompleted() {
+		this.applicationEventPublisher.publishEvent(new BuildCompleted(this));
 	}
 
 	private void performReleaseAndPostRelease(Options options, ProjectsAndVersion projectsAndVersion) {
@@ -152,7 +163,7 @@ public class SpringReleaser {
 			this.properties.getPom().setBranch(version.version);
 		}
 		return new Args(this.releaser, projects, version,
-				this.properties, options.interactive);
+				this.properties, options.interactive, this.applicationEventPublisher);
 	}
 
 	private ProjectVersion versionFromBranch() {
@@ -201,7 +212,7 @@ public class SpringReleaser {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		final Args defaultArgs = new Args(this.releaser, project, projectsAndVersion.projectVersions,
 				originalVersion, projectsAndVersion.versionFromScRelease, this.properties,
-				options.interactive, taskType);
+				options.interactive, taskType, this.applicationEventPublisher);
 		log.debug("Processing project [{}] with args [{}]", project, defaultArgs);
 		this.optionsProcessor.processOptions(options, defaultArgs);
 		return projectsAndVersion;

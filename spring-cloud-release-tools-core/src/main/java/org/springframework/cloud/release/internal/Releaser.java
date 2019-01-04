@@ -4,16 +4,18 @@ import java.io.File;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
-import org.springframework.cloud.release.internal.gradle.GradleUpdater;
-import org.springframework.cloud.release.internal.post.PostReleaseActions;
-import org.springframework.cloud.release.internal.sagan.SaganUpdater;
-import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.gradle.GradleUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.post.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.sagan.SaganUpdater;
+import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.Assert;
 
 /**
@@ -199,6 +201,7 @@ public class Releaser {
 			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 		} catch (Exception ex) {
 			log.error("\n\n[BUILD UNSTABLE] WARNING! FAILED TO UPDATE SAGAN, DUE TO THE FOLLOWING EXCEPTION", ex);
+			throw new MakeBuildUnstableException(ex);
 		}
 	}
 
