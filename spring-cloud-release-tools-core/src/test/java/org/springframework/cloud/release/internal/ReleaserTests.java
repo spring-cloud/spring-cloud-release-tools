@@ -10,8 +10,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.BDDMockito;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
@@ -25,7 +26,7 @@ import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 
 /**
@@ -113,6 +114,7 @@ public class ReleaserTests {
 
 	@Test
 	public void should_generate_email_for_release_version() {
+		BDDMockito.given(this.templateGenerator.email(projects())).willReturn(new File("."));
 		releaser().createEmail(new ProjectVersion("original", "1.0.0.RELEASE"), projects());
 
 		then(this.templateGenerator).should().email(any(Projects.class));

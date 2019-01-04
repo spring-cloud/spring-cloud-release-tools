@@ -4,21 +4,15 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.model.Model;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.cloud.release.internal.pom.ModelWrapper;
-import org.springframework.cloud.release.internal.pom.Project;
-import org.springframework.cloud.release.internal.pom.PropertyStorer;
-import org.springframework.cloud.release.internal.pom.PropertyVersionChanger;
-import org.springframework.cloud.release.internal.pom.Versions;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 
 /**

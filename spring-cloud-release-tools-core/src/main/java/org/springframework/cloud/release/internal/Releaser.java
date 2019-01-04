@@ -144,7 +144,7 @@ public class Releaser {
 		if (email != null) {
 			log.info("\nSuccessfully created email template at location [{}]", email);
 		} else {
-			log.warn("\nFailed to create an email template");
+			throw new MakeBuildUnstableException("Failed to create an email template");
 		}
 	}
 
@@ -157,7 +157,7 @@ public class Releaser {
 		if (blog != null) {
 			log.info("\nSuccessfully created blog template at location [{}]", blog);
 		} else {
-			log.warn("\nFailed to create a blog template");
+			throw new MakeBuildUnstableException("Failed to create a blog template");
 		}
 
 	}
@@ -168,7 +168,7 @@ public class Releaser {
 			return;
 		}
 		this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
-		log.info("\nSuccessfully updated Spring Guides issues");
+		throw new MakeBuildUnstableException("Successfully updated Spring Guides issues");
 	}
 
 	public void createTweet(ProjectVersion releaseVersion, Projects projects) {
@@ -180,7 +180,7 @@ public class Releaser {
 		if (tweet != null) {
 			log.info("\nSuccessfully created tweet template at location [{}]", tweet);
 		} else {
-			log.warn("\nFailed to create a tweet template");
+			throw new MakeBuildUnstableException("Failed to create a tweet template");
 		}
 	}
 
@@ -215,7 +215,7 @@ public class Releaser {
 		if (this.documentationUpdater.updateProjectRepo(projects) != null) {
 			log.info("\nSuccessfully updated Spring project page");
 		} else {
-			log.warn("\nFailed to update Spring Project page");
+			throw new MakeBuildUnstableException("Failed to update Spring Project page");
 		}
 	}
 

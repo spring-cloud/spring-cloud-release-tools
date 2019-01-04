@@ -53,7 +53,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 
 /**
  * @author Marcin Grzejszczak

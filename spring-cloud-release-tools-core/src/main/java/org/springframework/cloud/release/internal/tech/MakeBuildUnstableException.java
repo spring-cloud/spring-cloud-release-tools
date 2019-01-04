@@ -25,4 +25,8 @@ public class MakeBuildUnstableException extends RuntimeException {
 	public MakeBuildUnstableException(Throwable cause) {
 		super(cause);
 	}
+
+	public MakeBuildUnstableException(String message) {
+		super(message);
+	}
 }
