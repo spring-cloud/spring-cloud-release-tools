@@ -105,12 +105,14 @@ public class Releaser {
 		this.projectGitHandler.revertChangesIfApplicable(project, scReleaseVersion);
 		ProjectVersion originalVersion = originalVersion(project);
 		log.info("Original project version is [{}]", originalVersion);
-		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
+		if ((scReleaseVersion.isRelease() || scReleaseVersion
+				.isServiceRelease()) && originalVersion.isSnapshot()) {
 			Projects newProjects = Projects.forRollback(projects, originalVersion);
 			updateProjectFromBom(project, newProjects, originalVersion, SKIP_SNAPSHOT_ASSERTION);
 			this.projectGitHandler.commitAfterBumpingVersions(project, originalVersion);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
-		} else {
+		}
+		else {
 			log.info("\nSuccessfully reverted the commit and came back to snapshot versions");
 		}
 	}
@@ -129,8 +131,12 @@ public class Releaser {
 			log.info("\nWon't close a milestone for a SNAPSHOT version");
 			return;
 		}
-		this.projectGitHandler.closeMilestone(releaseVersion);
-		log.info("\nSuccessfully closed milestone");
+		try {
+			this.projectGitHandler.closeMilestone(releaseVersion);
+			log.info("\nSuccessfully closed milestone");
+		} catch (Exception ex) {
+			throw new MakeBuildUnstableException("Failed to create an email template");
+		}
 	}
 
 	public void createEmail(ProjectVersion releaseVersion, Projects projects) {
@@ -140,11 +146,17 @@ public class Releaser {
 			log.info("\nWon't create email template for a SNAPSHOT version");
 			return;
 		}
-		File email = this.templateGenerator.email(projects);
-		if (email != null) {
-			log.info("\nSuccessfully created email template at location [{}]", email);
-		} else {
-			throw new MakeBuildUnstableException("Failed to create an email template");
+		try {
+			File email = this.templateGenerator.email(projects);
+			if (email != null) {
+				log.info("\nSuccessfully created email template at location [{}]", email);
+			}
+			else {
+				throw new MakeBuildUnstableException("Failed to create an email template");
+			}
+		}
+		catch (Exception ex) {
+			throw new MakeBuildUnstableException("Failed to create an email template", ex);
 		}
 	}
 
@@ -153,13 +165,18 @@ public class Releaser {
 			log.info("\nWon't create blog template for a SNAPSHOT version");
 			return;
 		}
-		File blog = this.templateGenerator.blog(projects);
-		if (blog != null) {
-			log.info("\nSuccessfully created blog template at location [{}]", blog);
-		} else {
-			throw new MakeBuildUnstableException("Failed to create a blog template");
+		try {
+			File blog = this.templateGenerator.blog(projects);
+			if (blog != null) {
+				log.info("\nSuccessfully created blog template at location [{}]", blog);
+			}
+			else {
+				throw new MakeBuildUnstableException("Failed to create a blog template");
+			}
 		}
-
+		catch (Exception ex) {
+			throw new MakeBuildUnstableException("Failed to create a blog template", ex);
+		}
 	}
 
 	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects) {
@@ -167,8 +184,12 @@ public class Releaser {
 			log.info("\nWon't update Spring Guides for a non Release / Service Release version");
 			return;
 		}
-		this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
-		throw new MakeBuildUnstableException("Successfully updated Spring Guides issues");
+		try {
+			this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
+		}
+		catch (Exception ex) {
+			throw new MakeBuildUnstableException("Successfully updated Spring Guides issues", ex);
+		}
 	}
 
 	public void createTweet(ProjectVersion releaseVersion, Projects projects) {
@@ -176,11 +197,17 @@ public class Releaser {
 			log.info("\nWon't create tweet template for a SNAPSHOT version");
 			return;
 		}
-		File tweet = this.templateGenerator.tweet(projects);
-		if (tweet != null) {
-			log.info("\nSuccessfully created tweet template at location [{}]", tweet);
-		} else {
-			throw new MakeBuildUnstableException("Failed to create a tweet template");
+		try {
+			File tweet = this.templateGenerator.tweet(projects);
+			if (tweet != null) {
+				log.info("\nSuccessfully created tweet template at location [{}]", tweet);
+			}
+			else {
+				throw new MakeBuildUnstableException("Failed to create a tweet template");
+			}
+		}
+		catch (Exception ex) {
+			throw new MakeBuildUnstableException("Failed to create a tweet template", ex);
 		}
 	}
 
@@ -189,8 +216,13 @@ public class Releaser {
 			log.info("\nWon't create release notes for a SNAPSHOT version");
 			return;
 		}
-		File output = this.templateGenerator.releaseNotes(projects);
-		log.info("\nSuccessfully created release notes at location [{}]", output);
+		try {
+			File output = this.templateGenerator.releaseNotes(projects);
+			log.info("\nSuccessfully created release notes at location [{}]", output);
+		}
+		catch (Exception ex) {
+			throw new MakeBuildUnstableException("Failed to create release notes", ex);
+		}
 	}
 
 	public void updateSagan(File project, ProjectVersion releaseVersion) {
@@ -199,8 +231,8 @@ public class Releaser {
 		try {
 			this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
 			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
-		} catch (Exception ex) {
-			log.error("\n\n[BUILD UNSTABLE] WARNING! FAILED TO UPDATE SAGAN, DUE TO THE FOLLOWING EXCEPTION", ex);
+		}
+		catch (Exception ex) {
 			throw new MakeBuildUnstableException(ex);
 		}
 	}
@@ -214,7 +246,8 @@ public class Releaser {
 	public void updateSpringProjectPage(Projects projects) {
 		if (this.documentationUpdater.updateProjectRepo(projects) != null) {
 			log.info("\nSuccessfully updated Spring project page");
-		} else {
+		}
+		else {
 			throw new MakeBuildUnstableException("Failed to update Spring Project page");
 		}
 	}

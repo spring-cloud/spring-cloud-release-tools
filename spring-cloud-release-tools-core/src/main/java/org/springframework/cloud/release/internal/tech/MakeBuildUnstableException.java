@@ -16,17 +16,29 @@
 
 package org.springframework.cloud.release.internal.tech;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Exception to be thrown if one wants to continue with the build
  * and throw this exception at the end of the release
  */
 public class MakeBuildUnstableException extends RuntimeException {
 
+	private static final Logger log = LoggerFactory.getLogger(MakeBuildUnstableException.class);
+
 	public MakeBuildUnstableException(Throwable cause) {
 		super(cause);
+		log.error("\n\n[BUILD UNSTABLE] WARNING!", cause);
 	}
 
 	public MakeBuildUnstableException(String message) {
 		super(message);
+		log.error("\n\n[BUILD UNSTABLE] WARNING! " + message);
+	}
+
+	public MakeBuildUnstableException(String message, Throwable cause) {
+		super(message, cause);
+		log.error("\n\n[BUILD UNSTABLE] WARNING! " + message, cause);
 	}
 }
