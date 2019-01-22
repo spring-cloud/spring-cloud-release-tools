@@ -94,13 +94,18 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 				Properties props = loadProps(file);
 				final Map<String, String> substitution = this.properties.getGradle()
 						.getGradlePropsSubstitution();
-				props.entrySet().stream().forEach(entry -> {
-					if (substitution.containsKey(entry.getKey())) {
-						Object projectName = substitution.get(entry.getKey());
-						ProjectVersion value = this.projects.forName((String) projectName);
-						log.info("Replacing [{}->{}] with [{}->{}]", entry.getKey(), entry.getValue(), entry.getKey(), value);
-						changedString.set(changedString.get().replace(entry.getKey() + "=" + entry.getValue(),
-								entry.getKey() + "=" + value));
+				props.forEach((key, value1) -> {
+					if (substitution.containsKey(key)) {
+						String projectName = substitution.get(key);
+						if (!this.projects.containsProject(projectName)) {
+							log.warn("Should update project with name [{}] but it wasn't found in the list of projects [{}]", projectName, this.projects
+									.asList());
+							return;
+						}
+						ProjectVersion value = this.projects.forName(projectName);
+						log.info("Replacing [{}->{}] with [{}->{}]", key, value1, key, value);
+						changedString.set(changedString.get().replace(key + "=" + value1,
+								key + "=" + value));
 					}
 				});
 				storeString(path, changedString.get());

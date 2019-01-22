@@ -1,8 +1,5 @@
 package org.springframework.cloud.release.internal.pom;
 
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -12,6 +9,9 @@ import java.util.Set;
 import org.junit.Test;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak

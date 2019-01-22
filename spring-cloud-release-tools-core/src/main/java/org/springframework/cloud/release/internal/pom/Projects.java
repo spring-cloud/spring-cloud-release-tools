@@ -75,18 +75,12 @@ public class Projects extends HashSet<ProjectVersion> {
 		final ProjectVersion thisProject = new ProjectVersion(projectRoot);
 		return this.stream().filter(projectVersion -> projectVersion.projectName.equals(thisProject.projectName))
 				.findFirst()
-				.orElseThrow(() -> exception(thisProject.projectName));
+				.orElseThrow(() -> exception(this, thisProject.projectName));
 	}
 
-	private static IllegalStateException exception(String projectName) {
+	private static IllegalStateException exception(Projects projects, String projectName) {
 		return new IllegalStateException(
-				"Project with name [" + projectName + "] is not present. "
-						+ additionalErrorMessage(projectName));
-	}
-
-	private static IllegalStateException exceptionStartingWithName(String projectName) {
-		return new IllegalStateException(
-				"Project starting with name [" + projectName + "] is not present. "
+				"Project with name [" + projectName + "] is not present in the list of projects [" + projects.asList() + "] . "
 						+ additionalErrorMessage(projectName));
 	}
 
@@ -98,7 +92,7 @@ public class Projects extends HashSet<ProjectVersion> {
 	public ProjectVersion forName(String projectName) {
 		return this.stream().filter(projectVersion -> projectVersion.projectName.equals(projectName))
 				.findFirst()
-				.orElseThrow(() -> exception(projectName));
+				.orElseThrow(() -> exception(this, projectName));
 	}
 
 	public boolean containsProject(String projectName) {
@@ -113,5 +107,9 @@ public class Projects extends HashSet<ProjectVersion> {
 
 	public boolean containsSnapshots() {
 		return this.stream().anyMatch(ProjectVersion::isSnapshot);
+	}
+
+	public String asList() {
+		return this.stream().map(version -> version.projectName + ":" + version.version).collect(Collectors.joining(","));
 	}
 }
