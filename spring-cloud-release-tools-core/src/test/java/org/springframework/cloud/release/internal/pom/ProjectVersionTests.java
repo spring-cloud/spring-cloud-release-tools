@@ -1,15 +1,16 @@
 package org.springframework.cloud.release.internal.pom;
 
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.cloud.release.internal.git.GitRepoTests;
+
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -336,6 +337,27 @@ public class ProjectVersionTests {
 		thatVersion = "Greenwich.SR1";
 
 		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isNegative();
+	}
+
+	@Test
+	public void should_return_minus_1_when_this_train_is_empty() {
+		String thisVersion = "";
+		String thatVersion = "Finchley.SR2";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isNegative();
+
+		thisVersion = "";
+		thatVersion = "";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isZero();
+	}
+
+	@Test
+	public void should_return_plus_1_when_that_train_is_empty() {
+		String thisVersion = "Finchley.SR1";
+		String thatVersion = "";
+
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isPositive();
 	}
 
 	private ProjectVersion projectVersion(String version) {

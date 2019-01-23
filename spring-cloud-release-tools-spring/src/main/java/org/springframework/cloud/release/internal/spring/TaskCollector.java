@@ -91,7 +91,7 @@ class Table {
 	Exception exception;
 
 	Table(String projectName, TaskAndException tae) {
-		this.projectName = projectName;
+		this.projectName = StringUtils.hasText(projectName) ? projectName : "Post Release";
 		this.taskCaption = tae.task.name;
 		this.taskDescription = tae.task.description;
 		this.taskState = tae.taskState.name().toLowerCase();

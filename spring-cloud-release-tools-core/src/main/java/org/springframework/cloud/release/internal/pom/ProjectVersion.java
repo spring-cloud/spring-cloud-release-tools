@@ -180,10 +180,10 @@ public class ProjectVersion {
 		assertVersionSet();
 		String[] split = version.split("\\.");
 		String thatName = split[0];
-		String thatValue = split[1];
+		String thatValue = split.length > 1 ? split[1] : "";
 		String[] thisSplit = this.version.split("\\.");
 		String thisName = thisSplit[0];
-		String thisValue = thisSplit[1];
+		String thisValue = thisSplit.length > 1 ? thisSplit[1] : "";
 		int nameComparison = thisName.compareTo(thatName);
 		if (nameComparison != 0) {
 			return nameComparison;
@@ -218,15 +218,24 @@ class VersionNumber implements Comparable<VersionNumber> {
 
 	@Override
 	public int compareTo(VersionNumber o) {
-		char thisFirst = this.version.toLowerCase().charAt(0);
-		char thatFirst = o.version.toLowerCase().charAt(0);
+		String thisLower = this.version.toLowerCase();
+		char thisFirst = thisLower.isEmpty() ? ' ' : thisLower.charAt(0);
+		String thatLower = o.version.toLowerCase();
+		char thatFirst = thatLower.isEmpty() ? ' ' : thatLower.charAt(0);
 		// B < M < RC < R < S
 		int charComparison = Character.compare(thisFirst, thatFirst);
 		if (charComparison != 0) {
 			return charComparison;
 		}
-		Integer thisNumber = Integer.valueOf(this.version.replaceAll("\\D+",""));
-		Integer thatNumber = Integer.valueOf(o.version.replaceAll("\\D+",""));
+		String thisVersion = this.version.replaceAll("\\D+", "");
+		boolean thisVersionEmpty = StringUtils.isEmpty(this.version);
+		String thatVersion = o.version.replaceAll("\\D+", "");
+		boolean thatVersionEmpty = StringUtils.isEmpty(o.version);
+		if (thisVersionEmpty || thatVersionEmpty) {
+			return thisVersion.compareTo(thatVersion);
+		}
+		Integer thisNumber = Integer.valueOf(thisVersion);
+		Integer thatNumber = Integer.valueOf(thatVersion);
 		return thisNumber.compareTo(thatNumber);
 	}
 }
