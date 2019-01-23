@@ -223,6 +223,31 @@ public class PostReleaseActionsTests {
 				.forName("spring-boot-dependencies").version).isEqualTo("2.0.4.RELEASE");
 	}
 
+	@Test
+	public void should_assume_that_project_version_is_snapshot_when_no_pom_is_present() throws Exception {
+		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().getAllTestSampleUrls().clear();
+		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
+				Collections.singletonList(tmpFile("spring-cloud-static/")
+						.getAbsolutePath() + "/"));
+		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
+		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
+				this.updater, this.gradleUpdater, this.builder, this.properties) {
+			@Override
+			Projects getPostReleaseProjects(Projects projects) {
+				postReleaseProjects.set(super.getPostReleaseProjects(projects));
+				return postReleaseProjects.get();
+			}
+		};
+
+		actions.updateAllTestSamples(currentGa());
+
+		Map.Entry<String, List<File>> entry = this.clonedTestProjects.entrySet()
+				.stream()
+				.filter(s -> s.getKey().contains("spring-cloud-static"))
+				.findFirst().orElseThrow(() -> new IllegalStateException("Not found"));
+	}
+
 	private String sleuthParentPomVersion() {
 		return this.testPomReader.readPom(new File(this.cloned, "sleuth/pom.xml"))
 				.getParent().getVersion();

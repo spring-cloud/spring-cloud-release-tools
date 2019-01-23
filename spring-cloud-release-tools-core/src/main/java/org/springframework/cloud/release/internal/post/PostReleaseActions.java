@@ -23,6 +23,7 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.core.NestedExceptionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -62,7 +63,7 @@ public class PostReleaseActions implements Closeable {
 			return;
 		}
 		File file = this.projectGitHandler.cloneTestSamplesProject();
-		ProjectVersion projectVersion = new ProjectVersion(file);
+		ProjectVersion projectVersion = newProjectVersion(file);
 		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
 		updateWithVersions(file, newProjects);
@@ -92,15 +93,17 @@ public class PostReleaseActions implements Closeable {
 				.flatMap(Collection::stream)
 				.collect(Collectors.toList());
 		log.info("Updated all samples!");
-		List<String> exceptionMessages = projectUrlAndExceptions.stream()
+		String exceptionMessages = projectUrlAndExceptions.stream()
 				.filter(ProjectUrlAndException::hasException)
 				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] "
-						+ "has exception [" + Arrays
-						.toString(NestedExceptionUtils.getMostSpecificCause(e.ex)
-								.getStackTrace()) + "]")
-				.collect(Collectors.toList());
-		if (!exceptionMessages.isEmpty()) {
-			throw new IllegalStateException("Exceptions were found while updating samples\n" + String.join("\n", exceptionMessages));
+						+ "has exception [\n\n" + Arrays
+						.stream(NestedExceptionUtils.getMostSpecificCause(e.ex)
+								.getStackTrace())
+						.map(StackTraceElement::toString)
+						.collect(Collectors.joining("\n")) + "]")
+				.collect(Collectors.joining("\n"));
+		if (StringUtils.hasText(exceptionMessages)) {
+			throw new IllegalStateException("Exceptions were found while updating samples\n" + exceptionMessages);
 		} else {
 			log.info("No exceptions were found while updating the samples");
 		}
@@ -139,7 +142,8 @@ public class PostReleaseActions implements Closeable {
 		File file = this.projectGitHandler
 				.cloneAndGuessBranch(url, releaseTrainVersion, projectVersion);
 		Projects newPostRelease = new Projects(postRelease);
-		newPostRelease.add(new ProjectVersion(file));
+		ProjectVersion newProjectVersion = newProjectVersion(file);
+		newPostRelease.add(newProjectVersion);
 		updateWithVersions(file, newPostRelease);
 		this.projectGitHandler
 				.commit(file, "Updated versions after [" + releaseTrainVersion + "] "
@@ -148,12 +152,24 @@ public class PostReleaseActions implements Closeable {
 		this.projectGitHandler.pushCurrentBranch(file);
 	}
 
+	private ProjectVersion newProjectVersion(File file) {
+		try {
+			return new ProjectVersion(file);
+		} catch (Exception ex) {
+			ProjectVersion projectVersion = ProjectVersion.notMavenProject(file);
+			String name = projectVersion.projectName;
+			String version = projectVersion.version;
+			log.warn("Exception occurred while trying to read the pom file. Will assume that the project name is [" + name + "] and version [" + version + "]", ex);
+			return projectVersion;
+		}
+	}
+
 	private void updateWithVersions(File file, Projects newPostRelease) {
 		this.projectPomUpdater
 				.updateProjectFromReleaseTrain(file, newPostRelease,
-						new ProjectVersion(file), false);
+						newProjectVersion(file), false);
 		this.gradleUpdater.updateProjectFromBom(file, newPostRelease,
-				new ProjectVersion(file), false);
+				newProjectVersion(file), false);
 	}
 
 	private ProjectAndFuture run(String key, String url, Runnable runnable) {
@@ -194,7 +210,7 @@ public class PostReleaseActions implements Closeable {
 			return;
 		}
 		File file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
-		ProjectVersion projectVersion = new ProjectVersion(file);
+		ProjectVersion projectVersion = newProjectVersion(file);
 		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
 		updateWithVersions(file, newProjects);

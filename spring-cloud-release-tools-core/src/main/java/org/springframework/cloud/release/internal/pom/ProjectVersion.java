@@ -25,14 +25,28 @@ public class ProjectVersion {
 	}
 
 	public ProjectVersion(File project) {
-		PomReader pomReader = new PomReader();
-		Model model = pomReader.readPom(project);
-		this.projectName = nameWithoutParent(model.getArtifactId());
-		this.version = model.getVersion();
-		this.model = model;
+		if (new File(project, "build.gradle").exists()) {
+			ProjectVersion projectVersion = notMavenProject(project);
+			this.projectName = projectVersion.projectName;
+			this.version = projectVersion.version;
+			this.model = null;
+		} else {
+			PomReader pomReader = new PomReader();
+			Model model = pomReader.readPom(project);
+			this.projectName = nameWithoutParent(model.getArtifactId());
+			this.version = model.getVersion();
+			this.model = model;
+		}
 	}
 
-	private String nameWithoutParent(String projectName) {
+	public static ProjectVersion notMavenProject(File file) {
+		File parentFolder = file.getParentFile() != null ? file.getParentFile() : file;
+		String name = parentFolder.getName();
+		String version = "1.0.0.BUILD-SNAPSHOT";
+		return new ProjectVersion(nameWithoutParent(name), version);
+	}
+
+	private static String nameWithoutParent(String projectName) {
 		boolean containsParent = projectName.endsWith("-parent");
 		if (!containsParent) {
 			return projectName;
