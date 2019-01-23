@@ -16,26 +16,10 @@
 
 package org.springframework.cloud.release.internal.spring;
 
-class TaskCompleted extends ReleaserTask {
+import org.springframework.context.ApplicationEvent;
 
-	final String projectName;
-	final TaskAndException taskAndException;
-
-	/**
-	 * Create a new ApplicationEvent.
-	 * @param source the object on which the event initially occurred (never {@code null})
-	 */
-	TaskCompleted(Object source, String projectName, TaskAndException taskAndException) {
+class ReleaserTask extends ApplicationEvent {
+	ReleaserTask(Object source) {
 		super(source);
-		this.taskAndException = taskAndException;
-		this.projectName = projectName;
-	}
-
-	@Override
-	public String toString() {
-		return "TaskCompleted{" +
-				"projectName='" + this.projectName + '\'' +
-				", taskName=" + this.taskAndException.task.name +
-				'}';
 	}
 }

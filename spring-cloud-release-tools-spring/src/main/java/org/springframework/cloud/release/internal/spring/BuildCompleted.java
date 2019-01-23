@@ -16,9 +16,7 @@
 
 package org.springframework.cloud.release.internal.spring;
 
-import org.springframework.context.ApplicationEvent;
-
-class BuildCompleted extends ApplicationEvent {
+class BuildCompleted extends ReleaserTask {
 
 	/**
 	 * Create a new ApplicationEvent.

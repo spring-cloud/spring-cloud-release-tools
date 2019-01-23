@@ -26,24 +26,22 @@ import com.jakewharton.fliptables.FlipTableConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.context.event.EventListener;
+import org.springframework.context.ApplicationListener;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.util.StringUtils;
 
-class TaskCollector {
+class TaskCollector implements ApplicationListener<ReleaserTask> {
 
 	private static final Logger log = LoggerFactory.getLogger(TaskCollector.class);
 
 	private final Queue<TaskCompleted> completedTasks = new ArrayBlockingQueue<>(300);
 
-	@EventListener
-	public void handleTaskCompleted(TaskCompleted taskCompleted) {
+	private void handleTaskCompleted(TaskCompleted taskCompleted) {
 		this.completedTasks.add(taskCompleted);
 		log.info("Completed task: " + taskCompleted);
 	}
 
-	@EventListener
-	public void handleBuildCompleted(BuildCompleted buildCompleted) {
+	private void handleBuildCompleted(BuildCompleted buildCompleted) {
 		log.info("Build has finished. Will summarize the results");
 		List<Table> table = this.completedTasks.stream()
 				.map(task -> new Table(task.projectName, task.taskAndException))
@@ -74,6 +72,14 @@ class TaskCollector {
 		}
 	}
 
+	@Override
+	public void onApplicationEvent(ReleaserTask event) {
+		if (event instanceof TaskCompleted) {
+			handleTaskCompleted((TaskCompleted) event);
+		} else if (event instanceof BuildCompleted) {
+			handleBuildCompleted((BuildCompleted) event);
+		}
+	}
 }
 
 class Table {

@@ -630,7 +630,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Command to be executed to generate release train documentation
 		 */
-		private String generateReleaseTrainDocsCommand = "./release_train.sh --retrieveversions --version {{version}} --ghpages --auto";
+		private String generateReleaseTrainDocsCommand = "bash release_train.sh --retrieveversions --version {{version}} --ghpages --auto";
 
 		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
 
