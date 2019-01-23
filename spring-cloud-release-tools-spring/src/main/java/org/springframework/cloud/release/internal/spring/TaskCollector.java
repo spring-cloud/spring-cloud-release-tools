@@ -58,7 +58,7 @@ class TaskCollector implements ApplicationListener<ReleaserTask> {
 							.map(table1 ->
 									String.format("***** Project / Task : <%s/%s> ***** \nTask Description <%s>\nException Stacktrace \n\n%s",
 											table1.projectName, table1.taskCaption,
-											table1.taskDescription, Arrays
+											table1.taskDescription, table1.exception + "\n" + Arrays
 													.stream(table1.exception.getStackTrace())
 													.map(StackTraceElement::toString)
 													.collect(Collectors.joining("\n"))))
