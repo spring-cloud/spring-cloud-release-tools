@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -99,20 +100,20 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	 * @param projects - versions of projects used to update poms
 	 * @param versionFromReleaseTrain - version for the built project taken
 	 *                                  from release train (e.g. Spring Cloud Release project)
-	 * @param assertSnapshots - should snapshots present be asserted
+	 * @param assertVersions - should version assertion take place
 	 */
 	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
-			ProjectVersion versionFromReleaseTrain, boolean assertSnapshots) {
+			ProjectVersion versionFromReleaseTrain, boolean assertVersions) {
 		Versions versions = new Versions(projects, this.properties);
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
 			log.info("Skipping project updating");
 			return;
 		}
-		updatePoms(projectRoot, projects, versionFromReleaseTrain, assertSnapshots);
+		updatePoms(projectRoot, projects, versionFromReleaseTrain, assertVersions);
 	}
 
 	private void updatePoms(File projectRoot, Projects projects,
-			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+			ProjectVersion versionFromScRelease, boolean assertVersions) {
 		File rootPom = new File(projectRoot, "pom.xml");
 		if (!rootPom.exists()) {
 			log.info("No pom.xml present, skipping!");
@@ -120,7 +121,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 		}
 		ModelWrapper rootPomModel = this.pomUpdater.readModel(rootPom);
 		processAllPoms(projectRoot, new PomWalker(rootPomModel, projects, this.pomUpdater,
-				this.properties, versionFromScRelease, assertSnapshots));
+				this.properties, versionFromScRelease, assertVersions));
 	}
 
 	private void processAllPoms(File projectRoot, PomWalker pomWalker) {
@@ -144,18 +145,21 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 		private final Versions versions;
 		private final PomUpdater pomUpdater;
 		private final ReleaserProperties properties;
-		private final boolean snapshotVersion;
-		private final boolean assertSnapshots;
+		private final boolean skipVersionAssert;
+		private final boolean assertVersions;
+		private final List<Pattern> unacceptableVersionPatterns;
 
 		private PomWalker(ModelWrapper rootPom, Projects projects, PomUpdater pomUpdater,
 				ReleaserProperties properties, ProjectVersion versionFromScRelease,
-				boolean assertSnapshots) {
+				boolean assertVersions) {
 			this.rootPom = rootPom;
 			this.versions = new Versions(projects, properties);
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
-			this.snapshotVersion = !assertSnapshots || versionFromScRelease.isSnapshot();
-			this.assertSnapshots = assertSnapshots;
+			List<Pattern> unacceptableVersionPatterns = versionFromScRelease.unacceptableVersionPatterns();
+			this.unacceptableVersionPatterns = unacceptableVersionPatterns;
+			this.skipVersionAssert = !assertVersions || unacceptableVersionPatterns.isEmpty();
+			this.assertVersions = assertVersions;
 		}
 
 		@Override
@@ -168,21 +172,23 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 				}
 				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file, this.versions);
 				this.pomUpdater.overwritePomIfDirty(model, this.versions, file);
-				if (this.assertSnapshots && !this.snapshotVersion && !this.pomUpdater.hasSkipDeployment(model.model)) {
+				if (this.assertVersions && !this.skipVersionAssert && !this.pomUpdater.hasSkipDeployment(model.model)) {
 					log.debug("Update is a non-snapshot one. Checking if no snapshot versions remained in the pom");
 					Scanner scanner = new Scanner(asString(path));
 					int lineNumber = 0;
 					while (scanner.hasNextLine()) {
 						String line = scanner.nextLine();
 						lineNumber++;
-						boolean containsSnapshot = line.contains("SNAPSHOT") &&
-								IGNORED_SNAPSHOT_LINE_PATTERNS.stream().noneMatch(line::matches);
-						if (containsSnapshot) {
-							throw new IllegalStateException("The file [" + path + "] contains a SNAPSHOT "
-									+ "version for a non snapshot release in line number [" + lineNumber + "]\n\n" + line);
+						Pattern matchingPattern = this.unacceptableVersionPatterns.stream()
+								.filter(pattern ->
+										IGNORED_SNAPSHOT_LINE_PATTERNS.stream().noneMatch(line::matches) &&
+										pattern.matcher(line).matches())
+								.findFirst().orElse(null);
+						if (matchingPattern != null) {
+							throw new IllegalStateException("The file [" + path + "] matches the [ " + matchingPattern.pattern() + "] pattern in line number [" + lineNumber + "]\n\n" + line);
 						}
 					}
-					log.info("No snapshot versions remained in the pom");
+					log.info("No invalid versions remained in the pom");
 				}
 			}
 			return FileVisitResult.CONTINUE;
@@ -190,7 +196,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.assertSnapshots &&
+			return this.assertVersions &&
 					this.properties.getPom().getIgnoredPomRegex().stream().anyMatch(path::matches);
 		}
 

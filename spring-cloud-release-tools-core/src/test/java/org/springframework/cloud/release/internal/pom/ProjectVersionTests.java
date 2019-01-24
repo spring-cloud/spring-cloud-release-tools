@@ -3,6 +3,8 @@ package org.springframework.cloud.release.internal.pom;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -358,6 +360,45 @@ public class ProjectVersionTests {
 		String thatVersion = "";
 
 		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isPositive();
+	}
+
+	@Test
+	public void should_return_no_unacceptable_patterns_for_a_snapshot_version() {
+		then(projectVersion("1.0.0.BUILD-SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
+		then(projectVersion("1.0.0.SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
+	}
+
+	@Test
+	public void should_return_snapshot_unacceptable_patterns_for_a_milestone_or_rc_version() {
+		List<Pattern> milestonePatterns = projectVersion("1.0.0.M1").unacceptableVersionPatterns();
+		then(milestonePatterns).isNotEmpty();
+		then(milestonePatterns.get(0).pattern()).contains("SNAPSHOT");
+
+		List<Pattern> rcPatterns = projectVersion("1.0.0.RC1").unacceptableVersionPatterns();
+		then(rcPatterns).isNotEmpty();
+		then(rcPatterns.get(0).pattern()).contains("SNAPSHOT");
+	}
+
+	@Test
+	public void should_return_snapshot_milestone_rc_unacceptable_patterns_for_a_ga_or_sr_version() {
+		List<Pattern> gaPatterns = projectVersion("1.0.0.RELEASE").unacceptableVersionPatterns();
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(gaPatterns);
+
+		gaPatterns = projectVersion("1.0.0").unacceptableVersionPatterns();
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(gaPatterns);
+
+		List<Pattern> srPatterns = projectVersion("1.0.0.SR1").unacceptableVersionPatterns();
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatterns);
+
+		List<Pattern> unknownTypeOfVersion = projectVersion("1.0.0.SOMETHING").unacceptableVersionPatterns();
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(unknownTypeOfVersion);
+	}
+
+	private void thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(List<Pattern> unknownTypeOfVersion) {
+		then(unknownTypeOfVersion).isNotEmpty();
+		then(unknownTypeOfVersion.get(0).pattern()).contains("SNAPSHOT");
+		then(unknownTypeOfVersion.get(1).pattern()).contains("M[0-9]");
+		then(unknownTypeOfVersion.get(2).pattern()).contains("RC");
 	}
 
 	private ProjectVersion projectVersion(String version) {

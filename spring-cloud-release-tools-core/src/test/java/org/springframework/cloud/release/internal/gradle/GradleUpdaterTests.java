@@ -1,8 +1,5 @@
 package org.springframework.cloud.release.internal.gradle;
 
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -14,10 +11,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.util.FileSystemUtils;
+
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
 /**
  * @author Marcin Grzejszczak
@@ -70,8 +71,8 @@ public class GradleUpdaterTests {
 		);
 
 		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromBom(projectRoot,
-				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true))
-		.hasMessageContaining("contains a SNAPSHOT version for a non snapshot release in line number");
+				projects, new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"), true))
+		.hasMessageContaining("matches the [ ^.*\\.(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
 	}
 
 	private File file(String relativePath) throws URISyntaxException {

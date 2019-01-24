@@ -8,10 +8,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,22 +40,22 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 	 * For the given root folder (typically the working directory) performs the whole
 	 * flow of updating {@code gradle.properties} with values from BOM project.
 	 * Remember to pass the mapping from a property name inside {@code gradle.properties} to
-	 * the project name via {@link ReleaserProperties.Gradle#gradlePropsSubstitution}
+	 * the project name via {@link ReleaserProperties.Gradle#getGradlePropsSubstitution}
 	 * @param projectRoot - root folder with project to update
 	 * @param projects - versions of projects used to update poms
 	 * @param versionFromBom - version for the project from Spring Cloud Release
-	 * @param assertSnapshots - should snapshots presence be asserted
+	 * @param assertVersions - should snapshots / milestone / rc presence be asserted
 	 */
 	public void updateProjectFromBom(File projectRoot, Projects projects,
-			ProjectVersion versionFromBom, boolean assertSnapshots) {
-		processAllGradleProps(projectRoot, projects, versionFromBom, assertSnapshots);
+			ProjectVersion versionFromBom, boolean assertVersions) {
+		processAllGradleProps(projectRoot, projects, versionFromBom, assertVersions);
 	}
 
 	private void processAllGradleProps(File projectRoot, Projects projects,
-			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+			ProjectVersion versionFromScRelease, boolean assertVersions) {
 		try {
 			Files.walkFileTree(projectRoot.toPath(),
-					new GradlePropertiesWalker(this.properties, projects, versionFromScRelease, assertSnapshots));
+					new GradlePropertiesWalker(this.properties, projects, versionFromScRelease, assertVersions));
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);
@@ -69,15 +72,18 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 
 		private final ReleaserProperties properties;
 		private final Projects projects;
-		private final boolean snapshotVersion;
-		private final boolean assertSnapshots;
+		private final boolean skipVersionAssert;
+		private final boolean assertVersions;
+		private final List<Pattern> unacceptableVersionPatterns;
 
 		private GradlePropertiesWalker(ReleaserProperties properties, Projects projects,
-				ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+				ProjectVersion versionFromScRelease, boolean assertVersions) {
 			this.properties = properties;
 			this.projects = projects;
-			this.snapshotVersion = !assertSnapshots || versionFromScRelease.isSnapshot();
-			this.assertSnapshots = assertSnapshots;
+			List<Pattern> unacceptableVersionPatterns = versionFromScRelease.unacceptableVersionPatterns();
+			this.unacceptableVersionPatterns = unacceptableVersionPatterns;
+			this.skipVersionAssert = !assertVersions || unacceptableVersionPatterns.isEmpty();
+			this.assertVersions = assertVersions;
 		}
 
 		@Override
@@ -115,20 +121,23 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 		}
 
 		private void assertNoSnapshotsArePresent(Path path) {
-			if (this.assertSnapshots && !this.snapshotVersion) {
-				log.debug("Update is a non-snapshot one. Checking if no snapshot versions remained in the gradle prop");
+			if (this.assertVersions && !this.skipVersionAssert) {
+				log.debug("Update should check if no wrong versions remained in the gradle prop. List of wrong patterns: {}",
+						this.unacceptableVersionPatterns.stream().map(Pattern::pattern).collect(Collectors
+								.toList()));
 				Scanner scanner = new Scanner(asString(path));
 				int lineNumber = 0;
 				while (scanner.hasNextLine()) {
 					String line = scanner.nextLine();
 					lineNumber++;
-					boolean containsSnapshot = line.contains("SNAPSHOT");
-					if (containsSnapshot) {
-						throw new IllegalStateException("The file [" + path + "] contains a SNAPSHOT "
-								+ "version for a non snapshot release in line number [" + lineNumber + "]\n\n" + line);
+					Pattern matchingPattern = this.unacceptableVersionPatterns.stream()
+							.filter(pattern -> pattern.matcher(line).matches())
+							.findFirst().orElse(null);
+					if (matchingPattern != null) {
+						throw new IllegalStateException("The file [" + path + "] matches the [ " + matchingPattern.pattern() + "] pattern in line number [" + lineNumber + "]\n\n" + line);
 					}
 				}
-				log.info("No snapshot versions remained in the pom");
+				log.info("No invalid versions remained in the gradle properties");
 			}
 		}
 
@@ -145,7 +154,7 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.assertSnapshots &&
+			return this.assertVersions &&
 					this.properties.getGradle().getIgnoredGradleRegex().stream().anyMatch(path::matches);
 		}
 

@@ -1,9 +1,14 @@
 package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.apache.maven.model.Model;
+
 import org.springframework.util.StringUtils;
 
 /**
@@ -14,6 +19,9 @@ import org.springframework.util.StringUtils;
  */
 public class ProjectVersion {
 
+	private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("^.*\\.(BUILD-)?SNAPSHOT.*$");
+	private static final String MILESTONE_REGEX = ".*\\.M[0-9]+";
+	private static final String RC_REGEX = "^.*\\.RC.*$";
 	public final String projectName;
 	public final String version;
 	private final Model model;
@@ -134,11 +142,11 @@ public class ProjectVersion {
 	}
 
 	public boolean isRc() {
-		return this.version != null && this.version.contains("RC");
+		return this.version != null && this.version.matches(RC_REGEX);
 	}
 
 	public boolean isMilestone() {
-		return this.version != null && this.version.matches(".*M[0-9]+");
+		return this.version != null && this.version.matches(MILESTONE_REGEX);
 	}
 
 	public boolean isRelease() {
@@ -206,6 +214,16 @@ public class ProjectVersion {
 
 	@Override public int hashCode() {
 		return Objects.hash(this.projectName);
+	}
+
+	public List<Pattern> unacceptableVersionPatterns() {
+		if (isSnapshot()) {
+			return Collections.emptyList();
+		} else if (isMilestone() || isRc()) {
+			return Collections.singletonList(SNAPSHOT_PATTERN);
+		}
+		// treat like GA
+		return Arrays.asList(SNAPSHOT_PATTERN, Pattern.compile(MILESTONE_REGEX), Pattern.compile(RC_REGEX));
 	}
 }
 
