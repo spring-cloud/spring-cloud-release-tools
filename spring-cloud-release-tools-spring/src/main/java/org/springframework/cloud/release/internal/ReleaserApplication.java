@@ -43,6 +43,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.Parser;
 import org.springframework.cloud.release.internal.spring.SpringReleaser;
+import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 
 @SpringBootApplication
 public class ReleaserApplication implements CommandLineRunner {
@@ -62,9 +63,15 @@ public class ReleaserApplication implements CommandLineRunner {
 			application.setWebApplicationType(WebApplicationType.NONE);
 			application.run(args);
 		}
-		catch (Throwable e) {
-			log.error("Exception occurred for the releaser", e);
-			throw e;
+		catch (MakeBuildUnstableException ex) {
+			log.error(
+					"[BUILD UNSTABLE] The release happened successfully, but there were post release issues");
+			log.error("[BUILD UNSTABLE] An exception that should make "
+					+ "the build unstable occurred. Will not throw an exception.");
+		}
+		catch (Throwable th) {
+			log.error("Exception occurred for the releaser", th);
+			throw th;
 		}
 	}
 
