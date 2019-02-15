@@ -49,7 +49,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class ProjectVersion {
+public class ProjectVersion implements Comparable<ProjectVersion> {
 
 	private static final Pattern SNAPSHOT_PATTERN = Pattern
 			.compile("^.*\\.(BUILD-)?SNAPSHOT.*$");
@@ -244,7 +244,8 @@ public class ProjectVersion {
 		if (nameComparison != 0) {
 			return nameComparison;
 		}
-		return new VersionNumber(thisValue).compareTo(new VersionNumber(thatValue));
+		return new TrainVersionNumber(thisValue)
+				.compareTo(new TrainVersionNumber(thatValue));
 	}
 
 	@Override
@@ -281,18 +282,24 @@ public class ProjectVersion {
 				Pattern.compile(RC_REGEX));
 	}
 
+	@Override
+	public int compareTo(ProjectVersion o) {
+		// very simple comparison
+		return this.version.compareTo(o.version);
+	}
+
 }
 
-class VersionNumber implements Comparable<VersionNumber> {
+class TrainVersionNumber implements Comparable<TrainVersionNumber> {
 
 	private final String version;
 
-	VersionNumber(String version) {
+	TrainVersionNumber(String version) {
 		this.version = version;
 	}
 
 	@Override
-	public int compareTo(VersionNumber o) {
+	public int compareTo(TrainVersionNumber o) {
 		String thisLower = this.version.toLowerCase();
 		char thisFirst = thisLower.isEmpty() ? ' ' : thisLower.charAt(0);
 		String thatLower = o.version.toLowerCase();

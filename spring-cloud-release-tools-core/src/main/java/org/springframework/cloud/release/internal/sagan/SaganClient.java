@@ -47,6 +47,6 @@ public interface SaganClient {
 
 	Project updateRelease(String projectName, List<ReleaseUpdate> releaseUpdate);
 
-	void patchProject(Project project);
+	Project patchProject(Project project);
 
 }

@@ -281,7 +281,8 @@ public class Releaser {
 		String currentBranch = this.projectGitHandler.currentBranch(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		try {
-			this.saganUpdater.updateSagan(currentBranch, originalVersion, releaseVersion);
+			this.saganUpdater.updateSagan(project, currentBranch, originalVersion,
+					releaseVersion);
 			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 		}
 		catch (Exception ex) {
