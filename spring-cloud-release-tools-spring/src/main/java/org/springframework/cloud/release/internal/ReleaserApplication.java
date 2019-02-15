@@ -64,6 +64,7 @@ public class ReleaserApplication implements CommandLineRunner {
 			application.run(args);
 		}
 		catch (MakeBuildUnstableException ex) {
+			log.error("[BUILD UNSTABLE] The following exceptions took place in the post release process", ex);
 			log.error(
 					"[BUILD UNSTABLE] The release happened successfully, but there were post release issues");
 			log.error("[BUILD UNSTABLE] An exception that should make "
