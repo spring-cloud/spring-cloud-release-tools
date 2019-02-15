@@ -5,7 +5,23 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,20 +69,21 @@ class TaskCollector implements ApplicationListener<ReleaserTask> {
 				.filter(table1 -> StringUtils.hasText(table1.thrownException))
 				.collect(Collectors.toList());
 		if (!brokenTasks.isEmpty()) {
-			String brokenBuilds = "\n\n[BUILD UNSTABLE] The following release tasks are failing!\n\n" +
-					brokenTasks.stream()
-							.map(table1 ->
-									String.format("***** Project / Task : <%s/%s> ***** \nTask Description <%s>\nException Stacktrace \n\n%s",
-											table1.projectName, table1.taskCaption,
-											table1.taskDescription, table1.exception + "\n" + Arrays
-													.stream(table1.exception.getStackTrace())
-													.map(StackTraceElement::toString)
-													.collect(Collectors.joining("\n"))))
+			String brokenBuilds = "\n\n[BUILD UNSTABLE] The following release tasks are failing!\n\n"
+					+ brokenTasks.stream().map(table1 -> String.format(
+							"***** Project / Task : <%s/%s> ***** \nTask Description <%s>\nException Stacktrace \n\n%s",
+							table1.projectName, table1.taskCaption,
+							table1.taskDescription,
+							table1.exception + "\n"
+									+ Arrays.stream(table1.exception.getStackTrace())
+											.map(StackTraceElement::toString)
+											.collect(Collectors.joining("\n"))))
 							.collect(Collectors.joining("\n\n"));
 			log.warn(string + brokenBuilds);
 			this.completedTasks.clear();
 			throw new IllegalStateException(brokenBuilds);
-		} else {
+		}
+		else {
 			log.info(string);
 			this.completedTasks.clear();
 		}
@@ -76,27 +93,36 @@ class TaskCollector implements ApplicationListener<ReleaserTask> {
 	public void onApplicationEvent(ReleaserTask event) {
 		if (event instanceof TaskCompleted) {
 			handleTaskCompleted((TaskCompleted) event);
-		} else if (event instanceof BuildCompleted) {
+		}
+		else if (event instanceof BuildCompleted) {
 			handleBuildCompleted((BuildCompleted) event);
 		}
 	}
+
 }
 
 class Table {
+
 	final String projectName;
+
 	final String taskCaption;
+
 	final String taskDescription;
+
 	final String taskState;
+
 	final String thrownException;
+
 	Exception exception;
 
 	Table(String projectName, TaskAndException tae) {
-		this.projectName = StringUtils.hasText(projectName) ? projectName : "Post Release";
+		this.projectName = StringUtils.hasText(projectName) ? projectName
+				: "Post Release";
 		this.taskCaption = tae.task.name;
 		this.taskDescription = tae.task.description;
 		this.taskState = tae.taskState.name().toLowerCase();
-		this.thrownException = tae.exception == null ? "" :
-				NestedExceptionUtils.getMostSpecificCause(tae.exception).toString();
+		this.thrownException = tae.exception == null ? ""
+				: NestedExceptionUtils.getMostSpecificCause(tae.exception).toString();
 		this.exception = tae.exception;
 	}
 
@@ -119,4 +145,5 @@ class Table {
 	public String getThrownException() {
 		return this.thrownException;
 	}
+
 }

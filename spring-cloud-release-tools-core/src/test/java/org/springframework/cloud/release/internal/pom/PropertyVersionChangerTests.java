@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.pom;
 
 import java.util.HashSet;
@@ -11,8 +27,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.BDDMockito.then;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
 /**
@@ -21,33 +37,42 @@ import static org.mockito.Mockito.never;
 @RunWith(MockitoJUnitRunner.class)
 public class PropertyVersionChangerTests {
 
-	@Mock PropertyStorer propertyStorer;
+	@Mock
+	PropertyStorer propertyStorer;
 
 	@Test
 	public void should_set_version_when_project_matches_property_name() throws Exception {
-		PropertyVersionChanger changer = new PropertyVersionChanger(model(), versions(), null, null, this.propertyStorer);
+		PropertyVersionChanger changer = new PropertyVersionChanger(model(), versions(),
+				null, null, this.propertyStorer);
 
 		changer.apply(null);
 
-		then(this.propertyStorer).should().setPropertyVersionIfApplicable(project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT"));
+		then(this.propertyStorer).should().setPropertyVersionIfApplicable(
+				project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT"));
 	}
 
 	@Test
-	public void should_not_set_version_when_project_doesnt_match_property_name() throws Exception {
-		PropertyVersionChanger changer = new PropertyVersionChanger(nonMatchingModel(), versions(), null, null, this.propertyStorer);
+	public void should_not_set_version_when_project_doesnt_match_property_name()
+			throws Exception {
+		PropertyVersionChanger changer = new PropertyVersionChanger(nonMatchingModel(),
+				versions(), null, null, this.propertyStorer);
 
 		changer.apply(null);
 
-		then(this.propertyStorer).should(never()).setPropertyVersionIfApplicable(any(Project.class));
+		then(this.propertyStorer).should(never())
+				.setPropertyVersionIfApplicable(any(Project.class));
 	}
 
 	@Test
-	public void should_not_set_version_when_project_matches_property_name_and_versions_are_the_same() throws Exception {
-		PropertyVersionChanger changer = new PropertyVersionChanger(modelWithSameValues(), versions(), null, null, this.propertyStorer);
+	public void should_not_set_version_when_project_matches_property_name_and_versions_are_the_same()
+			throws Exception {
+		PropertyVersionChanger changer = new PropertyVersionChanger(modelWithSameValues(),
+				versions(), null, null, this.propertyStorer);
 
 		changer.apply(null);
 
-		then(this.propertyStorer).should(never()).setPropertyVersionIfApplicable(any(Project.class));
+		then(this.propertyStorer).should(never())
+				.setPropertyVersionIfApplicable(any(Project.class));
 	}
 
 	Versions versions() {
@@ -56,10 +81,9 @@ public class PropertyVersionChangerTests {
 
 	@SuppressWarnings("unchecked")
 	private Set<Project> allProjects() {
-		return new HashSet<>(Arrays.asList(new Project[] {
-				project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
-				project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT")
-		}));
+		return new HashSet<>(Arrays.asList(
+				new Project[] { project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
+						project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT") }));
 	}
 
 	Project project(String name, String value) {
@@ -101,4 +125,5 @@ public class PropertyVersionChangerTests {
 		properties.setProperty("spring-cloud-non-matching.version", "1.0.0.RELEASE");
 		return properties;
 	}
+
 }

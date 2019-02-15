@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
@@ -20,12 +36,15 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 public class ProjectVersionTests {
 
 	File springCloudReleaseProject;
+
 	File springCloudContract;
 
 	@Before
 	public void setup() throws URISyntaxException {
-		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
-		URI scContract = GitRepoTests.class.getResource("/projects/spring-cloud-contract").toURI();
+		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release")
+				.toURI();
+		URI scContract = GitRepoTests.class.getResource("/projects/spring-cloud-contract")
+				.toURI();
 		this.springCloudReleaseProject = new File(scRelease.getPath(), "pom.xml");
 		this.springCloudContract = new File(scContract.getPath(), "pom.xml");
 	}
@@ -48,7 +67,8 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_build_version_from_file() {
-		ProjectVersion projectVersion = new ProjectVersion(this.springCloudReleaseProject);
+		ProjectVersion projectVersion = new ProjectVersion(
+				this.springCloudReleaseProject);
 
 		then(projectVersion.version).isEqualTo("Dalston.BUILD-SNAPSHOT");
 		then(projectVersion.projectName).isEqualTo("spring-cloud-starter-build");
@@ -137,36 +157,44 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_not_bump_version_by_patch_version_when_non_ga_or_sr() {
-		then(projectVersion("1.0.1.BUILD-SNAPSHOT").postReleaseSnapshotVersion()).isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(projectVersion("1.0.1.M1").postReleaseSnapshotVersion()).isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(projectVersion("1.0.1.RC1").postReleaseSnapshotVersion()).isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(projectVersion("Finchley.SR1").postReleaseSnapshotVersion()).isEqualTo("Finchley.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1.BUILD-SNAPSHOT").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1.M1").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1.RC1").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(projectVersion("Finchley.SR1").postReleaseSnapshotVersion())
+				.isEqualTo("Finchley.BUILD-SNAPSHOT");
 	}
 
 	@Test
 	public void should_bump_version_by_patch_version_when_bumping_snapshots_for_ga() {
-		then(projectVersion("1.0.1.RELEASE").postReleaseSnapshotVersion()).isEqualTo("1.0.2.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1.RELEASE").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.2.BUILD-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_the_previous_version_for_release_train_version_when_bumping_snapshots() {
 		String version = "Edgware.BUILD-SNAPSHOT";
 
-		then(projectVersion(version).postReleaseSnapshotVersion()).isEqualTo("Edgware.BUILD-SNAPSHOT");
+		then(projectVersion(version).postReleaseSnapshotVersion())
+				.isEqualTo("Edgware.BUILD-SNAPSHOT");
 	}
 
 	@Test
 	public void should_bump_version_by_patch_version_when_bumping_releases() {
 		String version = "1.0.1.RELEASE";
 
-		then(projectVersion(version).postReleaseSnapshotVersion()).isEqualTo("1.0.2.BUILD-SNAPSHOT");
+		then(projectVersion(version).postReleaseSnapshotVersion())
+				.isEqualTo("1.0.2.BUILD-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_the_previous_version_for_release_train_version_when_bumping_releases() {
 		String version = "Edgware.RELEASE";
 
-		then(projectVersion(version).postReleaseSnapshotVersion()).isEqualTo("Edgware.BUILD-SNAPSHOT");
+		then(projectVersion(version).postReleaseSnapshotVersion())
+				.isEqualTo("Edgware.BUILD-SNAPSHOT");
 	}
 
 	@Test
@@ -240,7 +268,8 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_False_when_checking_ga_version_against_non_ga() {
-		then(projectVersion("1.0.1.BUILD-SNAPSHOT").isReleaseOrServiceRelease()).isFalse();
+		then(projectVersion("1.0.1.BUILD-SNAPSHOT").isReleaseOrServiceRelease())
+				.isFalse();
 		then(projectVersion("1.0.1.M4").isReleaseOrServiceRelease()).isFalse();
 		then(projectVersion("1.0.1.RC4").isReleaseOrServiceRelease()).isFalse();
 	}
@@ -296,7 +325,8 @@ public class ProjectVersionTests {
 		String thisVersion = "Finchley.SR1";
 		String thatVersion = "Finchley.SR10";
 
-		then(projectVersion(thatVersion).compareToReleaseTrainName(thisVersion)).isPositive();
+		then(projectVersion(thatVersion).compareToReleaseTrainName(thisVersion))
+				.isPositive();
 	}
 
 	@Test
@@ -312,12 +342,14 @@ public class ProjectVersionTests {
 		String thisVersion = "Finchley.SR2";
 		String thatVersion = "Finchley.SR1";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isPositive();
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
+				.isPositive();
 
 		thisVersion = "Greenwich.SR1";
 		thatVersion = "Finchley.SR2";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isPositive();
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
+				.isPositive();
 	}
 
 	@Test
@@ -333,12 +365,14 @@ public class ProjectVersionTests {
 		String thisVersion = "Finchley.SR1";
 		String thatVersion = "Finchley.SR2";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isNegative();
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
+				.isNegative();
 
 		thisVersion = "Finchley.SR2";
 		thatVersion = "Greenwich.SR1";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isNegative();
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
+				.isNegative();
 	}
 
 	@Test
@@ -346,7 +380,8 @@ public class ProjectVersionTests {
 		String thisVersion = "";
 		String thatVersion = "Finchley.SR2";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isNegative();
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
+				.isNegative();
 
 		thisVersion = "";
 		thatVersion = "";
@@ -359,42 +394,51 @@ public class ProjectVersionTests {
 		String thisVersion = "Finchley.SR1";
 		String thatVersion = "";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isPositive();
+		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
+				.isPositive();
 	}
 
 	@Test
 	public void should_return_no_unacceptable_patterns_for_a_snapshot_version() {
-		then(projectVersion("1.0.0.BUILD-SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
+		then(projectVersion("1.0.0.BUILD-SNAPSHOT").unacceptableVersionPatterns())
+				.isEmpty();
 		then(projectVersion("1.0.0.SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
 	}
 
 	@Test
 	public void should_return_snapshot_unacceptable_patterns_for_a_milestone_or_rc_version() {
-		List<Pattern> milestonePatterns = projectVersion("1.0.0.M1").unacceptableVersionPatterns();
+		List<Pattern> milestonePatterns = projectVersion("1.0.0.M1")
+				.unacceptableVersionPatterns();
 		then(milestonePatterns).isNotEmpty();
 		then(milestonePatterns.get(0).pattern()).contains("SNAPSHOT");
 
-		List<Pattern> rcPatterns = projectVersion("1.0.0.RC1").unacceptableVersionPatterns();
+		List<Pattern> rcPatterns = projectVersion("1.0.0.RC1")
+				.unacceptableVersionPatterns();
 		then(rcPatterns).isNotEmpty();
 		then(rcPatterns.get(0).pattern()).contains("SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_snapshot_milestone_rc_unacceptable_patterns_for_a_ga_or_sr_version() {
-		List<Pattern> gaPatterns = projectVersion("1.0.0.RELEASE").unacceptableVersionPatterns();
+		List<Pattern> gaPatterns = projectVersion("1.0.0.RELEASE")
+				.unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(gaPatterns);
 
 		gaPatterns = projectVersion("1.0.0").unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(gaPatterns);
 
-		List<Pattern> srPatterns = projectVersion("1.0.0.SR1").unacceptableVersionPatterns();
+		List<Pattern> srPatterns = projectVersion("1.0.0.SR1")
+				.unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatterns);
 
-		List<Pattern> unknownTypeOfVersion = projectVersion("1.0.0.SOMETHING").unacceptableVersionPatterns();
-		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(unknownTypeOfVersion);
+		List<Pattern> unknownTypeOfVersion = projectVersion("1.0.0.SOMETHING")
+				.unacceptableVersionPatterns();
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(
+				unknownTypeOfVersion);
 	}
 
-	private void thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(List<Pattern> unknownTypeOfVersion) {
+	private void thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(
+			List<Pattern> unknownTypeOfVersion) {
 		then(unknownTypeOfVersion).isNotEmpty();
 		then(unknownTypeOfVersion.get(0).pattern()).contains("SNAPSHOT");
 		then(unknownTypeOfVersion.get(1).pattern()).contains("M[0-9]");
@@ -404,4 +448,5 @@ public class ProjectVersionTests {
 	private ProjectVersion projectVersion(String version) {
 		return new ProjectVersion("foo", version);
 	}
+
 }

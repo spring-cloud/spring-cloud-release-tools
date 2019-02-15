@@ -1,18 +1,35 @@
 /*
- *  Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal;
 
 import java.io.Serializable;
@@ -29,8 +46,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
 /**
- * Since, we are making a deep copy of this object, remember to have all the
- * nested classes to implement the Serializable interface.
+ * Since, we are making a deep copy of this object, remember to have all the nested
+ * classes to implement the Serializable interface.
  *
  * @author Marcin Grzejszczak
  */
@@ -44,7 +61,7 @@ public class ReleaserProperties implements Serializable {
 	private String workingDir;
 
 	/**
-	 * If set to {@code true} will run only post release tasks
+	 * If set to {@code true} will run only post release tasks.
 	 */
 	private boolean postReleaseTasksOnly = false;
 
@@ -61,40 +78,133 @@ public class ReleaserProperties implements Serializable {
 	private Template template = new Template();
 
 	/**
-	 * Project name to its version - overrides all versions
-	 * retrieved from a repository like Spring Cloud Release
+	 * Project name to its version - overrides all versions retrieved from a repository
+	 * like Spring Cloud Release.
 	 */
 	private Map<String, String> fixedVersions = new LinkedHashMap<>();
 
 	private MetaRelease metaRelease = new MetaRelease();
 
+	public String getWorkingDir() {
+		return StringUtils.hasText(this.workingDir) ? this.workingDir
+				: System.getProperty("user.dir");
+	}
+
+	public void setWorkingDir(String workingDir) {
+		this.workingDir = workingDir;
+	}
+
+	public Git getGit() {
+		return this.git;
+	}
+
+	public void setGit(Git git) {
+		this.git = git;
+	}
+
+	public Pom getPom() {
+		return this.pom;
+	}
+
+	public void setPom(Pom pom) {
+		this.pom = pom;
+	}
+
+	public Maven getMaven() {
+		return this.maven;
+	}
+
+	public void setMaven(Maven maven) {
+		this.maven = maven;
+	}
+
+	public Gradle getGradle() {
+		return this.gradle;
+	}
+
+	public void setGradle(Gradle gradle) {
+		this.gradle = gradle;
+	}
+
+	public Map<String, String> getFixedVersions() {
+		return this.fixedVersions;
+	}
+
+	public void setFixedVersions(Map<String, String> fixedVersions) {
+		this.fixedVersions = fixedVersions;
+	}
+
+	public MetaRelease getMetaRelease() {
+		return this.metaRelease;
+	}
+
+	public void setMetaRelease(MetaRelease metaRelease) {
+		this.metaRelease = metaRelease;
+	}
+
+	public Sagan getSagan() {
+		return this.sagan;
+	}
+
+	public void setSagan(Sagan sagan) {
+		this.sagan = sagan;
+	}
+
+	public Template getTemplate() {
+		return this.template;
+	}
+
+	public void setTemplate(Template template) {
+		this.template = template;
+	}
+
+	public boolean isPostReleaseTasksOnly() {
+		return this.postReleaseTasksOnly;
+	}
+
+	public void setPostReleaseTasksOnly(boolean postReleaseTasksOnly) {
+		this.postReleaseTasksOnly = postReleaseTasksOnly;
+	}
+
+	@Override
+	public String toString() {
+		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git="
+				+ this.git + ", pom=" + this.pom + ", maven=" + this.maven + ", gradle="
+				+ this.gradle + ", sagan=" + this.sagan + ", fixedVersions="
+				+ this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
+				+ this.template + '}';
+	}
+
+	public ReleaserProperties copy() {
+		return (ReleaserProperties) SerializationUtils.clone(this);
+	}
+
 	public static class MetaRelease implements Serializable {
+
 		/**
 		 * Are we releasing the whole suite of apps or only one?
 		 */
 		private boolean enabled = false;
 
 		/**
-		 * Name of the release train project
+		 * Name of the release train project.
 		 */
 		private String releaseTrainProjectName = "spring-cloud-release";
 
 		/**
-		 * All the names of dependencies that should be updated with the release
-		 * train project version
+		 * All the names of dependencies that should be updated with the release train
+		 * project version.
 		 */
-		private List<String> releaseTrainDependencyNames = Arrays.asList(
-				"spring-cloud", "spring-cloud-dependencies", "spring-cloud-starter"
-		);
+		private List<String> releaseTrainDependencyNames = Arrays.asList("spring-cloud",
+				"spring-cloud-dependencies", "spring-cloud-starter");
 
 		/**
-		 * The URL of the Git organization. We'll append each project's
-		 * name to it
+		 * The URL of the Git organization. We'll append each project's name to it.
 		 */
 		private String gitOrgUrl = "https://github.com/spring-cloud";
 
 		/**
-		 * Names of projects to skip deployment for meta-release
+		 * Names of projects to skip deployment for meta-release.
 		 */
 		private List<String> projectsToSkip = new ArrayList<String>() {
 			{
@@ -132,7 +242,8 @@ public class ReleaserProperties implements Serializable {
 			return this.releaseTrainDependencyNames;
 		}
 
-		public void setReleaseTrainDependencyNames(List<String> releaseTrainDependencyNames) {
+		public void setReleaseTrainDependencyNames(
+				List<String> releaseTrainDependencyNames) {
 			this.releaseTrainDependencyNames = releaseTrainDependencyNames;
 		}
 
@@ -146,101 +257,102 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "MetaRelease{" +
-					"enabled=" + this.enabled +
-					", releaseTrainProjectName='" + this.releaseTrainProjectName + '\'' +
-					", gitOrgUrl='" + this.gitOrgUrl + '\'' +
-					", projectsToSkip=" + this.projectsToSkip +
-					'}';
+			return "MetaRelease{" + "enabled=" + this.enabled
+					+ ", releaseTrainProjectName='" + this.releaseTrainProjectName + '\''
+					+ ", gitOrgUrl='" + this.gitOrgUrl + '\'' + ", projectsToSkip="
+					+ this.projectsToSkip + '}';
 		}
+
 	}
 
 	public static class Git implements Serializable {
 
 		/**
-		 * URL to Spring Cloud Release Git repository
+		 * URL to Spring Cloud Release Git repository.
 		 */
 		private String releaseTrainBomUrl = "https://github.com/spring-cloud/spring-cloud-release";
 
 		/**
-		 * URL to the documentation Git repository
+		 * URL to the documentation Git repository.
 		 */
 		private String documentationUrl = "https://github.com/spring-cloud/spring-cloud-static";
 
 		/**
-		 * URL to main release train project repository
+		 * URL to main release train project repository.
 		 */
 		private String springProjectUrl = "https://github.com/spring-projects/spring-cloud";
 
 		/**
-		 * URL to test samples
+		 * URL to test samples.
 		 */
 		private String testSamplesProjectUrl = "https://github.com/spring-cloud/spring-cloud-core-tests";
 
 		/**
-		 * URL to the release train documentation
+		 * URL to the release train documentation.
 		 */
 		private String releaseTrainDocsUrl = "https://github.com/spring-cloud-samples/scripts";
 
 		/**
-		 * URL to the release train wiki
+		 * URL to the release train wiki.
 		 */
 		private String releaseTrainWikiUrl = "https://github.com/spring-projects/spring-cloud.wiki";
 
 		/**
-		 * Branch to check out for the documentation project
+		 * Branch to check out for the documentation project.
 		 */
 		private String documentationBranch = "gh-pages";
 
 		/**
-		 * Branch to check out for the release train project
+		 * Branch to check out for the release train project.
 		 */
 		private String springProjectBranch = "gh-pages";
 
 		/**
-		 * Branch to check out for the test samples
+		 * Branch to check out for the test samples.
 		 */
 		private String testSamplesBranch = "master";
 
 		/**
-		 * Branch to check out for the release train docs
+		 * Branch to check out for the release train docs.
 		 */
 		private String releaseTrainDocsBranch = "master";
 
 		/**
-		 * Page prefix for the release train wiki. E.g. for [Spring-Cloud-Finchley-Release-Notes]
-		 * it would be [Spring-Cloud].
+		 * Page prefix for the release train wiki. E.g. for
+		 * [Spring-Cloud-Finchley-Release-Notes] it would be [Spring-Cloud].
 		 */
 		private String releaseTrainWikiPagePrefix = "Spring-Cloud";
 
 		/**
-		 * Where should the Spring Cloud Release repo get cloned to. If {@code null} defaults to a temporary directory
+		 * Where should the Spring Cloud Release repo get cloned to. If {@code null}
+		 * defaults to a temporary directory.
 		 */
 		private String cloneDestinationDir;
 
 		/**
-		 * If {@code true} then should fill the map of versions from Git. If {@code false} then picks fixed versions
+		 * If {@code true} then should fill the map of versions from Git. If {@code false}
+		 * then picks fixed versions.
 		 */
 		private boolean fetchVersionsFromGit = true;
 
 		/**
-		 * GitHub OAuth token to be used to interact with GitHub repo
+		 * GitHub OAuth token to be used to interact with GitHub repo.
 		 */
 		private String oauthToken = "";
 
 		/**
-		 * Optional Git username. If not passed keys will be used for authentication
+		 * Optional Git username. If not passed keys will be used for authentication.
 		 */
 		private String username;
 
 		/**
-		 * Optional Git password. If not passed keys will be used for authentication
+		 * Optional Git password. If not passed keys will be used for authentication.
 		 */
 		private String password;
 
 		/**
-		 * In order not to iterate endlessly over milestones we introduce a threshold of milestones
-		 * that we will go through to find the matching milestone
+		 * In order not to iterate endlessly over milestones we introduce a threshold of
+		 * milestones that we will go through to find the matching milestone.
 		 */
 		private Integer numberOfCheckedMilestones = 50;
 
@@ -255,28 +367,29 @@ public class ReleaserProperties implements Serializable {
 		private boolean updateSpringGuides = true;
 
 		/**
-		 * If set to {@code false}, will not update the Spring Project for a release train.
-		 * E.g. for Spring Cloud will not update https://cloud.spring.io
+		 * If set to {@code false}, will not update the Spring Project for a release
+		 * train. E.g. for Spring Cloud will not update https://cloud.spring.io .
 		 */
 		private boolean updateSpringProject = true;
 
 		/**
-		 * If set to {@code false}, will not update the test samples
+		 * If set to {@code false}, will not update the test samples.
 		 */
 		private boolean runUpdatedSamples = true;
 
 		/**
-		 * If set to {@code false}, will not update the release train docs
+		 * If set to {@code false}, will not update the release train docs.
 		 */
 		private boolean updateReleaseTrainDocs = true;
 
 		/**
-		 * If set to {@code false}, will not clone and update the release train wiki
+		 * If set to {@code false}, will not clone and update the release train wiki.
 		 */
 		private boolean updateReleaseTrainWiki = true;
 
 		/**
-		 * If set to {@code false}, will not clone and update the samples for all projects
+		 * If set to {@code false}, will not clone and update the samples for all
+		 * projects.
 		 */
 		private boolean updateAllTestSamples = true;
 
@@ -286,15 +399,13 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private Map<String, List<String>> allTestSampleUrls = new HashMap<String, List<String>>() {
 			{
-				this.put("spring-cloud-sleuth" , Arrays.asList(
+				this.put("spring-cloud-sleuth", Arrays.asList(
 						"https://github.com/spring-cloud-samples/sleuth-issues",
-						"https://github.com/spring-cloud-samples/sleuth-documentation-apps")
-				);
-				this.put("spring-cloud-contract" , Arrays.asList(
+						"https://github.com/spring-cloud-samples/sleuth-documentation-apps"));
+				this.put("spring-cloud-contract", Arrays.asList(
 						"https://github.com/spring-cloud-samples/spring-cloud-contract-samples",
 						"https://github.com/spring-cloud-samples/the-legacy-app",
-						"https://github.com/spring-cloud-samples/sc-contract-car-rental")
-				);
+						"https://github.com/spring-cloud-samples/sc-contract-car-rental"));
 			}
 		};
 
@@ -366,16 +477,16 @@ public class ReleaserProperties implements Serializable {
 			return this.runUpdatedSamples;
 		}
 
+		public void setRunUpdatedSamples(boolean runUpdatedSamples) {
+			this.runUpdatedSamples = runUpdatedSamples;
+		}
+
 		public boolean isUpdateAllTestSamples() {
 			return this.updateAllTestSamples;
 		}
 
 		public void setUpdateAllTestSamples(boolean updateAllTestSamples) {
 			this.updateAllTestSamples = updateAllTestSamples;
-		}
-
-		public void setRunUpdatedSamples(boolean runUpdatedSamples) {
-			this.runUpdatedSamples = runUpdatedSamples;
 		}
 
 		public String getCloneDestinationDir() {
@@ -500,57 +611,57 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Git{" +
-					"releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\'' +
-					", documentationUrl='" + this.documentationUrl + '\'' +
-					", documentationBranch='" + this.documentationBranch + '\'' +
-					", releaseTrainWikiUrl='" + this.releaseTrainWikiUrl + '\'' +
-					", updateDocumentationRepo=" + this.updateDocumentationRepo +
-					", springProjectUrl=" + this.springProjectUrl+
-					", springProjectBranch=" + this.springProjectBranch +
-					", releaseTrainWikiPagePrefix=" + this.releaseTrainWikiPagePrefix +
-					", cloneDestinationDir='" + this.cloneDestinationDir + '\'' +
-					", fetchVersionsFromGit=" + this.fetchVersionsFromGit +
-					", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones +
-					", updateSpringGuides=" + this.updateSpringGuides +
-					", updateSpringProject=" + this.updateSpringProject +
-					", sampleUrlsSize=" + this.allTestSampleUrls.size() +
-					'}';
+			return "Git{" + "releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\''
+					+ ", documentationUrl='" + this.documentationUrl + '\''
+					+ ", documentationBranch='" + this.documentationBranch + '\''
+					+ ", releaseTrainWikiUrl='" + this.releaseTrainWikiUrl + '\''
+					+ ", updateDocumentationRepo=" + this.updateDocumentationRepo
+					+ ", springProjectUrl=" + this.springProjectUrl
+					+ ", springProjectBranch=" + this.springProjectBranch
+					+ ", releaseTrainWikiPagePrefix=" + this.releaseTrainWikiPagePrefix
+					+ ", cloneDestinationDir='" + this.cloneDestinationDir + '\''
+					+ ", fetchVersionsFromGit=" + this.fetchVersionsFromGit
+					+ ", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones
+					+ ", updateSpringGuides=" + this.updateSpringGuides
+					+ ", updateSpringProject=" + this.updateSpringProject
+					+ ", sampleUrlsSize=" + this.allTestSampleUrls.size() + '}';
 		}
+
 	}
 
 	public static class Pom implements Serializable {
 
 		/**
-		 * Which branch of release train BOM should be checked out. Defaults to {@code master}
+		 * Which branch of release train BOM should be checked out. Defaults to
+		 * {@code master}.
 		 */
 		private String branch = "master";
 
 		/**
-		 * Subfolder of the pom that contains the {@code spring-boot-starer-parent} dependency
+		 * Subfolder of the pom that contains the {@code spring-boot-starer-parent}
+		 * dependency.
 		 */
 		private String pomWithBootStarterParent = "spring-cloud-starter-parent/pom.xml";
 
 		/**
-		 * Subfolder of the pom that contains the versions for the release train
+		 * Subfolder of the pom that contains the versions for the release train.
 		 */
 		private String thisTrainBom = "spring-cloud-dependencies/pom.xml";
 
 		/**
-		 * The pattern to match a version property in a BOM
+		 * The pattern to match a version property in a BOM.
 		 */
 		private String bomVersionPattern = "^(spring-cloud-.*)\\.version$";
 
 		/**
-		 * List of regular expressions of ignored poms. Defaults to test projects and samples.
+		 * List of regular expressions of ignored poms. Defaults to test projects and
+		 * samples.
 		 */
 		@SuppressWarnings("unchecked")
-		private List<String> ignoredPomRegex = Arrays.asList(
-				"^.*\\.git/.*$",
+		private List<String> ignoredPomRegex = Arrays.asList("^.*\\.git/.*$",
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
-				"^.*samples/standalone/[a-z]+/.*$"
-		);
+				"^.*samples/standalone/[a-z]+/.*$");
 
 		public String getBranch() {
 			return this.branch;
@@ -594,54 +705,57 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Pom{" +
-					"branch='" + this.branch + '\'' +
-					", pomWithBootStarterParent='" + this.pomWithBootStarterParent + '\'' +
-					", thisTrainBom='" + this.thisTrainBom + '\'' +
-					", bomVersionPattern='" + this.bomVersionPattern + '\'' +
-					", ignoredPomRegex=" + this.ignoredPomRegex +
-					'}';
+			return "Pom{" + "branch='" + this.branch + '\''
+					+ ", pomWithBootStarterParent='" + this.pomWithBootStarterParent
+					+ '\'' + ", thisTrainBom='" + this.thisTrainBom + '\''
+					+ ", bomVersionPattern='" + this.bomVersionPattern + '\''
+					+ ", ignoredPomRegex=" + this.ignoredPomRegex + '}';
 		}
+
 	}
 
 	public static class Maven implements Serializable {
 
 		/**
-		 * Command to be executed to build the project
+		 * Placeholder for system properties.
+		 */
+		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
+
+		/**
+		 * Command to be executed to build the project.
 		 */
 		private String buildCommand = "./mvnw clean install -B -Pdocs {{systemProps}}";
 
 		/**
-		 * Command to be executed to deploy a built project
+		 * Command to be executed to deploy a built project.
 		 */
 		private String deployCommand = "./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}";
 
 		/**
-		 * Command to be executed to publish documentation. If present "{{version}}" will be replaced by the
-		 * provided version
+		 * Command to be executed to publish documentation. If present "{{version}}" will
+		 * be replaced by the provided version.
 		 */
-		private String[] publishDocsCommands = {
-				"mkdir -p target",
-				"wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh",
-				"chmod +x target/gh-pages.sh",
-				"./target/gh-pages.sh -v {{version}} -c"
-		};
+		private String[] publishDocsCommands = { "mkdir -p target",
+				"wget https://raw.githubusercontent.com/spring-cloud/"
+						+ "spring-cloud-build/master/"
+						+ "docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh",
+				"chmod +x target/gh-pages.sh", "./target/gh-pages.sh -v {{version}} -c" };
 
 		/**
-		 * Command to be executed to generate release train documentation
+		 * Command to be executed to generate release train documentation.
 		 */
-		private String generateReleaseTrainDocsCommand = "bash release_train.sh --retrieveversions --version {{version}} --ghpages --auto";
-
-		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
+		private String generateReleaseTrainDocsCommand = "bash release_train.sh "
+				+ "--retrieveversions --version {{version}} --ghpages --auto";
 
 		/**
-		 * Additional system properties that should be passed to the build / deploy commands.
-		 * If present in other commands "{{systemProps}}" will be substituted with this property.
+		 * Additional system properties that should be passed to the build / deploy
+		 * commands. If present in other commands "{{systemProps}}" will be substituted
+		 * with this property.
 		 */
 		private String systemProperties = "";
 
 		/**
-		 * Max wait time in minutes for the process to finish
+		 * Max wait time in minutes for the process to finish.
 		 */
 		private long waitTimeInMinutes = 20;
 
@@ -673,16 +787,17 @@ public class ReleaserProperties implements Serializable {
 			return this.publishDocsCommands;
 		}
 
+		public void setPublishDocsCommands(String[] publishDocsCommands) {
+			this.publishDocsCommands = publishDocsCommands;
+		}
+
 		public String getGenerateReleaseTrainDocsCommand() {
 			return this.generateReleaseTrainDocsCommand;
 		}
 
-		public void setGenerateReleaseTrainDocsCommand(String generateReleaseTrainDocsCommand) {
+		public void setGenerateReleaseTrainDocsCommand(
+				String generateReleaseTrainDocsCommand) {
 			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
-		}
-
-		public void setPublishDocsCommands(String[] publishDocsCommands) {
-			this.publishDocsCommands = publishDocsCommands;
 		}
 
 		public String getSystemProperties() {
@@ -693,26 +808,29 @@ public class ReleaserProperties implements Serializable {
 			this.systemProperties = systemProperties;
 		}
 
-		@Override public String toString() {
-			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='"
-					+ this.deployCommand + '\'' + ", publishDocsCommands=" + Arrays
-					.toString(this.publishDocsCommands) +
-					"generateReleaseTrainDocsCommand='" + this.generateReleaseTrainDocsCommand + '\'' +
-					", waitTimeInMinutes=" + this.waitTimeInMinutes + '}';
+		@Override
+		public String toString() {
+			return "Maven{" + "buildCommand='" + this.buildCommand + '\''
+					+ ", deployCommand='" + this.deployCommand + '\''
+					+ ", publishDocsCommands=" + Arrays.toString(this.publishDocsCommands)
+					+ "generateReleaseTrainDocsCommand='"
+					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes="
+					+ this.waitTimeInMinutes + '}';
 		}
+
 	}
 
 	public static class Gradle implements Serializable {
 
 		/**
-		 * A mapping that should be applied to {@code gradle.properties} in order
-		 * to perform a substitution of properties. The mapping is from a property
-		 * inside {@code gradle.properties} to the projects name. Example
+		 * A mapping that should be applied to {@code gradle.properties} in order to
+		 * perform a substitution of properties. The mapping is from a property inside
+		 * {@code gradle.properties} to the projects name. Example.
 		 *
-		 * In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You
-		 * want this property to get updated with the value of {@code spring-cloud-contract}
-		 * version. Then it's enough to do the mapping like this for this Releaser's property:
-		 * {@code verifierVersion=spring-cloud-contract}
+		 * In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You want
+		 * this property to get updated with the value of {@code spring-cloud-contract}
+		 * version. Then it's enough to do the mapping like this for this Releaser's
+		 * property: {@code verifierVersion=spring-cloud-contract}.
 		 */
 		private Map<String, String> gradlePropsSubstitution = new HashMap<String, String>() {
 			{
@@ -725,15 +843,14 @@ public class ReleaserProperties implements Serializable {
 		};
 
 		/**
-		 * List of regular expressions of ignored gradle props.
-		 * Defaults to test projects and samples.
+		 * List of regular expressions of ignored gradle props. Defaults to test projects
+		 * and samples.
 		 */
 		@SuppressWarnings("unchecked")
 		private List<String> ignoredGradleRegex = Arrays.asList(
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
-				"^.*samples/standalone/[a-z]+/.*$"
-		);
+				"^.*samples/standalone/[a-z]+/.*$");
 
 		public Map<String, String> getGradlePropsSubstitution() {
 			return this.gradlePropsSubstitution;
@@ -752,21 +869,23 @@ public class ReleaserProperties implements Serializable {
 			this.ignoredGradleRegex = ignoredGradleRegex;
 		}
 
-		@Override public String toString() {
+		@Override
+		public String toString() {
 			return "Gradle{" + "gradlePropsSubstitution=" + this.gradlePropsSubstitution
 					+ ", ignoredGradleRegex=" + this.ignoredGradleRegex + '}';
 		}
+
 	}
 
 	public static class Sagan implements Serializable {
 
 		/**
-		 * If set to {@code false} will not update Sagan
+		 * If set to {@code false} will not update Sagan.
 		 */
 		private boolean updateSagan = true;
 
 		/**
-		 * URL to the Sagan API
+		 * URL to the Sagan API.
 		 */
 		private String baseUrl = "https://spring.io";
 
@@ -786,14 +905,17 @@ public class ReleaserProperties implements Serializable {
 			this.updateSagan = updateSagan;
 		}
 
-		@Override public String toString() {
+		@Override
+		public String toString() {
 			return "Sagan{" + "baseUrl='" + this.baseUrl + '\'' + '}';
 		}
+
 	}
 
 	public static class Template implements Serializable {
+
 		/**
-		 * Folder in which blog, email etc. templates are stored
+		 * Folder in which blog, email etc. templates are stored.
 		 */
 		private String templateFolder = "cloud";
 
@@ -807,101 +929,9 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Template{" +
-					"templateFolder='" + this.templateFolder + '\'' +
-					'}';
+			return "Template{" + "templateFolder='" + this.templateFolder + '\'' + '}';
 		}
+
 	}
 
-	public String getWorkingDir() {
-		return StringUtils.hasText(this.workingDir) ?
-				this.workingDir : System.getProperty("user.dir");
-	}
-
-	public void setWorkingDir(String workingDir) {
-		this.workingDir = workingDir;
-	}
-
-	public Git getGit() {
-		return this.git;
-	}
-
-	public void setGit(Git git) {
-		this.git = git;
-	}
-
-	public Pom getPom() {
-		return this.pom;
-	}
-
-	public void setPom(Pom pom) {
-		this.pom = pom;
-	}
-
-	public Maven getMaven() {
-		return this.maven;
-	}
-
-	public void setMaven(Maven maven) {
-		this.maven = maven;
-	}
-
-	public Gradle getGradle() {
-		return this.gradle;
-	}
-
-	public void setGradle(Gradle gradle) {
-		this.gradle = gradle;
-	}
-
-	public Map<String, String> getFixedVersions() {
-		return this.fixedVersions;
-	}
-
-	public void setFixedVersions(Map<String, String> fixedVersions) {
-		this.fixedVersions = fixedVersions;
-	}
-
-	public MetaRelease getMetaRelease() {
-		return this.metaRelease;
-	}
-
-	public void setMetaRelease(MetaRelease metaRelease) {
-		this.metaRelease = metaRelease;
-	}
-
-	public Sagan getSagan() {
-		return this.sagan;
-	}
-
-	public void setSagan(Sagan sagan) {
-		this.sagan = sagan;
-	}
-
-	public Template getTemplate() {
-		return this.template;
-	}
-
-	public void setTemplate(Template template) {
-		this.template = template;
-	}
-
-	public boolean isPostReleaseTasksOnly() {
-		return this.postReleaseTasksOnly;
-	}
-
-	public void setPostReleaseTasksOnly(boolean postReleaseTasksOnly) {
-		this.postReleaseTasksOnly = postReleaseTasksOnly;
-	}
-
-	@Override public String toString() {
-		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git
-				+ ", pom=" + this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan="
-				+ this.sagan + ", fixedVersions=" + this.fixedVersions + ", metaRelease="
-				+ this.metaRelease + ", template=" + this.template + '}';
-	}
-
-	public ReleaserProperties copy() {
-		return (ReleaserProperties) SerializationUtils.clone(this);
-	}
 }

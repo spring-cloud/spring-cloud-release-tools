@@ -1,18 +1,35 @@
 /*
- *  Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
@@ -31,8 +48,10 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 
+import static org.springframework.cloud.release.internal.pom.SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
+
 /**
- * Parses the poms for a given project and populates versions from a release train
+ * Parses the poms for a given project and populates versions from a release train.
  *
  * @author Marcin Grzejszczak
  */
@@ -41,12 +60,16 @@ class BomParser {
 	private static final Logger log = LoggerFactory.getLogger(BomParser.class);
 
 	private final File thisProjectRoot;
-	private final String pomWithBootStarterParent;
-	private final String thisTrainBom;
-	private final PomReader pomReader = new PomReader();
-	private final Pattern versionPattern;
-	private final ReleaserProperties properties;
 
+	private final String pomWithBootStarterParent;
+
+	private final String thisTrainBom;
+
+	private final PomReader pomReader = new PomReader();
+
+	private final Pattern versionPattern;
+
+	private final ReleaserProperties properties;
 
 	BomParser(ReleaserProperties properties, File thisProjectRoot) {
 		this.thisProjectRoot = thisProjectRoot;
@@ -59,7 +82,8 @@ class BomParser {
 	Versions allVersions() {
 		Versions boot = bootVersion();
 		Versions cloud = versionsFromBom();
-		return new Versions(boot.bootVersion, cloud.scBuildVersion, allProjects(boot, cloud));
+		return new Versions(boot.bootVersion, cloud.scBuildVersion,
+				allProjects(boot, cloud));
 	}
 
 	private Set<Project> allProjects(Versions boot, Versions cloud) {
@@ -76,8 +100,10 @@ class BomParser {
 		}
 		String bootArtifactId = model.getParent().getArtifactId();
 		log.debug("Boot artifact id is equal to [{}]", bootArtifactId);
-		if (!SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID.equals(bootArtifactId)) {
-			throw new IllegalStateException("The pom doesn't have a [" + SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID
+		if (!SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID
+				.equals(bootArtifactId)) {
+			throw new IllegalStateException("The pom doesn't have a ["
+					+ SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID
 					+ "] artifact id");
 		}
 		String bootVersion = model.getParent().getVersion();
@@ -96,27 +122,29 @@ class BomParser {
 		return this.pomReader.readPom(pomFile);
 	}
 
-	// the BOM contains all versions of projects and its parent MUST be Spring Cloud Dependencies Parent
+	// the BOM contains all versions of projects and its parent MUST be Spring Cloud
+	// Dependencies Parent
 	Versions versionsFromBom() {
 		Model model = pom(this.thisTrainBom);
 		if (model == null) {
 			return Versions.EMPTY_VERSION;
 		}
 		String buildArtifact = model.getParent().getArtifactId();
-		log.debug("[{}] artifact id is equal to [{}]", SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
-		if (!SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID.equals(buildArtifact)) {
-			throw new IllegalStateException("The pom doesn't have a [" + SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID
-					+ "] artifact id");
+		log.debug("[{}] artifact id is equal to [{}]",
+				CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
+		if (!CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID.equals(buildArtifact)) {
+			throw new IllegalStateException("The pom doesn't have a ["
+					+ CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID + "] artifact id");
 		}
 		String buildVersion = model.getParent().getVersion();
 		log.debug("Spring Cloud Build version is equal to [{}]", buildVersion);
-		Set<Project> projects = model.getProperties().entrySet()
-				.stream()
-				.filter(propertyMatchesSCPattern())
-				.map(toProject())
+		Set<Project> projects = model.getProperties().entrySet().stream()
+				.filter(propertyMatchesSCPattern()).map(toProject())
 				.collect(Collectors.toSet());
 		String releaseTrainProjectVersion = model.getVersion();
-		projects.add(new Project(this.properties.getMetaRelease().getReleaseTrainProjectName(), releaseTrainProjectVersion));
+		projects.add(
+				new Project(this.properties.getMetaRelease().getReleaseTrainProjectName(),
+						releaseTrainProjectVersion));
 		return new Versions(buildVersion, projects);
 	}
 
@@ -133,5 +161,5 @@ class BomParser {
 			return new Project(name, entry.getValue().toString());
 		};
 	}
-}
 
+}

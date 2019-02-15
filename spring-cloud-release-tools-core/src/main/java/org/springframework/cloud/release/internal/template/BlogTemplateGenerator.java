@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.template;
 
 import java.io.File;
@@ -19,16 +51,23 @@ import org.springframework.cloud.release.internal.pom.Projects;
  */
 class BlogTemplateGenerator {
 
-	private static final Logger log = LoggerFactory.getLogger(BlogTemplateGenerator.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(BlogTemplateGenerator.class);
 
 	private static final Pattern RC_PATTERN = Pattern.compile("(.*)(RC)([0-9]+)");
+
 	private static final Pattern MILESTONE_PATTERN = Pattern.compile("(.*)(M)([0-9]+)");
+
 	private static final Pattern SR_PATTERN = Pattern.compile("(.*)(SR)([0-9]+)");
 
 	private final Template template;
+
 	private final String releaseVersion;
+
 	private final File blogOutput;
+
 	private final Projects projects;
+
 	private final NotesGenerator notesGenerator;
 
 	BlogTemplateGenerator(Template template, String releaseVersion, File blogOutput,
@@ -42,31 +81,33 @@ class BlogTemplateGenerator {
 
 	File blog() {
 		try {
-			// availability - General Availability (RELEASE) / Service Release 1 (SR1) / Milestone 1 (M1)
+			// availability - General Availability (RELEASE) / Service Release 1 (SR1) /
+			// Milestone 1 (M1)
 			// releaseName - Dalston
 			// releaseLink
-			// - [Maven Central](http://repo1.maven.org/maven2/org/springframework/cloud/spring-cloud-dependencies/Dalston.RELEASE/)
+			// - [Maven Central](http://repo1.maven.org/maven2/org/
+			// springframework/cloud/spring-cloud-dependencies/Dalston.RELEASE/)
 			// - [Spring Milestone](https://repo.spring.io/milestone/) repository
 			// releaseVersion '- Dalston.RELEASE
 			boolean release = this.releaseVersion.contains("RELEASE");
-			boolean nonRelease = !(release || SR_PATTERN.matcher(this.releaseVersion).matches());
+			boolean nonRelease = !(release
+					|| SR_PATTERN.matcher(this.releaseVersion).matches());
 			String availability = availability(release);
 			String releaseName = parsedReleaseName(this.releaseVersion);
 			String releaseLink = link(nonRelease);
 			Map<String, Object> map = ImmutableMap.<String, Object>builder()
-					.put("availability", availability)
-					.put("releaseName", releaseName)
+					.put("availability", availability).put("releaseName", releaseName)
 					.put("releaseLink", releaseLink)
 					.put("releaseVersion", this.releaseVersion)
 					.put("projects", this.notesGenerator.fromProjects(this.projects))
-					.put("nonRelease", nonRelease)
-					.build();
+					.put("nonRelease", nonRelease).build();
 			String blog = this.template.apply(map);
 			Files.write(this.blogOutput.toPath(), blog.getBytes());
 			return this.blogOutput;
 		}
 		catch (Exception e) {
-			throw new IllegalStateException("Exception occurred while trying to create a blog entry", e);
+			throw new IllegalStateException(
+					"Exception occurred while trying to create a blog entry", e);
 		}
 	}
 
@@ -80,15 +121,20 @@ class BlogTemplateGenerator {
 		Matcher milestone = MILESTONE_PATTERN.matcher(this.releaseVersion);
 		if (release) {
 			return "General Availability (RELEASE)";
-		} else if (sr.matches()) {
+		}
+		else if (sr.matches()) {
 			return availabilityText(sr, "Service Release", "SR");
-		} else if (rc.matches()) {
+		}
+		else if (rc.matches()) {
 			return availabilityText(rc, "Release Candidate", "RC");
-		} else if (milestone.matches()) {
+		}
+		else if (milestone.matches()) {
 			return milestone(milestone);
 		}
 		if (log.isWarnEnabled()) {
-			log.warn("Unrecognized release [{}] . Hopefully, you know what you're doing. Will treat it as milestone", this.releaseVersion);
+			log.warn("Unrecognized release [{}] . "
+					+ "Hopefully, you know what you're doing. Will treat it as milestone",
+					this.releaseVersion);
 		}
 		return milestone(milestone);
 	}
@@ -106,6 +152,9 @@ class BlogTemplateGenerator {
 		if (nonRelease) {
 			return "[Spring Milestone](https://repo.spring.io/milestone/) repository";
 		}
-		return "[Maven Central](http://repo1.maven.org/maven2/org/springframework/cloud/spring-cloud-dependencies/" + this.releaseVersion + "/)";
+		return "[Maven Central](http://repo1.maven.org/maven2/"
+				+ "org/springframework/cloud/spring-cloud-dependencies/"
+				+ this.releaseVersion + "/)";
 	}
+
 }

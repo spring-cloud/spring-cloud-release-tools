@@ -1,10 +1,20 @@
-package org.springframework.cloud.release.internal.git;
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-import static org.springframework.cloud.release.internal.git.GitTestUtils.clonedProject;
-import static org.springframework.cloud.release.internal.git.GitTestUtils.setOriginOnProjectToTmp;
+package org.springframework.cloud.release.internal.git;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,22 +35,34 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.springframework.cloud.release.internal.pom.TestUtils;
+
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+import static org.springframework.cloud.release.internal.git.GitTestUtils.clonedProject;
+import static org.springframework.cloud.release.internal.git.GitTestUtils.setOriginOnProjectToTmp;
 
 /**
  * @author Marcin Grzejszczak
  */
 public class GitRepoTests {
 
-	@Rule public TemporaryFolder tmp = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder tmp = new TemporaryFolder();
+
 	File springCloudReleaseProject;
+
 	File tmpFolder;
+
 	GitRepo gitRepo;
 
 	@Before
 	public void setup() throws IOException, URISyntaxException {
 		this.tmpFolder = this.tmp.newFolder();
-		this.springCloudReleaseProject = new File(GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
+		this.springCloudReleaseProject = new File(
+				GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 		TestUtils.prepareLocalRepo();
 		this.gitRepo = new GitRepo(this.tmpFolder);
 	}
@@ -55,43 +77,44 @@ public class GitRepoTests {
 
 	@Test
 	public void should_throw_exception_when_there_is_no_repo() {
-		thenThrownBy(() -> this.gitRepo
-				.cloneProject(new URIish(GitRepoTests.class.getResource("/projects/").toURI().toURL())))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Exception occurred while cloning repo");
+		thenThrownBy(() -> this.gitRepo.cloneProject(
+				new URIish(GitRepoTests.class.getResource("/projects/").toURI().toURL())))
+						.isInstanceOf(IllegalStateException.class)
+						.hasMessageContaining("Exception occurred while cloning repo");
 	}
 
 	@Test
 	public void should_throw_an_exception_when_failed_to_initialize_the_repo() {
-		thenThrownBy(() ->  new GitRepo(this.tmpFolder,
-				new ExceptionThrowingJGitFactory()).cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL())))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Exception occurred while cloning repo")
-				.hasCauseInstanceOf(CustomException.class);
+		thenThrownBy(() -> new GitRepo(this.tmpFolder, new ExceptionThrowingJGitFactory())
+				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL())))
+						.isInstanceOf(IllegalStateException.class)
+						.hasMessageContaining("Exception occurred while cloning repo")
+						.hasCauseInstanceOf(CustomException.class);
 	}
 
 	@Test
 	public void should_check_out_a_branch_on_cloned_repo() throws IOException {
 		URIish uri = new URIish(this.springCloudReleaseProject.toURI().toURL());
-		File project = this.gitRepo
-				.cloneProject(uri);
+		File project = this.gitRepo.cloneProject(uri);
 		new GitRepo(project).checkout("vCamden.SR3");
 
 		File pom = new File(new File(this.tmpFolder, uri.getHumanishName()), "pom.xml");
 		then(pom).exists();
-		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.SR3</version>"))).isTrue();
+		then(Files.lines(pom.toPath())
+				.anyMatch(s -> s.contains("<version>Camden.SR3</version>"))).isTrue();
 	}
 
 	@Test
 	public void should_check_out_a_branch_on_cloned_repo2() throws IOException {
 		URIish uri = new URIish(this.springCloudReleaseProject.toURI().toURL());
-		File project = this.gitRepo
-				.cloneProject(uri);
+		File project = this.gitRepo.cloneProject(uri);
 		new GitRepo(project).checkout("Camden.x");
 
 		File pom = new File(new File(this.tmpFolder, uri.getHumanishName()), "pom.xml");
 		then(pom).exists();
-		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.BUILD-SNAPSHOT</version>"))).isTrue();
+		then(Files.lines(pom.toPath())
+				.anyMatch(s -> s.contains("<version>Camden.BUILD-SNAPSHOT</version>")))
+						.isTrue();
 	}
 
 	@Test
@@ -111,13 +134,15 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_throw_an_exception_when_checking_out_nonexisting_branch() throws IOException {
+	public void should_throw_an_exception_when_checking_out_nonexisting_branch()
+			throws IOException {
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		try {
 			new GitRepo(project).checkout("nonExistingBranch");
 			fail("should throw an exception");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			then(e).hasMessageContaining("Ref nonExistingBranch can not be resolved");
 		}
 	}
@@ -130,7 +155,7 @@ public class GitRepoTests {
 
 		new GitRepo(project).commit("some message");
 
-		try(Git git = openGitProject(project)) {
+		try (Git git = openGitProject(project)) {
 			RevCommit revCommit = git.log().call().iterator().next();
 			then(revCommit.getShortMessage()).isEqualTo("some message");
 		}
@@ -145,7 +170,7 @@ public class GitRepoTests {
 
 		new GitRepo(project).commit("empty commit");
 
-		try(Git git = openGitProject(project)) {
+		try (Git git = openGitProject(project)) {
 			RevCommit revCommit = git.log().call().iterator().next();
 			then(revCommit.getShortMessage()).isNotEqualTo("empty commit");
 		}
@@ -160,7 +185,7 @@ public class GitRepoTests {
 
 		new GitRepo(project).tag("v1.0.0");
 
-		try(Git git = openGitProject(project)) {
+		try (Git git = openGitProject(project)) {
 			tagIsPresent(git, "v1.0.0");
 		}
 	}
@@ -168,7 +193,8 @@ public class GitRepoTests {
 	private void tagIsPresent(Git git, String tag) throws GitAPIException {
 		List<Ref> refs = git.tagList().call();
 		System.out.println("All tags" + refs);
-		then(refs.stream().anyMatch(ref -> ref.getName().startsWith("refs/tags/" + tag))).isTrue();
+		then(refs.stream().anyMatch(ref -> ref.getName().startsWith("refs/tags/" + tag)))
+				.isTrue();
 	}
 
 	@Test
@@ -182,7 +208,7 @@ public class GitRepoTests {
 
 		new GitRepo(project).pushBranch("master");
 
-		try(Git git = openGitProject(origin)) {
+		try (Git git = openGitProject(origin)) {
 			RevCommit revCommit = git.log().call().iterator().next();
 			then(revCommit.getShortMessage()).isEqualTo("some message");
 		}
@@ -199,7 +225,7 @@ public class GitRepoTests {
 
 		new GitRepo(project).pushCurrentBranch();
 
-		try(Git git = openGitProject(origin)) {
+		try (Git git = openGitProject(origin)) {
 			RevCommit revCommit = git.log().call().iterator().next();
 			then(revCommit.getShortMessage()).isEqualTo("some message");
 		}
@@ -230,14 +256,13 @@ public class GitRepoTests {
 
 		new GitRepo(project).pushTag("v5.6.7.RELEASE");
 
-		try(Git git = openGitProject(origin)) {
+		try (Git git = openGitProject(origin)) {
 			tagIsPresent(git, "v5.6.7");
 			git.checkout().setName("v5.6.7.RELEASE").call();
 			RevCommit revCommit = git.log().call().iterator().next();
 			then(revCommit.getShortMessage()).isEqualTo("some message");
 		}
 	}
-
 
 	private Git openGitProject(File project) {
 		return new GitRepo.JGitFactory().open(project);
@@ -249,7 +274,7 @@ public class GitRepoTests {
 		try (PrintStream out = new PrintStream(new FileOutputStream(newFile))) {
 			out.print("foo");
 		}
-		try(Git git = openGitProject(project)) {
+		try (Git git = openGitProject(project)) {
 			git.add().addFilepattern("newFile").call();
 		}
 	}
@@ -264,32 +289,37 @@ public class GitRepoTests {
 
 		new GitRepo(project).revert("Reverting the commit");
 
-		try(Git git = openGitProject(project)) {
+		try (Git git = openGitProject(project)) {
 			RevCommit revCommit = git.log().call().iterator().next();
 			then(revCommit.getShortMessage()).isEqualTo("Reverting the commit");
 		}
 	}
 
 	@Test
-	public void should_not_revert_changes_when_commit_message_is_not_related_to_updating_snapshots() throws Exception {
+	public void should_not_revert_changes_when_commit_message_is_not_related_to_updating_snapshots()
+			throws Exception {
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 
-		BDDAssertions.thenThrownBy(
-				() -> new GitRepo(project).revert("some message"))
-						.hasMessageContaining("Won't revert the commit with id");
+		BDDAssertions.thenThrownBy(() -> new GitRepo(project).revert("some message"))
+				.hasMessageContaining("Won't revert the commit with id");
 	}
 
 }
 
 class ExceptionThrowingJGitFactory extends GitRepo.JGitFactory {
-	@Override CloneCommand getCloneCommandByCloneRepository() {
+
+	@Override
+	CloneCommand getCloneCommandByCloneRepository() {
 		throw new CustomException("foo");
 	}
+
 }
 
 class CustomException extends RuntimeException {
-	public CustomException(String message) {
+
+	CustomException(String message) {
 		super(message);
 	}
+
 }

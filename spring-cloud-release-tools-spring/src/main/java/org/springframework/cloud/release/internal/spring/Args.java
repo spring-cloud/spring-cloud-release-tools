@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
@@ -16,21 +48,31 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Marcin Grzejszczak
  */
 class Args {
+
 	private static final Logger log = LoggerFactory.getLogger(Args.class);
 
 	final Releaser releaser;
+
 	final File project;
+
 	final Projects projects;
+
 	final ProjectVersion originalVersion;
+
 	final ProjectVersion versionFromScRelease;
+
 	final ReleaserProperties properties;
+
 	final boolean interactive;
+
 	final TaskType taskType;
+
 	final ApplicationEventPublisher applicationEventPublisher;
 
-	Args(Releaser releaser, File project, Projects projects, ProjectVersion originalVersion,
-			ProjectVersion versionFromScRelease, ReleaserProperties properties,
-			boolean interactive, TaskType taskType, ApplicationEventPublisher applicationEventPublisher) {
+	Args(Releaser releaser, File project, Projects projects,
+			ProjectVersion originalVersion, ProjectVersion versionFromScRelease,
+			ReleaserProperties properties, boolean interactive, TaskType taskType,
+			ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.project = project;
 		this.projects = projects;
@@ -43,10 +85,9 @@ class Args {
 	}
 
 	// Used by meta-release task
-	Args(Releaser releaser, Projects projects,
-			ProjectVersion versionFromScRelease,
-			ReleaserProperties properties,
-			boolean interactive, ApplicationEventPublisher applicationEventPublisher) {
+	Args(Releaser releaser, Projects projects, ProjectVersion versionFromScRelease,
+			ReleaserProperties properties, boolean interactive,
+			ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.project = null;
 		this.projects = projects;
@@ -85,15 +126,12 @@ class Args {
 
 	@Override
 	public String toString() {
-		return "Args{" +
-				"releaser=" + this.releaser +
-				", project=" + this.project +
-				", projects=" + this.projects +
-				", originalVersion=" + this.originalVersion +
-				", versionFromScRelease=" + this.versionFromScRelease +
-				", properties=" + this.properties +
-				", interactive=" + this.interactive +
-				", taskType=" + this.taskType +
-				'}';
+		return "Args{" + "releaser=" + this.releaser + ", project=" + this.project
+				+ ", projects=" + this.projects + ", originalVersion="
+				+ this.originalVersion + ", versionFromScRelease="
+				+ this.versionFromScRelease + ", properties=" + this.properties
+				+ ", interactive=" + this.interactive + ", taskType=" + this.taskType
+				+ '}';
 	}
+
 }

@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
@@ -12,18 +44,30 @@ import org.apache.maven.model.Model;
 import org.springframework.util.StringUtils;
 
 /**
- * Object representing a root project's version.
- * Knows how to provide a minor bumped version;
+ * Object representing a root project's version. Knows how to provide a minor bumped
+ * version;
  *
  * @author Marcin Grzejszczak
  */
 public class ProjectVersion {
 
-	private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("^.*\\.(BUILD-)?SNAPSHOT.*$");
+	private static final Pattern SNAPSHOT_PATTERN = Pattern
+			.compile("^.*\\.(BUILD-)?SNAPSHOT.*$");
+
 	private static final String MILESTONE_REGEX = ".*\\.M[0-9]+";
+
 	private static final String RC_REGEX = "^.*\\.RC.*$";
+
+	/**
+	 * Name of the project.
+	 */
 	public final String projectName;
+
+	/**
+	 * Version of the project.
+	 */
 	public final String version;
+
 	private final Model model;
 
 	public ProjectVersion(String projectName, String version) {
@@ -38,7 +82,8 @@ public class ProjectVersion {
 			this.projectName = projectVersion.projectName;
 			this.version = projectVersion.version;
 			this.model = null;
-		} else {
+		}
+		else {
 			PomReader pomReader = new PomReader();
 			Model model = pomReader.readPom(project);
 			this.projectName = nameWithoutParent(model.getArtifactId());
@@ -71,9 +116,9 @@ public class ProjectVersion {
 			return this.version;
 		}
 		Integer incrementedPatch = Integer.valueOf(splitVersion[2]) + 1;
-		return String.format("%s.%s.%s.%s", splitVersion[0], splitVersion[1], incrementedPatch, splitVersion[3]);
+		return String.format("%s.%s.%s.%s", splitVersion[0], splitVersion[1],
+				incrementedPatch, splitVersion[3]);
 	}
-
 
 	private String[] assertVersion() {
 		if (this.version == null) {
@@ -81,17 +126,18 @@ public class ProjectVersion {
 		}
 		// 1.0.0.BUILD-SNAPSHOT
 		String[] splitVersion = this.version.split("\\.");
-		if (splitVersion.length < 4 && isNumeric(splitVersion[0]) ||
-				splitVersion.length == 1 && !isNumeric(splitVersion[0])) {
-			throw new IllegalStateException("Version is invalid. Should be of format [1.2.3.A]");
+		if (splitVersion.length < 4 && isNumeric(splitVersion[0])
+				|| splitVersion.length == 1 && !isNumeric(splitVersion[0])) {
+			throw new IllegalStateException(
+					"Version is invalid. Should be of format [1.2.3.A]");
 		}
 		return splitVersion;
 	}
 
 	/**
-	 * For GA and SR will bump the snapshots
-	 * in the rest of cases will return snapshot of the current version
-	 * @return
+	 * For GA and SR will bump the snapshots in the rest of cases will return snapshot of
+	 * the current version.
+	 * @return the post release snapshot version
 	 */
 	public String postReleaseSnapshotVersion() {
 		String[] strings = assertVersion();
@@ -118,7 +164,8 @@ public class ProjectVersion {
 		if (StringUtils.hasText(this.model.getGroupId())) {
 			return this.model.getGroupId();
 		}
-		if (this.model.getParent() != null && StringUtils.hasText(this.model.getParent().getGroupId())) {
+		if (this.model.getParent() != null
+				&& StringUtils.hasText(this.model.getParent().getGroupId())) {
 			return this.model.getParent().getGroupId();
 		}
 		return "";
@@ -128,7 +175,8 @@ public class ProjectVersion {
 		try {
 			assertVersion();
 			return true;
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			return false;
 		}
 	}
@@ -167,8 +215,8 @@ public class ProjectVersion {
 		}
 		String[] splitThis = this.version.split("\\.");
 		String[] splitThat = version.split("\\.");
-		return splitThis.length == splitThat.length &&
-				splitThis[0].equals(splitThat[0]) && splitThis[1].equals(splitThat[1]);
+		return splitThis.length == splitThat.length && splitThis[0].equals(splitThat[0])
+				&& splitThis[1].equals(splitThat[1]);
 	}
 
 	public boolean isSameReleaseTrainName(String version) {
@@ -199,35 +247,44 @@ public class ProjectVersion {
 		return new VersionNumber(thisValue).compareTo(new VersionNumber(thatValue));
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return this.version;
 	}
 
-	@Override public boolean equals(Object o) {
-		if (this == o)
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		ProjectVersion that = (ProjectVersion) o;
 		return Objects.equals(this.projectName, that.projectName);
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 		return Objects.hash(this.projectName);
 	}
 
 	public List<Pattern> unacceptableVersionPatterns() {
 		if (isSnapshot()) {
 			return Collections.emptyList();
-		} else if (isMilestone() || isRc()) {
+		}
+		else if (isMilestone() || isRc()) {
 			return Collections.singletonList(SNAPSHOT_PATTERN);
 		}
 		// treat like GA
-		return Arrays.asList(SNAPSHOT_PATTERN, Pattern.compile(MILESTONE_REGEX), Pattern.compile(RC_REGEX));
+		return Arrays.asList(SNAPSHOT_PATTERN, Pattern.compile(MILESTONE_REGEX),
+				Pattern.compile(RC_REGEX));
 	}
+
 }
 
 class VersionNumber implements Comparable<VersionNumber> {
+
 	private final String version;
 
 	VersionNumber(String version) {
@@ -256,4 +313,5 @@ class VersionNumber implements Comparable<VersionNumber> {
 		Integer thatNumber = Integer.valueOf(thatVersion);
 		return thisNumber.compareTo(thatNumber);
 	}
+
 }

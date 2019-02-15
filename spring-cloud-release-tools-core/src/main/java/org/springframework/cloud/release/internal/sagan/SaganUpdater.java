@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.sagan;
 
 import java.util.stream.Collectors;
@@ -17,6 +49,7 @@ public class SaganUpdater {
 	private static final Logger log = LoggerFactory.getLogger(SaganUpdater.class);
 
 	private final SaganClient saganClient;
+
 	private final ReleaserProperties releaserProperties;
 
 	public SaganUpdater(SaganClient saganClient, ReleaserProperties releaserProperties) {
@@ -24,7 +57,8 @@ public class SaganUpdater {
 		this.releaserProperties = releaserProperties;
 	}
 
-	public void updateSagan(String branch, ProjectVersion originalVersion, ProjectVersion version) {
+	public void updateSagan(String branch, ProjectVersion originalVersion,
+			ProjectVersion version) {
 		if (!this.releaserProperties.getSagan().isUpdateSagan()) {
 			log.info("Will not update sagan, since the switch to do so "
 					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
@@ -33,13 +67,16 @@ public class SaganUpdater {
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, version);
 		updateSaganForNonSnapshot(branch, originalVersion, version);
 		log.info("Updating Sagan with \n\n{}", update);
-		this.saganClient.updateRelease(version.projectName, Collections.singletonList(update));
+		this.saganClient.updateRelease(version.projectName,
+				Collections.singletonList(update));
 	}
 
 	private void updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion,
 			ProjectVersion version) {
 		if (!version.isSnapshot()) {
-			log.info("Version is non snapshot [{}]. Will remove all older versions and mark this as current", version);
+			log.info(
+					"Version is non snapshot [{}]. Will remove all older versions and mark this as current",
+					version);
 			Project project = this.saganClient.getProject(version.projectName);
 			if (project != null) {
 				removeAllSameMinorVersions(version, project);
@@ -48,10 +85,11 @@ public class SaganUpdater {
 			removeVersionFromSagan(version, snapshot);
 			if (version.isRelease() || version.isServiceRelease()) {
 				String bumpedSnapshot = toSnapshot(version.bumpedVersion());
-				ReleaseUpdate snapshotUpdate =
-						releaseUpdate(branch, originalVersion, new ProjectVersion(version.projectName, bumpedSnapshot));
+				ReleaseUpdate snapshotUpdate = releaseUpdate(branch, originalVersion,
+						new ProjectVersion(version.projectName, bumpedSnapshot));
 				log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
-				this.saganClient.updateRelease(version.projectName, Collections.singletonList(snapshotUpdate));
+				this.saganClient.updateRelease(version.projectName,
+						Collections.singletonList(snapshotUpdate));
 			}
 		}
 	}
@@ -67,8 +105,10 @@ public class SaganUpdater {
 		log.info("Removing [{}/{}] from Sagan", version.projectName, snapshot);
 		try {
 			this.saganClient.deleteRelease(version.projectName, snapshot);
-		} catch (Exception e) {
-			log.error("Failed to remove [" + version.projectName + "/" + snapshot + "] from Sagan", e);
+		}
+		catch (Exception e) {
+			log.error("Failed to remove [" + version.projectName + "/" + snapshot
+					+ "] from Sagan", e);
 		}
 	}
 
@@ -88,7 +128,8 @@ public class SaganUpdater {
 	private String toSnapshot(String version) {
 		if (version.contains("RELEASE")) {
 			return version.replace("RELEASE", "BUILD-SNAPSHOT");
-		} else if (version.matches(".*SR[0-9]+")) {
+		}
+		else if (version.matches(".*SR[0-9]+")) {
 			return version.substring(0, version.lastIndexOf(".")) + ".BUILD-SNAPSHOT";
 		}
 		return version;
@@ -97,9 +138,11 @@ public class SaganUpdater {
 	private String version(ProjectVersion version) {
 		if (version.isSnapshot()) {
 			return "SNAPSHOT";
-		} else if (version.isMilestone() || version.isRc()) {
+		}
+		else if (version.isMilestone() || version.isRc()) {
 			return "PRERELEASE";
-		} else if (version.isRelease() || version.isServiceRelease()) {
+		}
+		else if (version.isRelease() || version.isServiceRelease()) {
 			return "GENERAL_AVAILABILITY";
 		}
 		return "";
@@ -108,13 +151,16 @@ public class SaganUpdater {
 	private String referenceUrl(String branch, ProjectVersion version) {
 		if (!version.isSnapshot()) {
 			// static/sleuth/{version}/
-			return "http://cloud.spring.io/spring-cloud-static/" + version.projectName + "/{version}/";
+			return "http://cloud.spring.io/spring-cloud-static/" + version.projectName
+					+ "/{version}/";
 		}
 		if (branch.toLowerCase().contains("master")) {
 			// sleuth/
-			return "http://cloud.spring.io/" + version.projectName + "/" + version.projectName + ".html";
+			return "http://cloud.spring.io/" + version.projectName + "/"
+					+ version.projectName + ".html";
 		}
 		// sleuth/1.1.x/
 		return "http://cloud.spring.io/" + version.projectName + "/" + branch + "/";
 	}
+
 }

@@ -1,18 +1,32 @@
-package demo;
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+package demo;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
+import apps.ConfigServer;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +41,19 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import apps.ConfigServer;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 // Explicitly enable config client because test classpath has config server on it
-@SpringBootTest(properties={ "spring.cloud.config.enabled=true",
+@SpringBootTest(properties = { "spring.cloud.config.enabled=true",
 		"logging.level.org.springframework.retry=TRACE" })
 @DirtiesContext
 public class StandaloneClientApplicationTests {
 
+	private static ConfigurableApplicationContext context;
 	@Autowired
 	private ConfigServicePropertySourceLocator locator;
-
-	private static ConfigurableApplicationContext context;
 
 	@BeforeClass
 	public static void delayConfigServer() {
@@ -55,10 +69,10 @@ public class StandaloneClientApplicationTests {
 			}
 		});
 	}
-	
+
 	@AfterClass
 	public static void shutdown() {
-		if (context!=null) {
+		if (context != null) {
 			context.close();
 		}
 	}
@@ -72,21 +86,23 @@ public class StandaloneClientApplicationTests {
 		@SuppressWarnings("unchecked")
 		Map<Method, MethodInterceptor> delegates = (Map<Method, MethodInterceptor>) ReflectionTestUtils
 				.getField(advice, "delegates");
-		Object obj = delegates
-				.values().iterator().next();
+		Object obj = delegates.values().iterator().next();
 		RetryTemplate retryTemplate = null;
-		if(RetryOperationsInterceptor.class.isInstance(obj)) {
-			//Prior to Boot 1.5.10
-			RetryOperationsInterceptor interceptor = (RetryOperationsInterceptor)obj;
-			retryTemplate = (RetryTemplate) ReflectionTestUtils.getField(
-					interceptor, "retryOperations");
-		} else if(Map.class.isInstance(obj)) {
-			//Boot 1.5.10 and later
-			Object[] methodInterceptors = ((Map)obj).values().toArray();
-			RetryOperationsInterceptor interceptor = (RetryOperationsInterceptor)methodInterceptors[0];
-			retryTemplate = (RetryTemplate)ReflectionTestUtils.getField(
-					interceptor, "retryOperations");;
-		} else {
+		if (RetryOperationsInterceptor.class.isInstance(obj)) {
+			// Prior to Boot 1.5.10
+			RetryOperationsInterceptor interceptor = (RetryOperationsInterceptor) obj;
+			retryTemplate = (RetryTemplate) ReflectionTestUtils.getField(interceptor,
+					"retryOperations");
+		}
+		else if (Map.class.isInstance(obj)) {
+			// Boot 1.5.10 and later
+			Object[] methodInterceptors = ((Map) obj).values().toArray();
+			RetryOperationsInterceptor interceptor = (RetryOperationsInterceptor) methodInterceptors[0];
+			retryTemplate = (RetryTemplate) ReflectionTestUtils.getField(interceptor,
+					"retryOperations");
+			;
+		}
+		else {
 			fail("Could not find RetryTemplate");
 		}
 		ExponentialBackOffPolicy backoff = (ExponentialBackOffPolicy) ReflectionTestUtils

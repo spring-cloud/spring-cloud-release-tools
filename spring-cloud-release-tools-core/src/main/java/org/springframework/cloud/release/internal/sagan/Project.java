@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.sagan;
 
 import java.util.ArrayList;
@@ -8,23 +40,41 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Marcin Grzejszczak
  */
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Project {
+
 	public String id = "";
+
 	public String name = "";
+
 	public String repoUrl = "";
+
 	public String siteUrl = "";
+
 	public String category = "";
+
 	public String stackOverflowTags;
+
 	public List<Release> projectReleases = new ArrayList<>();
+
 	public List<String> stackOverflowTagList = new ArrayList<>();
+
 	public Boolean aggregator;
 
-	@Override public String toString() {
-		return "Project{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", repoUrl='"
-				+ this.repoUrl + '\'' + ", siteUrl='" + this.siteUrl + '\'' + ", category='"
-				+ this.category + '\'' + ", stackOverflowTags='" + this.stackOverflowTags + '\''
-				+ ", projectReleases=" + this.projectReleases + ", stackOverflowTagList="
-				+ this.stackOverflowTagList + ", aggregator=" + this.aggregator + '}';
+	public String rawBootConfig;
+
+	public String rawOverview;
+
+	@Override
+	public String toString() {
+		return "Project{" + "id='" + this.id + '\'' + ", name='" + this.name + '\''
+				+ ", repoUrl='" + this.repoUrl + '\'' + ", siteUrl='" + this.siteUrl
+				+ '\'' + ", category='" + this.category + '\'' + ", stackOverflowTags='"
+				+ this.stackOverflowTags + '\'' + ", projectReleases="
+				+ this.projectReleases + ", stackOverflowTagList="
+				+ this.stackOverflowTagList + ", aggregator=" + this.aggregator
+				+ ", rawBootConfig='" + this.rawBootConfig + '\'' + ", rawOverview='"
+				+ this.rawOverview + '\'' + '}';
 	}
+
 }

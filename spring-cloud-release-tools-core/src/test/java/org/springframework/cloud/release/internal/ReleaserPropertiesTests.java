@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal;
 
 import java.util.Arrays;
@@ -13,6 +29,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  * @author Marcin Grzejszczak
  */
 public class ReleaserPropertiesTests {
+
 	@Test
 	public void should_return_provided_working_dir_when_it_was_set() {
 		String workingDir = "foo";
@@ -52,22 +69,17 @@ public class ReleaserPropertiesTests {
 		copy.getPom().setIgnoredPomRegex(Arrays.asList("bar8", "bar9"));
 		copy.getSagan().setBaseUrl("bar10");
 
-		BDDAssertions.then(properties.getWorkingDir())
-				.isEqualTo("foo");
-		BDDAssertions.then(properties.getFixedVersions())
-				.isEqualTo(map());
-		BDDAssertions.then(properties.getMaven().getBuildCommand())
-				.isEqualTo("foo2");
+		BDDAssertions.then(properties.getWorkingDir()).isEqualTo("foo");
+		BDDAssertions.then(properties.getFixedVersions()).isEqualTo(map());
+		BDDAssertions.then(properties.getMaven().getBuildCommand()).isEqualTo("foo2");
 		BDDAssertions.then(properties.getGradle().getIgnoredGradleRegex())
 				.isEqualTo(Arrays.asList("foo3", "foo4"));
 		BDDAssertions.then(properties.getMetaRelease().getProjectsToSkip())
 				.isEqualTo(Arrays.asList("foo5", "foo6"));
-		BDDAssertions.then(properties.getGit().getPassword())
-				.isEqualTo("foo7");
+		BDDAssertions.then(properties.getGit().getPassword()).isEqualTo("foo7");
 		BDDAssertions.then(properties.getPom().getIgnoredPomRegex())
 				.isEqualTo(Arrays.asList("foo8", "foo9"));
-		BDDAssertions.then(properties.getSagan().getBaseUrl())
-				.isEqualTo("foo10");
+		BDDAssertions.then(properties.getSagan().getBaseUrl()).isEqualTo("foo10");
 	}
 
 	private Map<String, String> map() {
@@ -81,4 +93,5 @@ public class ReleaserPropertiesTests {
 		map.put("bar", "foo");
 		return map;
 	}
+
 }

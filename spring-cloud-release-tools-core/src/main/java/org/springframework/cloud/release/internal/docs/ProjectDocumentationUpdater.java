@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.docs;
 
 import java.io.File;
@@ -18,9 +50,12 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
 	private static final String SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";
-	private static final Logger log = LoggerFactory.getLogger(ProjectDocumentationUpdater.class);
+
+	private static final Logger log = LoggerFactory
+			.getLogger(ProjectDocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
+
 	private ReleaserProperties properties;
 
 	ProjectDocumentationUpdater(ReleaserProperties properties,
@@ -30,21 +65,24 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 	}
 
 	/**
-	 * Updates the documentation repository if current release train version is greater or equal
-	 * than the one stored in the repo.
-	 *
-	 * @param currentProject
-	 * @param springCloudReleaseBranch
-	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is used
+	 * Updates the documentation repository if current release train version is greater or
+	 * equal than the one stored in the repo.
+	 * @param currentProject project to update the docs repo for
+	 * @param bomBranch the bom project branch
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
+	 * used
 	 */
-	File updateDocsRepo(ProjectVersion currentProject, String springCloudReleaseBranch) {
+	File updateDocsRepo(ProjectVersion currentProject, String bomBranch) {
 		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
-			log.info("Will not update documentation repository, since the switch to do so "
-					+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
+			log.info(
+					"Will not update documentation repository, since the switch to do so "
+							+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
 			return null;
 		}
 		if (!currentProject.isReleaseOrServiceRelease()) {
-			log.info("Will not update documentation repository for non release or service release [{}]", currentProject.version);
+			log.info(
+					"Will not update documentation repository for non release or service release [{}]",
+					currentProject.version);
 			return null;
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
@@ -52,28 +90,38 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		String pathToIndexHtml = "current/index.html";
 		File indexHtml = new File(documentationProject, pathToIndexHtml);
 		if (!indexHtml.exists()) {
-			throw new IllegalStateException("index.html is not present at [" + pathToIndexHtml + "]");
+			throw new IllegalStateException(
+					"index.html is not present at [" + pathToIndexHtml + "]");
 		}
-		return updateTheDocsRepo(springCloudReleaseBranch, documentationProject, indexHtml);
+		return updateTheDocsRepo(bomBranch, documentationProject, indexHtml);
 	}
 
-	private File updateTheDocsRepo(String springCloudReleaseBranch, File documentationProject, File indexHtml) {
+	private File updateTheDocsRepo(String springCloudReleaseBranch,
+			File documentationProject, File indexHtml) {
 		try {
 			String indexHtmlText = readIndexHtmlContents(indexHtml);
 			int index = indexHtmlText.indexOf(SC_STATIC_URL);
 			if (index == -1) {
-				throw new IllegalStateException("The URL to the documentation repo not found in the index.html file");
+				throw new IllegalStateException(
+						"The URL to the documentation repo not found in the index.html file");
 			}
 			int beginIndex = index + SC_STATIC_URL.length();
 			String storedReleaseTrainLine = indexHtmlText.substring(beginIndex);
-			String storedReleaseTrain = storedReleaseTrainLine.substring(0, storedReleaseTrainLine.indexOf("/"));
-			String firstLetterOfReleaseTrain = String.valueOf(storedReleaseTrain.charAt(0));
-			String currentReleaseTrainVersion = branchToReleaseVersion(springCloudReleaseBranch);
-			String firstLetterOfCurrentReleaseTrain = String.valueOf(currentReleaseTrainVersion.charAt(0));
-			boolean newerOrEqualReleaseTrain = (!storedReleaseTrain.equals(currentReleaseTrainVersion)) && firstLetterOfCurrentReleaseTrain
-					.compareToIgnoreCase(firstLetterOfReleaseTrain) >= 0;
+			String storedReleaseTrain = storedReleaseTrainLine.substring(0,
+					storedReleaseTrainLine.indexOf("/"));
+			String firstLetterOfReleaseTrain = String
+					.valueOf(storedReleaseTrain.charAt(0));
+			String currentReleaseTrainVersion = branchToReleaseVersion(
+					springCloudReleaseBranch);
+			String firstLetterOfCurrentReleaseTrain = String
+					.valueOf(currentReleaseTrainVersion.charAt(0));
+			boolean newerOrEqualReleaseTrain = (!storedReleaseTrain
+					.equals(currentReleaseTrainVersion))
+					&& firstLetterOfCurrentReleaseTrain
+							.compareToIgnoreCase(firstLetterOfReleaseTrain) >= 0;
 			if (!newerOrEqualReleaseTrain) {
-				log.info("Current release train [{}] is not newer than the stored one [{}]",
+				log.info(
+						"Current release train [{}] is not newer than the stored one [{}]",
 						currentReleaseTrainVersion, storedReleaseTrain);
 				return documentationProject;
 			}
@@ -95,11 +143,14 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 	private File pushCommitedChanges(String currentReleaseTrainVersion,
 			File documentationProject, File indexHtml, String indexHtmlText,
 			String storedReleaseTrain) throws IOException {
-		String replacedIndexHtml = indexHtmlText.replace(storedReleaseTrain, currentReleaseTrainVersion);
+		String replacedIndexHtml = indexHtmlText.replace(storedReleaseTrain,
+				currentReleaseTrainVersion);
 		Files.write(indexHtml.toPath(), replacedIndexHtml.getBytes());
-		log.info("Stored the release train [{}] in [{}]",
-				currentReleaseTrainVersion, indexHtml.getAbsolutePath());
-		this.gitHandler.commit(documentationProject, "Updating the link to the current version to [" + currentReleaseTrainVersion + "]");
+		log.info("Stored the release train [{}] in [{}]", currentReleaseTrainVersion,
+				indexHtml.getAbsolutePath());
+		this.gitHandler.commit(documentationProject,
+				"Updating the link to the current version to ["
+						+ currentReleaseTrainVersion + "]");
 		this.gitHandler.pushCurrentBranch(documentationProject);
 		log.info("Committed and pushed changes to the documentation project");
 		return documentationProject;
@@ -113,4 +164,5 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties = properties;
 	}
+
 }

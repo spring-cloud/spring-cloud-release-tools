@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.post;
 
 import java.io.Closeable;
@@ -35,14 +67,18 @@ public class PostReleaseActions implements Closeable {
 	private static final ExecutorService SERVICE = Executors.newCachedThreadPool();
 
 	private final ProjectGitHandler projectGitHandler;
+
 	private final ProjectPomUpdater projectPomUpdater;
+
 	private final GradleUpdater gradleUpdater;
+
 	private final ProjectBuilder projectBuilder;
+
 	private final ReleaserProperties properties;
 
 	public PostReleaseActions(ProjectGitHandler projectGitHandler,
-			ProjectPomUpdater projectPomUpdater, GradleUpdater gradleUpdater, ProjectBuilder projectBuilder,
-			ReleaserProperties properties) {
+			ProjectPomUpdater projectPomUpdater, GradleUpdater gradleUpdater,
+			ProjectBuilder projectBuilder, ReleaserProperties properties) {
 		this.projectGitHandler = projectGitHandler;
 		this.projectPomUpdater = projectPomUpdater;
 		this.gradleUpdater = gradleUpdater;
@@ -51,123 +87,128 @@ public class PostReleaseActions implements Closeable {
 	}
 
 	/**
-	 * Clones the test project, updates it and runs tests
-	 *
+	 * Clones the test project, updates it and runs tests.
 	 * @param projects - set of project with versions to assert against
 	 */
 	public void runUpdatedTests(Projects projects) {
-		if (!this.properties.getGit().isRunUpdatedSamples() ||
-				!this.properties.getMetaRelease().isEnabled()) {
+		if (!this.properties.getGit().isRunUpdatedSamples()
+				|| !this.properties.getMetaRelease().isEnabled()) {
 			log.info("Will not update and run test samples, since the switch to do so "
 					+ "is off. Set [releaser.git.run-updated-samples] to [true] to change that");
 			return;
 		}
 		File file = this.projectGitHandler.cloneTestSamplesProject();
 		ProjectVersion projectVersion = newProjectVersion(file);
-		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
-		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
+		String releaseTrainVersion = projects.releaseTrain(this.properties).version;
+		Projects newProjects = addVersionForTestsProject(projects, projectVersion,
+				releaseTrainVersion);
 		updateWithVersions(file, newProjects);
 		this.projectBuilder.build(projectVersion, file.getAbsolutePath());
 	}
 
 	/**
 	 * Clones all samples for the given project. For each of them, checks out the proper
-	 * branch, updates all the poms with the new, bumped versions of release train projects,
-	 * commits the changes and pushes them.
-	 *
+	 * branch, updates all the poms with the new, bumped versions of release train
+	 * projects, commits the changes and pushes them.
 	 * @param projects - set of project with versions to assert against
 	 */
 	public void updateAllTestSamples(Projects projects) {
-		if (!this.properties.getGit().isUpdateAllTestSamples() ||
-				!this.properties.getMetaRelease().isEnabled()) {
+		if (!this.properties.getGit().isUpdateAllTestSamples()
+				|| !this.properties.getMetaRelease().isEnabled()) {
 			log.info("Will not update all test samples, since the switch to do so "
 					+ "is off. Set [releaser.git.update-all-test-samples] to [true] to change that");
 			return;
 		}
 		List<ProjectUrlAndException> projectUrlAndExceptions = this.properties.getGit()
-				.getAllTestSampleUrls()
-				.entrySet()
-				.stream()
-				.map(e -> updateAllProjects(projects, e))
-				.map(this::getResult)
-				.flatMap(Collection::stream)
-				.collect(Collectors.toList());
+				.getAllTestSampleUrls().entrySet().stream()
+				.map(e -> updateAllProjects(projects, e)).map(this::getResult)
+				.flatMap(Collection::stream).collect(Collectors.toList());
 		log.info("Updated all samples!");
 		String exceptionMessages = projectUrlAndExceptions.stream()
 				.filter(ProjectUrlAndException::hasException)
 				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] "
-						+ "has exception [\n\n" + Arrays
-						.stream(NestedExceptionUtils.getMostSpecificCause(e.ex)
-								.getStackTrace())
-						.map(StackTraceElement::toString)
-						.collect(Collectors.joining("\n")) + "]")
+						+ "has exception [\n\n"
+						+ Arrays.stream(NestedExceptionUtils.getMostSpecificCause(e.ex)
+								.getStackTrace()).map(StackTraceElement::toString)
+								.collect(Collectors.joining("\n"))
+						+ "]")
 				.collect(Collectors.joining("\n"));
 		if (StringUtils.hasText(exceptionMessages)) {
-			throw new IllegalStateException("Exceptions were found while updating samples\n" + exceptionMessages);
-		} else {
+			throw new IllegalStateException(
+					"Exceptions were found while updating samples\n" + exceptionMessages);
+		}
+		else {
 			log.info("No exceptions were found while updating the samples");
 		}
 	}
 
-	private Future<List<ProjectUrlAndException>> updateAllProjects(Projects projects, Map.Entry<String, List<String>> e) {
+	private Future<List<ProjectUrlAndException>> updateAllProjects(Projects projects,
+			Map.Entry<String, List<String>> e) {
 		return SERVICE.submit(() -> {
 			String key = e.getKey();
 			List<String> value = e.getValue();
-			log.info("Running version update for project [{}] and samples {}", key, value);
+			log.info("Running version update for project [{}] and samples {}", key,
+					value);
 			ProjectVersion projectVersionForReleaseTrain = projects.forName(key);
 			Projects postRelease = getPostReleaseProjects(projects);
 			log.info("Versions to update the samples with \n" + postRelease.stream()
 					.map(v -> "[" + v.projectName + " => " + v.version + "]")
 					.collect(Collectors.joining("\n")));
 			return value.stream()
-					.map(url -> run(key, url, () ->
-							commitUpdatedProject(projects, key, projectVersionForReleaseTrain, postRelease, url)))
-					.map(this::getResult)
-					.collect(Collectors.toList());
+					.map(url -> run(key, url,
+							() -> commitUpdatedProject(projects, key,
+									projectVersionForReleaseTrain, postRelease, url)))
+					.map(this::getResult).collect(Collectors.toList());
 		});
 	}
 
 	Projects getPostReleaseProjects(Projects projects) {
-		return projects
-				.postReleaseSnapshotVersion(this.properties.getMetaRelease().getProjectsToSkip());
+		return projects.postReleaseSnapshotVersion(
+				this.properties.getMetaRelease().getProjectsToSkip());
 	}
 
-	private void commitUpdatedProject(Projects projects, String key, ProjectVersion projectVersionForReleaseTrain, Projects postRelease, String url) {
-		String releaseTrainVersion = projects
-				.forName(this.properties.getMetaRelease().getReleaseTrainProjectName()).version;
+	private void commitUpdatedProject(Projects projects, String key,
+			ProjectVersion projectVersionForReleaseTrain, Projects postRelease,
+			String url) {
+		String releaseTrainVersion = projects.forName(
+				this.properties.getMetaRelease().getReleaseTrainProjectName()).version;
 		String projectVersion = projects.forName(key).version;
-		log.info("Running version update for project [{}], url [{}], "
-				+ "release train version [{}] and project version [{}]", key, url,
-				releaseTrainVersion, projectVersion);
-		File file = this.projectGitHandler
-				.cloneAndGuessBranch(url, releaseTrainVersion, projectVersion);
+		log.info(
+				"Running version update for project [{}], url [{}], "
+						+ "release train version [{}] and project version [{}]",
+				key, url, releaseTrainVersion, projectVersion);
+		File file = this.projectGitHandler.cloneAndGuessBranch(url, releaseTrainVersion,
+				projectVersion);
 		Projects newPostRelease = new Projects(postRelease);
 		ProjectVersion newProjectVersion = newProjectVersion(file);
 		newPostRelease.add(newProjectVersion);
 		updateWithVersions(file, newPostRelease);
-		this.projectGitHandler
-				.commit(file, "Updated versions after [" + releaseTrainVersion + "] "
-						+ "release train and [" + projectVersionForReleaseTrain.version + "] ["
-						+ key + "] project release");
+		this.projectGitHandler.commit(file,
+				"Updated versions after [" + releaseTrainVersion + "] "
+						+ "release train and [" + projectVersionForReleaseTrain.version
+						+ "] [" + key + "] project release");
 		this.projectGitHandler.pushCurrentBranch(file);
 	}
 
 	private ProjectVersion newProjectVersion(File file) {
 		try {
 			return new ProjectVersion(file);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			ProjectVersion projectVersion = ProjectVersion.notMavenProject(file);
 			String name = projectVersion.projectName;
 			String version = projectVersion.version;
-			log.warn("Exception occurred while trying to read the pom file. Will assume that the project name is [" + name + "] and version [" + version + "]", ex);
+			log.warn(
+					"Exception occurred while trying to read the pom file. Will assume that the project name is ["
+							+ name + "] and version [" + version + "]",
+					ex);
 			return projectVersion;
 		}
 	}
 
 	private void updateWithVersions(File file, Projects newPostRelease) {
-		this.projectPomUpdater
-				.updateProjectFromReleaseTrain(file, newPostRelease,
-						newProjectVersion(file), false);
+		this.projectPomUpdater.updateProjectFromReleaseTrain(file, newPostRelease,
+				newProjectVersion(file), false);
 		this.gradleUpdater.updateProjectFromBom(file, newPostRelease,
 				newProjectVersion(file), false);
 	}
@@ -188,7 +229,8 @@ public class PostReleaseActions implements Closeable {
 		return new ProjectUrlAndException(projectAndFuture.key, projectAndFuture.url, e);
 	}
 
-	private List<ProjectUrlAndException> getResult(Future<List<ProjectUrlAndException>> future) {
+	private List<ProjectUrlAndException> getResult(
+			Future<List<ProjectUrlAndException>> future) {
 		try {
 			return future.get(10, TimeUnit.MINUTES);
 		}
@@ -198,29 +240,32 @@ public class PostReleaseActions implements Closeable {
 	}
 
 	/**
-	 * Clones the release train documentation project
-	 *
+	 * Clones the release train documentation project.
 	 * @param projects - set of project with versions to assert against
 	 */
 	public void generateReleaseTrainDocumentation(Projects projects) {
-		if (!this.properties.getGit().isUpdateReleaseTrainDocs() ||
-				!this.properties.getMetaRelease().isEnabled()) {
-			log.info("Will not update the release train documentation, since the switch to do so "
-					+ "is off. Set [releaser.git.update-release-train-docs] to [true] to change that");
+		if (!this.properties.getGit().isUpdateReleaseTrainDocs()
+				|| !this.properties.getMetaRelease().isEnabled()) {
+			log.info(
+					"Will not update the release train documentation, since the switch to do so "
+							+ "is off. Set [releaser.git.update-release-train-docs] to [true] to change that");
 			return;
 		}
 		File file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
 		ProjectVersion projectVersion = newProjectVersion(file);
-		String releaseTrainVersion  = projects.releaseTrain(this.properties).version;
-		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
+		String releaseTrainVersion = projects.releaseTrain(this.properties).version;
+		Projects newProjects = addVersionForTestsProject(projects, projectVersion,
+				releaseTrainVersion);
 		updateWithVersions(file, newProjects);
-		this.projectBuilder.generateReleaseTrainDocs(releaseTrainVersion, file.getAbsolutePath());
+		this.projectBuilder.generateReleaseTrainDocs(releaseTrainVersion,
+				file.getAbsolutePath());
 	}
 
-	private Projects addVersionForTestsProject(Projects projects, ProjectVersion projectVersion,
-			String releaseTrainVersion) {
+	private Projects addVersionForTestsProject(Projects projects,
+			ProjectVersion projectVersion, String releaseTrainVersion) {
 		Projects newProjects = new Projects(projects);
-		newProjects.add(new ProjectVersion(projectVersion.projectName, releaseTrainVersion));
+		newProjects
+				.add(new ProjectVersion(projectVersion.projectName, releaseTrainVersion));
 		return newProjects;
 	}
 
@@ -228,12 +273,15 @@ public class PostReleaseActions implements Closeable {
 	public void close() {
 		SERVICE.shutdown();
 	}
+
 }
 
-
 class ProjectAndFuture {
+
 	final String key;
+
 	final String url;
+
 	final Future future;
 
 	ProjectAndFuture(String key, String url, Future future) {
@@ -241,11 +289,15 @@ class ProjectAndFuture {
 		this.url = url;
 		this.future = future;
 	}
+
 }
 
 class ProjectUrlAndException {
+
 	final String key;
+
 	final String url;
+
 	final Exception ex;
 
 	ProjectUrlAndException(String key, String url, Exception ex) {
@@ -257,4 +309,5 @@ class ProjectUrlAndException {
 	boolean hasException() {
 		return this.ex != null;
 	}
+
 }

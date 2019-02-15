@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.spring;
 
 import java.util.ArrayList;
@@ -6,6 +38,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
@@ -16,25 +49,33 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 class OptionsProcessor {
+
 	private static final Logger log = LoggerFactory.getLogger(OptionsProcessor.class);
 
 	private final Releaser releaser;
+
 	private final ReleaserProperties properties;
+
 	private final List<Task> allTasks;
+
 	private final ApplicationEventPublisher applicationEventPublisher;
 
-	OptionsProcessor(Releaser releaser, ReleaserProperties properties, ApplicationEventPublisher applicationEventPublisher) {
-		this(releaser, properties, applicationEventPublisher, Tasks.ALL_TASKS_PER_PROJECT);
+	OptionsProcessor(Releaser releaser, ReleaserProperties properties,
+			ApplicationEventPublisher applicationEventPublisher) {
+		this(releaser, properties, applicationEventPublisher,
+				Tasks.ALL_TASKS_PER_PROJECT);
 	}
 
-	OptionsProcessor(Releaser releaser, ReleaserProperties properties, ApplicationEventPublisher applicationEventPublisher, List<Task> allTasks) {
+	OptionsProcessor(Releaser releaser, ReleaserProperties properties,
+			ApplicationEventPublisher applicationEventPublisher, List<Task> allTasks) {
 		this.releaser = releaser;
 		this.properties = properties;
 		this.allTasks = allTasks;
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
-	OptionsProcessor(Releaser releaser, ReleaserProperties properties, List<Task> allTasks) {
+	OptionsProcessor(Releaser releaser, ReleaserProperties properties,
+			List<Task> allTasks) {
 		this.releaser = releaser;
 		this.properties = properties;
 		this.allTasks = allTasks;
@@ -53,27 +94,32 @@ class OptionsProcessor {
 				return;
 			}
 			String chosenOption = chosenOption();
-			int pickedInteger = StringUtils.hasText(chosenOption) ?
-					Integer.parseInt(chosenOption) : -1;
+			int pickedInteger = StringUtils.hasText(chosenOption)
+					? Integer.parseInt(chosenOption) : -1;
 			boolean pickedOptionIsComposite = pickedInteger <= 1 && pickedInteger >= 0;
-			boolean pickedOptionIsFromPostRelease = pickedInteger >= Tasks.ALL_TASKS_PER_PROJECT.size()
-					- Tasks.DEFAULT_TASKS_PER_RELEASE.size();
+			boolean pickedOptionIsFromPostRelease = pickedInteger >= Tasks.ALL_TASKS_PER_PROJECT
+					.size() - Tasks.DEFAULT_TASKS_PER_RELEASE.size();
 			if (options.metaRelease || options.fullRelease || pickedOptionIsComposite) {
 				postReleaseTask().execute(args);
-			} else if (pickedOptionIsFromPostRelease) {
+			}
+			else if (pickedOptionIsFromPostRelease) {
 				processNonComposite(options, tasks, args);
-			} else {
-				log.info("Picked option [{}] doesn't allow post release steps", pickedInteger);
+			}
+			else {
+				log.info("Picked option [{}] doesn't allow post release steps",
+						pickedInteger);
 			}
 			return;
 		}
 		if (options.fullRelease && !options.interactive) {
 			log.info("Executing a full release in non-interactive mode");
 			releaseTask().execute(args);
-		} else if (options.fullRelease && options.interactive) {
+		}
+		else if (options.fullRelease && options.interactive) {
 			log.info("Executing a full release in interactive mode");
 			releaseVerboseTask().execute(args);
-		} else {
+		}
+		else {
 			processNonComposite(options, tasks, args);
 		}
 	}
@@ -81,13 +127,17 @@ class OptionsProcessor {
 	private void processNonComposite(Options options, List<Task> tasks, Args args) {
 		if (StringUtils.hasText(options.startFrom)) {
 			startFrom(tasks, options, args);
-		} else if (StringUtils.hasText(options.range)) {
+		}
+		else if (StringUtils.hasText(options.range)) {
 			range(tasks, options.range, args);
-		} else if (!options.taskNames.isEmpty()) {
+		}
+		else if (!options.taskNames.isEmpty()) {
 			tasks(tasks, options.taskNames, args);
-		} else if (options.interactive) {
+		}
+		else if (options.interactive) {
 			interactiveOnly(tasks, args);
-		} else {
+		}
+		else {
 			throw new IllegalStateException("You haven't picked any recognizable option");
 		}
 	}
@@ -136,10 +186,12 @@ class OptionsProcessor {
 				if (sameRange) {
 					break;
 				}
-			} else if (started && (stop.equals(task.name) || stop.equals(task.shortName))) {
+			}
+			else if (started && (stop.equals(task.name) || stop.equals(task.shortName))) {
 				task.execute(defaultArgs);
 				break;
-			} else if (started) {
+			}
+			else if (started) {
 				task.execute(defaultArgs);
 			}
 		}
@@ -148,10 +200,12 @@ class OptionsProcessor {
 	private void startFrom(List<Task> tasks, Options options, Args defaultArgs) {
 		boolean started = false;
 		for (Task task : tasks) {
-			if (options.startFrom.equals(task.name) || options.startFrom.equals(task.shortName)) {
+			if (options.startFrom.equals(task.name)
+					|| options.startFrom.equals(task.shortName)) {
 				started = true;
 				task.execute(defaultArgs);
-			} else if (started) {
+			}
+			else if (started) {
 				task.execute(defaultArgs);
 			}
 		}
@@ -161,11 +215,17 @@ class OptionsProcessor {
 		StringBuilder msg = new StringBuilder();
 		msg.append("\n\n\n=== WHAT DO YOU WANT TO DO? ===\n\n");
 		for (int i = 0; i < this.allTasks.size(); i++) {
-			msg.append(i).append(") ").append(this.allTasks.get(i).description).append("\n");
+			msg.append(i).append(") ").append(this.allTasks.get(i).description)
+					.append("\n");
 		}
-		msg.append("\n").append("You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]\n");
-		msg.append("You can execute all tasks starting from a job by using a hyphen and providing only one number - e.g. '8-' will execute jobs [8,9,10]\n");
-		msg.append("You can execute given tasks by providing a comma separated list of tasks - e.g. '3,7,8' will execute jobs [3,7,8]\n");
+		msg.append("\n").append(
+				"You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]\n");
+		msg.append("You can execute all tasks starting from a job "
+				+ "by using a hyphen and providing only one "
+				+ "number - e.g. '8-' will execute jobs [8,9,10]\n");
+		msg.append("You can execute given tasks by providing a "
+				+ "comma separated list of tasks - e.g. "
+				+ "'3,7,8' will execute jobs [3,7,8]\n");
 		msg.append("\n").append("You can press 'q' to quit\n\n");
 		return msg;
 	}
@@ -178,9 +238,11 @@ class OptionsProcessor {
 		default:
 			if (input.contains("-")) {
 				rangeInteractive(tasks, defaultArgs, input);
-			} else if (input.contains(",")) {
+			}
+			else if (input.contains(",")) {
 				tasksInteractive(tasks, defaultArgs, input);
-			} else {
+			}
+			else {
 				singleTask(tasks, defaultArgs, input);
 			}
 		}
@@ -222,10 +284,12 @@ class OptionsProcessor {
 	private Args args(Args defaultArgs, boolean interactive) {
 		return new Args(this.releaser, defaultArgs.project, defaultArgs.projects,
 				defaultArgs.originalVersion, defaultArgs.versionFromScRelease,
-				this.properties, interactive, defaultArgs.taskType, this.applicationEventPublisher);
+				this.properties, interactive, defaultArgs.taskType,
+				this.applicationEventPublisher);
 	}
 
 	String chosenOption() {
 		return System.console() == null ? "-1" : System.console().readLine();
 	}
+
 }

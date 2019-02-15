@@ -1,7 +1,41 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.template;
 
 import java.io.File;
 import java.io.IOException;
+
+import com.github.jknack.handlebars.Template;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
@@ -9,23 +43,30 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.tech.HandlebarsHelper;
 
-import com.github.jknack.handlebars.Template;
-
 /**
  * @author Marcin Grzejszczak
  */
 public class TemplateGenerator implements ReleaserPropertiesAware {
 
 	private static final String EMAIL_TEMPLATE = "email";
+
 	private static final String BLOG_TEMPLATE = "blog";
+
 	private static final String TWITTER_TEMPLATE = "tweet";
+
 	private static final String RELEASE_NOTES_TEMPLATE = "notes";
+
 	private final File emailOutput;
+
 	private final File blogOutput;
+
 	private final File tweetOutput;
+
 	private final File releaseNotesOutput;
-	private ReleaserProperties props;
+
 	private final ProjectGitHandler handler;
+
+	private ReleaserProperties props;
 
 	public TemplateGenerator(ReleaserProperties props, ProjectGitHandler handler) {
 		this.props = props;
@@ -63,7 +104,8 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 				throw new IllegalStateException("Couldn't create a file [" + file + "]");
 			}
 			return file;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
@@ -72,7 +114,8 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 		File blogOutput = file(this.blogOutput);
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(BLOG_TEMPLATE);
-		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects, this.handler).blog();
+		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects,
+				this.handler).blog();
 	}
 
 	public File tweet(Projects projects) {
@@ -86,8 +129,8 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 		File output = file(this.releaseNotesOutput);
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(RELEASE_NOTES_TEMPLATE);
-		return new ReleaseNotesTemplateGenerator(template, releaseVersion,
-				output, projects, this.handler).releaseNotes();
+		return new ReleaseNotesTemplateGenerator(template, releaseVersion, output,
+				projects, this.handler).releaseNotes();
 	}
 
 	private String parsedVersion(Projects projects) {
@@ -102,10 +145,13 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 	}
 
 	private Template template(String template) {
-		return HandlebarsHelper.template(this.props.getTemplate().getTemplateFolder(), template);
+		return HandlebarsHelper.template(this.props.getTemplate().getTemplateFolder(),
+				template);
 	}
 
-	@Override public void setReleaserProperties(ReleaserProperties properties) {
+	@Override
+	public void setReleaserProperties(ReleaserProperties properties) {
 		this.props = properties;
 	}
+
 }

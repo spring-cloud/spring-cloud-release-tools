@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.gradle;
 
 import java.io.File;
@@ -24,7 +40,10 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  * @author Marcin Grzejszczak
  */
 public class GradleUpdaterTests {
-	@Rule public TemporaryFolder tmp = new TemporaryFolder();
+
+	@Rule
+	public TemporaryFolder tmp = new TemporaryFolder();
+
 	File temporaryFolder;
 
 	@Before
@@ -37,21 +56,21 @@ public class GradleUpdaterTests {
 	public void should_substitute_values_in_gradle_properties() throws IOException {
 		File projectRoot = tmpFile("gradleproject");
 		ReleaserProperties properties = new ReleaserProperties();
-		Map<String, String> props = new HashMap<String, String>() {{
-			put("foo", "spring-cloud-contract");
-			put("bar", "spring-cloud-sleuth");
-		}};
+		Map<String, String> props = new HashMap<String, String>() {
+			{
+				put("foo", "spring-cloud-contract");
+				put("bar", "spring-cloud-sleuth");
+			}
+		};
 		properties.getGradle().setGradlePropsSubstitution(props);
 		Projects projects = new Projects(
 				new ProjectVersion("spring-cloud-contract", "1.0.0"),
-				new ProjectVersion("spring-cloud-sleuth", "2.0.0")
-		);
+				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		new GradleUpdater(properties).updateProjectFromBom(projectRoot,
-				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
+		new GradleUpdater(properties).updateProjectFromBom(projectRoot, projects,
+				new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
 
-		then(asString(tmpFile("gradleproject/gradle.properties")))
-				.contains("foo=1.0.0");
+		then(asString(tmpFile("gradleproject/gradle.properties"))).contains("foo=1.0.0");
 		then(asString(tmpFile("gradleproject/child/gradle.properties")))
 				.contains("bar=2.0.0");
 	}
@@ -60,19 +79,21 @@ public class GradleUpdaterTests {
 	public void should_throw_exception_if_snapshots_remain() {
 		File projectRoot = tmpFile("gradleproject");
 		ReleaserProperties properties = new ReleaserProperties();
-		Map<String, String> props = new HashMap<String, String>() {{
-			put("foo", "spring-cloud-contract");
-			put("bar", "spring-cloud-sleuth");
-		}};
+		Map<String, String> props = new HashMap<String, String>() {
+			{
+				put("foo", "spring-cloud-contract");
+				put("bar", "spring-cloud-sleuth");
+			}
+		};
 		properties.getGradle().setGradlePropsSubstitution(props);
 		Projects projects = new Projects(
 				new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
-				new ProjectVersion("spring-cloud-sleuth", "2.0.0")
-		);
+				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
 		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromBom(projectRoot,
-				projects, new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"), true))
-		.hasMessageContaining("matches the [ ^.*\\.(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
+				projects, new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"),
+				true)).hasMessageContaining(
+						"matches the [ ^.*\\.(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
 	}
 
 	private File file(String relativePath) throws URISyntaxException {
@@ -86,4 +107,5 @@ public class GradleUpdaterTests {
 	private String asString(File file) throws IOException {
 		return new String(Files.readAllBytes(file.toPath()));
 	}
+
 }

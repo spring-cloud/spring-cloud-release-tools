@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.docs;
 
 import java.io.File;
@@ -15,18 +47,22 @@ import org.springframework.cloud.release.internal.template.TemplateGenerator;
 public class DocumentationUpdater implements ReleaserPropertiesAware {
 
 	private final ProjectDocumentationUpdater projectDocumentationUpdater;
+
 	private final ReleaseTrainContentsUpdater releaseTrainContentsUpdater;
+
 	private ReleaserProperties properties;
 
-	public DocumentationUpdater(ProjectGitHandler gitHandler, ReleaserProperties properties,
-			TemplateGenerator templateGenerator) {
+	public DocumentationUpdater(ProjectGitHandler gitHandler,
+			ReleaserProperties properties, TemplateGenerator templateGenerator) {
 		this.properties = properties;
-		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(this.properties, gitHandler);
-		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(this.properties, gitHandler,
-				templateGenerator);
+		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(
+				this.properties, gitHandler);
+		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(
+				this.properties, gitHandler, templateGenerator);
 	}
 
-	DocumentationUpdater(ReleaserProperties properties, ProjectDocumentationUpdater updater,
+	DocumentationUpdater(ReleaserProperties properties,
+			ProjectDocumentationUpdater updater,
 			ReleaseTrainContentsUpdater contentsUpdater) {
 		this.properties = properties;
 		this.projectDocumentationUpdater = updater;
@@ -34,34 +70,34 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	}
 
 	/**
-	 * Updates the documentation repository if current release train version is greater or equal
-	 * than the one stored in the repo.
-	 *
-	 * @param currentProject
-	 * @param springCloudReleaseBranch
-	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is used
+	 * Updates the documentation repository if current release train version is greater or
+	 * equal than the one stored in the repo.
+	 * @param currentProject the project we're parsing
+	 * @param bomReleaseBranch branch of the BOM
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
+	 * used
 	 */
-	public File updateDocsRepo(ProjectVersion currentProject, String springCloudReleaseBranch) {
-		return this.projectDocumentationUpdater
-				.updateDocsRepo(currentProject, springCloudReleaseBranch);
+	public File updateDocsRepo(ProjectVersion currentProject, String bomReleaseBranch) {
+		return this.projectDocumentationUpdater.updateDocsRepo(currentProject,
+				bomReleaseBranch);
 	}
 
 	/**
-	 * Updates the project page if current release train version is greater or equal
-	 * than the one stored in the repo.
-	 *
-	 * @param projects
-	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is used or the switch is turned off
+	 * Updates the project page if current release train version is greater or equal than
+	 * the one stored in the repo.
+	 * @param projects list of projects to update versions for
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
+	 * used or the switch is turned off
 	 */
 	public File updateProjectRepo(Projects projects) {
 		return this.releaseTrainContentsUpdater.updateProjectRepo(projects);
 	}
 
 	/**
-	 * Updates the release train wiki page
-	 *
-	 * @param projects
-	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is used or the switch is turned off
+	 * Updates the release train wiki page.
+	 * @param projects list of projects to update versions for
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
+	 * used or the switch is turned off
 	 */
 	public File updateReleaseTrainWiki(Projects projects) {
 		return this.releaseTrainContentsUpdater.updateReleaseTrainWiki(projects);
@@ -73,4 +109,5 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 		this.projectDocumentationUpdater.setReleaserProperties(properties);
 		this.releaseTrainContentsUpdater.setReleaserProperties(properties);
 	}
+
 }

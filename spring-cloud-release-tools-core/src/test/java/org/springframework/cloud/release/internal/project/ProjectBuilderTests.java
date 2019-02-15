@@ -1,7 +1,20 @@
-package org.springframework.cloud.release.internal.project;
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+package org.springframework.cloud.release.internal.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +28,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
@@ -22,14 +36,21 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.util.FileSystemUtils;
 
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+
 /**
  * @author Marcin Grzejszczak
  */
 public class ProjectBuilderTests {
 
-	@Rule public TemporaryFolder tmp = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder tmp = new TemporaryFolder();
+
+	@Rule
+	public OutputCapture outputCapture = new OutputCapture();
+
 	File temporaryFolder;
-	@Rule public OutputCapture outputCapture = new OutputCapture();
 
 	@Before
 	public void checkOs() throws Exception {
@@ -49,7 +70,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_after_running_there_is_no_html_file_with_unresolved_tag() throws Exception {
+	public void should_successfully_execute_a_command_when_after_running_there_is_no_html_file_with_unresolved_tag()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -62,20 +84,23 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_path_is_provided_explicitly() throws Exception {
+	public void should_successfully_execute_a_command_when_path_is_provided_explicitly()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("ls -al");
 		properties.setWorkingDir(new File("/foo/bar").getAbsolutePath());
 		ProjectBuilder builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"), tmpFile("/builder/resolved").getPath());
+		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
+				tmpFile("/builder/resolved").getPath());
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_milestone_version() throws Exception {
+	public void should_successfully_execute_a_build_command_for_milestone_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -88,7 +113,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_rc_version() throws Exception {
+	public void should_successfully_execute_a_build_command_for_rc_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -101,7 +127,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_release_version() throws Exception {
+	public void should_successfully_execute_a_build_command_for_release_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -114,7 +141,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_sr_version() throws Exception {
+	public void should_successfully_execute_a_build_command_for_sr_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -127,7 +155,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present() throws Exception {
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo {{systemProps}}");
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
@@ -141,7 +170,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_and_there_are_no_sys_props() throws Exception {
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_and_there_are_no_sys_props()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo foo {{systemProps}}");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -149,12 +179,12 @@ public class ProjectBuilderTests {
 
 		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_without_system_props() throws Exception {
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_without_system_props()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo {{systemProps}}");
 		properties.getMaven().setSystemProperties("hello=world foo=bar");
@@ -168,7 +198,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_inside_command() throws Exception {
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present_inside_command()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo {{systemProps}} bar");
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
@@ -182,7 +213,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_pass_system_props_when_build_gets_executed_without_explicit_system_props() throws Exception {
+	public void should_successfully_pass_system_props_when_build_gets_executed_without_explicit_system_props()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("echo bar");
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
@@ -202,8 +234,10 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectBuilder builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-				.hasMessageContaining("contains a tag that wasn't resolved properly");
+		thenThrownBy(
+				() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+						.hasMessageContaining(
+								"contains a tag that wasn't resolved properly");
 	}
 
 	@Test
@@ -214,8 +248,10 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectBuilder builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		thenThrownBy(
+				() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+						.hasMessageContaining(
+								"Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -232,7 +268,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_milestone_version() throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_milestone_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -245,7 +282,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_rc_version() throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_rc_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -258,7 +296,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_release_version() throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_release_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -271,7 +310,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_sr_version() throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_sr_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -284,7 +324,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_with_sys_props_placeholder() throws Exception {
+	public void should_successfully_execute_a_deploy_command_with_sys_props_placeholder()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo \"{{systemProps}}\"");
 		properties.getMaven().setSystemProperties("-Dhello=hello-world");
@@ -298,7 +339,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_pass_system_props_when_deploy_gets_executed_without_explicit_system_props() throws Exception {
+	public void should_successfully_pass_system_props_when_deploy_gets_executed_without_explicit_system_props()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo ");
 		properties.getMaven().setSystemProperties("-Dhello=hello-world");
@@ -319,8 +361,10 @@ public class ProjectBuilderTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectBuilder builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		thenThrownBy(
+				() -> builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+						.hasMessageContaining(
+								"Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -344,9 +388,11 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder() throws Exception {
+	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getMaven().setPublishDocsCommands(new String[] { "echo {{systemProps}} 1", "echo {{systemProps}} 2" });
+		properties.getMaven().setPublishDocsCommands(
+				new String[] { "echo {{systemProps}} 1", "echo {{systemProps}} 2" });
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
@@ -365,9 +411,11 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_publish_docs_command_and_substitute_the_version() throws Exception {
+	public void should_successfully_execute_a_publish_docs_command_and_substitute_the_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getMaven().setPublishDocsCommands(new String[] { "echo '{{version}}'" });
+		properties.getMaven()
+				.setPublishDocsCommands(new String[] { "echo '{{version}}'" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectBuilder builder = new ProjectBuilder(properties) {
@@ -384,7 +432,8 @@ public class ProjectBuilderTests {
 	}
 
 	@Test
-	public void should_successfully_execute_an_update_docs_command_and_substitute_the_version() throws Exception {
+	public void should_successfully_execute_an_update_docs_command_and_substitute_the_version()
+			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setGenerateReleaseTrainDocsCommand("echo '{{version}}'");
 		File resolved = tmpFile("/builder/resolved");
@@ -406,12 +455,14 @@ public class ProjectBuilderTests {
 	@Test
 	public void should_throw_exception_when_publish_docs_command_took_too_long_to_execute() {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getMaven().setPublishDocsCommands(new String[] { "sleep 1", "sleep 1" });
+		properties.getMaven()
+				.setPublishDocsCommands(new String[] { "sleep 1", "sleep 1" });
 		properties.getMaven().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectBuilder builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.publishDocs("")).hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.publishDocs(""))
+				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -423,40 +474,49 @@ public class ProjectBuilderTests {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return new ProcessExecutor(properties.getWorkingDir()) {
-					@Override Process startProcess(ProcessBuilder builder) {
+					@Override
+					Process startProcess(ProcessBuilder builder) {
 						return processWithInvalidExitCode();
 					}
 				};
 			}
 		};
 
-		thenThrownBy(() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-				.hasMessageContaining("The process has exited with exit code [1]");
+		thenThrownBy(
+				() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+						.hasMessageContaining(
+								"The process has exited with exit code [1]");
 	}
 
 	private Process processWithInvalidExitCode() {
 		return new Process() {
-			@Override public OutputStream getOutputStream() {
+			@Override
+			public OutputStream getOutputStream() {
 				return null;
 			}
 
-			@Override public InputStream getInputStream() {
+			@Override
+			public InputStream getInputStream() {
 				return null;
 			}
 
-			@Override public InputStream getErrorStream() {
+			@Override
+			public InputStream getErrorStream() {
 				return null;
 			}
 
-			@Override public int waitFor() {
+			@Override
+			public int waitFor() {
 				return 0;
 			}
 
-			@Override public int exitValue() {
+			@Override
+			public int exitValue() {
 				return 1;
 			}
 
-			@Override public void destroy() {
+			@Override
+			public void destroy() {
 
 			}
 		};
@@ -464,21 +524,6 @@ public class ProjectBuilderTests {
 
 	private TestProcessExecutor testExecutor(String workingDir) {
 		return new TestProcessExecutor(workingDir);
-	}
-
-	class TestProcessExecutor extends ProcessExecutor {
-
-		int counter = 0;
-
-		TestProcessExecutor(String workingDir) {
-			super(workingDir);
-		}
-
-		@Override ProcessBuilder builder(String[] commands, String workingDir) {
-			this.counter++;
-			return super.builder(commands, workingDir)
-					.redirectOutput(tmpFile("/builder/resolved/resolved.log"));
-		}
 	}
 
 	private File tmpFile(String relativePath) {
@@ -491,6 +536,23 @@ public class ProjectBuilderTests {
 
 	private String asString(File file) throws IOException {
 		return new String(Files.readAllBytes(file.toPath()));
+	}
+
+	class TestProcessExecutor extends ProcessExecutor {
+
+		int counter = 0;
+
+		TestProcessExecutor(String workingDir) {
+			super(workingDir);
+		}
+
+		@Override
+		ProcessBuilder builder(String[] commands, String workingDir) {
+			this.counter++;
+			return super.builder(commands, workingDir)
+					.redirectOutput(tmpFile("/builder/resolved/resolved.log"));
+		}
+
 	}
 
 }

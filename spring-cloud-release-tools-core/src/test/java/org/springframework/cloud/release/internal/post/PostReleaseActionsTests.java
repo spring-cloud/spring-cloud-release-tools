@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.post;
 
 import java.io.File;
@@ -39,12 +55,19 @@ public class PostReleaseActionsTests {
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
+
 	File temporaryFolder;
+
 	TestPomReader testPomReader = new TestPomReader();
+
 	GradleUpdater gradleUpdater = BDDMockito.mock(GradleUpdater.class);
+
 	ReleaserProperties properties = new ReleaserProperties();
+
 	File cloned;
+
 	LinkedMultiValueMap<String, File> clonedTestProjects = new LinkedMultiValueMap<>();
+
 	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties) {
 		@Override
 		public File cloneTestSamplesProject() {
@@ -65,7 +88,9 @@ public class PostReleaseActionsTests {
 			return file;
 		}
 	};
+
 	ProjectPomUpdater updater = new ProjectPomUpdater(this.properties);
+
 	ProjectBuilder builder = new ProjectBuilder(this.properties);
 
 	@Before
@@ -102,7 +127,8 @@ public class PostReleaseActionsTests {
 	@Test
 	public void should_update_project_and_run_tests_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(true);
-		this.properties.getGit().setTestSamplesProjectUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
+		this.properties.getGit().setTestSamplesProjectUrl(
+				tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setBuildCommand("touch build.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
 				this.updater, this.gradleUpdater, this.builder, this.properties);
@@ -118,8 +144,9 @@ public class PostReleaseActionsTests {
 	}
 
 	private void thenGradleUpdaterWasCalled() {
-		BDDMockito.then(this.gradleUpdater).should().updateProjectFromBom(BDDMockito.any(File.class),
-				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class), BDDMockito.eq(false));
+		BDDMockito.then(this.gradleUpdater).should().updateProjectFromBom(
+				BDDMockito.any(File.class), BDDMockito.any(Projects.class),
+				BDDMockito.any(ProjectVersion.class), BDDMockito.eq(false));
 	}
 
 	@Test
@@ -147,8 +174,10 @@ public class PostReleaseActionsTests {
 	@Test
 	public void should_update_project_and_run_tests_and_release_train_docs_generation_is_called() {
 		this.properties.getMetaRelease().setEnabled(true);
-		this.properties.getGit().setReleaseTrainDocsUrl(tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
-		this.properties.getMaven().setGenerateReleaseTrainDocsCommand("touch generate.log");
+		this.properties.getGit().setReleaseTrainDocsUrl(
+				tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
+		this.properties.getMaven()
+				.setGenerateReleaseTrainDocsCommand("touch generate.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
 				this.updater, this.gradleUpdater, this.builder, this.properties);
 
@@ -175,7 +204,7 @@ public class PostReleaseActionsTests {
 	}
 
 	@Test
-	public void should_do_nothing_when_the_switch_for_test_samples_update_check_is_off_and_test_samples_update_is_called() {
+	public void should_do_nothing_when_the_switch_for_test_samples_update_check_is_off_and_update_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
 				this.updater, this.gradleUpdater, this.builder, this.properties);
@@ -187,12 +216,13 @@ public class PostReleaseActionsTests {
 	}
 
 	@Test
-	public void should_update_test_sample_projects_when_test_samples_update_is_called() throws Exception {
+	public void should_update_test_sample_projects_when_test_samples_update_is_called()
+			throws Exception {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().getAllTestSampleUrls().clear();
 		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
-				Collections.singletonList(tmpFile("spring-cloud-core-tests/")
-						.getAbsolutePath() + "/"));
+				Collections.singletonList(
+						tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
 				this.updater, this.gradleUpdater, this.builder, this.properties) {
@@ -205,31 +235,36 @@ public class PostReleaseActionsTests {
 
 		actions.updateAllTestSamples(currentGa());
 
-		Map.Entry<String, List<File>> entry = this.clonedTestProjects.entrySet()
-				.stream()
-				.filter(s -> s.getKey().contains("spring-cloud-core-tests"))
-				.findFirst().orElseThrow(() -> new IllegalStateException("Not found"));
+		Map.Entry<String, List<File>> entry = this.clonedTestProjects.entrySet().stream()
+				.filter(s -> s.getKey().contains("spring-cloud-core-tests")).findFirst()
+				.orElseThrow(() -> new IllegalStateException("Not found"));
 		File clonedFile = entry.getValue().get(0);
-		Model pomWithCloud = this.testPomReader.readPom(new File(clonedFile, "zuul-proxy-eureka/pom.xml"));
+		Model pomWithCloud = this.testPomReader
+				.readPom(new File(clonedFile, "zuul-proxy-eureka/pom.xml"));
 		Git git = GitTestUtils.openGitProject(clonedFile);
-		BDDAssertions.then(pomWithCloud.getProperties().getProperty("spring-cloud.version")).isEqualTo("Finchley.BUILD-SNAPSHOT");
-		BDDAssertions.then(pomWithCloud.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
+		BDDAssertions
+				.then(pomWithCloud.getProperties().getProperty("spring-cloud.version"))
+				.isEqualTo("Finchley.BUILD-SNAPSHOT");
+		BDDAssertions.then(pomWithCloud.getParent().getVersion())
+				.isEqualTo("2.0.4.RELEASE");
 		Iterator<RevCommit> iterator = git.log().call().iterator();
 		RevCommit commit = iterator.next();
-		BDDAssertions.then(commit.getShortMessage())
-				.isEqualTo("Updated versions after [Finchley.SR1] release train and [2.0.1.RELEASE] [spring-cloud-sleuth] project release");
+		BDDAssertions.then(commit.getShortMessage()).isEqualTo(
+				"Updated versions after [Finchley.SR1] release train and [2.0.1.RELEASE] [spring-cloud-sleuth] project release");
 		thenGradleUpdaterWasCalled();
-		BDDAssertions.then(postReleaseProjects.get()
-				.forName("spring-boot-dependencies").version).isEqualTo("2.0.4.RELEASE");
+		BDDAssertions.then(
+				postReleaseProjects.get().forName("spring-boot-dependencies").version)
+				.isEqualTo("2.0.4.RELEASE");
 	}
 
 	@Test
-	public void should_assume_that_project_version_is_snapshot_when_no_pom_is_present() throws Exception {
+	public void should_assume_that_project_version_is_snapshot_when_no_pom_is_present()
+			throws Exception {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().getAllTestSampleUrls().clear();
 		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
-				Collections.singletonList(tmpFile("spring-cloud-static/")
-						.getAbsolutePath() + "/"));
+				Collections.singletonList(
+						tmpFile("spring-cloud-static/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
 				this.updater, this.gradleUpdater, this.builder, this.properties) {
@@ -242,10 +277,9 @@ public class PostReleaseActionsTests {
 
 		actions.updateAllTestSamples(currentGa());
 
-		Map.Entry<String, List<File>> entry = this.clonedTestProjects.entrySet()
-				.stream()
-				.filter(s -> s.getKey().contains("spring-cloud-static"))
-				.findFirst().orElseThrow(() -> new IllegalStateException("Not found"));
+		Map.Entry<String, List<File>> entry = this.clonedTestProjects.entrySet().stream()
+				.filter(s -> s.getKey().contains("spring-cloud-static")).findFirst()
+				.orElseThrow(() -> new IllegalStateException("Not found"));
 	}
 
 	private String sleuthParentPomVersion() {
@@ -254,8 +288,7 @@ public class PostReleaseActionsTests {
 	}
 
 	Projects currentGa() {
-		return new Projects(
-				new ProjectVersion("spring-cloud-aws", "2.0.0.RELEASE"),
+		return new Projects(new ProjectVersion("spring-cloud-aws", "2.0.0.RELEASE"),
 				new ProjectVersion("spring-cloud-bus", "2.0.0.RELEASE"),
 				new ProjectVersion("spring-cloud-cli", "2.0.0.RELEASE"),
 				new ProjectVersion("spring-cloud-commons", "2.0.1.RELEASE"),
@@ -286,4 +319,5 @@ public class PostReleaseActionsTests {
 	private File file(String relativePath) throws URISyntaxException {
 		return new File(PomUpdateAcceptanceTests.class.getResource(relativePath).toURI());
 	}
+
 }

@@ -1,22 +1,40 @@
 /*
- *  Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -31,29 +49,37 @@ public class ReleaserApplication implements CommandLineRunner {
 
 	private static final Logger log = LoggerFactory.getLogger(ReleaserApplication.class);
 
+	@Autowired
+	SpringReleaser releaser;
+
+	@Autowired
+	Parser parser;
+
 	public static void main(String[] args) {
 		try {
-			SpringApplication application = new SpringApplication(ReleaserApplication.class);
+			SpringApplication application = new SpringApplication(
+					ReleaserApplication.class);
 			application.setWebApplicationType(WebApplicationType.NONE);
 			application.run(args);
-		} catch (Throwable e) {
+		}
+		catch (Throwable e) {
 			log.error("Exception occurred for the releaser", e);
 			throw e;
 		}
 	}
 
-	@Autowired SpringReleaser releaser;
-	@Autowired Parser parser;
-
-	@Override public void run(String... strings) {
+	@Override
+	public void run(String... strings) {
 		Options options = this.parser.parse(strings);
 		try {
 			this.releaser.release(options);
-		} catch (Throwable e) {
-			log.error("Exception occurred for the releaser. Picked options were [" + options + "]");
+		}
+		catch (Throwable e) {
+			log.error("Exception occurred for the releaser. Picked options were ["
+					+ options + "]");
 			throw e;
 		}
 		System.exit(0);
 	}
-}
 
+}

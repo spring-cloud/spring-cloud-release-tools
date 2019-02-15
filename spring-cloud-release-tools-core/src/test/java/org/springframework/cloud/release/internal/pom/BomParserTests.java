@@ -1,7 +1,22 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.pom;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.junit.Before;
@@ -19,19 +34,20 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 public class BomParserTests {
 
 	File springCloudReleaseProject;
+
 	ReleaserProperties properties = new ReleaserProperties();
 
 	@Before
 	public void setup() throws URISyntaxException {
-		this.springCloudReleaseProject = new File(GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
+		this.springCloudReleaseProject = new File(
+				GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 	}
 
 	@Test
 	public void should_throw_exception_when_boot_pom_is_missing() {
 		BomParser parser = new BomParser(this.properties, new File("."));
 
-		thenThrownBy(parser::bootVersion)
-				.isInstanceOf(IllegalStateException.class)
+		thenThrownBy(parser::bootVersion).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
@@ -41,8 +57,7 @@ public class BomParserTests {
 		this.properties.getPom().setThisTrainBom(null);
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::bootVersion)
-				.isInstanceOf(IllegalStateException.class)
+		thenThrownBy(parser::bootVersion).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
@@ -52,16 +67,17 @@ public class BomParserTests {
 		this.properties.getPom().setThisTrainBom(null);
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::bootVersion)
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("The pom doesn't have a [spring-boot-starter-parent] artifact id");
+		thenThrownBy(parser::bootVersion).isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining(
+						"The pom doesn't have a [spring-boot-starter-parent] artifact id");
 	}
 
 	@Test
 	public void should_populate_sc_release_version() {
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		String scReleaseVersion = parser.allVersions().versionForProject("spring-cloud-release");
+		String scReleaseVersion = parser.allVersions()
+				.versionForProject("spring-cloud-release");
 
 		then(scReleaseVersion).isEqualTo("Dalston.BUILD-SNAPSHOT");
 	}
@@ -79,8 +95,7 @@ public class BomParserTests {
 	public void should_throw_exception_when_cloud_pom_is_missing() {
 		BomParser parser = new BomParser(this.properties, new File("."));
 
-		thenThrownBy(parser::versionsFromBom)
-				.isInstanceOf(IllegalStateException.class)
+		thenThrownBy(parser::versionsFromBom).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
@@ -90,8 +105,7 @@ public class BomParserTests {
 		this.properties.getPom().setThisTrainBom(null);
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::versionsFromBom)
-				.isInstanceOf(IllegalStateException.class)
+		thenThrownBy(parser::versionsFromBom).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
@@ -101,9 +115,9 @@ public class BomParserTests {
 		this.properties.getPom().setThisTrainBom("pom.xml");
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::versionsFromBom)
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("The pom doesn't have a [spring-cloud-dependencies-parent] artifact id");
+		thenThrownBy(parser::versionsFromBom).isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining(
+						"The pom doesn't have a [spring-cloud-dependencies-parent] artifact id");
 	}
 
 	@Test
@@ -147,4 +161,5 @@ public class BomParserTests {
 	Project project(String name, String value) {
 		return new Project(name, value);
 	}
+
 }

@@ -1,8 +1,24 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.git;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Collections;
+
 import javax.json.Json;
 
 import com.jcabi.github.Coordinates;
@@ -29,13 +45,18 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class GithubIssuesTests {
 
+	@Rule
+	public TemporaryFolder folder = new TemporaryFolder();
+
+	@Rule
+	public OutputCapture capture = new OutputCapture();
+
 	MkGithub github;
+
 	Repo repo;
-	@Rule public TemporaryFolder folder = new TemporaryFolder();
-	@Rule public OutputCapture capture = new OutputCapture();
 
 	@Before
-	public void setup() throws IOException  {
+	public void setup() throws IOException {
 		this.github = new MkGithub("spring-guides");
 		this.repo = createGettingStartedGuides(this.github);
 	}
@@ -45,9 +66,8 @@ public class GithubIssuesTests {
 		Github github = BDDMockito.mock(Github.class);
 		GithubIssues issues = new GithubIssues(github, withToken());
 
-		issues.fileIssue(new Projects(
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")
-				), new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
+		issues.fileIssue(new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
+				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
 		BDDMockito.then(github).shouldHaveZeroInteractions();
 	}
@@ -59,11 +79,11 @@ public class GithubIssuesTests {
 		properties.getGit().setUpdateSpringGuides(false);
 		GithubIssues issues = new GithubIssues(github, properties);
 
-		issues.fileIssue(new Projects(
-				new ProjectVersion("foo", "1.0.0.RELEASE"),
-				new ProjectVersion("bar", "2.0.0.RELEASE"),
-				new ProjectVersion("baz", "3.0.0.RELEASE")
-		), new ProjectVersion("sc-release", "Edgware.RELEASE"));
+		issues.fileIssue(
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
+						new ProjectVersion("bar", "2.0.0.RELEASE"),
+						new ProjectVersion("baz", "3.0.0.RELEASE")),
+				new ProjectVersion("sc-release", "Edgware.RELEASE"));
 
 		BDDMockito.then(github).shouldHaveZeroInteractions();
 	}
@@ -72,23 +92,23 @@ public class GithubIssuesTests {
 	public void should_file_an_issue_for_release_version() throws IOException {
 		GithubIssues issues = new GithubIssues(this.github, withToken());
 
-		issues.fileIssue(new Projects(
-				new ProjectVersion("foo", "1.0.0.RELEASE"),
-				new ProjectVersion("bar", "2.0.0.RELEASE"),
-				new ProjectVersion("baz", "3.0.0.RELEASE")
-				), new ProjectVersion("sc-release", "Edgware.RELEASE"));
+		issues.fileIssue(
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
+						new ProjectVersion("bar", "2.0.0.RELEASE"),
+						new ProjectVersion("baz", "3.0.0.RELEASE")),
+				new ProjectVersion("sc-release", "Edgware.RELEASE"));
 
-		then(this.capture.toString()).doesNotContain("Guide issue creation will occur only");
+		then(this.capture.toString())
+				.doesNotContain("Guide issue creation will occur only");
 		Issue issue = this.github.repos()
 				.get(new Coordinates.Simple("spring-guides", "getting-started-guides"))
 				.issues().get(1);
 		then(issue.exists()).isTrue();
 		Issue.Smart smartIssue = new Issue.Smart(issue);
-		then(smartIssue.title()).isEqualTo("Edgware.RELEASE Spring Cloud Release took place");
-		then(smartIssue.body())
-				.contains("Spring Cloud [Edgware.RELEASE]")
-				.contains("foo : `1.0.0.RELEASE`")
-				.contains("bar : `2.0.0.RELEASE`")
+		then(smartIssue.title())
+				.isEqualTo("Edgware.RELEASE Spring Cloud Release took place");
+		then(smartIssue.body()).contains("Spring Cloud [Edgware.RELEASE]")
+				.contains("foo : `1.0.0.RELEASE`").contains("bar : `2.0.0.RELEASE`")
 				.contains("baz : `3.0.0.RELEASE`");
 	}
 
@@ -97,18 +117,14 @@ public class GithubIssuesTests {
 		GithubIssues issues = new GithubIssues(new ReleaserProperties());
 
 		thenThrownBy(() -> issues.fileIssue(new Projects(Collections.emptySet()),
-				nonGaSleuthProject()))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("You have to pass Github OAuth token for milestone closing to be operational");
+				nonGaSleuthProject())).isInstanceOf(IllegalArgumentException.class)
+						.hasMessageContaining(
+								"You have to pass Github OAuth token for milestone closing to be operational");
 	}
 
 	private Repo createGettingStartedGuides(MkGithub github) throws IOException {
 		return github.repos().create(
-				Json.createObjectBuilder().add(
-						"name",
-						"getting-started-guides"
-				).build()
-		);
+				Json.createObjectBuilder().add("name", "getting-started-guides").build());
 	}
 
 	private ProjectVersion nonGaSleuthProject() {
@@ -121,4 +137,5 @@ public class GithubIssuesTests {
 		properties.getPom().setBranch("vEdgware.RELEASE");
 		return properties;
 	}
+
 }

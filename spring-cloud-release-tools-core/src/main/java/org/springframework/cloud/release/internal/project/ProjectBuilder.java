@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.project;
 
 import java.io.File;
@@ -17,8 +49,9 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
+
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.util.StringUtils;
 
@@ -28,6 +61,7 @@ import org.springframework.util.StringUtils;
 public class ProjectBuilder implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectBuilder.class);
+
 	private static final String VERSION_MUSTACHE = "{{version}}";
 
 	private ReleaserProperties properties;
@@ -42,34 +76,38 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 
 	public void build(ProjectVersion versionFromReleaseTrain, String projectRoot) {
 		try {
-			String[] commands = commandWithSystemProps(this.properties.getMaven().getBuildCommand(),
-					versionFromReleaseTrain).split(" ");
+			String[] commands = commandWithSystemProps(
+					this.properties.getMaven().getBuildCommand(), versionFromReleaseTrain)
+							.split(" ");
 			runCommand(projectRoot, commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
 			log.info("No HTML files from docs contain unresolved tags");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	public void generateReleaseTrainDocs(String version, String projectRoot) {
 		try {
-			String updatedCommand =
-					this.properties.getMaven().getGenerateReleaseTrainDocsCommand().replace(VERSION_MUSTACHE, version);
+			String updatedCommand = this.properties.getMaven()
+					.getGenerateReleaseTrainDocsCommand()
+					.replace(VERSION_MUSTACHE, version);
 			runCommand(projectRoot, updatedCommand.split(" "));
 			assertNoHtmlFilesInDocsContainUnresolvedTags(this.properties.getWorkingDir());
 			log.info("No HTML files from docs contain unresolved tags");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private String commandWithSystemProps(String command,
-			ProjectVersion version) {
+	private String commandWithSystemProps(String command, ProjectVersion version) {
 		if (command.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
 			return appendProfile(command, version);
 		}
-		return appendProfile(command, version) + " " + ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
+		return appendProfile(command, version) + " "
+				+ ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
 	}
 
 	private String appendProfile(String command, ProjectVersion version) {
@@ -77,10 +115,12 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		if (version.isMilestone() || version.isRc()) {
 			log.info("Adding the milestone profile to the Maven build");
 			return trimmedCommand + " -Pmilestone";
-		} else if (version.isRelease() || version.isServiceRelease()) {
+		}
+		else if (version.isRelease() || version.isServiceRelease()) {
 			log.info("Adding the central profile to the Maven build");
 			return trimmedCommand + " -Pcentral";
-		} else {
+		}
+		else {
 			log.info("The build is a snapshot one - will not add any profiles");
 		}
 		return trimmedCommand;
@@ -101,11 +141,12 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 
 	public void deploy(ProjectVersion version) {
 		try {
-			String[] commands = commandWithSystemProps(this.properties.getMaven().getDeployCommand(),
-					version).split(" ");
+			String[] commands = commandWithSystemProps(
+					this.properties.getMaven().getDeployCommand(), version).split(" ");
 			runCommand(commands);
 			log.info("The project has successfully been deployed");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
@@ -132,29 +173,31 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 				runCommand(commands);
 			}
 			log.info("The docs got published successfully");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	/**
-	 * We need to insert the system properties as a list of -Dkey=value entries
-	 * instead of just pasting the String that contains these values
+	 * We need to insert the system properties as a list of -Dkey=value entries instead of
+	 * just pasting the String that contains these values.
 	 */
 	private String[] substituteSystemProps(String... commands) {
-		boolean containsSystemProps = this.properties.getMaven().getSystemProperties().contains("-D");
-		String[] splitSystemProps = StringUtils.delimitedListToStringArray(this.properties.getMaven()
-				.getSystemProperties(), "-D");
+		boolean containsSystemProps = this.properties.getMaven().getSystemProperties()
+				.contains("-D");
+		String[] splitSystemProps = StringUtils.delimitedListToStringArray(
+				this.properties.getMaven().getSystemProperties(), "-D");
 		// first element might be empty even though the second one contains values
 		if (splitSystemProps.length > 1) {
-			splitSystemProps = StringUtils.isEmpty(splitSystemProps[0]) ?
-					Arrays.copyOfRange(splitSystemProps, 1, splitSystemProps.length) :
-					splitSystemProps;
+			splitSystemProps = StringUtils.isEmpty(splitSystemProps[0])
+					? Arrays.copyOfRange(splitSystemProps, 1, splitSystemProps.length)
+					: splitSystemProps;
 		}
-		String[] systemPropsWithPrefix = containsSystemProps ? Arrays.stream(splitSystemProps)
-				.map(s -> "-D" + s.trim())
-				.collect(Collectors.toList())
-				.toArray(new String[splitSystemProps.length]) : splitSystemProps;
+		String[] systemPropsWithPrefix = containsSystemProps ? Arrays
+				.stream(splitSystemProps).map(s -> "-D" + s.trim())
+				.collect(Collectors.toList()).toArray(new String[splitSystemProps.length])
+				: splitSystemProps;
 		final AtomicInteger index = new AtomicInteger(-1);
 		for (int i = 0; i < commands.length; i++) {
 			if (commands[i].contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
@@ -168,8 +211,10 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 			commandsList.remove(index.get());
 			if (index.get() >= commandsList.size()) {
 				commandsList.addAll(systemPropsList);
-			} else {
-				// we need to reverse to set the objects in the same order as passed in the prop
+			}
+			else {
+				// we need to reverse to set the objects in the same order as passed in
+				// the prop
 				List<String> reversedSystemProps = new ArrayList<>(systemPropsList);
 				Collections.reverse(reversedSystemProps);
 				reversedSystemProps.forEach(s -> commandsList.add(index.get(), s));
@@ -178,12 +223,15 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		return commandsList.toArray(new String[commandsList.size()]);
 	}
 
-	@Override public void setReleaserProperties(ReleaserProperties properties) {
+	@Override
+	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties = properties;
 	}
+
 }
 
 class ProcessExecutor implements ReleaserPropertiesAware {
+
 	private static final Logger log = LoggerFactory.getLogger(ProcessExecutor.class);
 
 	private String workingDir;
@@ -195,18 +243,22 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	void runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
 			String workingDir = this.workingDir;
-			log.debug("Will run the command from [{}] via {} and wait for result for [{}] minutes",
+			log.debug(
+					"Will run the command from [{}] via {} and wait for result for [{}] minutes",
 					workingDir, commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
 			Process process = startProcess(builder);
 			boolean finished = process.waitFor(waitTimeInMinutes, TimeUnit.MINUTES);
 			if (!finished) {
-				log.error("The command hasn't managed to finish in [{}] minutes", waitTimeInMinutes);
+				log.error("The command hasn't managed to finish in [{}] minutes",
+						waitTimeInMinutes);
 				process.destroyForcibly();
-				throw new IllegalStateException("Process waiting time of [" + waitTimeInMinutes + "] minutes exceeded");
+				throw new IllegalStateException("Process waiting time of ["
+						+ waitTimeInMinutes + "] minutes exceeded");
 			}
 			if (process.exitValue() != 0) {
-				throw new IllegalStateException("The process has exited with exit code [" + process.exitValue() + "]");
+				throw new IllegalStateException("The process has exited with exit code ["
+						+ process.exitValue() + "]");
 			}
 		}
 		catch (InterruptedException | IOException e) {
@@ -219,24 +271,27 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	}
 
 	ProcessBuilder builder(String[] commands, String workingDir) {
-		return new ProcessBuilder(commands)
-				.directory(new File(workingDir))
-				.inheritIO();
+		return new ProcessBuilder(commands).directory(new File(workingDir)).inheritIO();
 	}
 
-	@Override public void setReleaserProperties(ReleaserProperties properties) {
+	@Override
+	public void setReleaserProperties(ReleaserProperties properties) {
 		this.workingDir = properties.getWorkingDir();
 	}
+
 }
 
 class HtmlFileWalker extends SimpleFileVisitor<Path> {
 
 	private static final String HTML_EXTENSION = ".html";
 
-	@Override public FileVisitResult visitFile(Path path, BasicFileAttributes attr) {
+	@Override
+	public FileVisitResult visitFile(Path path, BasicFileAttributes attr) {
 		File file = path.toFile();
-		if (file.getName().endsWith(HTML_EXTENSION) && asString(file).contains("Unresolved")) {
-			throw new IllegalStateException("File [" + file + "] contains a tag that wasn't resolved properly");
+		if (file.getName().endsWith(HTML_EXTENSION)
+				&& asString(file).contains("Unresolved")) {
+			throw new IllegalStateException(
+					"File [" + file + "] contains a tag that wasn't resolved properly");
 		}
 		return FileVisitResult.CONTINUE;
 	}
@@ -249,4 +304,5 @@ class HtmlFileWalker extends SimpleFileVisitor<Path> {
 			throw new IllegalStateException(e);
 		}
 	}
+
 }

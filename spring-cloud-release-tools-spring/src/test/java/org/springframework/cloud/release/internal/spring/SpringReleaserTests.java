@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
@@ -35,14 +51,26 @@ public class SpringReleaserTests {
 
 	private static final Logger log = LoggerFactory.getLogger(SpringReleaserTests.class);
 
-	@Mock Releaser releaser;
+	@Mock
+	Releaser releaser;
+
 	ReleaserProperties properties = properties();
-	@Mock OptionsProcessor optionsProcessor;
-	@Mock ApplicationContext context;
+
+	@Mock
+	OptionsProcessor optionsProcessor;
+
+	@Mock
+	ApplicationContext context;
+
 	Aware1 aware1 = new Aware1();
+
 	Aware2 aware2 = new Aware2();
+
 	ReleaserPropertiesUpdater updater;
-	@Mock ApplicationEventPublisher applicationEventPublisher;
+
+	@Mock
+	ApplicationEventPublisher applicationEventPublisher;
+
 	File releaserUpdater = new File(ReleaserPropertiesUpdaterTests.class
 			.getResource("/projects/releaser-updater/config/releaser.yml").toURI());
 
@@ -102,8 +130,8 @@ public class SpringReleaserTests {
 	private void thenOnlyCallsPostRelease() {
 		BDDMockito.then(this.optionsProcessor).should().postReleaseOptions(
 				BDDMockito.any(Options.class), BDDMockito.any(Args.class));
-		BDDMockito.then(this.optionsProcessor).should(BDDMockito.never())
-				.processOptions(BDDMockito.any(Options.class), BDDMockito.any(Args.class));
+		BDDMockito.then(this.optionsProcessor).should(BDDMockito.never()).processOptions(
+				BDDMockito.any(Options.class), BDDMockito.any(Args.class));
 	}
 
 	private void assertBuildCommand(Queue<ReleaserProperties> properties) {
@@ -114,11 +142,12 @@ public class SpringReleaserTests {
 	}
 
 	private SpringReleaser stubbedSpringReleaser() {
-		return new SpringReleaser(this.releaser, this.properties,
-				this.optionsProcessor, this.updater, applicationEventPublisher) {
+		return new SpringReleaser(this.releaser, this.properties, this.optionsProcessor,
+				this.updater, this.applicationEventPublisher) {
 
 			@Override
-			Args postReleaseOptionsAgs(Options options, ProjectsAndVersion projectsAndVersion) {
+			Args postReleaseOptionsAgs(Options options,
+					ProjectsAndVersion projectsAndVersion) {
 				return new Args(TaskType.RELEASE);
 			}
 
@@ -128,7 +157,8 @@ public class SpringReleaserTests {
 			}
 
 			@Override
-			ProjectsAndVersion processProject(Options options, File project, TaskType taskType) {
+			ProjectsAndVersion processProject(Options options, File project,
+					TaskType taskType) {
 				return null;
 			}
 		};
@@ -139,6 +169,7 @@ public class SpringReleaserTests {
 		properties.getMaven().setBuildCommand("build");
 		return properties;
 	}
+
 }
 
 class Aware1 implements ReleaserPropertiesAware {
@@ -149,6 +180,7 @@ class Aware1 implements ReleaserPropertiesAware {
 	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties.add(properties);
 	}
+
 }
 
 class Aware2 implements ReleaserPropertiesAware {
@@ -159,4 +191,5 @@ class Aware2 implements ReleaserPropertiesAware {
 	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties.add(properties);
 	}
+
 }

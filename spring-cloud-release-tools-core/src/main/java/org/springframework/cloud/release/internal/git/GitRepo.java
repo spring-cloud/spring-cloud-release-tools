@@ -1,18 +1,35 @@
 /*
- *  Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.git;
 
 import java.io.File;
@@ -58,8 +75,8 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Abstraction over a Git repo. Can cloned repo from a given location
- * and check its branch.
+ * Abstraction over a Git repo. Can cloned repo from a given location and check its
+ * branch.
  *
  * @author Marcin Grzejszczak
  */
@@ -89,7 +106,7 @@ class GitRepo {
 	}
 
 	/**
-	 * Clones the project
+	 * Clones the project.
 	 * @param projectUri - URI of the project
 	 * @return file where the project was cloned
 	 */
@@ -111,7 +128,7 @@ class GitRepo {
 	}
 
 	/**
-	 * Checks out a branch for a project
+	 * Checks out a branch for a project.
 	 * @param branch - branch to check out
 	 */
 	void checkout(String branch) {
@@ -126,31 +143,35 @@ class GitRepo {
 	}
 
 	/**
-	 * Performs a commit
+	 * Performs a commit.
 	 * @param message - commit message
 	 */
 	void commit(String message) {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			git.add().addFilepattern(".").call();
 			git.commit().setAllowEmpty(false).setMessage(message).call();
 			printLog(git);
-		} catch (EmtpyCommitException e) {
+		}
+		catch (EmtpyCommitException e) {
 			log.info("There were no changes detected. Will not commit an empty commit");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	boolean hasBranch(String branch) {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL)
 					.call();
-			boolean present = refs.stream().anyMatch(ref -> branch.equals(nameOfBranch(ref.getName())));
+			boolean present = refs.stream()
+					.anyMatch(ref -> branch.equals(nameOfBranch(ref.getName())));
 			if (log.isDebugEnabled()) {
 				log.debug("Branch [{}] is present [{}]", branch, present);
 			}
 			return present;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
@@ -165,84 +186,92 @@ class GitRepo {
 		log.info("Printing [{}] last commits for branch [{}]", maxCount, currentBranch);
 		Iterable<RevCommit> commits = git.log().setMaxCount(maxCount).call();
 		for (RevCommit commit : commits) {
-			log.info("Name [{}], msg [{}]", commit.getId().name(), commit.getShortMessage());
+			log.info("Name [{}], msg [{}]", commit.getId().name(),
+					commit.getShortMessage());
 		}
 	}
 
 	/**
-	 * Creates a tag with a given name
-	 * @param tagName
+	 * Creates a tag with a given name.
+	 * @param tagName name of the tag to set
 	 */
 	void tag(String tagName) {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			git.tag().setName(tagName).call();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	/**
-	 * Pushes the commits to {@code origin} remote branch
+	 * Pushes the commits to {@code origin} remote branch.
 	 * @param branch - remote branch to which the code should be pushed
 	 */
 	void pushBranch(String branch) {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + branch);
 			this.gitFactory.push(git).setPushTags().setRefSpecs(refSpec).call();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	/**
-	 * Pushes the commits od current branch
+	 * Pushes the commits od current branch.
 	 */
 	void pushCurrentBranch() {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			this.gitFactory.push(git).call();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	/**
-	 * Pushes the commits to {@code origin} remote tag
+	 * Pushes the commits to {@code origin} remote tag.
 	 * @param tagName - remote tag to which the code should be pushed
 	 */
 	void pushTag(String tagName) {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			String localBranch = git.getRepository().getFullBranch();
 			RefSpec refSpec = new RefSpec(localBranch + ":" + "refs/tags/" + tagName);
 			this.gitFactory.push(git).setPushTags().setRefSpecs(refSpec).call();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	void revert(String message) {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			RevCommit commit = git.log().setMaxCount(1).call().iterator().next();
 			String shortMessage = commit.getShortMessage();
 			String id = commit.getId().getName();
 			if (!shortMessage.contains("Update SNAPSHOT to ")) {
-				throw new IllegalStateException("Won't revert the commit with id [" + id + "] "
-						+ "and message [" + shortMessage + "]. Only commit that updated "
-						+ "snapshot to another version can be reverted");
+				throw new IllegalStateException(
+						"Won't revert the commit with id [" + id + "] " + "and message ["
+								+ shortMessage + "]. Only commit that updated "
+								+ "snapshot to another version can be reverted");
 			}
 			log.debug("The commit to be reverted is [{}]", commit);
 			git.revert().include(commit).call();
 			git.commit().setAmend(true).setMessage(message).call();
 			printLog(git);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
 	String currentBranch() {
-		try(Git git = this.gitFactory.open(file(this.basedir))) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			return git.getRepository().getBranch();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
@@ -254,8 +283,8 @@ class GitRepo {
 	private Git cloneToBasedir(URIish projectUrl, File destinationFolder)
 			throws GitAPIException {
 		CloneCommand command = this.gitFactory.getCloneCommandByCloneRepository()
-				.setURI(projectUrl.toString() + ".git").setDirectory(
-						humanishDestination(projectUrl, destinationFolder));
+				.setURI(projectUrl.toString() + ".git")
+				.setDirectory(humanishDestination(projectUrl, destinationFolder));
 		try {
 			return command.call();
 		}
@@ -269,8 +298,7 @@ class GitRepo {
 		return new File(destinationFolder, projectUrl.getHumanishName());
 	}
 
-	private Ref checkoutBranch(File projectDir, String branch)
-			throws GitAPIException {
+	private Ref checkoutBranch(File projectDir, String branch) throws GitAPIException {
 		Git git = this.gitFactory.open(projectDir);
 		CheckoutCommand command = git.checkout().setName(branch);
 		try {
@@ -282,7 +310,8 @@ class GitRepo {
 		catch (GitAPIException e) {
 			deleteBaseDirIfExists();
 			throw e;
-		} finally {
+		}
+		finally {
 			git.close();
 		}
 	}
@@ -305,8 +334,8 @@ class GitRepo {
 		return containsBranch(git, label, null);
 	}
 
-	private boolean containsBranch(Git git, String label, ListBranchCommand.ListMode listMode)
-			throws GitAPIException {
+	private boolean containsBranch(Git git, String label,
+			ListBranchCommand.ListMode listMode) throws GitAPIException {
 		ListBranchCommand command = git.branchList();
 		if (listMode != null) {
 			command.setListMode(listMode);
@@ -336,31 +365,37 @@ class GitRepo {
 	 * {@link org.eclipse.jgit.api.CloneCommand} allowing for easier unit testing.
 	 */
 	static class JGitFactory {
+
 		private static final Logger log = LoggerFactory.getLogger(JGitFactory.class);
 
 		private final JschConfigSessionFactory factory = new JschConfigSessionFactory() {
 
-			@Override protected void configure(OpenSshConfig.Host host, Session session) {
+			@Override
+			protected void configure(OpenSshConfig.Host host, Session session) {
 			}
 
 			@Override
 			protected JSch createDefaultJSch(FS fs) throws JSchException {
 				Connector connector = null;
 				try {
-					if(SSHAgentConnector.isConnectorAvailable()){
+					if (SSHAgentConnector.isConnectorAvailable()) {
 						USocketFactory usf = new JNAUSocketFactory();
 						connector = new SSHAgentConnector(usf);
 					}
 					log.info("Successfully connected to an agent");
-				} catch (AgentProxyException e) {
-					log.error("Exception occurred while trying to connect to agent. Will create"
-							+ "the default JSch connection", e);
+				}
+				catch (AgentProxyException e) {
+					log.error(
+							"Exception occurred while trying to connect to agent. Will create"
+									+ "the default JSch connection",
+							e);
 					return super.createDefaultJSch(fs);
 				}
 				final JSch jsch = super.createDefaultJSch(fs);
 				if (connector != null) {
 					JSch.setConfig("PreferredAuthentications", "publickey,password");
-					IdentityRepository identityRepository = new RemoteIdentityRepository(connector);
+					IdentityRepository identityRepository = new RemoteIdentityRepository(
+							connector);
 					jsch.setIdentityRepository(identityRepository);
 				}
 				return jsch;
@@ -369,27 +404,6 @@ class GitRepo {
 
 		private final CredentialsProvider provider;
 
-		JGitFactory(ReleaserProperties releaserProperties) {
-			if (StringUtils.hasText(releaserProperties.getGit().getUsername())) {
-				log.info("Passed username and password - will set a custom credentials provider");
-				this.provider = credentialsProvider(releaserProperties);
-			} else {
-				log.info("No custom credentials provider will be set");
-				this.provider = null;
-			}
-		}
-
-		CredentialsProvider credentialsProvider(ReleaserProperties properties) {
-			return new UsernamePasswordCredentialsProvider(
-					properties.getGit().getUsername(),
-					properties.getGit().getPassword());
-		}
-
-		// for tests
-		JGitFactory() {
-			this.provider = null;
-		}
-
 		private final TransportConfigCallback callback = transport -> {
 			if (transport instanceof SshTransport) {
 				SshTransport sshTransport = (SshTransport) transport;
@@ -397,15 +411,35 @@ class GitRepo {
 			}
 		};
 
+		JGitFactory(ReleaserProperties releaserProperties) {
+			if (StringUtils.hasText(releaserProperties.getGit().getUsername())) {
+				log.info(
+						"Passed username and password - will set a custom credentials provider");
+				this.provider = credentialsProvider(releaserProperties);
+			}
+			else {
+				log.info("No custom credentials provider will be set");
+				this.provider = null;
+			}
+		}
+
+		// for tests
+		JGitFactory() {
+			this.provider = null;
+		}
+
+		CredentialsProvider credentialsProvider(ReleaserProperties properties) {
+			return new UsernamePasswordCredentialsProvider(
+					properties.getGit().getUsername(), properties.getGit().getPassword());
+		}
+
 		CloneCommand getCloneCommandByCloneRepository() {
-			return Git.cloneRepository()
-					.setCredentialsProvider(this.provider)
+			return Git.cloneRepository().setCredentialsProvider(this.provider)
 					.setTransportConfigCallback(this.callback);
 		}
 
 		PushCommand push(Git git) {
-			return git.push()
-					.setCredentialsProvider(this.provider)
+			return git.push().setCredentialsProvider(this.provider)
 					.setTransportConfigCallback(this.callback);
 		}
 
@@ -417,5 +451,7 @@ class GitRepo {
 				throw new IllegalStateException(e);
 			}
 		}
+
 	}
+
 }

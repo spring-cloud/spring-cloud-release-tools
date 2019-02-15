@@ -1,18 +1,35 @@
 /*
- *  Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +64,10 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	SpringReleaser springReleaser(Releaser releaser,
-			ReleaserPropertiesUpdater updater,
+	SpringReleaser springReleaser(Releaser releaser, ReleaserPropertiesUpdater updater,
 			ApplicationEventPublisher applicationEventPublisher) {
-		return new SpringReleaser(releaser, this.properties, updater, applicationEventPublisher);
+		return new SpringReleaser(releaser, this.properties, updater,
+				applicationEventPublisher);
 	}
 
 	@Bean
@@ -79,14 +96,17 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	SaganUpdater saganUpdater(SaganClient saganClient, ReleaserProperties releaserProperties) {
+	SaganUpdater saganUpdater(SaganClient saganClient,
+			ReleaserProperties releaserProperties) {
 		return new SaganUpdater(saganClient, releaserProperties);
 	}
 
 	@Bean
-	PostReleaseActions postReleaseActions(ProjectGitHandler handler, ProjectPomUpdater pomUpdater,
-			GradleUpdater gradleUpdater, ProjectBuilder projectBuilder, ReleaserProperties releaserProperties) {
-		return new PostReleaseActions(handler, pomUpdater, gradleUpdater, projectBuilder, releaserProperties);
+	PostReleaseActions postReleaseActions(ProjectGitHandler handler,
+			ProjectPomUpdater pomUpdater, GradleUpdater gradleUpdater,
+			ProjectBuilder projectBuilder, ReleaserProperties releaserProperties) {
+		return new PostReleaseActions(handler, pomUpdater, gradleUpdater, projectBuilder,
+				releaserProperties);
 	}
 
 	@Bean
@@ -99,9 +119,11 @@ class ReleaserConfiguration {
 	Releaser releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
 			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
 			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
-			DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions) {
+			DocumentationUpdater documentationUpdater,
+			PostReleaseActions postReleaseActions) {
 		return new Releaser(projectPomUpdater, projectBuilder, projectGitHandler,
-				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater, postReleaseActions);
+				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater,
+				postReleaseActions);
 	}
 
 	@Bean
@@ -113,4 +135,5 @@ class ReleaserConfiguration {
 	Parser optionsParser() {
 		return new OptionsParser();
 	}
+
 }

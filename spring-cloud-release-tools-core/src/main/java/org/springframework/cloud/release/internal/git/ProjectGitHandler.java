@@ -1,3 +1,35 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.git;
 
 import java.io.File;
@@ -15,7 +47,7 @@ import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.util.StringUtils;
 
 /**
- * Contains business logic around Git & Github operations
+ * Contains business logic around Git & Github operations.
  *
  * @author Marcin Grzejszczak
  */
@@ -24,11 +56,17 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	private static final Logger log = LoggerFactory.getLogger(ProjectGitHandler.class);
 
 	private static final String MSG = "Bumping versions";
+
 	private static final String PRE_RELEASE_MSG = "Update SNAPSHOT to %s";
+
 	private static final String POST_RELEASE_MSG = "Going back to snapshots";
+
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
+
 	private final GithubMilestones githubMilestones;
+
 	private final GithubIssues githubIssues;
+
 	private ReleaserProperties properties;
 
 	public ProjectGitHandler(ReleaserProperties properties) {
@@ -40,11 +78,14 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	public void commitAndTagIfApplicable(File project, ProjectVersion version) {
 		GitRepo gitRepo = gitRepo(project);
 		if (version.isSnapshot()) {
-			log.info("Snapshot version [{}] found. Will only commit the changed poms", version);
+			log.info("Snapshot version [{}] found. Will only commit the changed poms",
+					version);
 			gitRepo.commit(MSG);
 		}
 		else {
-			log.info("NON-snapshot version [{}] found. Will commit the changed poms, tag the version and push the tag", version);
+			log.info(
+					"NON-snapshot version [{}] found. Will commit the changed poms, tag the version and push the tag",
+					version);
 			gitRepo.commit(String.format(PRE_RELEASE_MSG, version.version));
 			String tagName = "v" + version.version;
 			gitRepo.tag(tagName);
@@ -54,9 +95,10 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 
 	public void commitAfterBumpingVersions(File project, ProjectVersion version) {
 		if (version.isSnapshot()) {
-			log.info("Snapshot version [{}] found. Will only commit the changed poms", version);
-			commit(project, String
-					.format(POST_RELEASE_BUMP_MSG, version.bumpedVersion()));
+			log.info("Snapshot version [{}] found. Will only commit the changed poms",
+					version);
+			commit(project,
+					String.format(POST_RELEASE_BUMP_MSG, version.bumpedVersion()));
 		}
 		else {
 			log.info("Non snapshot version [{}] found. Won't do anything", version);
@@ -87,18 +129,17 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	}
 
 	public File cloneDocumentationProject() {
-		return cloneAndCheckOut(this.properties.getGit()
-				.getDocumentationUrl(), this.properties.getGit()
-				.getDocumentationBranch());
+		return cloneAndCheckOut(this.properties.getGit().getDocumentationUrl(),
+				this.properties.getGit().getDocumentationBranch());
 	}
 
 	public File cloneSpringDocProject() {
-		return cloneAndCheckOut(this.properties.getGit()
-				.getSpringProjectUrl(), this.properties.getGit()
-				.getSpringProjectBranch());
+		return cloneAndCheckOut(this.properties.getGit().getSpringProjectUrl(),
+				this.properties.getGit().getSpringProjectBranch());
 	}
 
-	private File cloneAndCheckOut(String springProjectUrl, String springProjectUrlBranch) {
+	private File cloneAndCheckOut(String springProjectUrl,
+			String springProjectUrlBranch) {
 		File clonedProject = cloneProject(springProjectUrl);
 		checkout(clonedProject, springProjectUrlBranch);
 		return clonedProject;
@@ -111,8 +152,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	 */
 	public File cloneProjectFromOrg(String projectName) {
 		String orgUrl = this.properties.getMetaRelease().getGitOrgUrl();
-		String fullUrl = orgUrl.endsWith("/") ? (orgUrl + projectName) : (orgUrl + "/" +
-				projectName + suffixNonHttpRepo(orgUrl));
+		String fullUrl = orgUrl.endsWith("/") ? (orgUrl + projectName)
+				: (orgUrl + "/" + projectName + suffixNonHttpRepo(orgUrl));
 		if (log.isDebugEnabled()) {
 			log.debug("Full url of the project is [{}]", fullUrl);
 		}
@@ -122,20 +163,20 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		}
 		String version = this.properties.getFixedVersions().get(projectName);
 		if (StringUtils.isEmpty(version)) {
-			throw new IllegalStateException("You haven't provided a version for project [" + projectName + "]");
+			throw new IllegalStateException(
+					"You haven't provided a version for project [" + projectName + "]");
 		}
 		return findAndCheckOutBranchForVersion(clonedProject, new String[] { version });
 	}
 
-
 	/**
-	 * From the version analyzes the branch and checks it out. E.g.
-	 * - for spring-cloud-release’s `Finchley.RELEASE version will resolve either Finchley
-	 * branch or will fallback to master if there’s no Finchley branch
-	 * - for spring-cloud-sleuth’s `2.1.0.RELEASE version will resolve 2.1.x branch
-	 *
+	 * From the version analyzes the branch and checks it out. E.g. - for
+	 * spring-cloud-release’s `Finchley.RELEASE version will resolve either Finchley
+	 * branch or will fallback to master if there’s no Finchley branch - for
+	 * spring-cloud-sleuth’s `2.1.0.RELEASE version will resolve 2.1.x branch
 	 * @param url - of project to clone
-	 * @param versions - list of versions to check against, if none matches, will fallback to master
+	 * @param versions - list of versions to check against, if none matches, will fallback
+	 * to master
 	 * @return location of the cloned project
 	 */
 	public File cloneAndGuessBranch(String url, String... versions) {
@@ -150,14 +191,13 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		if (log.isDebugEnabled()) {
 			log.debug("Checking versions {} for project [{}]", versions, clonedProject);
 		}
-		String branchToCheckout = Arrays.stream(versions)
-				.map(this::branchFromVersion)
+		String branchToCheckout = Arrays.stream(versions).map(this::branchFromVersion)
 				.map(version -> gitRepo(clonedProject).hasBranch(version) ? version : "")
-				.filter(StringUtils::hasText)
-				.findFirst()
-				.orElse("master");
+				.filter(StringUtils::hasText).findFirst().orElse("master");
 		if ("master".equals(branchToCheckout)) {
-			log.info("None of the versions {} matches a branch. Assuming that should work with master branch", (Object) versions);
+			log.info(
+					"None of the versions {} matches a branch. Assuming that should work with master branch",
+					(Object) versions);
 			return clonedProject;
 		}
 		log.info("Branch [{}] exists. Will check it out", branchToCheckout);
@@ -171,9 +211,10 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 
 	File cloneProject(String url) {
 		try {
-			File destinationDir = this.properties.getGit().getCloneDestinationDir() != null ?
-					new File(this.properties.getGit().getCloneDestinationDir()) :
-					Files.createTempDirectory("releaser").toFile();
+			File destinationDir = this.properties.getGit()
+					.getCloneDestinationDir() != null
+							? new File(this.properties.getGit().getCloneDestinationDir())
+							: Files.createTempDirectory("releaser").toFile();
 			return gitRepo(destinationDir).cloneProject(new URIish(url));
 		}
 		catch (Exception e) {
@@ -203,7 +244,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 			// [Camden] -> [Camden.x]
 			return splitVersion[0];
 		}
-		throw new IllegalStateException("Wrong version [" + version + "]. Can't extract semver pieces of it");
+		throw new IllegalStateException(
+				"Wrong version [" + version + "]. Can't extract semver pieces of it");
 
 	}
 
@@ -244,4 +286,5 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties = properties;
 	}
+
 }

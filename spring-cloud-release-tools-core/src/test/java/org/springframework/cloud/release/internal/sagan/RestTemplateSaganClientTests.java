@@ -1,14 +1,29 @@
+/*
+ * Copyright 2013-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.release.internal.sagan;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.assertj.core.api.BDDAssertions.then;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +34,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
+import static org.assertj.core.api.BDDAssertions.then;
+
 /**
  * @author Marcin Grzejszczak
  */
@@ -27,7 +44,9 @@ import org.springframework.web.client.RestTemplate;
 @AutoConfigureStubRunner(ids = "sagan:sagan-site")
 public class RestTemplateSaganClientTests {
 
-	@Value("${stubrunner.runningstubs.sagan-site.port}") Integer saganPort;
+	@Value("${stubrunner.runningstubs.sagan-site.port}")
+	Integer saganPort;
+
 	SaganClient client;
 
 	@Before
@@ -45,7 +64,8 @@ public class RestTemplateSaganClientTests {
 
 		then(project.id).isEqualTo("spring-framework");
 		then(project.name).isEqualTo("Spring Framework");
-		then(project.repoUrl).isEqualTo("http://github.com/spring-projects/spring-framework");
+		then(project.repoUrl)
+				.isEqualTo("http://github.com/spring-projects/spring-framework");
 		then(project.siteUrl).isEqualTo("http://projects.spring.io/spring-framework");
 		then(project.category).isEqualTo("active");
 		then(project.stackOverflowTags).isNotBlank();
@@ -54,8 +74,10 @@ public class RestTemplateSaganClientTests {
 		then(project.projectReleases).isNotEmpty();
 		Release release = project.projectReleases.get(0);
 		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/spring-framework-reference/");
-		then(release.apiDocUrl).isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/javadoc-api/");
+		then(release.refDocUrl).isEqualTo(
+				"http://docs.spring.io/spring/docs/5.0.0.RC4/spring-framework-reference/");
+		then(release.apiDocUrl)
+				.isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/javadoc-api/");
 		then(release.groupId).isEqualTo("org.springframework");
 		then(release.artifactId).isEqualTo("spring-context");
 		then(release.repository.id).isEqualTo("spring-milestones");
@@ -75,8 +97,10 @@ public class RestTemplateSaganClientTests {
 		Release release = this.client.getRelease("spring-framework", "5.0.0.RC4");
 
 		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo("http://docs.spring.io/spring/docs/{version}/spring-framework-reference/");
-		then(release.apiDocUrl).isEqualTo("http://docs.spring.io/spring/docs/{version}/javadoc-api/");
+		then(release.refDocUrl).isEqualTo(
+				"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/");
+		then(release.apiDocUrl)
+				.isEqualTo("http://docs.spring.io/spring/docs/{version}/javadoc-api/");
 		then(release.groupId).isEqualTo("org.springframework");
 		then(release.artifactId).isEqualTo("spring-context");
 		then(release.repository.id).isEqualTo("spring-milestones");
@@ -156,7 +180,8 @@ public class RestTemplateSaganClientTests {
 		sithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
 		sithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
 
-		List<ReleaseUpdate> updates = Arrays.asList(firstRelease, secondRelease, thirdRelease, fourthRelease ,fithRelease, sithRelease);
+		List<ReleaseUpdate> updates = Arrays.asList(firstRelease, secondRelease,
+				thirdRelease, fourthRelease, fithRelease, sithRelease);
 
 		Project project = this.client.updateRelease("spring-framework", updates);
 
@@ -190,8 +215,7 @@ public class RestTemplateSaganClientTests {
 
 	private RestTemplate restTemplate(ReleaserProperties properties) {
 		return new RestTemplateBuilder()
-				.basicAuthorization(properties.getGit().getOauthToken(), "")
-				.build();
+				.basicAuthorization(properties.getGit().getOauthToken(), "").build();
 	}
 
 	@Configuration
@@ -199,4 +223,5 @@ public class RestTemplateSaganClientTests {
 	static class Config {
 
 	}
+
 }
