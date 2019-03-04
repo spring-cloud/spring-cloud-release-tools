@@ -43,27 +43,37 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Project {
 
-	public String id = "";
+	public String id;
 
-	public String name = "";
+	public String name;
 
-	public String repoUrl = "";
+	public String repoUrl;
 
-	public String siteUrl = "";
+	public String siteUrl;
 
-	public String category = "";
+	public String category;
 
 	public String stackOverflowTags;
 
 	public List<Release> projectReleases = new ArrayList<>();
 
+	public List<String> projectSamples = new ArrayList<>();
+
+	public List<Release> nonMostCurrentReleases = new ArrayList<>();
+
 	public List<String> stackOverflowTagList = new ArrayList<>();
+
+	public MostCurrentRelease mostCurrentRelease = new MostCurrentRelease();
 
 	public Boolean aggregator;
 
 	public String rawBootConfig;
 
 	public String rawOverview;
+
+	public int displayOrder = Integer.MAX_VALUE;
+
+	public boolean topLevelProject = true;
 
 	@Override
 	public String toString() {
@@ -75,6 +85,12 @@ public class Project {
 				+ this.stackOverflowTagList + ", aggregator=" + this.aggregator
 				+ ", rawBootConfig='" + this.rawBootConfig + '\'' + ", rawOverview='"
 				+ this.rawOverview + '\'' + '}';
+	}
+
+	static class MostCurrentRelease {
+
+		public boolean present;
+
 	}
 
 }

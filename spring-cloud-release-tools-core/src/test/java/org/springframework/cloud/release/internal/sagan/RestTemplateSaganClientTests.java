@@ -16,14 +16,17 @@
 
 package org.springframework.cloud.release.internal.sagan;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +49,9 @@ public class RestTemplateSaganClientTests {
 
 	@Value("${stubrunner.runningstubs.sagan-site.port}")
 	Integer saganPort;
+
+	@Autowired
+	ObjectMapper objectMapper;
 
 	SaganClient client;
 
@@ -188,6 +194,23 @@ public class RestTemplateSaganClientTests {
 		then(project.id).isEqualTo("spring-framework");
 		then(project.name).isEqualTo("Spring Framework");
 		then(project.projectReleases).hasSize(7);
+	}
+
+	@Test
+	public void should_patch_a_project() throws IOException {
+		String projectJson = "{\n  \"id\" : \"spring-framework\",\n  "
+				+ "\"rawBootConfig\" : \"rawBootConfig\",\n  \"rawOverview\" : \"rawOverview\",\n  "
+				+ "\"displayOrder\" : 2147483647,\n  \"projectReleases\" : [ ],"
+				+ "\n  \"projectSamples\" : [ ],\n  \"mostCurrentRelease\" : {\n    \"present\" : false\n  },"
+				+ "\n  \"nonMostCurrentReleases\" : [ ],\n  \"stackOverflowTagList\" : [ ],\n  \"topLevelProject\" : true\n}";
+		Project project = this.objectMapper.readValue(projectJson, Project.class);
+
+		Project patchedProject = this.client.patchProject(project);
+
+		then(patchedProject.id).isEqualTo("spring-framework");
+		then(patchedProject.name).isEqualTo("Spring Framework");
+		then(patchedProject.rawBootConfig).isEqualTo("rawBootConfig");
+		then(patchedProject.rawOverview).isEqualTo("rawOverview");
 	}
 
 	private Repository milestone() {

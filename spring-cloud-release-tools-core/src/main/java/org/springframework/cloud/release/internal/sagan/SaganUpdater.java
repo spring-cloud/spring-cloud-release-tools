@@ -32,6 +32,11 @@
 
 package org.springframework.cloud.release.internal.sagan;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -57,18 +62,97 @@ public class SaganUpdater {
 		this.releaserProperties = releaserProperties;
 	}
 
-	public void updateSagan(String branch, ProjectVersion originalVersion,
-			ProjectVersion version) {
+	public void updateSagan(File projectFile, String branch,
+			ProjectVersion originalVersion, ProjectVersion currentVersion) {
 		if (!this.releaserProperties.getSagan().isUpdateSagan()) {
 			log.info("Will not update sagan, since the switch to do so "
 					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
 			return;
 		}
-		ReleaseUpdate update = releaseUpdate(branch, originalVersion, version);
-		updateSaganForNonSnapshot(branch, originalVersion, version);
-		log.info("Updating Sagan with \n\n{}", update);
-		this.saganClient.updateRelease(version.projectName,
+		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion);
+		updateSaganForNonSnapshot(branch, originalVersion, currentVersion);
+		log.info("Updating Sagan releases with \n\n{}", update);
+		Project project = this.saganClient.updateRelease(currentVersion.projectName,
 				Collections.singletonList(update));
+		Optional<ProjectVersion> projectVersion = latestVersion(currentVersion, project);
+		log.info("Found the following latest project version [{}]", projectVersion);
+		boolean present = projectVersion.isPresent();
+		if (present && currentVersionNewerOrEqual(currentVersion, projectVersion)) {
+			updateDocumentationIfNecessary(projectFile, project);
+		}
+		else {
+			log.info(present
+					? "Latest version [" + projectVersion.get() + "] present and "
+							+ "the current version [" + currentVersion
+							+ "] is older than that one. " + "Will do nothing."
+					: "No latest version found. Will do nothing.");
+		}
+	}
+
+	private void updateDocumentationIfNecessary(File projectFile, Project project) {
+		boolean shouldUpdate = false;
+		File docsModule = docsModule(projectFile);
+		File indexDoc = new File(docsModule,
+				this.releaserProperties.getSagan().getIndexSectionFileName());
+		File bootDoc = new File(docsModule,
+				this.releaserProperties.getSagan().getBootSectionFileName());
+		if (indexDoc.exists()) {
+			log.debug("Index adoc file exists");
+			String fileText = fileToText(indexDoc);
+			if (!fileText.equals(project.rawOverview)) {
+				log.info(
+						"Index adoc content differs from the previously stored, will update it");
+				project.rawOverview = fileText;
+				shouldUpdate = true;
+			}
+		}
+		if (bootDoc.exists()) {
+			log.debug("Boot adoc file exists");
+			String fileText = fileToText(bootDoc);
+			if (!fileText.equals(project.rawBootConfig)) {
+				log.info(
+						"Boot adoc content differs from the previously stored, will update it");
+				project.rawBootConfig = fileText;
+				shouldUpdate = true;
+			}
+		}
+		if (shouldUpdate) {
+			this.saganClient.patchProject(project);
+			log.info("Updating Sagan project with adoc data.");
+		}
+		else {
+			log.info("Nothing changed in project's meta-data. Won't change anything.");
+		}
+	}
+
+	File docsModule(File projectFile) {
+		return new File(projectFile,
+				this.releaserProperties.getSagan().getDocsAdocsFile());
+	}
+
+	private String fileToText(File file) {
+		try {
+			return new String(Files.readAllBytes(file.toPath()));
+		}
+		catch (IOException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	private Optional<ProjectVersion> latestVersion(ProjectVersion currentVersion,
+			Project project) {
+		if (project == null) {
+			return Optional.empty();
+		}
+		return project.projectReleases.stream().filter(release -> release.current)
+				.map(release -> new ProjectVersion(currentVersion.projectName,
+						release.version))
+				.max(Comparator.comparing(o -> o.version));
+	}
+
+	private boolean currentVersionNewerOrEqual(ProjectVersion currentVersion,
+			Optional<ProjectVersion> projectVersion) {
+		return currentVersion.compareTo(projectVersion.get()) >= 0;
 	}
 
 	private void updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion,

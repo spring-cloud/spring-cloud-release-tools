@@ -889,6 +889,23 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private String baseUrl = "https://spring.io";
 
+		/**
+		 * Folder with asciidoctor files for docs.
+		 */
+		private String docsAdocsFile = "docs/src/main/asciidoc";
+
+		/**
+		 * Name of the ascii doc file with core part of this project's Sagan project page.
+		 * Linked with {@link this#docsAdocsFile}.
+		 */
+		private String indexSectionFileName = "sagan-index.adoc";
+
+		/**
+		 * Name of the ascii doc file with boot part of this project's Sagan project page.
+		 * Linked with {@link this#docsAdocsFile}.
+		 */
+		private String bootSectionFileName = "sagan-boot.adoc";
+
 		public String getBaseUrl() {
 			return this.baseUrl;
 		}
@@ -903,6 +920,30 @@ public class ReleaserProperties implements Serializable {
 
 		public void setUpdateSagan(boolean updateSagan) {
 			this.updateSagan = updateSagan;
+		}
+
+		public String getDocsAdocsFile() {
+			return this.docsAdocsFile;
+		}
+
+		public void setDocsAdocsFile(String docsAdocsFile) {
+			this.docsAdocsFile = docsAdocsFile;
+		}
+
+		public String getIndexSectionFileName() {
+			return this.indexSectionFileName;
+		}
+
+		public void setIndexSectionFileName(String indexSectionFileName) {
+			this.indexSectionFileName = indexSectionFileName;
+		}
+
+		public String getBootSectionFileName() {
+			return this.bootSectionFileName;
+		}
+
+		public void setBootSectionFileName(String bootSectionFileName) {
+			this.bootSectionFileName = bootSectionFileName;
 		}
 
 		@Override

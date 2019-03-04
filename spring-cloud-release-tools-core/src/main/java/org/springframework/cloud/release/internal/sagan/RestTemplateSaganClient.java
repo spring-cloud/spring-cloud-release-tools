@@ -106,16 +106,16 @@ class RestTemplateSaganClient implements SaganClient {
 	}
 
 	@Override
-	public void patchProject(Project project) {
+	public Project patchProject(Project project) {
 		RequestEntity<Project> request = RequestEntity
-				.patch(URI
-						.create(this.baseUrl + "/project_metadata/" + project.name + "/"))
+				.patch(URI.create(this.baseUrl + "/project_metadata/" + project.id))
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
 				.body(project);
 		ResponseEntity<Project> entity = this.restTemplate.exchange(request,
 				Project.class);
 		Project updatedProject = entity.getBody();
 		log.info("Response from Sagan\n\n[{}] \n with body [{}]", entity, updatedProject);
+		return updatedProject;
 	}
 
 }

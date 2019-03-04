@@ -306,6 +306,32 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_return_equal_when_versions_are_the_same() {
+		String thisVersion = "1.3.1.SR3";
+		String thatVersion = "1.3.1.SR3";
+
+		then(projectVersion(thisVersion).compareTo(projectVersion(thatVersion))).isZero();
+	}
+
+	@Test
+	public void should_return_greater_when_versions_this_version_is_greater_than_the_other() {
+		String thisVersion = "1.3.2.SR3";
+		String thatVersion = "1.3.1.SR3";
+
+		then(projectVersion(thisVersion).compareTo(projectVersion(thatVersion)))
+				.isPositive();
+	}
+
+	@Test
+	public void should_return_lower_when_versions_this_version_is_lower_than_the_other() {
+		String thisVersion = "1.3.0.RC3";
+		String thatVersion = "1.3.1.RC3";
+
+		then(projectVersion(thisVersion).compareTo(projectVersion(thatVersion)))
+				.isNegative();
+	}
+
+	@Test
 	public void should_return_empty_group_id_when_it_is_missing() {
 		ProjectVersion projectVersion = projectVersion("1.0.0.RC1");
 
