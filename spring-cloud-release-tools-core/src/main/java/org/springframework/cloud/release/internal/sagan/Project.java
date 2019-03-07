@@ -57,13 +57,13 @@ public class Project {
 
 	public List<Release> projectReleases = new ArrayList<>();
 
-	public List<String> projectSamples = new ArrayList<>();
+	public Object projectSamples = new ArrayList<>();
 
-	public List<Release> nonMostCurrentReleases = new ArrayList<>();
+	public Object nonMostCurrentReleases = new ArrayList<>();
 
 	public List<String> stackOverflowTagList = new ArrayList<>();
 
-	public MostCurrentRelease mostCurrentRelease = new MostCurrentRelease();
+	public Object mostCurrentRelease = new MostCurrentRelease();
 
 	public Boolean aggregator;
 
