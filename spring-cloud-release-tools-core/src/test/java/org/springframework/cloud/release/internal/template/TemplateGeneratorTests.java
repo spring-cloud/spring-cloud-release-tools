@@ -40,6 +40,9 @@ public class TemplateGeneratorTests {
 	ProjectGitHandler handler = new ProjectGitHandler(this.props) {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
+			if (releaseVersion.projectName.equals("spring-cloud-foo")) {
+				return "";
+			}
 			return "http://foo.bar.com";
 		}
 	};
@@ -103,6 +106,7 @@ public class TemplateGeneratorTests {
 			{
 				add(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RELEASE"));
 				add(new ProjectVersion("spring-cloud-consul", "1.0.1.RELEASE"));
+				add(new ProjectVersion("spring-cloud-foo", "1.0.2.RELEASE"));
 			}
 		});
 
@@ -115,6 +119,7 @@ public class TemplateGeneratorTests {
 				.contains("### Spring Cloud Sleuth")
 				.contains(
 						"| Spring Cloud Sleuth	| 1.0.0.RELEASE	| ([issues](http://foo.bar.com))")
+				.contains("| Spring Cloud Foo\t| 1.0.2.RELEASE\t| &nbsp;")
 				.contains("<version>Dalston.RELEASE</version>").contains(
 						"mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RELEASE'");
 	}
