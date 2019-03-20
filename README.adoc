@@ -12,8 +12,8 @@ image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codec
 :org: spring-cloud
 :repo: spring-cloud-release-tools
 :github-repo: {org}/{repo}
-:github-raw: http://raw.github.com/{github-repo}/{github-tag}
-:github-code: http://github.com/{github-repo}/tree/{github-tag}
+:github-raw: https://raw.github.com/{github-repo}/{github-tag}
+:github-code: https://github.com/{github-repo}/tree/{github-tag}
 :toc: left
 :toclevels: 8
 :nofooter:
@@ -50,7 +50,7 @@ After project release
 - Generates a blog template under `target/blog.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a tweet template under `target/tweet.txt` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Generates a release notes template under `target/notes.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
-- Updates project information in Sagan (http://spring.io) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)
+- Updates project information in Sagan (https://spring.io) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)
 - For `GA`/ `SR` release will create an issue in Spring Guides under https://github.com/spring-guides/getting-started-guides/issues/
 - For `GA`/ `SR` release will update the links under https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current
 - Will update the release train project page (for Spring Cloud it will be `https://github.com/spring-projects/spring-cloud`)
@@ -350,7 +350,7 @@ folder and run your application like this:
 
 [source,bash]
 ----
-$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser
 ----
 
@@ -381,7 +381,7 @@ each release
 ----
 $ export RELEASER_POM_BRANCH=Dalston.RELEASE
 $ export RELEASER_GIT_OAUTH_TOKEN=...
-$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root
 ----
 
@@ -457,7 +457,7 @@ credentials and you already have those.
 
 The projects that require middleware generally include a
 `docker-compose.yml`, so consider using
-http://compose.docker.io/[Docker Compose] to run the middeware servers
+https://compose.docker.io/[Docker Compose] to run the middeware servers
 in Docker containers. See the README in the
 https://github.com/spring-cloud-samples/scripts[scripts demo
 repository] for specific instructions about the common cases of mongo,
@@ -479,13 +479,13 @@ a modified file in the correct place. Just commit it and push the change.
 
 === Working with the code
 If you don't have an IDE preference we would recommend that you use
-http://www.springsource.com/developer/sts[Spring Tools Suite] or
-http://eclipse.org[Eclipse] when working with the code. We use the
-http://eclipse.org/m2e/[m2eclipse] eclipse plugin for maven support. Other IDEs and tools
+https://www.springsource.com/developer/sts[Spring Tools Suite] or
+https://eclipse.org[Eclipse] when working with the code. We use the
+https://eclipse.org/m2e/[m2eclipse] eclipse plugin for maven support. Other IDEs and tools
 should also work without issue as long as they use Maven 3.3.3 or better.
 
 ==== Importing into eclipse with m2eclipse
-We recommend the http://eclipse.org/m2e/[m2eclipse] eclipse plugin when working with
+We recommend the https://eclipse.org/m2e/[m2eclipse] eclipse plugin when working with
 eclipse. If you don't already have m2eclipse installed it is available from the "eclipse
 marketplace".
 
@@ -546,7 +546,7 @@ added after the original pull request but before a merge.
   `eclipse-code-formatter.xml` file from the
   https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-dependencies-parent/eclipse-code-formatter.xml[Spring
   Cloud Build] project. If using IntelliJ, you can use the
-  http://plugins.jetbrains.com/plugin/6546[Eclipse Code Formatter
+  https://plugins.jetbrains.com/plugin/6546[Eclipse Code Formatter
   Plugin] to import the same file.
 * Make sure all new `.java` files to have a simple Javadoc class comment with at least an
   `@author` tag identifying you, and preferably at least a paragraph on what the class is
@@ -559,6 +559,6 @@ added after the original pull request but before a merge.
 * A few unit tests would help a lot as well -- someone has to do it.
 * If no-one else is using your branch, please rebase it against the current master (or
   other target branch in the main project).
-* When writing a commit message please follow http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html[these conventions],
+* When writing a commit message please follow https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html[these conventions],
   if you are fixing an existing issue please add `Fixes gh-XXXX` at the end of the commit
   message (where XXXX is the issue number).

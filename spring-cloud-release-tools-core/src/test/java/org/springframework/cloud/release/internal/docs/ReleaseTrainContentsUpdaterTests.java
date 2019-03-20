@@ -50,7 +50,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties) {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
-			return "http://foo.com";
+			return "http://www.foo.com/";
 		}
 	};
 
@@ -150,7 +150,7 @@ public class ReleaseTrainContentsUpdaterTests {
 		BDDAssertions.then(file).isNotNull();
 		BDDAssertions.then(edgwareWikiEntryContent(file)).doesNotContain("# Edgware.SR7")
 				.doesNotContain(
-						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://foo.com))");
+						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
 		BDDAssertions
 				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
 						.getShortMessage())
@@ -169,7 +169,7 @@ public class ReleaseTrainContentsUpdaterTests {
 		BDDAssertions.then(file).isNotNull();
 		BDDAssertions.then(edgwareWikiEntryContent(file)).contains("# Edgware.SR7")
 				.contains(
-						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://foo.com))");
+						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
 		BDDAssertions
 				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
 						.getShortMessage())
@@ -188,7 +188,7 @@ public class ReleaseTrainContentsUpdaterTests {
 		BDDAssertions.then(file).isNotNull();
 		BDDAssertions.then(greenwichWikiEntryContent(file))
 				.contains("# Greenwich.RELEASE").contains(
-						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://foo.com))");
+						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
 		BDDAssertions
 				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
 						.getShortMessage())

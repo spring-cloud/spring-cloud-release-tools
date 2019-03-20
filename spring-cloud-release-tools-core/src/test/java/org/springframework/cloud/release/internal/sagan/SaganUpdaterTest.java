@@ -81,7 +81,7 @@ public class SaganUpdaterTest {
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.M1",
-						"http://cloud.spring.io/spring-cloud-static/foo/{version}/",
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/",
 						"PRERELEASE")));
 	}
 
@@ -92,7 +92,7 @@ public class SaganUpdaterTest {
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RC1",
-						"http://cloud.spring.io/spring-cloud-static/foo/{version}/",
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/",
 						"PRERELEASE")));
 	}
 
@@ -207,7 +207,7 @@ public class SaganUpdaterTest {
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.BUILD-SNAPSHOT",
-						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
+						"https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
 	@Test
@@ -221,12 +221,12 @@ public class SaganUpdaterTest {
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RELEASE",
-						"http://cloud.spring.io/spring-cloud-static/foo/{version}/",
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/",
 						"GENERAL_AVAILABILITY")));
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.1.BUILD-SNAPSHOT",
-						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
+						"https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
 	@Test
@@ -239,7 +239,7 @@ public class SaganUpdaterTest {
 		then(this.saganClient).should(never()).deleteRelease(anyString(), anyString());
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.1.0.BUILD-SNAPSHOT",
-						"http://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
+						"https://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
 	}
 
 	private ArgumentMatcher<List<ReleaseUpdate>> withReleaseUpdate(final String version,

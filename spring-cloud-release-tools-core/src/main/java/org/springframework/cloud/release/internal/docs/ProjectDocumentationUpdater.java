@@ -49,7 +49,7 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
  */
 class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
-	private static final String SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";
+	private static final String SC_STATIC_URL = "https://cloud.spring.io/spring-cloud-static/";
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ProjectDocumentationUpdater.class);
