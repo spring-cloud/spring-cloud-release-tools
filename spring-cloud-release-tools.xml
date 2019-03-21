@@ -73,7 +73,7 @@ otherwise the application will fail to start</simpara>
 <simpara>Generates a release notes template under <literal>target/notes.md</literal> (ONLY FOR NON-SNAPSHOT VERSIONS)</simpara>
 </listitem>
 <listitem>
-<simpara>Updates project information in Sagan (<link xl:href="http://spring.io">http://spring.io</link>) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)</simpara>
+<simpara>Updates project information in Sagan (<link xl:href="https://spring.io">https://spring.io</link>) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)</simpara>
 </listitem>
 <listitem>
 <simpara>For <literal>GA</literal>/ <literal>SR</literal> release will create an issue in Spring Guides under <link xl:href="https://github.com/spring-guides/getting-started-guides/issues/">https://github.com/spring-guides/getting-started-guides/issues/</link></simpara>
@@ -471,7 +471,7 @@ Example for application arguments: <literal>java -jar target/spring-cloud-releas
 <simpara>If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed
 to build the project and properly merge the docs) then you can put a file named e.g. <literal>releaser.yml</literal> under <literal>config</literal>
 folder and run your application like this:</simpara>
-<programlisting language="bash" linenumbering="unnumbered">$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
+<programlisting language="bash" linenumbering="unnumbered">$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</programlisting>
 <tip>
 <simpara>Notice that we&#8217;re downloading the jar to a parent folder, not to <literal>target</literal>. That&#8217;s because <literal>target</literal> get cleaned
@@ -496,7 +496,7 @@ releasing multiple projects, this keeps you from having to specify the same para
 each release</simpara>
 <programlisting language="bash" linenumbering="unnumbered">$ export RELEASER_POM_BRANCH=Dalston.RELEASE
 $ export RELEASER_GIT_OAUTH_TOKEN=...
-$ wget http://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
+$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root</programlisting>
 </section>
 </section>
