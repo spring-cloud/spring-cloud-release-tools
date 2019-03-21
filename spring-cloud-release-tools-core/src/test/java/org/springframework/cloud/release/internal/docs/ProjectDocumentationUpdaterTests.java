@@ -134,7 +134,7 @@ public class ProjectDocumentationUpdaterTests {
 		String indexHtmlContent = new String(
 				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
 		then(indexHtmlContent)
-				.doesNotContain("http://cloud.spring.io/spring-cloud-static/Angel.SR33/");
+				.doesNotContain("https://cloud.spring.io/spring-cloud-static/Angel.SR33/");
 	}
 
 	@Test
@@ -167,7 +167,7 @@ public class ProjectDocumentationUpdaterTests {
 		String indexHtmlContent = new String(
 				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
 		then(indexHtmlContent)
-				.doesNotContain("http://cloud.spring.io/spring-cloud-static/Angel.SR33/");
+				.doesNotContain("https://cloud.spring.io/spring-cloud-static/Angel.SR33/");
 	}
 
 	@Test
@@ -185,7 +185,7 @@ public class ProjectDocumentationUpdaterTests {
 		String indexHtmlContent = new String(
 				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
 		then(indexHtmlContent)
-				.contains("http://cloud.spring.io/spring-cloud-static/Finchley.SR33/");
+				.contains("https://cloud.spring.io/spring-cloud-static/Finchley.SR33/");
 	}
 
 	@Test
@@ -203,7 +203,7 @@ public class ProjectDocumentationUpdaterTests {
 		String indexHtmlContent = new String(
 				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
 		then(indexHtmlContent)
-				.contains("http://cloud.spring.io/spring-cloud-static/Finchley.SR33/");
+				.contains("https://cloud.spring.io/spring-cloud-static/Finchley.SR33/");
 	}
 
 	@Test
