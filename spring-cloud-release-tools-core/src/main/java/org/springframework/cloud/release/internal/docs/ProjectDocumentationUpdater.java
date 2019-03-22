@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2013-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.cloud.release.internal.docs;
 
 import java.io.File;
@@ -49,7 +33,9 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
  */
 class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
-	private static final String SC_STATIC_URL = "https://cloud.spring.io/spring-cloud-static/";
+	private static final String HTTP_SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";
+
+	private static final String HTTPS_SC_STATIC_URL = "https://cloud.spring.io/spring-cloud-static/";
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ProjectDocumentationUpdater.class);
@@ -100,12 +86,13 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 			File documentationProject, File indexHtml) {
 		try {
 			String indexHtmlText = readIndexHtmlContents(indexHtml);
-			int index = indexHtmlText.indexOf(SC_STATIC_URL);
-			if (index == -1) {
+			int httpIndex = indexHtmlText.indexOf(HTTP_SC_STATIC_URL);
+			int httpsIndex = indexHtmlText.indexOf(HTTPS_SC_STATIC_URL);
+			if (httpIndex == -1 && httpsIndex == -1) {
 				throw new IllegalStateException(
 						"The URL to the documentation repo not found in the index.html file");
 			}
-			int beginIndex = index + SC_STATIC_URL.length();
+			int beginIndex = beginIndex(httpIndex, httpsIndex);
 			String storedReleaseTrainLine = indexHtmlText.substring(beginIndex);
 			String storedReleaseTrain = storedReleaseTrainLine.substring(0,
 					storedReleaseTrainLine.indexOf("/"));
@@ -131,6 +118,13 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	private int beginIndex(int httpIndex, int httpsIndex) {
+		if (httpIndex != -1) {
+			return httpIndex + HTTP_SC_STATIC_URL.length();
+		}
+		return httpsIndex + HTTPS_SC_STATIC_URL.length();
 	}
 
 	private String branchToReleaseVersion(String springCloudReleaseBranch) {
