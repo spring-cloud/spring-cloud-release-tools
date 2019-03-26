@@ -171,8 +171,8 @@ public class AcceptanceTests {
 		then(releaseNotesTemplate()).exists();
 		then(releaseNotesTemplateContents())
 				.contains("Camden.SR5")
-				.contains("- Spring Cloud Config `1.2.2.RELEASE` ([issues](http://foo.bar.com/1.2.2.RELEASE))")
-				.contains("- Spring Cloud Aws `1.1.3.RELEASE` ([issues](http://foo.bar.com/1.1.3.RELEASE))");
+				.contains("- Spring Cloud Config `1.2.2.RELEASE` ([issues](https://foo.bar.com/1.2.2.RELEASE))")
+				.contains("- Spring Cloud Aws `1.1.3.RELEASE` ([issues](https://foo.bar.com/1.1.3.RELEASE))");
 		// once for updating GA
 		// second time to update SNAPSHOT
 		BDDMockito.then(this.saganClient).should(BDDMockito.times(2)).updateRelease(BDDMockito.eq("spring-cloud-consul"),
@@ -404,8 +404,8 @@ public class AcceptanceTests {
 		then(releaseNotesTemplate()).exists();
 		then(releaseNotesTemplateContents())
 				.contains("Dalston.RC1")
-				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
-				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1))");
+				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](https://foo.bar.com/1.3.1.RELEASE))")
+				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](https://foo.bar.com/1.3.0.M1))");
 		BDDMockito.then(this.saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
 				BDDMockito.anyList());
 		BDDMockito.then(this.saganClient).should()
@@ -444,8 +444,8 @@ public class AcceptanceTests {
 		then(releaseNotesTemplate()).exists();
 		then(releaseNotesTemplateContents())
 				.contains("Dalston.RC1")
-				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](http://foo.bar.com/1.3.1.RELEASE))")
-				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](http://foo.bar.com/1.3.0.M1)");
+				.contains("- Spring Cloud Build `1.3.1.RELEASE` ([issues](https://foo.bar.com/1.3.1.RELEASE))")
+				.contains("- Spring Cloud Bus `1.3.0.M1` ([issues](https://foo.bar.com/1.3.0.M1)");
 		BDDMockito.then(this.saganClient).should(BDDMockito.never()).updateRelease(
 				BDDMockito.anyString(), BDDMockito.anyList());
 		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
@@ -698,7 +698,7 @@ public class AcceptanceTests {
 		}
 
 		@Override public String milestoneUrl(ProjectVersion releaseVersion) {
-			return "http://foo.bar.com/" + releaseVersion.toString();
+			return "https://foo.bar.com/" + releaseVersion.toString();
 		}
 	}
 
@@ -722,7 +722,7 @@ public class AcceptanceTests {
 		}
 
 		@Override public String milestoneUrl(ProjectVersion releaseVersion) {
-			return "http://foo.bar.com/" + releaseVersion.toString();
+			return "https://foo.bar.com/" + releaseVersion.toString();
 		}
 
 		@Override public File cloneReleaseTrainProject() {

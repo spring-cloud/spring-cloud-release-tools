@@ -46,7 +46,7 @@ class BlogTemplateGenerator {
 			// availability - General Availability (RELEASE) / Service Release 1 (SR1) / Milestone 1 (M1)
 			// releaseName - Dalston
 			// releaseLink
-			// - [Maven Central](http://repo1.maven.org/maven2/org/springframework/cloud/spring-cloud-dependencies/Dalston.RELEASE/)
+			// - [Maven Central](https://repo1.maven.org/maven2/org/springframework/cloud/spring-cloud-dependencies/Dalston.RELEASE/)
 			// - [Spring Milestone](https://repo.spring.io/milestone/) repository
 			// releaseVersion '- Dalston.RELEASE
 			boolean release = this.releaseVersion.contains("RELEASE");
@@ -117,7 +117,7 @@ class BlogTemplateGenerator {
 		if (nonRelease) {
 			return "[Spring Milestone](https://repo.spring.io/milestone/) repository";
 		}
-		return "[Maven Central](http://repo1.maven.org/maven2/org/springframework/cloud/spring-cloud-dependencies/" + this.releaseVersion + "/)";
+		return "[Maven Central](https://repo1.maven.org/maven2/org/springframework/cloud/spring-cloud-dependencies/" + this.releaseVersion + "/)";
 	}
 }
 

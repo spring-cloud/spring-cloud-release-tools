@@ -100,13 +100,13 @@ public class SaganUpdater {
 	private String referenceUrl(String branch, ProjectVersion version) {
 		if (!version.isSnapshot()) {
 			// static/sleuth/{version}/
-			return "http://cloud.spring.io/spring-cloud-static/" + version.projectName + "/{version}/";
+			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName + "/{version}/";
 		}
 		if (branch.toLowerCase().contains("master")) {
 			// sleuth/
-			return "http://cloud.spring.io/" + version.projectName + "/" + version.projectName + ".html";
+			return "https://cloud.spring.io/" + version.projectName + "/" + version.projectName + ".html";
 		}
 		// sleuth/1.1.x/
-		return "http://cloud.spring.io/" + version.projectName + "/" + branch + "/";
+		return "https://cloud.spring.io/" + version.projectName + "/" + branch + "/";
 	}
 }

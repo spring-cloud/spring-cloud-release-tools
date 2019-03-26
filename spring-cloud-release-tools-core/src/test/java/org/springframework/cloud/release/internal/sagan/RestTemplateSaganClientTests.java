@@ -46,8 +46,8 @@ public class RestTemplateSaganClientTests {
 
 		then(project.id).isEqualTo("spring-framework");
 		then(project.name).isEqualTo("Spring Framework");
-		then(project.repoUrl).isEqualTo("http://github.com/spring-projects/spring-framework");
-		then(project.siteUrl).isEqualTo("http://projects.spring.io/spring-framework");
+		then(project.repoUrl).isEqualTo("https://github.com/spring-projects/spring-framework");
+		then(project.siteUrl).isEqualTo("https://projects.spring.io/spring-framework");
 		then(project.category).isEqualTo("active");
 		then(project.stackOverflowTags).isNotBlank();
 		then(project.stackOverflowTagList).isNotEmpty();
@@ -55,8 +55,8 @@ public class RestTemplateSaganClientTests {
 		then(project.projectReleases).isNotEmpty();
 		Release release = project.projectReleases.get(0);
 		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/spring-framework-reference/");
-		then(release.apiDocUrl).isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/javadoc-api/");
+		then(release.refDocUrl).isEqualTo("https://docs.spring.io/spring/docs/5.0.0.RC4/spring-framework-reference/");
+		then(release.apiDocUrl).isEqualTo("https://docs.spring.io/spring/docs/5.0.0.RC4/javadoc-api/");
 		then(release.groupId).isEqualTo("org.springframework");
 		then(release.artifactId).isEqualTo("spring-context");
 		then(release.repository.id).isEqualTo("spring-milestones");
@@ -76,8 +76,8 @@ public class RestTemplateSaganClientTests {
 		Release release = this.client.getRelease("spring-framework", "5.0.0.RC4");
 
 		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo("http://docs.spring.io/spring/docs/{version}/spring-framework-reference/");
-		then(release.apiDocUrl).isEqualTo("http://docs.spring.io/spring/docs/{version}/javadoc-api/");
+		then(release.refDocUrl).isEqualTo("https://docs.spring.io/spring/docs/{version}/spring-framework-reference/");
+		then(release.apiDocUrl).isEqualTo("https://docs.spring.io/spring/docs/{version}/javadoc-api/");
 		then(release.groupId).isEqualTo("org.springframework");
 		then(release.artifactId).isEqualTo("spring-context");
 		then(release.repository.id).isEqualTo("spring-milestones");
@@ -110,8 +110,8 @@ public class RestTemplateSaganClientTests {
 		firstRelease.artifactId = "spring-context";
 		firstRelease.version = "1.2.8.RELEASE";
 		firstRelease.releaseStatus = "PRERELEASE";
-		firstRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
-		firstRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		firstRelease.refDocUrl = "https://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
+		firstRelease.apiDocUrl = "https://docs.spring.io/spring/docs/{version}/javadoc-api/";
 		firstRelease.repository = milestone;
 
 		ReleaseUpdate secondRelease = new ReleaseUpdate();
@@ -119,8 +119,8 @@ public class RestTemplateSaganClientTests {
 		secondRelease.artifactId = "spring-context";
 		secondRelease.version = "5.0.0.BUILD-SNAPSHOT";
 		secondRelease.releaseStatus = "SNAPSHOT";
-		secondRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
-		secondRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		secondRelease.refDocUrl = "https://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
+		secondRelease.apiDocUrl = "https://docs.spring.io/spring/docs/{version}/javadoc-api/";
 		secondRelease.repository = snapshots;
 
 		ReleaseUpdate thirdRelease = new ReleaseUpdate();
@@ -128,8 +128,8 @@ public class RestTemplateSaganClientTests {
 		thirdRelease.artifactId = "spring-context";
 		thirdRelease.version = "4.3.12.BUILD-SNAPSHOT";
 		thirdRelease.releaseStatus = "SNAPSHOT";
-		thirdRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
-		thirdRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		thirdRelease.refDocUrl = "https://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
+		thirdRelease.apiDocUrl = "https://docs.spring.io/spring/docs/{version}/javadoc-api/";
 		thirdRelease.repository = snapshots;
 
 		ReleaseUpdate fourthRelease = new ReleaseUpdate();
@@ -138,24 +138,24 @@ public class RestTemplateSaganClientTests {
 		fourthRelease.version = "4.3.11.RELEASE";
 		fourthRelease.releaseStatus = "GENERAL_AVAILABILITY";
 		fourthRelease.current = true;
-		fourthRelease.refDocUrl = "http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/";
-		fourthRelease.apiDocUrl = "http://docs.spring.io/spring/docs/current/javadoc-api/";
+		fourthRelease.refDocUrl = "https://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/";
+		fourthRelease.apiDocUrl = "https://docs.spring.io/spring/docs/current/javadoc-api/";
 
 		ReleaseUpdate fithRelease = new ReleaseUpdate();
 		fithRelease.groupId = "org.springframework";
 		fithRelease.artifactId = "spring-context";
 		fithRelease.version = "4.2.9.RELEASE";
 		fithRelease.releaseStatus = "GENERAL_AVAILABILITY";
-		fithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
-		fithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		fithRelease.refDocUrl = "https://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
+		fithRelease.apiDocUrl = "https://docs.spring.io/spring/docs/{version}/javadoc-api/";
 
 		ReleaseUpdate sithRelease = new ReleaseUpdate();
 		sithRelease.groupId = "org.springframework";
 		sithRelease.artifactId = "spring-context";
 		sithRelease.version = "3.2.18.RELEASE";
 		sithRelease.releaseStatus = "GENERAL_AVAILABILITY";
-		sithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
-		sithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
+		sithRelease.refDocUrl = "https://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
+		sithRelease.apiDocUrl = "https://docs.spring.io/spring/docs/{version}/javadoc-api/";
 
 		List<ReleaseUpdate> updates = Arrays.asList(firstRelease, secondRelease, thirdRelease, fourthRelease ,fithRelease, sithRelease);
 
