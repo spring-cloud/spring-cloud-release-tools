@@ -35,7 +35,7 @@ Some of the highlights of the Brixton release train are:
 * Hashicorp Consul support for service registration/discovery & configuration via Spring Cloud Consul
 * Apache Zookeeper support for service registration/discovery, configuration via Spring Cloud Zookeeper and leader election in Spring Cloud Cluster
 * Distributed tracing through the Spring Cloud Sleuth abstraction with two out of the box implementations: one supporting logging (ideal for log collectors and multiplexers like Logstash and Loggregator) and one supporting Twitter's Zipkin
-* Netflix http://techblog.netflix.com/2014/12/introducing-atlas-netflixs-primary.html[Atlas Telemetry System], the next generation https://github.com/Netflix/spectator/wiki[Spectator Metrics library] and recent versions of Eureka, Ribbon, Hystrix and Feign are available in Spring Cloud Netflix
+* Netflix https://medium.com/netflix-techblog/introducing-atlas-netflixs-primary-telemetry-platform-bd31f4d8ed9a[Atlas Telemetry System], the next generation https://github.com/Netflix/spectator/wiki[Spectator Metrics library] and recent versions of Eureka, Ribbon, Hystrix and Feign are available in Spring Cloud Netflix
 * Spring Cloud Bus is now powered by the recently released https://spring.io/blog/2016/05/10/spring-cloud-stream-1-0-0-release-is-available[Spring Cloud Stream]
 * Cluster Leadership election and locks via Spring Cloud Cluster
 * Export of Spring Boot metrics to Amazon Cloudwatch, and native support for Amazon RDS
@@ -43,9 +43,9 @@ Some of the highlights of the Brixton release train are:
 
 == Notes:
 
-Starting with Brixton, Zuul will no longer automatically send all headers to downstream services. By default `Cookie`, `Set-Cookie` and `Authorization` *are not* sent to downstream services. To return to the Angel behaviour, set `zuul.sensitiveHeaders=""` in the Zuul configuration. See http://cloud.spring.io/spring-cloud-static/Brixton.SR6/#_cookies_and_sensitive_headers[the documentation] for more information.
+Starting with Brixton, Zuul will no longer automatically send all headers to downstream services. By default `Cookie`, `Set-Cookie` and `Authorization` *are not* sent to downstream services. To return to the Angel behaviour, set `zuul.sensitiveHeaders=""` in the Zuul configuration. See https://cloud.spring.io/spring-cloud-static/Brixton.SR6/#_cookies_and_sensitive_headers[the documentation] for more information.
 
-A `@LoadBalanced` `RestTemplate` is no longer created by default. See the http://cloud.spring.io/spring-cloud-static/spring-cloud.html=_spring_resttemplate_as_a_load_balancer_client[updated documentation for details]. You need to create it in your application’s configuration. For example:
+A `@LoadBalanced` `RestTemplate` is no longer created by default. See the https://cloud.spring.io/spring-cloud-static/spring-cloud.html=_spring_resttemplate_as_a_load_balancer_client[updated documentation for details]. You need to create it in your application’s configuration. For example:
 
 ```java
 @Configuration
