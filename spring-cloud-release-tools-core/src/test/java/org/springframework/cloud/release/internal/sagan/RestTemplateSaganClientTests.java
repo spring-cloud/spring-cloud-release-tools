@@ -238,7 +238,7 @@ public class RestTemplateSaganClientTests {
 
 	private RestTemplate restTemplate(ReleaserProperties properties) {
 		return new RestTemplateBuilder()
-				.basicAuthorization(properties.getGit().getOauthToken(), "").build();
+				.basicAuthentication(properties.getGit().getOauthToken(), "").build();
 	}
 
 	@Configuration

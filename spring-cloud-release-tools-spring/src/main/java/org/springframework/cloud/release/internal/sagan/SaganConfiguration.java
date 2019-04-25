@@ -41,7 +41,7 @@ class SaganConfiguration {
 						+ "You can do it via the [--releaser.git.oauth-token=...] "
 						+ "command line argument or an env variable [export RELEASER_GIT_OAUTH_TOKEN=...].");
 		return new RestTemplateBuilder()
-				.basicAuthorization(properties.getGit().getOauthToken(), "").build();
+				.basicAuthentication(properties.getGit().getOauthToken(), "").build();
 	}
 
 }

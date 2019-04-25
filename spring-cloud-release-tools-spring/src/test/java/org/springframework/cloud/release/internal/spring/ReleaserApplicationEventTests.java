@@ -29,7 +29,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ReleaserApplicationEventTests.Config.class, properties = "releaser.git.oauth-token=some-fake-token")
+@SpringBootTest(classes = ReleaserApplicationEventTests.Config.class,
+		properties = "releaser.git.oauth-token=some-fake-token")
 public class ReleaserApplicationEventTests {
 
 	@Autowired
