@@ -41,7 +41,7 @@ public class Project {
 
 	public List<Release> projectReleases = new ArrayList<>();
 
-	public Object projectSamples = new ArrayList<>();
+	public Object projectSamples = new Object();
 
 	public Object nonMostCurrentReleases = new ArrayList<>();
 
