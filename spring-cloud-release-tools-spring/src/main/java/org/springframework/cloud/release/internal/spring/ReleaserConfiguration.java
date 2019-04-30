@@ -30,6 +30,7 @@ import org.springframework.cloud.release.internal.project.ProjectBuilder;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
+import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -55,13 +56,18 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	ProjectBuilder projectBuilder() {
-		return new ProjectBuilder(this.properties);
+	ProjectBuilder projectBuilder(VersionsFetcher versionsFetcher) {
+		return new ProjectBuilder(this.properties, versionsFetcher);
 	}
 
 	@Bean
 	ProjectPomUpdater pomUpdater() {
 		return new ProjectPomUpdater(this.properties);
+	}
+
+	@Bean
+	VersionsFetcher versionsFetcher(ProjectPomUpdater updater) {
+		return new VersionsFetcher(this.properties, updater);
 	}
 
 	@Bean

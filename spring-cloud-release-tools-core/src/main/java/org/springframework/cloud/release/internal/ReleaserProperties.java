@@ -61,6 +61,8 @@ public class ReleaserProperties implements Serializable {
 
 	private Template template = new Template();
 
+	private Versions versions = new Versions();
+
 	/**
 	 * Project name to its version - overrides all versions retrieved from a repository
 	 * like Spring Cloud Release.
@@ -150,13 +152,21 @@ public class ReleaserProperties implements Serializable {
 		this.postReleaseTasksOnly = postReleaseTasksOnly;
 	}
 
+	public Versions getVersions() {
+		return this.versions;
+	}
+
+	public void setVersions(Versions versions) {
+		this.versions = versions;
+	}
+
 	@Override
 	public String toString() {
 		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git="
 				+ this.git + ", pom=" + this.pom + ", maven=" + this.maven + ", gradle="
 				+ this.gradle + ", sagan=" + this.sagan + ", fixedVersions="
 				+ this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
-				+ this.template + '}';
+				+ this.template + ", versions=" + this.versions + '}';
 	}
 
 	public ReleaserProperties copy() {
@@ -955,6 +965,43 @@ public class ReleaserProperties implements Serializable {
 		@Override
 		public String toString() {
 			return "Template{" + "templateFolder='" + this.templateFolder + '\'' + '}';
+		}
+
+	}
+
+	public static class Versions implements Serializable {
+
+		/**
+		 * Url to a file containing all the versions. Defaults to YAML from
+		 * start.spring.io.
+		 */
+		private String allVersionsFileUrl = "https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml";
+
+		/**
+		 * Name in the YAML from initilizr for BOM mappings.
+		 */
+		private String bomName = "spring-cloud";
+
+		public String getAllVersionsFileUrl() {
+			return this.allVersionsFileUrl;
+		}
+
+		public void setAllVersionsFileUrl(String allVersionsFileUrl) {
+			this.allVersionsFileUrl = allVersionsFileUrl;
+		}
+
+		public String getBomName() {
+			return bomName;
+		}
+
+		public void setBomName(String bomName) {
+			this.bomName = bomName;
+		}
+
+		@Override
+		public String toString() {
+			return "Versions{" + "allVersionsFileUrl='" + this.allVersionsFileUrl + '\''
+					+ ", bomName='" + this.bomName + '\'' + '}';
 		}
 
 	}

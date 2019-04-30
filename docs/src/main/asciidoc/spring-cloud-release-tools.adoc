@@ -324,6 +324,8 @@ be set there. Just provide a mapping for the `gradle-props-substition` looking l
 Example: `"--releaser.pom.ignored-pom-regex=".{asterisk}\\.git/.{asterisk}$,.\{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.{asterisk}$,.{asterisk}spring-cloud-contract-maven-plugin/target/.{asterisk}$,.{asterisk}samples/standalone/[a-z]+/.{asterisk}$"`.
 - `releaser.working-dir` - By default Releaser assumes running the program from the current working directory.
 - `releaser.template.template-folder` - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to `cloud`.
+- `releaser.versions.all-versions-file-url` - Url to a file containing all the versions. Defaults to YAML from start.spring.io.
+- `releaser.versions.bom-name` - Name in the YAML from initilizr for BOM mappings. Defaults to `spring-cloud`.
 
 TIP: You can pass the options either via system properties or via application arguments.
 Example for system properties: `java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar`

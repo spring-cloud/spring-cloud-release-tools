@@ -25,8 +25,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,10 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 			"^[\\s]*<!--.*-->.*$");
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectPomUpdater.class);
+
+	private static final boolean UPDATE_FIXED_VERSIONS = true;
+
+	private static final Map<String, Versions> CACHE = new ConcurrentHashMap<>();
 
 	private final ProjectGitHandler gitRepo;
 
@@ -71,13 +77,32 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	 * @return projects retrieved from the release train bom
 	 */
 	public Projects retrieveVersionsFromReleaseTrainBom() {
-		File clonedScRelease = this.gitRepo.cloneReleaseTrainProject();
-		this.gitRepo.checkout(clonedScRelease, this.properties.getPom().getBranch());
-		BomParser sCReleasePomParser = new BomParser(this.properties, clonedScRelease);
-		Versions versions = sCReleasePomParser.allVersions();
-		log.info("Will update the following versions manually [{}]",
-				this.properties.getFixedVersions());
-		this.properties.getFixedVersions().forEach(versions::setVersion);
+		return retrieveVersionsFromReleaseTrainBom(this.properties.getPom().getBranch(),
+				UPDATE_FIXED_VERSIONS);
+	}
+
+	/**
+	 * For the given root folder (typically the working directory) retrieves list of
+	 * versions for a given release version.
+	 * @param branch branch for which to pick the versions
+	 * @param updateFixedVersions whether should update the retrieved versions with fixed
+	 * ones
+	 * @return projects retrieved from the release train bom
+	 */
+	public Projects retrieveVersionsFromReleaseTrainBom(String branch,
+			boolean updateFixedVersions) {
+		Versions versions = CACHE.computeIfAbsent(branch, s -> {
+			File clonedScRelease = this.gitRepo.cloneReleaseTrainProject();
+			this.gitRepo.checkout(clonedScRelease, branch);
+			BomParser sCReleasePomParser = new BomParser(this.properties,
+					clonedScRelease);
+			return sCReleasePomParser.allVersions();
+		});
+		if (updateFixedVersions) {
+			log.info("Will update the following versions manually [{}]",
+					this.properties.getFixedVersions());
+			this.properties.getFixedVersions().forEach(versions::setVersion);
+		}
 		log.info("Retrieved the following versions\n{}", versions);
 		return versions.toProjectVersions();
 	}

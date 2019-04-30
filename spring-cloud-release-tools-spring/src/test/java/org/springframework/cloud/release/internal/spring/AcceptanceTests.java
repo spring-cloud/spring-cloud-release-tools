@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ import org.springframework.cloud.release.internal.sagan.Release;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
+import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
@@ -694,7 +696,8 @@ public class AcceptanceTests {
 	private Releaser defaultReleaser(String expectedVersion, String projectName,
 			ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
+		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, pomUpdater);
+		ProjectBuilder projectBuilder = new ProjectBuilder(properties, versionsFetcher);
 		TestProjectGitHandler handler = new TestProjectGitHandler(properties,
 				expectedVersion, projectName);
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
@@ -724,7 +727,8 @@ public class AcceptanceTests {
 
 	private Releaser defaultMetaReleaser(ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
+		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, pomUpdater);
+		ProjectBuilder projectBuilder = new ProjectBuilder(properties, versionsFetcher);
 		NonAssertingTestProjectGitHandler handler = new NonAssertingTestProjectGitHandler(
 				properties);
 		TemplateGenerator templateGenerator = Mockito
@@ -781,6 +785,9 @@ public class AcceptanceTests {
 				.setSpringProjectUrl(tmpFile("spring-cloud").getAbsolutePath() + "/");
 		releaserProperties.getGit().setReleaseTrainWikiUrl(
 				tmpFile("spring-cloud-wiki").getAbsolutePath() + "/");
+		URI initilizrUri = AcceptanceTests.class.getResource("/raw/initializr.yml")
+				.toURI();
+		releaserProperties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}
@@ -810,6 +817,9 @@ public class AcceptanceTests {
 		releaserProperties.getGit().setReleaseTrainWikiUrl(
 				tmpFile("spring-cloud-wiki").getAbsolutePath() + "/");
 		releaserProperties.setFixedVersions(versions);
+		URI initilizrUri = AcceptanceTests.class.getResource("/raw/initializr.yml")
+				.toURI();
+		releaserProperties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}
@@ -821,6 +831,9 @@ public class AcceptanceTests {
 				file("/projects/spring-cloud-release-with-snapshot/").toURI().toString());
 		releaserProperties.getGit().setDocumentationUrl(
 				file("/projects/spring-cloud-static/").toURI().toString());
+		URI initilizrUri = AcceptanceTests.class.getResource("/raw/initializr.yml")
+				.toURI();
+		releaserProperties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		this.releaserProperties = releaserProperties;
 		return releaserProperties;
 	}

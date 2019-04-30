@@ -45,6 +45,7 @@ import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.pom.TestPomReader;
 import org.springframework.cloud.release.internal.pom.TestUtils;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.LinkedMultiValueMap;
 
@@ -91,7 +92,9 @@ public class PostReleaseActionsTests {
 
 	ProjectPomUpdater updater = new ProjectPomUpdater(this.properties);
 
-	ProjectBuilder builder = new ProjectBuilder(this.properties);
+	VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
+
+	ProjectBuilder builder = new ProjectBuilder(this.properties, versionsFetcher);
 
 	@Before
 	public void setup() throws Exception {

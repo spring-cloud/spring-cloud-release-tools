@@ -32,8 +32,10 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.TestUtils;
+import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -61,7 +63,7 @@ public class ProjectBuilderTests {
 	}
 
 	ProjectBuilder projectBuilder(ReleaserProperties properties) {
-		return new ProjectBuilder(properties) {
+		return new ProjectBuilder(properties, versionsFetcher(properties)) {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return testExecutor(workingDir);
@@ -123,7 +125,7 @@ public class ProjectBuilderTests {
 		builder.build(new ProjectVersion("foo", "1.0.0.RC1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pmilestone");
+				.contains("foo -Pmilestone").doesNotContain("-Pguides");
 	}
 
 	@Test
@@ -137,7 +139,7 @@ public class ProjectBuilderTests {
 		builder.build(new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pcentral");
+				.contains("foo -Pcentral -Pguides");
 	}
 
 	@Test
@@ -278,7 +280,7 @@ public class ProjectBuilderTests {
 		builder.deploy(new ProjectVersion("foo", "1.0.0.M1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pmilestone");
+				.contains("foo -Pmilestone").doesNotContain("-Pguides");
 	}
 
 	@Test
@@ -292,7 +294,7 @@ public class ProjectBuilderTests {
 		builder.deploy(new ProjectVersion("foo", "1.0.0.RC1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pmilestone");
+				.contains("foo -Pmilestone").doesNotContain("-Pguides");
 	}
 
 	@Test
@@ -306,7 +308,7 @@ public class ProjectBuilderTests {
 		builder.deploy(new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pcentral");
+				.contains("foo -Pcentral -Pguides");
 	}
 
 	@Test
@@ -320,7 +322,7 @@ public class ProjectBuilderTests {
 		builder.deploy(new ProjectVersion("foo", "1.0.0.SR1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pcentral");
+				.contains("foo -Pcentral -Pguides");
 	}
 
 	@Test
@@ -373,7 +375,8 @@ public class ProjectBuilderTests {
 		properties.getMaven().setPublishDocsCommands(new String[] { "ls -al", "ls -al" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
-		ProjectBuilder builder = new ProjectBuilder(properties) {
+		ProjectBuilder builder = new ProjectBuilder(properties,
+				versionsFetcher(properties)) {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return executor;
@@ -387,6 +390,16 @@ public class ProjectBuilderTests {
 		then(executor.counter).isEqualTo(2);
 	}
 
+	private VersionsFetcher versionsFetcher(ReleaserProperties properties) {
+		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
+		return new VersionsFetcher(properties, pomUpdater) {
+			@Override
+			public boolean isLatestGa(ProjectVersion version) {
+				return true;
+			}
+		};
+	}
+
 	@Test
 	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder()
 			throws Exception {
@@ -396,7 +409,8 @@ public class ProjectBuilderTests {
 		properties.getMaven().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
-		ProjectBuilder builder = new ProjectBuilder(properties) {
+		ProjectBuilder builder = new ProjectBuilder(properties,
+				versionsFetcher(properties)) {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return executor;
@@ -418,7 +432,8 @@ public class ProjectBuilderTests {
 				.setPublishDocsCommands(new String[] { "echo '{{version}}'" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
-		ProjectBuilder builder = new ProjectBuilder(properties) {
+		ProjectBuilder builder = new ProjectBuilder(properties,
+				versionsFetcher(properties)) {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return executor;
@@ -439,7 +454,8 @@ public class ProjectBuilderTests {
 		File resolved = tmpFile("/builder/resolved");
 		properties.setWorkingDir(resolved.getPath());
 		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
-		ProjectBuilder builder = new ProjectBuilder(properties) {
+		ProjectBuilder builder = new ProjectBuilder(properties,
+				versionsFetcher(properties)) {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return executor;
@@ -470,7 +486,8 @@ public class ProjectBuilderTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setBuildCommand("exit 1");
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
-		ProjectBuilder builder = new ProjectBuilder(properties) {
+		ProjectBuilder builder = new ProjectBuilder(properties,
+				versionsFetcher(properties)) {
 			@Override
 			ProcessExecutor executor(String workingDir) {
 				return new ProcessExecutor(properties.getWorkingDir()) {

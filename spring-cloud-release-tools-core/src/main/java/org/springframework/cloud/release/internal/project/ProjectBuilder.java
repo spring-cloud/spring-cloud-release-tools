@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.util.StringUtils;
 
 /**
@@ -50,8 +51,12 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 
 	private ReleaserProperties properties;
 
-	public ProjectBuilder(ReleaserProperties properties) {
+	private final VersionsFetcher versionsFetcher;
+
+	public ProjectBuilder(ReleaserProperties properties,
+			VersionsFetcher versionsFetcher) {
 		this.properties = properties;
+		this.versionsFetcher = versionsFetcher;
 	}
 
 	public void build(ProjectVersion versionFromReleaseTrain) {
@@ -102,12 +107,22 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		}
 		else if (version.isRelease() || version.isServiceRelease()) {
 			log.info("Adding the central profile to the Maven build");
-			return trimmedCommand + " -Pcentral";
+			return trimmedCommand + " -Pcentral" + profilesForLatestVersion(version);
 		}
 		else {
 			log.info("The build is a snapshot one - will not add any profiles");
 		}
 		return trimmedCommand;
+	}
+
+	private String profilesForLatestVersion(ProjectVersion projectVersion) {
+		boolean latestGa = this.versionsFetcher.isLatestGa(projectVersion);
+		if (latestGa) {
+			log.info("Version [" + projectVersion.version
+					+ "] is the latest GA! Will append additional profiles");
+			return " -Pguides";
+		}
+		return "";
 	}
 
 	private void assertNoHtmlFilesInDocsContainUnresolvedTags(String workingDir) {
