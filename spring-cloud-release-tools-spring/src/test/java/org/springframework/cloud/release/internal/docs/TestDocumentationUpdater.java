@@ -28,15 +28,15 @@ public class TestDocumentationUpdater extends DocumentationUpdater {
 		return "<!DOCTYPE HTML>\n"
 				+ "\n"
 				+ "<meta charset=\"UTF-8\">\n"
-				+ "<meta http-equiv=\"refresh\" content=\"1; url=http://cloud.spring.io/spring-cloud-static/" + this.version + "/\">\n"
+				+ "<meta http-equiv=\"refresh\" content=\"1; url=https://cloud.spring.io/spring-cloud-static/" + this.version + "/\">\n"
 				+ "\n"
 				+ "<script>\n"
-				+ "  window.location.href = \"http://cloud.spring.io/spring-cloud-static/" + this.version + "/\"\n"
+				+ "  window.location.href = \"https://cloud.spring.io/spring-cloud-static/" + this.version + "/\"\n"
 				+ "</script>\n"
 				+ "\n"
 				+ "<title>Page Redirection</title>\n"
 				+ "\n"
 				+ "<!-- Note: don't tell people to `click` the link, just tell them that it is a link. -->\n"
-				+ "If you are not redirected automatically, follow the <a href='http://cloud.spring.io/spring-cloud-static/" + this.version + "/'>link to latest release</a>\n";
+				+ "If you are not redirected automatically, follow the <a href='https://cloud.spring.io/spring-cloud-static/" + this.version + "/'>link to latest release</a>\n";
 	}
 }

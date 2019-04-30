@@ -16,7 +16,7 @@ import org.springframework.cloud.release.internal.pom.ProjectVersion;
  */
 public class DocumentationUpdater {
 
-	private static final String SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";
+	private static final String SC_STATIC_URL = "https://cloud.spring.io/spring-cloud-static/";
 	private static final Logger log = LoggerFactory.getLogger(DocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;

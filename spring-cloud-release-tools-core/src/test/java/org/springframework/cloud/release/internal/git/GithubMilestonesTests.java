@@ -135,7 +135,7 @@ public class GithubMilestonesTests {
 
 			@Override URL foundMilestoneUrl(Milestone.Smart milestone)
 					throws IOException {
-				return new URL("http://foo.com/bar");
+				return new URL("http://www.foo.com/bar");
 			}
 		};
 

@@ -174,7 +174,7 @@ public class TemplateGeneratorTests {
 				.contains("### Spring Cloud Sleuth")
 				.contains("| Spring Cloud Sleuth        \t| 1.0.0.M1  \t|")
 				.contains("<id>spring-milestones</id>")
-				.contains("url 'http://repo.spring.io/milestone'")
+				.contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.M1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.M1'");
 	}
@@ -198,7 +198,7 @@ public class TemplateGeneratorTests {
 				.contains("### Spring Cloud Sleuth")
 				.contains("| Spring Cloud Sleuth        \t| 1.0.0.M1  \t|")
 				.contains("<id>spring-milestones</id>")
-				.contains("url 'http://repo.spring.io/milestone'")
+				.contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.M1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.M1'");
 	}
@@ -222,7 +222,7 @@ public class TemplateGeneratorTests {
 				.contains("### Spring Cloud Sleuth")
 				.contains("| Spring Cloud Sleuth        \t| 1.0.0.RC1  \t|")
 				.contains("<id>spring-milestones</id>")
-				.contains("url 'http://repo.spring.io/milestone'")
+				.contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.RC1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RC1'");
 	}
@@ -246,7 +246,7 @@ public class TemplateGeneratorTests {
 				.contains("### Spring Cloud Sleuth")
 				.contains("| Spring Cloud Sleuth        \t| 1.0.0.RC1  \t|")
 				.contains("<id>spring-milestones</id>")
-				.contains("url 'http://repo.spring.io/milestone'")
+				.contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.RC1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RC1'");
 	}
@@ -256,7 +256,7 @@ public class TemplateGeneratorTests {
 			throws IOException {
 		ProjectGitHandler handler = new ProjectGitHandler(this.props) {
 			@Override public String milestoneUrl(ProjectVersion releaseVersion) {
-				return "http://foo.bar.com?closed=1";
+				return "https://foo.bar.com?closed=1";
 			}
 		};
 		this.props.getPom().setBranch("Dalston.RC1");
@@ -272,8 +272,8 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedOutput))
 				.contains("# Dalston.RC1")
-				.contains("Spring Cloud Sleuth `1.0.0.RC1` ([issues](http://foo.bar.com?closed=1))")
-				.contains("Spring Cloud Consul `1.0.1.RC1` ([issues](http://foo.bar.com?closed=1))")
+				.contains("Spring Cloud Sleuth `1.0.0.RC1` ([issues](https://foo.bar.com?closed=1))")
+				.contains("Spring Cloud Consul `1.0.1.RC1` ([issues](https://foo.bar.com?closed=1))")
 				.doesNotContain("Boot");
 	}
 

@@ -52,7 +52,7 @@ public class SaganUpdaterTest {
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.M1",
-						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
 
 	@Test public void should_update_sagan_for_rc() throws Exception {
@@ -60,7 +60,7 @@ public class SaganUpdaterTest {
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RC1",
-						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
 
 	private ProjectVersion version(String version) {
@@ -74,7 +74,7 @@ public class SaganUpdaterTest {
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.BUILD-SNAPSHOT",
-						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
+						"https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
 	@Test public void should_update_sagan_from_release_version() throws Exception {
@@ -86,11 +86,11 @@ public class SaganUpdaterTest {
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RELEASE",
-						"http://cloud.spring.io/spring-cloud-static/foo/{version}/", "GENERAL_AVAILABILITY")));
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/", "GENERAL_AVAILABILITY")));
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.1.BUILD-SNAPSHOT",
-						"http://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
+						"https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
 	@Test public void should_update_sagan_from_non_master() throws Exception {
@@ -101,7 +101,7 @@ public class SaganUpdaterTest {
 		then(this.saganClient).should(never()).deleteRelease(anyString(), anyString());
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.1.0.BUILD-SNAPSHOT",
-						"http://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
+						"https://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
 	}
 
 	private ArgumentMatcher<List<ReleaseUpdate>> withReleaseUpdate(final String version,
