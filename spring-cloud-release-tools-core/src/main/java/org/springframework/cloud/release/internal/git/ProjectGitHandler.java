@@ -19,6 +19,8 @@ package org.springframework.cloud.release.internal.git;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jgit.transport.URIish;
 import org.slf4j.Logger;
@@ -36,6 +38,8 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 public class ProjectGitHandler implements ReleaserPropertiesAware {
+
+	private static final Map<URIish, File> CACHE = new ConcurrentHashMap<>();
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectGitHandler.class);
 
@@ -195,11 +199,22 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 
 	File cloneProject(String url) {
 		try {
+			URIish urIish = new URIish(url);
+			// retrieve from cache and fetch if from cache
+			File clonedProject = CACHE.get(urIish);
+			if (clonedProject != null) {
+				log.info(
+						"Project has already been cloned. Will fetch the latest changes and return the cached location");
+				gitRepo(clonedProject).fetch();
+				return clonedProject;
+			}
 			File destinationDir = this.properties.getGit()
 					.getCloneDestinationDir() != null
 							? new File(this.properties.getGit().getCloneDestinationDir())
 							: Files.createTempDirectory("releaser").toFile();
-			return gitRepo(destinationDir).cloneProject(new URIish(url));
+			File clonedLocation = gitRepo(destinationDir).cloneProject(urIish);
+			CACHE.put(urIish, clonedLocation);
+			return clonedLocation;
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);

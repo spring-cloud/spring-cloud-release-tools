@@ -44,6 +44,9 @@ import org.springframework.util.StringUtils;
  */
 public class ProjectBuilder implements ReleaserPropertiesAware {
 
+	/**
+	 * Enumeration over commonly used Maven profiles.
+	 */
 	public enum MavenProfile {
 
 		/**

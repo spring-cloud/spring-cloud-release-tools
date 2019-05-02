@@ -103,8 +103,9 @@ public class Releaser {
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 	}
 
-	public void buildProject(ProjectVersion versionFromScRelease) {
-		this.projectBuilder.build(versionFromScRelease);
+	public void buildProject(ProjectVersion versionFromScRelease,
+			ProjectBuilder.MavenProfile... profiles) {
+		this.projectBuilder.build(versionFromScRelease, profiles);
 		log.info("\nProject was successfully built");
 	}
 

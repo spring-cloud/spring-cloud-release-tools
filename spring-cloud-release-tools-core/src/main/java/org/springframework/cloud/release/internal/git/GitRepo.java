@@ -34,6 +34,7 @@ import com.jcraft.jsch.agentproxy.usocket.JNAUSocketFactory;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
+import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.PushCommand;
@@ -43,6 +44,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.OpenSshConfig;
 import org.eclipse.jgit.transport.RefSpec;
@@ -120,6 +122,20 @@ class GitRepo {
 			log.info("Checking out branch [{}] for repo [{}]", branch, this.basedir);
 			checkoutBranch(this.basedir, branch);
 			log.info("Successfully checked out the branch [{}]", branch);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
+	 * Pull changes.
+	 */
+	void fetch() {
+		try {
+			log.info("Pull changes for repo [{}]", this.basedir);
+			fetch(this.basedir);
+			log.info("Successfully pulled the changes");
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -280,6 +296,21 @@ class GitRepo {
 
 	private File humanishDestination(URIish projectUrl, File destinationFolder) {
 		return new File(destinationFolder, projectUrl.getHumanishName());
+	}
+
+	private FetchResult fetch(File projectDir) throws GitAPIException {
+		Git git = this.gitFactory.open(projectDir);
+		FetchCommand command = git.fetch();
+		try {
+			return command.call();
+		}
+		catch (GitAPIException e) {
+			deleteBaseDirIfExists();
+			throw e;
+		}
+		finally {
+			git.close();
+		}
 	}
 
 	private Ref checkoutBranch(File projectDir, String branch) throws GitAPIException {
