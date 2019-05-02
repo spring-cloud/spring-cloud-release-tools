@@ -56,8 +56,8 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	ProjectBuilder projectBuilder(VersionsFetcher versionsFetcher) {
-		return new ProjectBuilder(this.properties, versionsFetcher);
+	ProjectBuilder projectBuilder() {
+		return new ProjectBuilder(this.properties);
 	}
 
 	@Bean

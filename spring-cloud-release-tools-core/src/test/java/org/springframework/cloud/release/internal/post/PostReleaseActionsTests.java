@@ -94,7 +94,7 @@ public class PostReleaseActionsTests {
 
 	VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
-	ProjectBuilder builder = new ProjectBuilder(this.properties, versionsFetcher);
+	ProjectBuilder builder = new ProjectBuilder(this.properties);
 
 	@Before
 	public void setup() throws Exception {

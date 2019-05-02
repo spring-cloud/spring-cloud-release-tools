@@ -65,7 +65,6 @@ import org.springframework.cloud.release.internal.sagan.Release;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
-import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
@@ -696,8 +695,7 @@ public class AcceptanceTests {
 	private Releaser defaultReleaser(String expectedVersion, String projectName,
 			ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, pomUpdater);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties, versionsFetcher);
+		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
 		TestProjectGitHandler handler = new TestProjectGitHandler(properties,
 				expectedVersion, projectName);
 		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
@@ -727,8 +725,7 @@ public class AcceptanceTests {
 
 	private Releaser defaultMetaReleaser(ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, pomUpdater);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties, versionsFetcher);
+		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
 		NonAssertingTestProjectGitHandler handler = new NonAssertingTestProjectGitHandler(
 				properties);
 		TemplateGenerator templateGenerator = Mockito

@@ -75,6 +75,12 @@ class GithubIssues {
 					releaseVersion);
 			return;
 		}
+		fileAGithubIssue(projects, releaseVersion);
+		// iterate over projects, checkout the tag, build the guides project
+		// only with -Pintegration,guides profile
+	}
+
+	private void fileAGithubIssue(Projects projects, String releaseVersion) {
 		Repo springGuides = this.github.repos()
 				.get(new Coordinates.Simple("spring-guides", "getting-started-guides"));
 		String issueTitle = StringUtils.capitalize(releaseVersion) + " "
