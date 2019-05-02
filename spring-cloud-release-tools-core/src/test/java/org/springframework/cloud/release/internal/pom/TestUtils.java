@@ -21,7 +21,11 @@ import java.io.IOException;
 
 import org.eclipse.jgit.util.FileUtils;
 
-public class TestUtils {
+public final class TestUtils {
+
+	private TestUtils() {
+		throw new IllegalStateException("Can't instantiate a utility class");
+	}
 
 	public static void prepareLocalRepo() throws IOException {
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud");

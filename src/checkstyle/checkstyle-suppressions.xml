@@ -28,4 +28,5 @@
 	<suppress files=".*org.springframework.cloud.release.internal.sagan.Release.*" checks="JavadocVariableCheck"/>
 	<suppress files=".*org.springframework.cloud.release.internal.sagan.ReleaseUpdate.*" checks="JavadocVariableCheck"/>
 	<suppress files=".*org.springframework.cloud.release.internal.sagan.Repository.*" checks="JavadocVariableCheck"/>
+	<suppress files=".*src.test.java.*" checks="JavadocVariableCheck"/>
 </suppressions>

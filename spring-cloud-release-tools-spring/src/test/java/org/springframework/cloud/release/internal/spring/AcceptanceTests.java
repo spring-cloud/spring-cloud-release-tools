@@ -805,6 +805,8 @@ public class AcceptanceTests {
 						.add(s));
 		releaserProperties.getGit().setDocumentationUrl(
 				file("/projects/spring-cloud-static-angel/").toURI().toString());
+		releaserProperties.getGit().setReleaseTrainBomUrl(
+				file("/projects/spring-cloud-release/").toURI().toString());
 		releaserProperties.getMaven().setBuildCommand("echo executed_build");
 		releaserProperties.getMaven().setDeployCommand("echo executed_deploy");
 		releaserProperties.getMaven()

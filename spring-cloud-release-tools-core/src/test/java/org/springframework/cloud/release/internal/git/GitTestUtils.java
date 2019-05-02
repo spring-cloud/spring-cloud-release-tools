@@ -29,7 +29,11 @@ import org.eclipse.jgit.transport.URIish;
 /**
  * @author Marcin Grzejszczak
  */
-public class GitTestUtils {
+public final class GitTestUtils {
+
+	private GitTestUtils() {
+		throw new IllegalStateException("Can't instantiate a utility class");
+	}
 
 	public static void setOriginOnProjectToTmp(File origin, File project)
 			throws GitAPIException, MalformedURLException {

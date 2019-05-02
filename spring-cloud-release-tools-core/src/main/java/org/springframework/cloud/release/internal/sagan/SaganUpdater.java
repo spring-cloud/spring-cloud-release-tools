@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -83,7 +84,7 @@ public class SaganUpdater {
 		if (indexDoc.exists()) {
 			log.debug("Index adoc file exists");
 			String fileText = fileToText(indexDoc);
-			if (!fileText.equals(project.rawOverview)) {
+			if (StringUtils.hasText(fileText) && !fileText.equals(project.rawOverview)) {
 				log.info(
 						"Index adoc content differs from the previously stored, will update it");
 				project.rawOverview = fileText;
@@ -93,7 +94,8 @@ public class SaganUpdater {
 		if (bootDoc.exists()) {
 			log.debug("Boot adoc file exists");
 			String fileText = fileToText(bootDoc);
-			if (!fileText.equals(project.rawBootConfig)) {
+			if (StringUtils.hasText(fileText)
+					&& !fileText.equals(project.rawBootConfig)) {
 				log.info(
 						"Boot adoc content differs from the previously stored, will update it");
 				project.rawBootConfig = fileText;
