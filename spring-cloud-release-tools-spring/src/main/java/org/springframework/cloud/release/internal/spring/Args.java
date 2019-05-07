@@ -17,12 +17,15 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.pom.ProcessedProject;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.context.ApplicationEvent;
@@ -47,6 +50,8 @@ class Args {
 
 	final ReleaserProperties properties;
 
+	final List<ProcessedProject> processedProjects;
+
 	final boolean interactive;
 
 	final TaskType taskType;
@@ -63,6 +68,8 @@ class Args {
 		this.originalVersion = originalVersion;
 		this.versionFromScRelease = versionFromScRelease;
 		this.properties = properties;
+		this.processedProjects = Collections
+				.singletonList(new ProcessedProject(properties, versionFromScRelease));
 		this.interactive = interactive;
 		this.taskType = taskType;
 		this.applicationEventPublisher = applicationEventPublisher;
@@ -70,14 +77,15 @@ class Args {
 
 	// Used by meta-release task
 	Args(Releaser releaser, Projects projects, ProjectVersion versionFromScRelease,
-			ReleaserProperties properties, boolean interactive,
-			ApplicationEventPublisher applicationEventPublisher) {
+			ReleaserProperties properties, List<ProcessedProject> processedProjects,
+			boolean interactive, ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.project = null;
 		this.projects = projects;
 		this.originalVersion = null;
 		this.versionFromScRelease = versionFromScRelease;
 		this.properties = properties;
+		this.processedProjects = processedProjects;
 		this.interactive = interactive;
 		this.taskType = TaskType.POST_RELEASE;
 		this.applicationEventPublisher = applicationEventPublisher;
@@ -91,6 +99,7 @@ class Args {
 		this.originalVersion = null;
 		this.versionFromScRelease = null;
 		this.properties = null;
+		this.processedProjects = Collections.emptyList();
 		this.interactive = false;
 		this.taskType = taskType;
 		this.applicationEventPublisher = null;
@@ -112,10 +121,9 @@ class Args {
 	public String toString() {
 		return "Args{" + "releaser=" + this.releaser + ", project=" + this.project
 				+ ", projects=" + this.projects + ", originalVersion="
-				+ this.originalVersion + ", versionFromScRelease="
-				+ this.versionFromScRelease + ", properties=" + this.properties
-				+ ", interactive=" + this.interactive + ", taskType=" + this.taskType
-				+ '}';
+				+ this.originalVersion + ", versionFromBom=" + this.versionFromScRelease
+				+ ", properties=" + this.properties + ", interactive=" + this.interactive
+				+ ", taskType=" + this.taskType + '}';
 	}
 
 }

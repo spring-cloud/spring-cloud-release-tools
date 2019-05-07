@@ -89,6 +89,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	 * ones
 	 * @return projects retrieved from the release train bom
 	 */
+	// TODO: I don't like this flag but don't have a better idea
 	public Projects retrieveVersionsFromReleaseTrainBom(String branch,
 			boolean updateFixedVersions) {
 		Versions versions = CACHE.computeIfAbsent(branch, s -> {

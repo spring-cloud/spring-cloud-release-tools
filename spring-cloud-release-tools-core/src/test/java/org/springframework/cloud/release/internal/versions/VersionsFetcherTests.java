@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.pom.Projects;
 
 class VersionsFetcherTests {
 
@@ -93,6 +94,25 @@ class VersionsFetcherTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
+
+		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
+
+		BDDAssertions.then(latestGa).isFalse();
+	}
+
+	@Test
+	void should_return_false_when_exception_occurs_while_fetching_version_info() {
+		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
+				"1.0.0.BUILD-SNAPSHOT");
+		ReleaserProperties properties = new ReleaserProperties();
+		VersionsFetcher versionsFetcher = new VersionsFetcher(properties,
+				new ProjectPomUpdater(properties) {
+					@Override
+					public Projects retrieveVersionsFromReleaseTrainBom(String branch,
+							boolean updateFixedVersions) {
+						throw new IllegalStateException("BOOM!");
+					}
+				});
 
 		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
 

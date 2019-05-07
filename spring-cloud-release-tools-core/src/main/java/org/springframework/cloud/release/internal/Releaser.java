@@ -17,6 +17,7 @@
 package org.springframework.cloud.release.internal;
 
 import java.io.File;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
+import org.springframework.cloud.release.internal.pom.ProcessedProject;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
@@ -213,18 +215,48 @@ public class Releaser {
 		}
 	}
 
-	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects) {
+	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects,
+			List<ProcessedProject> processedProjects) {
 		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
 			log.info(
 					"\nWon't update Spring Guides for a non Release / Service Release version");
 			return;
 		}
+		Exception springGuidesException = createIssueInSpringGuides(releaseVersion,
+				projects);
+		Exception deployGuidesException = deployGuides(processedProjects);
+		if (springGuidesException != null || deployGuidesException != null) {
+			throw new MakeBuildUnstableException(
+					"Failed to update Spring Guides. Spring Guides updated successfully ["
+							+ (springGuidesException != null)
+							+ "] deployed guides successfully ["
+							+ (deployGuidesException != null) + "]");
+		}
+	}
+
+	private Exception createIssueInSpringGuides(ProjectVersion releaseVersion,
+			Projects projects) {
 		try {
 			this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
+			log.info("\nSuccessfully created an issue in Spring Guides");
+			return null;
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException(
-					"Successfully updated Spring Guides issues", ex);
+			log.error("Failed to update Spring Guides repo", ex);
+			return new MakeBuildUnstableException("Failed to update Spring Guides repo",
+					ex);
+		}
+	}
+
+	private Exception deployGuides(List<ProcessedProject> processedProjects) {
+		try {
+			this.postReleaseActions.deployGuides(processedProjects);
+			log.info("\nSuccessfully updated the guides repo");
+			return null;
+		}
+		catch (Exception ex) {
+			log.error("Failed to deploy new guides", ex);
+			return new MakeBuildUnstableException("Failed to deploy new guides", ex);
 		}
 	}
 

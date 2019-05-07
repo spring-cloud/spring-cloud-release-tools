@@ -726,6 +726,11 @@ public class ReleaserProperties implements Serializable {
 		private String deployCommand = "./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}";
 
 		/**
+		 * Command to be executed to build and deploy guides project only.
+		 */
+		private String deployGuidesCommand = "./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}";
+
+		/**
 		 * Command to be executed to publish documentation. If present "{{version}}" will
 		 * be replaced by the provided version.
 		 */
@@ -775,6 +780,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setDeployCommand(String deployCommand) {
 			this.deployCommand = deployCommand;
+		}
+
+		public String getDeployGuidesCommand() {
+			return this.deployGuidesCommand;
+		}
+
+		public void setDeployGuidesCommand(String deployGuidesCommand) {
+			this.deployGuidesCommand = deployGuidesCommand;
 		}
 
 		public String[] getPublishDocsCommands() {

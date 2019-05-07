@@ -50,6 +50,7 @@ class ReleaserPropertiesUpdater {
 			File clonedProjectFromOrg) {
 		ReleaserProperties props = updatePropertiesFromFile(properties,
 				clonedProjectFromOrg);
+		props.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
 		log.info("Updated properties [\n\n{}\n\n]", props);
 		updateProperties(props);
 		return props;

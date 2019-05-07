@@ -40,6 +40,9 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
+import org.springframework.cloud.release.internal.pom.ProcessedProject;
+import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -147,7 +150,8 @@ public class SpringReleaserTests {
 
 			@Override
 			Args postReleaseOptionsAgs(Options options,
-					ProjectsAndVersion projectsAndVersion) {
+					ProjectsAndVersion projectsAndVersion,
+					List<ProcessedProject> processedProjects) {
 				return new Args(TaskType.RELEASE);
 			}
 
@@ -159,9 +163,24 @@ public class SpringReleaserTests {
 			@Override
 			ProjectsAndVersion processProject(Options options, File project,
 					TaskType taskType) {
-				return null;
+				return new ProjectsAndVersion(sampleProjects(),
+						new ProjectVersion("spring-cloud-foo", "1.0.0.BUILD-SNAPSHOT"));
+			}
+
+			@Override
+			ProjectVersion assertNoSnapshotsForANonSnapshotProject(File project,
+					Projects projectsToUpdate) {
+				return sampleVersion();
 			}
 		};
+	}
+
+	private Projects sampleProjects() {
+		return new Projects(sampleVersion());
+	}
+
+	private ProjectVersion sampleVersion() {
+		return new ProjectVersion("spring-cloud-foo", "1.0.0.RELEASE");
 	}
 
 	private ReleaserProperties properties() {

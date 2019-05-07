@@ -56,8 +56,8 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	ProjectBuilder projectBuilder(VersionsFetcher versionsFetcher) {
-		return new ProjectBuilder(this.properties, versionsFetcher);
+	ProjectBuilder projectBuilder() {
+		return new ProjectBuilder(this.properties);
 	}
 
 	@Bean
@@ -94,9 +94,10 @@ class ReleaserConfiguration {
 	@Bean
 	PostReleaseActions postReleaseActions(ProjectGitHandler handler,
 			ProjectPomUpdater pomUpdater, GradleUpdater gradleUpdater,
-			ProjectBuilder projectBuilder, ReleaserProperties releaserProperties) {
+			ProjectBuilder projectBuilder, ReleaserProperties releaserProperties,
+			VersionsFetcher versionsFetcher) {
 		return new PostReleaseActions(handler, pomUpdater, gradleUpdater, projectBuilder,
-				releaserProperties);
+				releaserProperties, versionsFetcher);
 	}
 
 	@Bean

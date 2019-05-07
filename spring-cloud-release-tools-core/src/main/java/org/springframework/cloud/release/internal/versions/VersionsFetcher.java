@@ -97,8 +97,17 @@ public class VersionsFetcher implements ReleaserPropertiesAware {
 					this.properties.getVersions().getBomName());
 			return false;
 		}
-		Projects projectVersions = this.projectPomUpdater
-				.retrieveVersionsFromReleaseTrainBom("v" + bomVersion.toString(), false);
+		Projects projectVersions = null;
+		try {
+			projectVersions = this.projectPomUpdater.retrieveVersionsFromReleaseTrainBom(
+					"v" + bomVersion.toString(), false);
+		}
+		catch (Exception ex) {
+			log.error(
+					"Failed to check the project versions. Will return that the proejct is not GA",
+					ex);
+			return false;
+		}
 		boolean containsProject = projectVersions.containsProject(version.projectName);
 		if (containsProject) {
 			return bomVersion.compareTo(projectVersions.forName(version.projectName)) > 0;
