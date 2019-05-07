@@ -2,4 +2,4 @@ spring:
   cloud:
     info:
       git:
-        oauthtoken: {cipher}99de9d0bdd23780d4080721353eba425db5c1ab0ca3db1d665c253224d0e8b1d5fc9e04226fed5e93d410d5f502893f7a41dec9f82c7616d51c379f919b4e11c
+        oauthtoken: '{cipher}99de9d0bdd23780d4080721353eba425db5c1ab0ca3db1d665c253224d0e8b1d5fc9e04226fed5e93d410d5f502893f7a41dec9f82c7616d51c379f919b4e11c'
