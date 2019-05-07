@@ -80,6 +80,11 @@ public class VersionsFetcher implements ReleaserPropertiesAware {
 			}
 			return false;
 		}
+		if (!this.properties.getGit().isUpdateSpringGuides()) {
+			log.info("Will not file an issue to Spring Guides, since the switch to do so "
+					+ "is off. Set [releaser.git.update-spring-guides] to [true] to change that");
+			return false;
+		}
 		String latestVersionsUrl = this.properties.getVersions().getAllVersionsFileUrl();
 		InitializrProperties initializrProperties = this.toPropertiesConverter
 				.toProperties(latestVersionsUrl);
