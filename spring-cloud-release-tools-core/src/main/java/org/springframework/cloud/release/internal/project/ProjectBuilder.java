@@ -47,7 +47,7 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 	/**
 	 * Enumeration over commonly used Maven profiles.
 	 */
-	public enum MavenProfile {
+	private enum Profile {
 
 		/**
 		 * Profile used for milestone versions.
@@ -89,16 +89,14 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		this.properties = properties;
 	}
 
-	public void build(ProjectVersion versionFromReleaseTrain, MavenProfile... profiles) {
-		build(versionFromReleaseTrain, this.properties.getWorkingDir(), profiles);
+	public void build(ProjectVersion versionFromReleaseTrain) {
+		build(versionFromReleaseTrain, this.properties.getWorkingDir());
 	}
 
-	public void build(ProjectVersion versionFromReleaseTrain, String projectRoot,
-			MavenProfile... profiles) {
+	public void build(ProjectVersion versionFromReleaseTrain, String projectRoot) {
 		try {
 			String[] commands = commandWithSystemProps(
-					this.properties.getMaven().getBuildCommand(), versionFromReleaseTrain,
-					profiles).split(" ");
+					this.properties.getMaven().getBuildCommand(), versionFromReleaseTrain).split(" ");
 			runCommand(projectRoot, commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
 			log.info("No HTML files from docs contain unresolved tags");
@@ -123,7 +121,7 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 	}
 
 	private String commandWithSystemProps(String command, ProjectVersion version,
-			MavenProfile... profiles) {
+			Profile... profiles) {
 		if (command.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
 			return appendProfile(command, version, profiles);
 		}
@@ -132,16 +130,16 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 	}
 
 	private String appendProfile(String command, ProjectVersion version,
-			MavenProfile... profiles) {
+			Profile... profiles) {
 		String trimmedCommand = command.trim();
 		if (version.isMilestone() || version.isRc()) {
 			log.info("Adding the milestone profile to the Maven build");
-			return trimmedCommand + " " + MavenProfile.MILESTONE.asMavenProfile()
+			return trimmedCommand + " " + Profile.MILESTONE.asMavenProfile()
 					+ profilesToString(profiles);
 		}
 		else if (version.isRelease() || version.isServiceRelease()) {
 			log.info("Adding the central profile to the Maven build");
-			return trimmedCommand + " " + MavenProfile.CENTRAL.asMavenProfile()
+			return trimmedCommand + " " + Profile.CENTRAL.asMavenProfile()
 					+ profilesToString(profiles);
 		}
 		else {
@@ -150,7 +148,7 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		return trimmedCommand;
 	}
 
-	private String profilesToString(MavenProfile... profiles) {
+	private String profilesToString(Profile... profiles) {
 		return Arrays.stream(profiles).map(profile -> "-P" + profile)
 				.collect(Collectors.joining(" "));
 	}
@@ -168,11 +166,19 @@ public class ProjectBuilder implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void deploy(ProjectVersion version, MavenProfile... profiles) {
+	public void deploy(ProjectVersion version) {
+		doDeploy(version, this.properties.getMaven().getDeployCommand());
+	}
+
+	public void deployGuides(ProjectVersion version) {
+		doDeploy(version, this.properties.getMaven().getDeployGuidesCommand(), Profile.GUIDES, Profile.INTEGRATION);
+	}
+
+	private void doDeploy(ProjectVersion version, String command,
+			Profile... profiles) {
 		try {
-			String[] commands = commandWithSystemProps(
-					this.properties.getMaven().getDeployCommand(), version, profiles)
-							.split(" ");
+			String[] commands = commandWithSystemProps(command, version, profiles)
+					.split(" ");
 			runCommand(commands);
 			log.info("The project has successfully been deployed");
 		}

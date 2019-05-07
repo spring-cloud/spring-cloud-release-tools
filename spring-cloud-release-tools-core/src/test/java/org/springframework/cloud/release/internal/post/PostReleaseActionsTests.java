@@ -107,7 +107,7 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.runUpdatedTests(currentGa());
 
@@ -119,7 +119,7 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_update_test_is_called() {
 		this.properties.getGit().setRunUpdatedSamples(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.runUpdatedTests(currentGa());
 
@@ -134,7 +134,7 @@ public class PostReleaseActionsTests {
 				tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setBuildCommand("touch build.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.runUpdatedTests(currentGa());
 
@@ -156,7 +156,7 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_release_train_docs_generation_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -167,7 +167,7 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_release_train_docs_generation_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -182,7 +182,7 @@ public class PostReleaseActionsTests {
 		this.properties.getMaven()
 				.setGenerateReleaseTrainDocsCommand("touch generate.log");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -198,7 +198,7 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_test_samples_update_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.updateAllTestSamples(currentGa());
 
@@ -210,7 +210,7 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_the_switch_for_test_samples_update_check_is_off_and_update_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties);
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher);
 
 		actions.updateAllTestSamples(currentGa());
 
@@ -228,7 +228,7 @@ public class PostReleaseActionsTests {
 						tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties) {
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher) {
 			@Override
 			Projects getPostReleaseProjects(Projects projects) {
 				postReleaseProjects.set(super.getPostReleaseProjects(projects));
@@ -270,7 +270,7 @@ public class PostReleaseActionsTests {
 						tmpFile("spring-cloud-static/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties) {
+				this.updater, this.gradleUpdater, this.builder, this.properties, versionsFetcher) {
 			@Override
 			Projects getPostReleaseProjects(Projects projects) {
 				postReleaseProjects.set(super.getPostReleaseProjects(projects));

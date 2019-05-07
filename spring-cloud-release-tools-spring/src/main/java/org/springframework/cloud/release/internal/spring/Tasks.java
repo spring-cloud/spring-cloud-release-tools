@@ -69,7 +69,7 @@ final class Tasks {
 	static Task UPDATE_GUIDES = task("updateGuides", "ug", "UPDATE GUIDES",
 			"Updating Spring Guides", args -> {
 				args.releaser.updateSpringGuides(args.versionFromScRelease,
-						args.projects);
+						args.projects, args.processedProjects);
 			}, TaskType.POST_RELEASE);
 	static Task UPDATE_SAGAN = task("updateSagan", "g", "UPDATE SAGAN",
 			"Updating Sagan with release info", args -> {

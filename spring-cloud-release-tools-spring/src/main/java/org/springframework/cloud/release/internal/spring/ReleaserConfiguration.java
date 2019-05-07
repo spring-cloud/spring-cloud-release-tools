@@ -96,7 +96,7 @@ class ReleaserConfiguration {
 			ProjectPomUpdater pomUpdater, GradleUpdater gradleUpdater,
 			ProjectBuilder projectBuilder, ReleaserProperties releaserProperties) {
 		return new PostReleaseActions(handler, pomUpdater, gradleUpdater, projectBuilder,
-				releaserProperties);
+				releaserProperties, versionsFetcher);
 	}
 
 	@Bean

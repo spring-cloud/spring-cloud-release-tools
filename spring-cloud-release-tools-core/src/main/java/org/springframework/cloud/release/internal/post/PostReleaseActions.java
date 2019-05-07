@@ -34,10 +34,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
+import org.springframework.cloud.release.internal.pom.ProcessedProject;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.util.StringUtils;
 
@@ -60,14 +62,41 @@ public class PostReleaseActions implements Closeable {
 
 	private final ReleaserProperties properties;
 
+	private final VersionsFetcher versionsFetcher;
+
 	public PostReleaseActions(ProjectGitHandler projectGitHandler,
 			ProjectPomUpdater projectPomUpdater, GradleUpdater gradleUpdater,
-			ProjectBuilder projectBuilder, ReleaserProperties properties) {
+			ProjectBuilder projectBuilder, ReleaserProperties properties,
+			VersionsFetcher versionsFetcher) {
 		this.projectGitHandler = projectGitHandler;
 		this.projectPomUpdater = projectPomUpdater;
 		this.gradleUpdater = gradleUpdater;
 		this.projectBuilder = projectBuilder;
 		this.properties = properties;
+		this.versionsFetcher = versionsFetcher;
+	}
+
+	/**
+	 * Clones the projects, checks out the proper branch and runs guides building and
+	 * deployment.
+	 * @param processedProjects - set of project with versions to assert against
+	 */
+	public void deployGuides(List<ProcessedProject> processedProjects) {
+		if (!this.properties.getGit().isUpdateSpringGuides()) {
+			log.info(
+					"Will not build and deploy latest Spring Guides, since the switch to do so "
+							+ "is off. Set [releaser.git.update-spring-guides] to [true] to change that");
+			return;
+		}
+		List<ProcessedProject> latestGaProcessedProjects = processedProjects.stream()
+				.filter(processedProject -> this.versionsFetcher
+						.isLatestGa(processedProject.newProjectVersion))
+				.collect(Collectors.toList());
+		log.info("Found the following latest ga processed projects "
+				+ latestGaProcessedProjects);
+		List<ProjectUrlAndException> projectUrlAndExceptions = runDeployGuides(latestGaProcessedProjects);
+		log.info("Deployed all guides!");
+		assertExceptions(projectUrlAndExceptions);
 	}
 
 	/**
@@ -108,6 +137,10 @@ public class PostReleaseActions implements Closeable {
 				.map(e -> updateAllProjects(projects, e)).map(this::getResult)
 				.flatMap(Collection::stream).collect(Collectors.toList());
 		log.info("Updated all samples!");
+		assertExceptions(projectUrlAndExceptions);
+	}
+
+	private void assertExceptions(List<ProjectUrlAndException> projectUrlAndExceptions) {
 		String exceptionMessages = projectUrlAndExceptions.stream()
 				.filter(ProjectUrlAndException::hasException)
 				.map(e -> "Project [" + e.key + "] for url [" + e.url + "] "
@@ -126,6 +159,22 @@ public class PostReleaseActions implements Closeable {
 		}
 	}
 
+	private List<ProjectUrlAndException> runDeployGuides(
+			List<ProcessedProject> latestGaProcessedProjects) {
+		return latestGaProcessedProjects.stream().map(
+				processedProject -> run(processedProject.projectName(), "", () -> SERVICE.submit(() -> {
+					String tagName = processedProject.newProjectVersion
+							.releaseTagName();
+					File clonedProject = this.projectGitHandler
+							.cloneProjectFromOrg(processedProject.projectName());
+					this.projectGitHandler.checkout(clonedProject, tagName);
+					new ProjectBuilder(processedProject.propertiesForProject)
+							.deployGuides(processedProject.newProjectVersion);
+				})))
+				.map(this::getSingleResult)
+				.collect(Collectors.toList());
+	}
+
 	private Future<List<ProjectUrlAndException>> updateAllProjects(Projects projects,
 			Map.Entry<String, List<String>> e) {
 		return SERVICE.submit(() -> {
@@ -142,7 +191,7 @@ public class PostReleaseActions implements Closeable {
 					.map(url -> run(key, url,
 							() -> commitUpdatedProject(projects, key,
 									projectVersionForReleaseTrain, postRelease, url)))
-					.map(this::getResult).collect(Collectors.toList());
+					.map(this::getSingleResult).collect(Collectors.toList());
 		});
 	}
 
@@ -201,7 +250,7 @@ public class PostReleaseActions implements Closeable {
 		return new ProjectAndFuture(key, url, SERVICE.submit(runnable));
 	}
 
-	private ProjectUrlAndException getResult(ProjectAndFuture projectAndFuture) {
+	private ProjectUrlAndException getSingleResult(ProjectAndFuture projectAndFuture) {
 		Exception e = null;
 		try {
 			projectAndFuture.future.get(10, TimeUnit.MINUTES);

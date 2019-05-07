@@ -200,11 +200,13 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	File cloneProject(String url) {
 		try {
 			URIish urIish = new URIish(url);
-			// retrieve from cache and fetch if from cache
+			// retrieve from cache
+			// reset any changes and fetch the latest data
 			File clonedProject = CACHE.get(urIish);
 			if (clonedProject != null) {
 				log.info(
-						"Project has already been cloned. Will fetch the latest changes and return the cached location");
+						"Project has already been cloned. Will reset the current branch and fetch the latest changes.");
+				gitRepo(clonedProject).reset();
 				gitRepo(clonedProject).fetch();
 				return clonedProject;
 			}

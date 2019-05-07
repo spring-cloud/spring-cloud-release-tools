@@ -40,6 +40,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
+import org.springframework.cloud.release.internal.pom.ProcessedProject;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -147,7 +148,7 @@ public class SpringReleaserTests {
 
 			@Override
 			Args postReleaseOptionsAgs(Options options,
-					ProjectsAndVersion projectsAndVersion) {
+					ProjectsAndVersion projectsAndVersion, List<ProcessedProject> processedProjects) {
 				return new Args(TaskType.RELEASE);
 			}
 

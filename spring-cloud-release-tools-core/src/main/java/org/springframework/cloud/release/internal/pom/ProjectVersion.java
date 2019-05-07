@@ -232,6 +232,17 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 				.compareTo(new TrainVersionNumber(thatValue));
 	}
 
+	/**
+	 * Returns the release tag name.
+	 * @return tag name or empty if non ga or sr.
+	 */
+	public String releaseTagName() {
+		if (isReleaseOrServiceRelease()) {
+			return "v" + this.version;
+		}
+		return "";
+	}
+
 	@Override
 	public String toString() {
 		return this.version;

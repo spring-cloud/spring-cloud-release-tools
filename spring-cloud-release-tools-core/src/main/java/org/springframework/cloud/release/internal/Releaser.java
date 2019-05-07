@@ -17,6 +17,7 @@
 package org.springframework.cloud.release.internal;
 
 import java.io.File;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.gradle.GradleUpdater;
+import org.springframework.cloud.release.internal.pom.ProcessedProject;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
@@ -103,9 +105,8 @@ public class Releaser {
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
 	}
 
-	public void buildProject(ProjectVersion versionFromScRelease,
-			ProjectBuilder.MavenProfile... profiles) {
-		this.projectBuilder.build(versionFromScRelease, profiles);
+	public void buildProject(ProjectVersion versionFromScRelease) {
+		this.projectBuilder.build(versionFromScRelease);
 		log.info("\nProject was successfully built");
 	}
 
@@ -214,18 +215,28 @@ public class Releaser {
 		}
 	}
 
-	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects) {
+	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects,
+			List<ProcessedProject> processedProjects) {
 		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
 			log.info(
 					"\nWon't update Spring Guides for a non Release / Service Release version");
 			return;
 		}
+		createIssueInSpringGuides(releaseVersion, projects);
 		try {
 			this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException(
-					"Successfully updated Spring Guides issues", ex);
+			throw new MakeBuildUnstableException("Failed to update Spring Guides", ex);
+		}
+	}
+
+	private void createIssueInSpringGuides(ProjectVersion releaseVersion, Projects projects) {
+		try {
+			this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
+		}
+		catch (Exception ex) {
+			throw new MakeBuildUnstableException("Failed to update Spring Guides", ex);
 		}
 	}
 

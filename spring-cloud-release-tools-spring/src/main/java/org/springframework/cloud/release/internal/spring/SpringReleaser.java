@@ -19,6 +19,8 @@ package org.springframework.cloud.release.internal.spring;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
+import org.springframework.cloud.release.internal.pom.ProcessedProject;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,6 +42,8 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 public class SpringReleaser {
+
+	private static final Map<File, ProjectsAndVersion> CACHE = new ConcurrentHashMap<>();
 
 	private static final Logger log = LoggerFactory.getLogger(SpringReleaser.class);
 
@@ -81,19 +86,30 @@ public class SpringReleaser {
 	}
 
 	public void release(Options options) {
-		ProjectsAndVersion projectsAndVersion = null;
 		if (options.metaRelease) {
 			prepareForMetaRelease(options);
 		}
 		if (this.properties.isPostReleaseTasksOnly()) {
 			log.info("Skipping release process and moving only to post release");
-			this.optionsProcessor.postReleaseOptions(options,
-					postReleaseOptionsAgs(options, projectsAndVersion));
+			this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(
+					options, null, postReleaseTaskOnlyProcessedProjects(options)));
 			buildCompleted();
 			return;
 		}
-		performReleaseAndPostRelease(options, projectsAndVersion);
+		performReleaseAndPostRelease(options, null);
 		buildCompleted();
+	}
+
+	private List<ProcessedProject> postReleaseTaskOnlyProcessedProjects(Options options) {
+		return metaReleaseProjects(options).stream().map(project -> {
+			File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
+			ReleaserProperties properties = updatePropertiesIfCustomConfigPresent(
+					this.properties.copy(), clonedProjectFromOrg);
+			log.info("Successfully cloned the project [{}] to [{}]", project,
+					clonedProjectFromOrg);
+			ProjectsAndVersion projects = projects(clonedProjectFromOrg);
+			return new ProcessedProject(properties, projects.versionFromBom);
+		}).collect(Collectors.toList());
 	}
 
 	private void buildCompleted() {
@@ -102,12 +118,14 @@ public class SpringReleaser {
 
 	private void performReleaseAndPostRelease(Options options,
 			ProjectsAndVersion projectsAndVersion) {
+		List<ProcessedProject> processedProjects = new ArrayList<>();
 		if (options.metaRelease) {
 			ReleaserProperties original = this.properties.copy();
 			log.debug("The following properties were found [{}]", original);
-			metaReleaseProjects(options)
-					.forEach(project -> processProjectForMetaRelease(original.copy(),
-							options, project));
+			processedProjects = metaReleaseProjects(options).stream()
+					.map(project -> processProjectForMetaRelease(original.copy(), options,
+							project))
+					.collect(Collectors.toList());
 		}
 		else {
 			log.info(
@@ -116,7 +134,7 @@ public class SpringReleaser {
 			projectsAndVersion = processProject(options, projectFolder, TaskType.RELEASE);
 		}
 		this.optionsProcessor.postReleaseOptions(options,
-				postReleaseOptionsAgs(options, projectsAndVersion));
+				postReleaseOptionsAgs(options, projectsAndVersion, processedProjects));
 	}
 
 	private void prepareForMetaRelease(Options options) {
@@ -126,21 +144,23 @@ public class SpringReleaser {
 		this.properties.getMetaRelease().setEnabled(options.metaRelease);
 	}
 
-	void processProjectForMetaRelease(ReleaserProperties copy, Options options,
-			String project) {
+	ProcessedProject processProjectForMetaRelease(ReleaserProperties copy,
+			Options options, String project) {
 		log.info("Original properties [\n\n{}\n\n]", copy);
 		File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
-		updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
+		copy = updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
 		log.info("Successfully cloned the project [{}] to [{}]", project,
 				clonedProjectFromOrg);
+		ProjectsAndVersion projectsAndVersion;
 		try {
-			processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
+			projectsAndVersion = processProject(options, clonedProjectFromOrg, TaskType.RELEASE);
 		}
 		catch (Exception e) {
 			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for project <"
 					+ project + "> \n\n", e);
 			throw e;
 		}
+		return new ProcessedProject(copy, projectsAndVersion.versionFromBom);
 	}
 
 	private ReleaserProperties updatePropertiesIfCustomConfigPresent(
@@ -196,7 +216,8 @@ public class SpringReleaser {
 		return new File(workingDir);
 	}
 
-	Args postReleaseOptionsAgs(Options options, ProjectsAndVersion projectsAndVersion) {
+	Args postReleaseOptionsAgs(Options options, ProjectsAndVersion projectsAndVersion,
+			List<ProcessedProject> processedProjects) {
 		Projects projects = projectsAndVersion == null
 				? projectsToUpdateForFixedVersions() : projectsAndVersion.projectVersions;
 		ProjectVersion version = projects.containsProject(
@@ -206,7 +227,7 @@ public class SpringReleaser {
 			this.properties.getPom().setBranch(version.version);
 		}
 		return new Args(this.releaser, projects, version, this.properties,
-				options.interactive, this.applicationEventPublisher);
+				processedProjects, options.interactive, this.applicationEventPublisher);
 	}
 
 	private ProjectVersion versionFromBranch() {
@@ -216,7 +237,12 @@ public class SpringReleaser {
 	}
 
 	private ProjectsAndVersion projects(File project) {
-		ProjectVersion versionFromScRelease;
+		ProjectsAndVersion projectsAndVersion = CACHE.get(project);
+		if (projectsAndVersion != null) {
+			log.info("Found cached version of projects and version [{}]", projectsAndVersion);
+			return projectsAndVersion;
+		}
+		ProjectVersion versionFromBom;
 		Projects projectsToUpdate;
 		log.info("Fetch from git [{}], meta release [{}]",
 				this.properties.getGit().isFetchVersionsFromGit(),
@@ -225,25 +251,27 @@ public class SpringReleaser {
 				&& !this.properties.getMetaRelease().isEnabled()) {
 			printVersionRetrieval();
 			projectsToUpdate = this.releaser.retrieveVersionsFromSCRelease();
-			versionFromScRelease = projectsToUpdate.forFile(project);
+			versionFromBom = projectsToUpdate.forFile(project);
 			assertNoSnapshotsForANonSnapshotProject(projectsToUpdate,
-					versionFromScRelease);
+					versionFromBom);
 		}
 		else {
 			ProjectVersion originalVersion = new ProjectVersion(project);
 			String fixedVersionForProject = this.properties.getFixedVersions()
 					.get(project.getName());
-			versionFromScRelease = StringUtils.hasText(fixedVersionForProject)
+			versionFromBom = StringUtils.hasText(fixedVersionForProject)
 					? new ProjectVersion(originalVersion.projectName,
 							fixedVersionForProject)
 					: new ProjectVersion(project);
 			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
 					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
 					.collect(Collectors.toCollection(Projects::new));
-			projectsToUpdate.add(versionFromScRelease);
+			projectsToUpdate.add(versionFromBom);
 			printSettingVersionFromFixedVersions(projectsToUpdate);
 		}
-		return new ProjectsAndVersion(projectsToUpdate, versionFromScRelease);
+		projectsAndVersion = new ProjectsAndVersion(projectsToUpdate, versionFromBom);
+		CACHE.put(project, projectsAndVersion);
+		return projectsAndVersion;
 	}
 
 	ProjectsAndVersion processProject(Options options, File project, TaskType taskType) {
@@ -251,7 +279,7 @@ public class SpringReleaser {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		final Args defaultArgs = new Args(this.releaser, project,
 				projectsAndVersion.projectVersions, originalVersion,
-				projectsAndVersion.versionFromScRelease, this.properties,
+				projectsAndVersion.versionFromBom, this.properties,
 				options.interactive, taskType, this.applicationEventPublisher);
 		log.debug("Processing project [{}] with args [{}]", project, defaultArgs);
 		this.optionsProcessor.processOptions(options, defaultArgs);
@@ -293,12 +321,12 @@ public class SpringReleaser {
 
 		final Projects projectVersions;
 
-		final ProjectVersion versionFromScRelease;
+		final ProjectVersion versionFromBom;
 
 		ProjectsAndVersion(Projects projectVersions,
-				ProjectVersion versionFromScRelease) {
+				ProjectVersion versionFromBom) {
 			this.projectVersions = projectVersions;
-			this.versionFromScRelease = versionFromScRelease;
+			this.versionFromBom = versionFromBom;
 		}
 
 	}

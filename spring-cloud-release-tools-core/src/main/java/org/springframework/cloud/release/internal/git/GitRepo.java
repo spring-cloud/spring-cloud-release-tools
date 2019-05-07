@@ -38,6 +38,7 @@ import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.EmtpyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -129,13 +130,27 @@ class GitRepo {
 	}
 
 	/**
-	 * Pull changes.
+	 * Fetch changes.
 	 */
 	void fetch() {
 		try {
 			log.info("Pull changes for repo [{}]", this.basedir);
 			fetch(this.basedir);
 			log.info("Successfully pulled the changes");
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
+	 * Reset changes.
+	 */
+	void reset() {
+		try {
+			log.info("Resetting changes for repo [{}]", this.basedir);
+			reset(this.basedir);
+			log.info("Successfully reset any changes");
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -301,6 +316,21 @@ class GitRepo {
 	private FetchResult fetch(File projectDir) throws GitAPIException {
 		Git git = this.gitFactory.open(projectDir);
 		FetchCommand command = git.fetch();
+		try {
+			return command.call();
+		}
+		catch (GitAPIException e) {
+			deleteBaseDirIfExists();
+			throw e;
+		}
+		finally {
+			git.close();
+		}
+	}
+
+	private Ref reset(File projectDir) throws GitAPIException {
+		Git git = this.gitFactory.open(projectDir);
+		ResetCommand command = git.reset().setMode(ResetCommand.ResetType.HARD);
 		try {
 			return command.call();
 		}

@@ -463,6 +463,16 @@ public class ProjectVersionTests {
 				unknownTypeOfVersion);
 	}
 
+	@Test
+	public void should_return_v100RELEASE_when_tag_name_is_requested() {
+		then(projectVersion("1.0.0.RELEASE").releaseTagName()).isEqualTo("v1.0.0.RELEASE");
+	}
+
+	@Test
+	public void should_return_empty_when_tag_name_is_non_ga() {
+		then(projectVersion("1.0.0.BUILD-SNAPSHOT").releaseTagName()).isEmpty();
+	}
+
 	private void thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(
 			List<Pattern> unknownTypeOfVersion) {
 		then(unknownTypeOfVersion).isNotEmpty();
