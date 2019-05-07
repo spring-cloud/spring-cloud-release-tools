@@ -41,11 +41,16 @@ public class ReleaserApplication implements CommandLineRunner {
 	Parser parser;
 
 	public static void main(String[] args) {
+		SpringApplication application = new SpringApplication(ReleaserApplication.class);
+		application.setWebApplicationType(WebApplicationType.NONE);
+		application.run(args);
+	}
+
+	@Override
+	public void run(String... strings) {
+		Options options = this.parser.parse(strings);
 		try {
-			SpringApplication application = new SpringApplication(
-					ReleaserApplication.class);
-			application.setWebApplicationType(WebApplicationType.NONE);
-			application.run(args);
+			this.releaser.release(options);
 		}
 		catch (MakeBuildUnstableException ex) {
 			log.error(
@@ -59,19 +64,6 @@ public class ReleaserApplication implements CommandLineRunner {
 		catch (Throwable th) {
 			log.error("Exception occurred for the releaser", th);
 			throw th;
-		}
-	}
-
-	@Override
-	public void run(String... strings) {
-		Options options = this.parser.parse(strings);
-		try {
-			this.releaser.release(options);
-		}
-		catch (Throwable e) {
-			log.error("Exception occurred for the releaser. Picked options were ["
-					+ options + "]");
-			throw e;
 		}
 		System.exit(0);
 	}
