@@ -21,6 +21,7 @@
 		<module>docs</module>
 		<module>spring-cloud-release-tools-core</module>
 		<module>spring-cloud-release-tools-spring</module>
+		<module>spring-cloud-info</module>
 	</modules>
 
 	<properties>

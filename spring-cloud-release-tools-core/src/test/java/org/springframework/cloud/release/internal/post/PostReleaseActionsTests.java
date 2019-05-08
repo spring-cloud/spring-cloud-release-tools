@@ -29,6 +29,7 @@ import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -311,6 +312,7 @@ public class PostReleaseActionsTests {
 	}
 
 	@Test
+	@Ignore
 	public void should_build_and_deploy_guides_when_switch_is_on() throws Exception {
 		this.properties.getGit().setUpdateSpringGuides(true);
 		String projects = this.temporaryFolder.getAbsolutePath();
