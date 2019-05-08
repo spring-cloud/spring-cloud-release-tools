@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.info;
 
+import java.util.stream.Collectors;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,8 +78,8 @@ public class SpringCloudInfoRestControllerTests {
 		doReturn(new SpringCloudVersion("Greenwich.RELEASE")).when(springCloudInfoService)
 				.getSpringCloudVersion(eq("2.1.1.RELEASE"));
 		this.mockMvc
-				.perform(get("/springcloudversion/{bootVersion}", "2.1.1.RELEASE")
-						.accept(MediaType.APPLICATION_JSON))
+				.perform(get("/springcloudversion/springboot/{bootVersion}",
+						"2.1.1.RELEASE").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andDo(document("springcloudversion",
 						pathParameters(parameterWithName("bootVersion")
@@ -88,8 +90,9 @@ public class SpringCloudInfoRestControllerTests {
 
 	@Test
 	public void versions() throws Exception {
-		doReturn(springCloudVersions).when(springCloudInfoService)
-				.getSpringCloudVersions();
+		doReturn(springCloudVersions.stream().map(v -> v.replaceFirst("v", ""))
+				.collect(Collectors.toList())).when(springCloudInfoService)
+						.getSpringCloudVersions();
 		this.mockMvc
 				.perform(get("/springcloudversions").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -117,7 +120,7 @@ public class SpringCloudInfoRestControllerTests {
 
 	@Test
 	public void milestoneDueDate() throws Exception {
-		doReturn(new SpringCloudInfoService.Milestone("2019-07-31T07:00:00Z"))
+		doReturn(new SpringCloudInfoService.Milestone("2019-07-31"))
 				.when(springCloudInfoService).getMilestoneDueDate(eq("Hoxton.RELEASE"));
 		this.mockMvc
 				.perform(get("/milestones/{release}/duedate", "Hoxton.RELEASE")

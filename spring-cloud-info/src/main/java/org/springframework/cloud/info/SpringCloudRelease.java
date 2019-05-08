@@ -17,6 +17,10 @@
 package org.springframework.cloud.info;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -90,7 +94,7 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 		reader.close();
 		List<JsonObject> tagsList = tags.getValuesAs(JsonObject.class);
 		for (JsonObject obj : tagsList) {
-			releaseVersions.add(obj.getString("name"));
+			releaseVersions.add(obj.getString("name").replaceFirst("v", ""));
 		}
 		return releaseVersions;
 	}
@@ -145,7 +149,10 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 					return new Milestone("No Due Date");
 				}
 				else {
-					return new Milestone(json.getString("due_on"));
+					Instant instant = Instant.parse(json.getString("due_on"));
+					return new Milestone(LocalDateTime
+							.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()))
+							.toLocalDate().toString());
 				}
 			}
 		}

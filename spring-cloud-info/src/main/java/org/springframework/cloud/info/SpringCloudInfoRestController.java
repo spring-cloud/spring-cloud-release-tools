@@ -41,7 +41,7 @@ public class SpringCloudInfoRestController {
 		this.versionService = versionService;
 	}
 
-	@GetMapping("/springcloudversion/{bootVersion}")
+	@GetMapping("/springcloudversion/springboot/{bootVersion}")
 	public SpringCloudVersion version(@PathVariable String bootVersion) {
 		try {
 			return versionService.getSpringCloudVersion(bootVersion);

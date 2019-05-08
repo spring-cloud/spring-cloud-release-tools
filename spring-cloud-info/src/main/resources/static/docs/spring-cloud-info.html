@@ -177,10 +177,10 @@ Host: spring-cloud-info.cfapps.io</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Content-Length: 479
+Content-Length: 449
 Content-Type: application/json;charset=UTF-8
 
-["vGreenwich.SR1","vGreenwich.RELEASE","vGreenwich.RC2","vGreenwich.RC1","vGreenwich.M3","vGreenwich.M2","vGreenwich.M1","vFinchley.SR3","vFinchley.SR2","vFinchley.SR1","vFinchley.RELEASE","vFinchley.RC2","vFinchley.RC1","vFinchley.M9","vFinchley.M8","vFinchley.M7","vFinchley.M6","vFinchley.M5","vFinchley.M3","vFinchley.M2","vFinchley.M1","vEdgware.SR5","vEdgware.SR4","vEdgware.SR3","vEdgware.SR2","vEdgware.SR1","vEdgware.RELEASE","vEdgware.M1","vDalston.SR5","vDalston.SR4"]</code></pre>
+["Greenwich.SR1","Greenwich.RELEASE","Greenwich.RC2","Greenwich.RC1","Greenwich.M3","Greenwich.M2","Greenwich.M1","Finchley.SR3","Finchley.SR2","Finchley.SR1","Finchley.RELEASE","Finchley.RC2","Finchley.RC1","Finchley.M9","Finchley.M8","Finchley.M7","Finchley.M6","Finchley.M5","Finchley.M3","Finchley.M2","Finchley.M1","Edgware.SR5","Edgware.SR4","Edgware.SR3","Edgware.SR2","Edgware.SR1","Edgware.RELEASE","Edgware.M1","Dalston.SR5","Dalston.SR4"]</code></pre>
 </div>
 </div>
 </div>
@@ -219,7 +219,7 @@ Content-Type: application/json;charset=UTF-8
 <div class="sect2">
 <h3 id="_path_parameters"><a class="link" href="#_path_parameters">Path Parameters</a></h3>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /springcloudversion/{bootVersion}</caption>
+<caption class="title">Table 1. /springcloudversion/springboot/{bootVersion}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -242,7 +242,7 @@ Content-Type: application/json;charset=UTF-8
 <h3 id="_curl_request_2"><a class="link" href="#_curl_request_2">cURL Request</a></h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://spring-cloud-info.cfapps.io/springcloudversion/2.1.1.RELEASE' -i -X GET \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://spring-cloud-info.cfapps.io/springcloudversion/springboot/2.1.1.RELEASE' -i -X GET \
     -H 'Accept: application/json'</code></pre>
 </div>
 </div>
@@ -251,7 +251,7 @@ Content-Type: application/json;charset=UTF-8
 <h3 id="_httpie_request_2"><a class="link" href="#_httpie_request_2">HTTPie Request</a></h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ http GET 'http://spring-cloud-info.cfapps.io/springcloudversion/2.1.1.RELEASE' \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ http GET 'http://spring-cloud-info.cfapps.io/springcloudversion/springboot/2.1.1.RELEASE' \
     'Accept:application/json'</code></pre>
 </div>
 </div>
@@ -260,7 +260,7 @@ Content-Type: application/json;charset=UTF-8
 <h3 id="_http_request_2"><a class="link" href="#_http_request_2">HTTP Request</a></h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /springcloudversion/2.1.1.RELEASE HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /springcloudversion/springboot/2.1.1.RELEASE HTTP/1.1
 Accept: application/json
 Host: spring-cloud-info.cfapps.io</code></pre>
 </div>
@@ -464,9 +464,9 @@ Host: spring-cloud-info.cfapps.io</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 34
+Content-Length: 24
 
-{"dueDate":"2019-07-31T07:00:00Z"}</code></pre>
+{"dueDate":"2019-07-31"}</code></pre>
 </div>
 </div>
 </div>

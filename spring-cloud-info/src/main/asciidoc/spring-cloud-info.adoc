@@ -1,1 +1,96 @@
-include::index.adoc[]
+# Rest API
+
+## Spring Cloud Versions
+
+Gets all the available Spring Cloud release trains.
+
+### cURL Request
+include::{snippets}/springcloudversions/curl-request.adoc[]
+
+### HTTPie Request
+include::{snippets}/springcloudversions/httpie-request.adoc[]
+
+### HTTP Request
+include::{snippets}/springcloudversions/http-request.adoc[]
+
+### Response
+include::{snippets}/springcloudversions/http-response.adoc[]
+
+### Response Fields
+include::{snippets}/springcloudversions/response-fields.adoc[]
+
+## Spring Cloud Version Given Spring Boot Version
+
+Gets the Spring Cloud release train version given a Spring Boot version.
+
+### Path Parameters
+include::{snippets}/springcloudversion/path-parameters.adoc[]
+
+### cURL Request
+include::{snippets}/springcloudversion/curl-request.adoc[]
+
+### HTTPie Request
+include::{snippets}/springcloudversion/httpie-request.adoc[]
+
+### HTTP Request
+include::{snippets}/springcloudversion/http-request.adoc[]
+
+### HTTP Response
+include::{snippets}/springcloudversion/http-response.adoc[]
+
+### Response Fields
+include::{snippets}/springcloudversion/response-fields.adoc[]
+
+## Spring Cloud Project Versions
+
+Get the Spring Cloud project versions for a given Spring Cloud release train.
+
+### cURL Request
+include::{snippets}/bomversions/curl-request.adoc[]
+
+### HTTPie Request
+include::{snippets}/bomversions/httpie-request.adoc[]
+
+### HTTP Request
+include::{snippets}/bomversions/http-request.adoc[]
+
+### HTTP Response
+include::{snippets}/bomversions/http-response.adoc[]
+
+## Upcoming Spring Cloud Releases
+
+Gets all the upcoming Spring Cloud releases.
+
+### cURL Request
+include::{snippets}/milestones/curl-request.adoc[]
+
+### HTTPie Request
+include::{snippets}/milestones/httpie-request.adoc[]
+
+### HTTP Request
+include::{snippets}/milestones/http-request.adoc[]
+
+### HTTP Response
+include::{snippets}/milestones/http-response.adoc[]
+
+## Get Spring Cloud Release Date
+
+Gets the tentative date given an upcoming Spring Cloud release train name.
+
+### Path Parameters
+include::{snippets}/milestoneduedate/path-parameters.adoc[]
+
+### cURL Request
+include::{snippets}/milestoneduedate/curl-request.adoc[]
+
+### HTTPie Request
+include::{snippets}/milestoneduedate/httpie-request.adoc[]
+
+### HTTP Request
+include::{snippets}/milestoneduedate/http-request.adoc[]
+
+### HTTP Response
+include::{snippets}/milestoneduedate/http-response.adoc[]
+
+### Response Fields
+include::{snippets}/milestoneduedate/response-fields.adoc[]

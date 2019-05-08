@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.json.Json;
 import javax.json.JsonBuilderFactory;
@@ -175,7 +176,8 @@ public class InitializrSpringCloudInfoServiceTests {
 		InitializrSpringCloudInfoService service = spy(
 				new InitializrSpringCloudInfoService(rest, github, githubPomReader));
 		assertThat(service.getSpringCloudVersions(),
-				Matchers.equalTo(SpringCloudInfoTestData.springCloudVersions));
+				Matchers.equalTo(SpringCloudInfoTestData.springCloudVersions.stream()
+						.map(v -> v.replaceFirst("v", "")).collect(Collectors.toList())));
 	}
 
 	@Test
@@ -195,8 +197,8 @@ public class InitializrSpringCloudInfoServiceTests {
 				new InitializrSpringCloudInfoService(rest, github, githubPomReader));
 		assertThat(service.getMilestoneDueDate("Finchley.SR4"),
 				Matchers.equalTo(new SpringCloudInfoService.Milestone("No Due Date")));
-		assertThat(service.getMilestoneDueDate("Hoxton.RELEASE"), Matchers
-				.equalTo(new SpringCloudInfoService.Milestone("2019-07-31T07:00:00Z")));
+		assertThat(service.getMilestoneDueDate("Hoxton.RELEASE"),
+				Matchers.equalTo(new SpringCloudInfoService.Milestone("2019-07-31")));
 	}
 
 	@Test
