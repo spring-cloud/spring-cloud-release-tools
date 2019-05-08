@@ -19,12 +19,11 @@ package org.springframework.cloud.release.internal.git;
 import java.io.IOException;
 import java.util.Collections;
 
-import javax.json.Json;
-
 import com.jcabi.github.Coordinates;
 import com.jcabi.github.Github;
 import com.jcabi.github.Issue;
 import com.jcabi.github.Repo;
+import com.jcabi.github.Repos;
 import com.jcabi.github.mock.MkGithub;
 import org.junit.Before;
 import org.junit.Rule;
@@ -123,8 +122,8 @@ public class GithubIssuesTests {
 	}
 
 	private Repo createGettingStartedGuides(MkGithub github) throws IOException {
-		return github.repos().create(
-				Json.createObjectBuilder().add("name", "getting-started-guides").build());
+		return github.repos()
+				.create(new Repos.RepoCreate("getting-started-guides", false));
 	}
 
 	private ProjectVersion nonGaSleuthProject() {

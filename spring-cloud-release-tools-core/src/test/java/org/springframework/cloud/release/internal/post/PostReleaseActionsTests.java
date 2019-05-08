@@ -26,10 +26,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
+import org.awaitility.Awaitility;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -312,7 +312,6 @@ public class PostReleaseActionsTests {
 	}
 
 	@Test
-	@Ignore
 	public void should_build_and_deploy_guides_when_switch_is_on() throws Exception {
 		this.properties.getGit().setUpdateSpringGuides(true);
 		String projects = this.temporaryFolder.getAbsolutePath();
@@ -336,8 +335,11 @@ public class PostReleaseActionsTests {
 		actions.deployGuides(Collections
 				.singletonList(new ProcessedProject(this.properties, projectVersion)));
 
-		BDDAssertions.then(projectBuilderStub.get()).isNotNull();
-		BDDMockito.then(projectBuilderStub.get()).should().deployGuides(projectVersion);
+		Awaitility.await().untilAsserted(() -> {
+			BDDAssertions.then(projectBuilderStub.get()).isNotNull();
+			BDDMockito.then(projectBuilderStub.get()).should()
+					.deployGuides(projectVersion);
+		});
 	}
 
 	private String sleuthParentPomVersion() {

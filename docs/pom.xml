@@ -37,6 +37,28 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-resources-plugin</artifactId>
+						<inherited>true</inherited>
+						<executions>
+							<execution>
+								<id>copy-resources-for-global-docs</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>
+										${project.build.directory}/generated-docs
+									</outputDirectory>
+									<resources>
+										<resource>
+											<directory>
+												${maven.multiModuleProjectDirectory}/spring-cloud-info/target/generated-docs
+											</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 					<plugin>
 						<groupId>org.asciidoctor</groupId>

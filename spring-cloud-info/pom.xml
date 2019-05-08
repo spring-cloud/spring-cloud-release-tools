@@ -13,16 +13,12 @@
 	<artifactId>spring-cloud-info</artifactId>
 
 	<properties>
-		<java.version>1.8</java.version>
 		<maven-core.version>3.6.1</maven-core.version>
-		<jcabi-github.version>1.0</jcabi-github.version>
 		<javax.json-api.version>1.0</javax.json-api.version>
 		<maven-model.version>3.6.1</maven-model.version>
 		<scs.version>2.1.2.RELEASE</scs.version>
-		<spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
-		<asciidoctor-maven-plugin.version>1.5.3</asciidoctor-maven-plugin.version>
+		<spring-cloud-bom.version>Greenwich.RELEASE</spring-cloud-bom.version>
 		<spring-rest-docs.version>2.0.3.RELEASE</spring-rest-docs.version>
-		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -87,7 +83,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
+				<version>${spring-cloud-bom.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -130,7 +126,7 @@
 				<version>${maven-resources-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>copy-resources</id>
+						<id>copy-resources-for-fatjar</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-resources</goal>

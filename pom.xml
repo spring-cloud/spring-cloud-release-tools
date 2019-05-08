@@ -18,14 +18,15 @@
 	</parent>
 
 	<modules>
-		<module>docs</module>
 		<module>spring-cloud-release-tools-core</module>
 		<module>spring-cloud-release-tools-spring</module>
 		<module>spring-cloud-info</module>
+		<module>docs</module>
 	</modules>
 
 	<properties>
 		<spring-cloud-bom.version>Hoxton.BUILD-SNAPSHOT</spring-cloud-bom.version>
+		<jcabi-github.version>1.0</jcabi-github.version>
 	</properties>
 
 	<dependencyManagement>

@@ -19,10 +19,9 @@ package org.springframework.cloud.release.internal.git;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.json.Json;
-
 import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
+import com.jcabi.github.Repos;
 import com.jcabi.github.mock.MkGithub;
 import org.junit.Before;
 import org.junit.Rule;
@@ -254,8 +253,7 @@ public class GithubMilestonesTests {
 	}
 
 	private Repo createSleuthRepo(MkGithub github) throws IOException {
-		return github.repos().create(
-				Json.createObjectBuilder().add("name", "spring-cloud-sleuth").build());
+		return github.repos().create(new Repos.RepoCreate("spring-cloud-sleuth", false));
 	}
 
 	@Test
