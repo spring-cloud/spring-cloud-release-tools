@@ -1,1 +1,0 @@
-releaser.maven.buildCommand: ./mvnw clean install -U -fae

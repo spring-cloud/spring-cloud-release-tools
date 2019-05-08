@@ -1,2 +1,0 @@
-0000000000000000000000000000000000000000 b05cdc5318cbc5c049a391fe67ac4a8cf763689d Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1486372922 +0100	fetch: storing head
-b05cdc5318cbc5c049a391fe67ac4a8cf763689d b566ab3bea0506bccaa10f83784a41673606d6ee Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1486379066 +0100	update by push

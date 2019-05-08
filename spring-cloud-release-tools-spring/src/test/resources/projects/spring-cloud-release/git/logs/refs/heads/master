@@ -1,4 +1,0 @@
-0000000000000000000000000000000000000000 3f8925dcec6d590f62429edea458812128c1c57f Marcin Grzejszczak <marcin@grzejszczak.pl> 1481127445 +0100	clone: from git@github.com:spring-cloud/spring-cloud-release.git
-3f8925dcec6d590f62429edea458812128c1c57f 821555cad8a6132fd045755733e6a0ec6d0957f3 Marcin Grzejszczak <marcin@grzejszczak.pl> 1481128769 +0100	commit: Bumping contract for Dalston
-821555cad8a6132fd045755733e6a0ec6d0957f3 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488809155 +0100	rebase finished: refs/heads/master onto 320597b84bb0312c15228c4d42f46c189b86ed90
-320597b84bb0312c15228c4d42f46c189b86ed90 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663275 +0100	rebase finished: refs/heads/master onto 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9

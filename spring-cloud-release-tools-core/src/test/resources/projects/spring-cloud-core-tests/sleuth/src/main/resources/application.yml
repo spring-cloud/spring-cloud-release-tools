@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: sleuthSample
-  sleuth:
-    log:
-      json:
-        enabled: true

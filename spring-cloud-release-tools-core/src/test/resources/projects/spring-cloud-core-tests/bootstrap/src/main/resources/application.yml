@@ -1,5 +1,0 @@
-server:
-  display-name: SAMPLE
-spring:
-  application:
-    name: client
