@@ -17,18 +17,35 @@
 package org.springframework.cloud.release.internal.versions;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 
 import org.assertj.core.api.BDDAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.pom.TestUtils;
+import org.springframework.util.FileSystemUtils;
 
 class VersionsFetcherTests {
+
+	File temporaryFolder;
+
+	@BeforeEach
+	void setup() throws IOException, URISyntaxException {
+		this.temporaryFolder = Files.createTempDirectory("versions-fetcher").toFile();
+		this.temporaryFolder.mkdirs();
+		File projects = new File(this.temporaryFolder, "projects");
+		projects.mkdirs();
+		TestUtils.prepareLocalRepo();
+		FileSystemUtils.copyRecursively(localFile("/projects"), projects);
+	}
 
 	@Test
 	void should_return_true_when_current_version_is_the_latest_ga()
@@ -40,7 +57,7 @@ class VersionsFetcherTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
-				file("/projects/spring-cloud-release/").toURI().toString());
+				file("/projects/spring-cloud-release/").toURI().toString() + "/");
 		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
@@ -59,7 +76,7 @@ class VersionsFetcherTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
-				file("/projects/spring-cloud-release/").toURI().toString());
+				file("/projects/spring-cloud-release/").toURI().toString() + "/");
 		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
@@ -119,8 +136,12 @@ class VersionsFetcherTests {
 		BDDAssertions.then(latestGa).isFalse();
 	}
 
-	private File file(String relativePath) throws URISyntaxException {
+	private File localFile(String relativePath) throws URISyntaxException {
 		return new File(VersionsFetcherTests.class.getResource(relativePath).toURI());
+	}
+
+	private File file(String relativePath) {
+		return new File(this.temporaryFolder, relativePath);
 	}
 
 }

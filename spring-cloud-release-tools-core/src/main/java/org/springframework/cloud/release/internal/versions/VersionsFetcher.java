@@ -104,7 +104,7 @@ public class VersionsFetcher implements ReleaserPropertiesAware {
 		}
 		catch (Exception ex) {
 			log.error(
-					"Failed to check the project versions. Will return that the proejct is not GA",
+					"Failed to check the project versions. Will return that the project is not GA",
 					ex);
 			return false;
 		}
