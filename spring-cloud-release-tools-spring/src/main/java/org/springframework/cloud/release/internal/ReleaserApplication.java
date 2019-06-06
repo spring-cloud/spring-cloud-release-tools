@@ -28,6 +28,7 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.Parser;
 import org.springframework.cloud.release.internal.spring.SpringReleaser;
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
+import org.springframework.core.NestedExceptionUtils;
 
 @SpringBootApplication
 public class ReleaserApplication implements CommandLineRunner {
@@ -53,19 +54,29 @@ public class ReleaserApplication implements CommandLineRunner {
 			this.releaser.release(options);
 		}
 		catch (MakeBuildUnstableException ex) {
-			log.error(
-					"[BUILD UNSTABLE] The following exceptions took place in the post release process",
-					ex);
-			log.error(
-					"[BUILD UNSTABLE] The release happened successfully, but there were post release issues");
-			log.error("[BUILD UNSTABLE] An exception that should make "
-					+ "the build unstable occurred. Will not throw an exception.");
+			handleUnstableException(ex);
 		}
 		catch (Throwable th) {
 			log.error("Exception occurred for the releaser", th);
-			throw th;
+			Throwable mostSpecificCause = NestedExceptionUtils.getMostSpecificCause(th);
+			if (mostSpecificCause instanceof MakeBuildUnstableException) {
+				handleUnstableException((MakeBuildUnstableException) mostSpecificCause);
+			}
+			else {
+				throw th;
+			}
 		}
 		System.exit(0);
+	}
+
+	private void handleUnstableException(MakeBuildUnstableException ex) {
+		log.error(
+				"[BUILD UNSTABLE] The following exceptions took place in the post release process",
+				ex);
+		log.error(
+				"[BUILD UNSTABLE] The release happened successfully, but there were post release issues");
+		log.error("[BUILD UNSTABLE] An exception that should make "
+				+ "the build unstable occurred. Will not throw an exception.");
 	}
 
 }
