@@ -26,6 +26,7 @@ import com.jakewharton.fliptables.FlipTableConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.util.StringUtils;
@@ -65,7 +66,7 @@ class TaskCollector implements ApplicationListener<ReleaserTask> {
 							.collect(Collectors.joining("\n\n"));
 			log.warn(string + brokenBuilds);
 			this.completedTasks.clear();
-			throw new IllegalStateException(brokenBuilds);
+			throw new MakeBuildUnstableException(brokenBuilds);
 		}
 		else {
 			log.info(string);
