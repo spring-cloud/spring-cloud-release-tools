@@ -743,7 +743,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Command to be executed to generate release train documentation.
 		 */
-		private String generateReleaseTrainDocsCommand = "bash release_train.sh "
+		private String generateReleaseTrainDocsCommand = "SPRING_CLOUD_RELEASE_REPO=\"https://github.com/spring-cloud/spring-cloud-release.git\" bash release_train.sh "
 				+ "--retrieveversions --version {{version}} --ghpages --auto";
 
 		/**
