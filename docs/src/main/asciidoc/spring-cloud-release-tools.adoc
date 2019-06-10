@@ -384,7 +384,7 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.wor
 
 === Performing a release via Jenkins
 
-NOTE: Whenever a release process is broken, Jenkins will mark it with a red ball and break the build. Whenever a post-release action went wrong, but the release is successful, Jenkins will mark the build wuth a yellow ball and mark the build as unstable.
+NOTE: Whenever a release process is broken, Jenkins will mark it with a red ball and break the build. Whenever a post-release action went wrong, but the release is successful, Jenkins will mark the build with a yellow ball and mark the build as unstable.
 
 ==== Releasing a single project
 
