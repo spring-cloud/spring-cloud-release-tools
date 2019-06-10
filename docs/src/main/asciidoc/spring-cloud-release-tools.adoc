@@ -489,7 +489,7 @@ image::{github-raw}/docs/src/main/asciidoc/images/springCloudMetaRelease.png[Spr
 
 Next, click `Build with parameters`.
 
-image::{github-raw}/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Updated `RELEASER_POM_BRANCH`]
+image::{github-raw}/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Spring Cloud Meta Releaser view]
 
 You have quite a few options to pick, but the most important one is to set the value of the `RELEASE_VERSION` to the given release train version (e.g. `Greenwich.SR2`). Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.
 
