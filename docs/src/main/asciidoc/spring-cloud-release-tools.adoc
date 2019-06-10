@@ -382,21 +382,21 @@ $ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/
 $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root
 ----
 
-=== Performing a release via Jenkins
+=== Releasing through Jenkins
 
-NOTE: Whenever a release process is broken, Jenkins will mark it with a red ball and break the build. Whenever a post-release action went wrong, but the release is successful, Jenkins will mark the build with a yellow ball and mark the build as unstable.
+NOTE: Whenever a release process is broken, Jenkins marks it with a red ball and breaks the build. Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow ball and marks the build as unstable.
 
-==== Releasing a single project
+==== Releasing a Single Project
 
 Let us assume that we are to release `spring-cloud-build` project. We need to do the following steps:
 
-- create a branch (e.g. `springCloudBuildRelease`) in a BOM containing project e.g. https://github.com/spring-cloud/spring-cloud-release/[spring-cloud-release]
+. Create a branch (for example, `springCloudBuildRelease`) in a project that contains a BOM (for example, https://github.com/spring-cloud/spring-cloud-release/[spring-cloud-release]). The following example shows how to do so:
 ```bash
 $ git clone git@github.com:spring-cloud/spring-cloud-release.git
 $ cd spring-cloud-release
 $ git checkout -b springCloudBuildRelease
 ```
-- update *all* versions as if you were doing a release train. We need to update the project's versions, Boot version and dependencies versions too. Let us assume that we will eventually be doing a release train `Hoxton.M1` release, Spring Boot to latest available one and `spring-cloud-commons` to `1.2.3.BUILD-SNAPSHOT`
+. Update *all* versions as if you were doing a release train. We need to update the project's versions, Boot version, and dependencies versions, too. Let us assume that we will eventually be doing a release train for the `Hoxton.M1` release, Spring Boot to the latest available one, and `spring-cloud-commons` to `1.2.3.BUILD-SNAPSHOT`. The following example shows how to do so:
 ```bash
 // setting the release train value
 $ ./mvnw versions:set -DnewVersion=Hoxton.M1 -DgenerateBackupPoms=false -DprocessAllModules=true
@@ -405,31 +405,31 @@ $ ./mvnw versions:update-parent -DgenerateBackupPoms=false -DprocessAllModules=t
 // Setting the necessary dependencies
 $ ./mvnw versions:set-property -Dproperty=spring-cloud-commons.version -DnewVersion=1.2.3.BUILD-SNAPSHOT -pl spring-cloud-dependencies -DgenerateBackupPoms=false
 // NOTE!!!
-// Verify if the versions set by Maven are correct!!
+// Verify that the versions set by Maven are correct!!
 $ git diff
 // commit and push the branch
 $ git add . && git commit -m "Updating project for Spring Cloud Build release" && git push origin springCloudBuildRelease
 ```
 
-Since the project is prepared, go to Jenkins to the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view].
+Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], which the following image shows:
 
 image::{github-raw}/docs/src/main/asciidoc/images/releasers.png[Releaser view]
 
- Pick the proper releaser project (e.g. `spring-cloud-build-releaser`.
+. Pick the proper releaser project (for example, `spring-cloud-build-releaser`). The following image shows the settings for this example:
 
 image::{github-raw}/docs/src/main/asciidoc/images/scBuildReleaser.png[Spring Cloud Build Releaser - build with parameters]
 
-Next, click `Build with parameters`.
+. Next, click `Build with parameters`. The following image shows the UI for doing so:
 
 image::{github-raw}/docs/src/main/asciidoc/images/runningScBuildReleaser.png[Updated `RELEASER_POM_BRANCH`]
 
-Pick from which branch you would like the project (e.g. `spring-cloud-build` to be built - defaults to `master`) and update the `RELEASER_POM_BRANCH` to point to the checked out branch of Spring Cloud Release (e.g. `springCloudBuildRelease`). You can pick if you only want to perform post-release tasks or the whole release.
+Pick from which branch you would like the project (for example, `spring-cloud-build` - defaults to `master`) to be built and update the `RELEASER_POM_BRANCH` to point to the checked-out branch of Spring Cloud Release (for example, `springCloudBuildRelease`). You can pick whether you want to perform only post-release tasks or the whole release.
 
-Finally, click `Build`.
+. Finally, click `Build`.
 
-You're done!
+You are done!
 
-As a post action, don't forget to remove the branch.
+As a post action, do not forget to remove the branch. The following example shows how to do so:
 
 ```bash
 // to synchronize any deleted branches (don't run this if you want leave any deleted branches that were deleted in the origin)
@@ -438,21 +438,21 @@ $ git branch -d springCloudBuildRelease
 $ git push origin --delete springCloudBuildRelease
 ```
 
-==== Releasing a release train
+==== Releasing a Release Train
 
 We call a release train a `meta-release`. In order to perform one, you need to:
 
-- in your BOM containing project (e.g. `spring-cloud-release` you have to have a branch, where you store properties with versions of your projects. E.g. the branch name can be https://github.com/spring-cloud/spring-cloud-release/tree/jenkins-releaser-config[jenkins-releaser-config]).
+. In your project (which must contain a BOM, such as `spring-cloud-release`) you have to have a branch, where you store properties with versions of your projects. For example, the branch name can be https://github.com/spring-cloud/spring-cloud-release/tree/jenkins-releaser-config[jenkins-releaser-config]). The folloiwng example shows how to do so:
 ```bash
 $ git clone git@github.com:spring-cloud/spring-cloud-release.git
 $ cd spring-cloud-release
 $ git checkout jenkins-releaser-config
 ```
-- create a file that will contain all properties for a given release train. The name of the release train should be lowercase and dots should be converted to underscores. E.g. for the `Greenwich.SR2` release train we need to have `greenwich_sr2.properties` file.
+. Create a file that contains all properties for a given release train. The name of the release train should be lowercase, and dots should be converted to underscores. For example, for the `Greenwich.SR2` release train we need to have a file named  `greenwich_sr2.properties`. The following example shows how to do so:
 ```bash
 $ touch greenwich_sr2.properties
 ```
-- We need to update the file with all versions for the release train. The properties file contains an *ordered* list of `releaser.fixed-versions[project-name]=project-version` entries.
+. We need to update the file with all versions for the release train. The properties file contains an *ordered* list of `releaser.fixed-versions[project-name]=project-version` entries, as the following listing shows:
 ```bash
 $ echo "releaser.fixed-versions[spring-boot]=2.1.5.RELEASE
 releaser.fixed-versions[spring-cloud-build]=2.1.5.RELEASE
@@ -479,29 +479,29 @@ releaser.fixed-versions[spring-cloud-release]=Greenwich.SR2" >> greenwich_sr2.pr
 $ git add greenwich_sr2.properties && git commit -m "Added Greenwich.SR2 properties" && git push origin jenkins-releaser-config
 ```
 
-Since the project is prepared, go to Jenkins to the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view].
+Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], as the following image shows:
 
 image::{github-raw}/docs/src/main/asciidoc/images/releasersForMetaRelease.png[Releaser view]
 
- Pick the proper meta-releaser project (e.g. `spring-cloud-meta-releaser`.
+. Pick the proper meta-releaser project (for example, `spring-cloud-meta-releaser`), as the following image shows:
 
 image::{github-raw}/docs/src/main/asciidoc/images/springCloudMetaRelease.png[Spring Cloud Meta Releaser - build with parameters]
 
-Next, click `Build with parameters`.
+. Next, click `Build with parameters`.
 
 image::{github-raw}/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Spring Cloud Meta Releaser view]
 
-You have quite a few options to pick, but the most important one is to set the value of the `RELEASE_VERSION` to the given release train version (e.g. `Greenwich.SR2`). Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.
+You have quite a few options to pick, but the most important one is to set the value of the `RELEASE_VERSION` to the given release train version (for example, `Greenwich.SR2`). Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.
 
-Finally, click `Build`.
+. Finally, click `Build`.
 
-You're done!
+You are done!
 
 === FAQ
 
 ==== JSchException: Auth fail
 
-I got such an exception
+You may get an exception similar to the following:
 
 [source]
 ----
@@ -520,7 +520,7 @@ Caused by: com.jcraft.jsch.JSchException: Auth fail
 	... 31 common frames omitted
 ----
 
-To fix that just call
+To fix that just call, run the following commands before running the app:
 
 [source,bash]
 ----
@@ -529,5 +529,3 @@ $ eval `ssh-agent`
 # to store the pass in the agent
 $ ssh-add ~/.ssh/id_rsa
 ----
-
-before running the app
