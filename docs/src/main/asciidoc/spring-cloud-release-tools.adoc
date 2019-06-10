@@ -429,6 +429,15 @@ Finally, click `Build`.
 
 You're done!
 
+As a post action, don't forget to remove the branch.
+
+```bash
+// to synchronize any deleted branches (don't run this if you want leave any deleted branches that were deleted in the origin)
+$ git fetch -p
+$ git branch -d springCloudBuildRelease
+$ git push origin --delete springCloudBuildRelease
+```
+
 ==== Releasing a release train
 
 We call a release train a `meta-release`. In order to perform one, you need to:
