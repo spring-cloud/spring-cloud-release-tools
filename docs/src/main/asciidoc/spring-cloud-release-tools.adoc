@@ -410,6 +410,7 @@ $ git diff
 // commit and push the branch
 $ git add . && git commit -m "Updating project for Spring Cloud Build release" && git push origin springCloudBuildRelease
 ```
+IMPORTANT: If you're doing a e.g. `M1` release, remember to not have any snapshot versions in this branch.
 
 Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], which the following image shows:
 
