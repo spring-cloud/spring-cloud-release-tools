@@ -49,13 +49,12 @@ class GithubIssues {
 	private final ReleaserProperties properties;
 
 	GithubIssues(ReleaserProperties properties) {
-		this.github = new RtGithub(new RtGithub(properties.getGit().getOauthToken())
-				.entry().through(RetryWire.class));
-		this.properties = properties;
+		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry()
+				.through(RetryWire.class)), properties);
 	}
 
 	GithubIssues(Github github, ReleaserProperties properties) {
-		this.github = github;
+		this.github = new CachingGithub(github);
 		this.properties = properties;
 	}
 

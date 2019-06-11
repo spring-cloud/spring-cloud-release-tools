@@ -24,7 +24,11 @@ import java.util.Map;
 /**
  * @author Ryan Baxter
  */
-public class SpringCloudInfoTestData {
+public final class SpringCloudInfoTestData {
+
+	private SpringCloudInfoTestData() {
+		throw new IllegalStateException("Can't instantiate utility class");
+	}
 
 	public static Map<String, String> releaseVersions = new HashMap<>();
 	static {

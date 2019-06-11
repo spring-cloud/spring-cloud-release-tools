@@ -51,13 +51,12 @@ class GithubMilestones {
 	private final ReleaserProperties properties;
 
 	GithubMilestones(ReleaserProperties properties) {
-		this.github = new RtGithub(new RtGithub(properties.getGit().getOauthToken())
-				.entry().through(RetryWire.class));
-		this.properties = properties;
+		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry()
+				.through(RetryWire.class)), properties);
 	}
 
 	GithubMilestones(Github github, ReleaserProperties properties) {
-		this.github = github;
+		this.github = new CachingGithub(github);
 		this.properties = properties;
 	}
 
