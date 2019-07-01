@@ -718,7 +718,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Command to be executed to build the project.
 		 */
-		private String buildCommand = "./mvnw clean install -B -Pdocs {{systemProps}}";
+		private String buildCommand = "./mvnw clean install -X -B -Pdocs {{systemProps}}";
 
 		/**
 		 * Command to be executed to deploy a built project.
