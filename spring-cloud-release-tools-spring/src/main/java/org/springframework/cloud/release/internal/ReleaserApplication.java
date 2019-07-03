@@ -16,6 +16,10 @@
 
 package org.springframework.cloud.release.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +81,16 @@ public class ReleaserApplication implements CommandLineRunner {
 				"[BUILD UNSTABLE] The release happened successfully, but there were post release issues");
 		log.error("[BUILD UNSTABLE] An exception that should make "
 				+ "the build unstable occurred. Will not throw an exception.");
+		File buildUnstable = new File("build_unstable");
+		try {
+			buildUnstable.createNewFile();
+			String text = "[BUILD UNSTABLE] The release happened successfully, but there were post release issues";
+			Files.write(buildUnstable.toPath(), text.getBytes());
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(
+					"[BUILD UNSTABLE] Couldn't create a file to show that the build is unstable");
+		}
 	}
 
 }
