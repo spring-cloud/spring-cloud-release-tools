@@ -70,6 +70,7 @@ public class ReleaserApplication implements CommandLineRunner {
 				throw th;
 			}
 		}
+		handleStableBuild();
 		System.exit(0);
 	}
 
@@ -81,15 +82,31 @@ public class ReleaserApplication implements CommandLineRunner {
 				"[BUILD UNSTABLE] The release happened successfully, but there were post release issues");
 		log.error("[BUILD UNSTABLE] An exception that should make "
 				+ "the build unstable occurred. Will not throw an exception.");
-		File buildUnstable = new File("build_unstable");
+		File buildStatus = new File("build_status");
 		try {
-			buildUnstable.createNewFile();
+			buildStatus.createNewFile();
 			String text = "[BUILD UNSTABLE] The release happened successfully, but there were post release issues";
-			Files.write(buildUnstable.toPath(), text.getBytes());
+			Files.write(buildStatus.toPath(), text.getBytes());
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(
 					"[BUILD UNSTABLE] Couldn't create a file to show that the build is unstable");
+		}
+	}
+
+	private void handleStableBuild() {
+		File buildStatus = new File("build_status");
+		if (buildStatus.exists()) {
+			log.info("Build status file has already been created!");
+			return;
+		}
+		try {
+			buildStatus.createNewFile();
+			String text = "[BUILD STABLE] All the release steps have been successfully executed!";
+			Files.write(buildStatus.toPath(), text.getBytes());
+		}
+		catch (IOException e) {
+			log.info("Failed to store the file but the build was stable");
 		}
 	}
 
