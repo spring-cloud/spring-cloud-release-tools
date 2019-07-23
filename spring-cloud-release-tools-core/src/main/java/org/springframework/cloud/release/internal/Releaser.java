@@ -314,6 +314,7 @@ public class Releaser {
 				releaseBranch);
 	}
 
+	@Deprecated
 	public void updateSpringProjectPage(Projects projects) {
 		if (this.documentationUpdater.updateProjectRepo(projects) != null) {
 			log.info("\nSuccessfully updated Spring project page");

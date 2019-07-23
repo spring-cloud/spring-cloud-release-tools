@@ -72,7 +72,9 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 	 * @param projects projects to update project repo for
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used or the switch is turned off
+	 * @deprecated - index.html doesn't look like this anymore
 	 */
+	@Deprecated
 	File updateProjectRepo(Projects projects) {
 		if (!this.properties.getGit().isUpdateSpringProject()) {
 			log.info("Will not update the Spring Project cause "

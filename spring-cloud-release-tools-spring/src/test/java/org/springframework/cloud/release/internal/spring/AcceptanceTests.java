@@ -252,18 +252,14 @@ public class AcceptanceTests {
 
 		releaser.release(new OptionsBuilder().metaRelease(true).options());
 
-		// consul, release, documentation, spring-cloud
-		then(this.nonAssertingGitHandler.clonedProjects).hasSize(4);
+		// consul, release, documentation
+		then(this.nonAssertingGitHandler.clonedProjects).hasSize(3);
 		// don't want to verify the docs
 		thenAllStepsWereExecutedForEachProject();
 		thenSaganWasCalled();
 		thenDocumentationWasUpdated();
 		BDDAssertions.then(clonedProject("spring-cloud-consul").tagList().call())
 				.extracting("name").contains("refs/tags/v1.3.5.RELEASE");
-		BDDAssertions
-				.then(gitProject(this.cloudProjectFolder).log().call().iterator().next()
-						.getShortMessage())
-				.contains("Updating project page to release train [Edgware.SR10]");
 		thenRunUpdatedTestsWereCalled();
 		thenUpdateReleaseTrainDocsWasCalled();
 	}
@@ -349,7 +345,7 @@ public class AcceptanceTests {
 
 		releaser.release(new OptionsBuilder().metaRelease(true).options());
 
-		then(temporaryDestination.list()).containsOnly("spring-cloud");
+		then(temporaryDestination.list()).isEmpty();
 	}
 
 	@Test
@@ -365,8 +361,8 @@ public class AcceptanceTests {
 		releaser.release(new OptionsBuilder().metaRelease(true)
 				.startFrom("spring-cloud-consul").options());
 
-		// consul, cloud
-		then(this.nonAssertingGitHandler.clonedProjects).hasSize(2);
+		// consul
+		then(this.nonAssertingGitHandler.clonedProjects).hasSize(1);
 		this.nonAssertingGitHandler.clonedProjects.stream()
 				.filter(file -> file.getName().equals("spring-cloud-consul"))
 				.forEach(project -> {
@@ -392,8 +388,8 @@ public class AcceptanceTests {
 		releaser.release(new OptionsBuilder().metaRelease(true)
 				.taskNames(Collections.singletonList("spring-cloud-consul")).options());
 
-		// consul, cloud
-		then(this.nonAssertingGitHandler.clonedProjects).hasSize(2);
+		// consul
+		then(this.nonAssertingGitHandler.clonedProjects).hasSize(1);
 		this.nonAssertingGitHandler.clonedProjects.stream()
 				.filter(file -> !file.getName().equals("spring-cloud"))
 				.forEach(project -> {

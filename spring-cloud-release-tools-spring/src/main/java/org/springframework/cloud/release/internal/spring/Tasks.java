@@ -80,6 +80,8 @@ final class Tasks {
 				args.releaser.updateDocumentationRepository(args.properties,
 						args.versionFromScRelease);
 			}, TaskType.POST_RELEASE);
+
+	@Deprecated
 	static Task UPDATE_SPRING_PROJECT_PAGE = task("updateSpringProjectPage", "up",
 			"UPDATE SPRING PROJECT PAGE", "Updating Spring Project page", args -> {
 				args.releaser.updateSpringProjectPage(args.projects);
@@ -112,8 +114,7 @@ final class Tasks {
 	static final List<Task> DEFAULT_TASKS_PER_RELEASE = Stream
 			.of(Tasks.RUN_UPDATED_SAMPLES, Tasks.CREATE_TEMPLATES, Tasks.UPDATE_GUIDES,
 					Tasks.UPDATE_RELEASE_TRAIN_DOCUMENTATION, Tasks.UPDATE_DOCUMENTATION,
-					Tasks.UPDATE_SPRING_PROJECT_PAGE, Tasks.UPDATE_RELEASE_TRAIN_WIKI,
-					Tasks.UPDATE_ALL_SAMPLES)
+					Tasks.UPDATE_RELEASE_TRAIN_WIKI, Tasks.UPDATE_ALL_SAMPLES)
 			.collect(Collectors.toList());
 
 	static final List<Task> NON_COMPOSITE_TASKS = new ArrayList<Task>() {

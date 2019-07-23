@@ -72,7 +72,9 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	 * @param projects list of projects to update versions for
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used or the switch is turned off
+	 * @deprecated - index.html doesn't look like this anymore
 	 */
+	@Deprecated
 	public File updateProjectRepo(Projects projects) {
 		return this.releaseTrainContentsUpdater.updateProjectRepo(projects);
 	}
