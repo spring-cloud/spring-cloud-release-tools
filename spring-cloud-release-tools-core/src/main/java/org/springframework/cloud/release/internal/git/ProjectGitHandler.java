@@ -17,7 +17,6 @@
 package org.springframework.cloud.release.internal.git;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +29,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.pom.ProjectVersion;
 import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.tech.TemporaryFileStorage;
 import org.springframework.util.StringUtils;
 
 /**
@@ -61,6 +61,11 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		this.properties = properties;
 		this.githubMilestones = new GithubMilestones(properties);
 		this.githubIssues = new GithubIssues(properties);
+		registerShutdownHook();
+	}
+
+	private void registerShutdownHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread(TemporaryFileStorage::cleanup));
 	}
 
 	public void commitAndTagIfApplicable(File project, ProjectVersion version) {
@@ -213,7 +218,7 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 			File destinationDir = this.properties.getGit()
 					.getCloneDestinationDir() != null
 							? new File(this.properties.getGit().getCloneDestinationDir())
-							: Files.createTempDirectory("releaser").toFile();
+							: TemporaryFileStorage.createTempDir("releaser");
 			File clonedLocation = gitRepo(destinationDir).cloneProject(urIish);
 			CACHE.put(urIish, clonedLocation);
 			return clonedLocation;
