@@ -87,9 +87,9 @@ class GithubIssues {
 				"You have to pass Github OAuth token for milestone closing to be operational");
 		// do this only for RELEASE & SR
 		String releaseVersion = parsedVersion();
-		if (!(version.isRelease() || version.isServiceRelease())) {
+		if (version.isSnapshot()) {
 			log.info(
-					"Github issue creation will occur only for Release or Service Release versions. Your version is [{}]",
+					"Github issue creation will occur only for non snapshot versions. Your version is [{}]",
 					releaseVersion);
 			return;
 		}
