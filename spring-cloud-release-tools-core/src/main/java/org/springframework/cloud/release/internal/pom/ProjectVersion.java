@@ -36,11 +36,11 @@ import org.springframework.util.StringUtils;
 public class ProjectVersion implements Comparable<ProjectVersion> {
 
 	private static final Pattern SNAPSHOT_PATTERN = Pattern
-			.compile("^.*\\.(BUILD-)?SNAPSHOT.*$");
+			.compile("^.*[\\.|\\-](BUILD-)?SNAPSHOT.*$");
 
-	private static final String MILESTONE_REGEX = ".*\\.M[0-9]+";
+	private static final String MILESTONE_REGEX = ".*[\\.|\\-]M[0-9]+";
 
-	private static final String RC_REGEX = "^.*\\.RC.*$";
+	private static final String RC_REGEX = "^.*[\\.|\\-]RC.*$";
 
 	/**
 	 * Name of the project.

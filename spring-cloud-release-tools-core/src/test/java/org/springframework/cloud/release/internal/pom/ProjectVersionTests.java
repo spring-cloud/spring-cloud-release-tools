@@ -442,6 +442,16 @@ public class ProjectVersionTests {
 				.unacceptableVersionPatterns();
 		then(rcPatterns).isNotEmpty();
 		then(rcPatterns.get(0).pattern()).contains("SNAPSHOT");
+
+		List<Pattern> milestonePatternsWithASlash = projectVersion("1.0.0-M1")
+				.unacceptableVersionPatterns();
+		then(milestonePatterns).isNotEmpty();
+		then(milestonePatterns.get(0).pattern()).contains("SNAPSHOT");
+
+		List<Pattern> rcPatternsWithASlash = projectVersion("1.0.0-RC1")
+				.unacceptableVersionPatterns();
+		then(rcPatterns).isNotEmpty();
+		then(rcPatterns.get(0).pattern()).contains("SNAPSHOT");
 	}
 
 	@Test
@@ -453,7 +463,14 @@ public class ProjectVersionTests {
 		gaPatterns = projectVersion("1.0.0").unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(gaPatterns);
 
+		gaPatterns = projectVersion("1.0.0-RELEASE").unacceptableVersionPatterns();
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(gaPatterns);
+
 		List<Pattern> srPatterns = projectVersion("1.0.0.SR1")
+				.unacceptableVersionPatterns();
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatterns);
+
+		List<Pattern> srPatternsWithASlash = projectVersion("1.0.0-SR1")
 				.unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatterns);
 
@@ -480,6 +497,17 @@ public class ProjectVersionTests {
 		then(unknownTypeOfVersion.get(0).pattern()).contains("SNAPSHOT");
 		then(unknownTypeOfVersion.get(1).pattern()).contains("M[0-9]");
 		then(unknownTypeOfVersion.get(2).pattern()).contains("RC");
+
+		then(unknownTypeOfVersion.get(0).matcher("SomeName-BUILD-SNAPSHOT").matches())
+				.isTrue();
+		then(unknownTypeOfVersion.get(0).matcher("SomeName.BUILD-SNAPSHOT").matches())
+				.isTrue();
+
+		then(unknownTypeOfVersion.get(1).matcher("SomeName-M3").matches()).isTrue();
+		then(unknownTypeOfVersion.get(1).matcher("SomeName.M3").matches()).isTrue();
+
+		then(unknownTypeOfVersion.get(2).matcher("SomeName-RC3").matches()).isTrue();
+		then(unknownTypeOfVersion.get(2).matcher("SomeName.RC3").matches()).isTrue();
 	}
 
 	private ProjectVersion projectVersion(String version) {
