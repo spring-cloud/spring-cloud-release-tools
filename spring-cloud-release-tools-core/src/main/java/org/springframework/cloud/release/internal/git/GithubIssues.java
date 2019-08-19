@@ -42,7 +42,7 @@ class GithubIssues {
 
 	private static final Logger log = LoggerFactory.getLogger(GithubIssues.class);
 
-	private static final String GITHUB_ISSUE_TITLE = "Spring Cloud Release took place";
+	private static final String GITHUB_ISSUE_TITLE = "release of the [%s] release train took place";
 
 	private final Github github;
 
@@ -99,8 +99,9 @@ class GithubIssues {
 	private void fileAGithubIssue(String user, String repo, Projects projects,
 			String releaseVersion) {
 		Repo ghRepo = this.github.repos().get(new Coordinates.Simple(user, repo));
-		String issueTitle = StringUtils.capitalize(releaseVersion) + " "
-				+ GITHUB_ISSUE_TITLE;
+		String issueTitle = "[" + StringUtils.capitalize(releaseVersion) + "] "
+				+ String.format(GITHUB_ISSUE_TITLE,
+						this.properties.getMetaRelease().getReleaseTrainProjectName());
 		// check if the issue is not already there
 		boolean issueAlreadyFiled = issueAlreadyFiled(ghRepo, issueTitle);
 		if (issueAlreadyFiled) {
@@ -128,9 +129,10 @@ class GithubIssues {
 	}
 
 	private String issueText(Projects projects) {
-		StringBuilder builder = new StringBuilder().append("Spring Cloud [")
-				.append(parsedVersion()).append("] Released with the following projects:")
-				.append("\n\n");
+		StringBuilder builder = new StringBuilder().append("Release train [")
+				.append(this.properties.getMetaRelease().getReleaseTrainProjectName())
+				.append("] in version [").append(parsedVersion())
+				.append("] released with the following projects:").append("\n\n");
 		projects.forEach(project -> builder.append(project.projectName).append(" : ")
 				.append("`").append(project.version).append("`").append("\n"));
 		return builder.toString();

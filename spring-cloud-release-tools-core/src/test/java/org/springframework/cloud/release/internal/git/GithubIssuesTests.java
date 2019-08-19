@@ -114,9 +114,10 @@ public class GithubIssuesTests {
 				.issues().get(1);
 		then(issue.exists()).isTrue();
 		Issue.Smart smartIssue = new Issue.Smart(issue);
-		then(smartIssue.title())
-				.isEqualTo("Edgware.RELEASE Spring Cloud Release took place");
-		then(smartIssue.body()).contains("Spring Cloud [Edgware.RELEASE]")
+		then(smartIssue.title()).isEqualTo(
+				"[Edgware.RELEASE] release of the [spring-cloud-release] release train took place");
+		then(smartIssue.body()).contains(
+				"Release train [spring-cloud-release] in version [Edgware.RELEASE] released with the following projects")
 				.contains("foo : `1.0.0.RELEASE`").contains("bar : `2.0.0.RELEASE`")
 				.contains("baz : `3.0.0.RELEASE`");
 	}
@@ -182,9 +183,10 @@ public class GithubIssuesTests {
 				.get(1);
 		then(issue.exists()).isTrue();
 		Issue.Smart smartIssue = new Issue.Smart(issue);
-		then(smartIssue.title())
-				.isEqualTo("Edgware.RELEASE Spring Cloud Release took place");
-		then(smartIssue.body()).contains("Spring Cloud [Edgware.RELEASE]")
+		then(smartIssue.title()).isEqualTo(
+				"[Edgware.RELEASE] release of the [spring-cloud-release] release train took place");
+		then(smartIssue.body()).contains(
+				"Release train [spring-cloud-release] in version [Edgware.RELEASE] released with the following projects")
 				.contains("foo : `1.0.0.RELEASE`").contains("bar : `2.0.0.RELEASE`")
 				.contains("baz : `3.0.0.RELEASE`");
 	}
