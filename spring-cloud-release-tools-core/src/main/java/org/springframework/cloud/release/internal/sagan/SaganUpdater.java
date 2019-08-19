@@ -190,7 +190,7 @@ public class SaganUpdater {
 		update.version = version.version;
 		update.releaseStatus = version(version);
 		update.apiDocUrl = referenceUrl(branch, version);
-		update.refDocUrl = referenceUrl(branch, version);
+		update.refDocUrl = update.apiDocUrl;
 		update.current = true;
 		return update;
 	}
@@ -222,15 +222,15 @@ public class SaganUpdater {
 		if (!version.isSnapshot()) {
 			// static/sleuth/{version}/
 			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName
-					+ "/{version}/";
+					+ "/{version}/reference/html/";
 		}
 		if (branch.toLowerCase().contains("master")) {
 			// sleuth/
-			return "https://cloud.spring.io/" + version.projectName + "/"
-					+ version.projectName + ".html";
+			return "https://cloud.spring.io/" + version.projectName + "/reference/html/";
 		}
 		// sleuth/1.1.x/
-		return "https://cloud.spring.io/" + version.projectName + "/" + branch + "/";
+		return "https://cloud.spring.io/" + version.projectName + "/" + branch
+				+ "/reference/html/";
 	}
 
 }
