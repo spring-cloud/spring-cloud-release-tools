@@ -273,7 +273,11 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	}
 
 	public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
-		this.githubIssues.fileIssue(projects, version);
+		this.githubIssues.fileIssueInSpringGuides(projects, version);
+	}
+
+	public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
+		this.githubIssues.fileIssueInStartSpringIo(projects, version);
 	}
 
 	public String milestoneUrl(ProjectVersion releaseVersion) {

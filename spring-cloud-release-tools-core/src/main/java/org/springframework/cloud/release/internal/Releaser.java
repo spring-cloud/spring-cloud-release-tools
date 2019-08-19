@@ -234,6 +234,18 @@ public class Releaser {
 		}
 	}
 
+	public void updateStartSpringIo(ProjectVersion releaseVersion, Projects projects) {
+		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
+			log.info(
+					"\nWon't update start.spring.io for a non Release / Service Release version");
+			return;
+		}
+		Exception exception = createIssueInStartSpringIo(releaseVersion, projects);
+		if (exception != null) {
+			throw new MakeBuildUnstableException("Failed to update start.spring.io");
+		}
+	}
+
 	private Exception createIssueInSpringGuides(ProjectVersion releaseVersion,
 			Projects projects) {
 		try {
@@ -244,6 +256,20 @@ public class Releaser {
 		catch (Exception ex) {
 			log.error("Failed to update Spring Guides repo", ex);
 			return new MakeBuildUnstableException("Failed to update Spring Guides repo",
+					ex);
+		}
+	}
+
+	private Exception createIssueInStartSpringIo(ProjectVersion releaseVersion,
+			Projects projects) {
+		try {
+			this.projectGitHandler.createIssueInStartSpringIo(projects, releaseVersion);
+			log.info("\nSuccessfully created an issue in start.spring.io");
+			return null;
+		}
+		catch (Exception ex) {
+			log.error("Failed to update start.spring.io repo", ex);
+			return new MakeBuildUnstableException("Failed to update start.spring.io repo",
 					ex);
 		}
 	}

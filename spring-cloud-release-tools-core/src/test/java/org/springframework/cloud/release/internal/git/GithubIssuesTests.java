@@ -56,8 +56,17 @@ public class GithubIssuesTests {
 
 	@Before
 	public void setup() throws IOException {
-		this.github = new MkGithub("spring-guides");
+		this.github = github("spring-guides");
 		this.repo = createGettingStartedGuides(this.github);
+	}
+
+	public void setupStartSpringIo() throws IOException {
+		this.github = github("spring-io");
+		this.repo = createStartSpringIo(this.github);
+	}
+
+	private MkGithub github(String login) throws IOException {
+		return new MkGithub(login);
 	}
 
 	@Test
@@ -65,7 +74,8 @@ public class GithubIssuesTests {
 		Github github = BDDMockito.mock(Github.class);
 		GithubIssues issues = new GithubIssues(github, withToken());
 
-		issues.fileIssue(new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
+		issues.fileIssueInSpringGuides(
+				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
 		BDDMockito.then(github).shouldHaveZeroInteractions();
@@ -78,7 +88,7 @@ public class GithubIssuesTests {
 		properties.getGit().setUpdateSpringGuides(false);
 		GithubIssues issues = new GithubIssues(github, properties);
 
-		issues.fileIssue(
+		issues.fileIssueInSpringGuides(
 				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
 						new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
@@ -91,7 +101,7 @@ public class GithubIssuesTests {
 	public void should_file_an_issue_for_release_version() throws IOException {
 		GithubIssues issues = new GithubIssues(this.github, withToken());
 
-		issues.fileIssue(
+		issues.fileIssueInSpringGuides(
 				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
 						new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
@@ -115,8 +125,79 @@ public class GithubIssuesTests {
 	public void should_throw_exception_when_no_token_was_passed() {
 		GithubIssues issues = new GithubIssues(new ReleaserProperties());
 
-		thenThrownBy(() -> issues.fileIssue(new Projects(Collections.emptySet()),
-				nonGaSleuthProject())).isInstanceOf(IllegalArgumentException.class)
+		thenThrownBy(() -> issues.fileIssueInSpringGuides(
+				new Projects(Collections.emptySet()), nonGaSleuthProject()))
+						.isInstanceOf(IllegalArgumentException.class)
+						.hasMessageContaining(
+								"You have to pass Github OAuth token for milestone closing to be operational");
+	}
+
+	@Test
+	public void should_not_do_anything_for_non_release_train_version_when_updating_startspringio()
+			throws IOException {
+		setupStartSpringIo();
+		Github github = BDDMockito.mock(Github.class);
+		GithubIssues issues = new GithubIssues(github, withToken());
+
+		issues.fileIssueInStartSpringIo(
+				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
+				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
+
+		BDDMockito.then(github).shouldHaveZeroInteractions();
+	}
+
+	@Test
+	public void should_not_do_anything_if_switch_is_not_set_when_updating_startspringio()
+			throws IOException {
+		setupStartSpringIo();
+		Github github = BDDMockito.mock(Github.class);
+		ReleaserProperties properties = withToken();
+		properties.getGit().setUpdateStartSpringIo(false);
+		GithubIssues issues = new GithubIssues(github, properties);
+
+		issues.fileIssueInStartSpringIo(
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
+						new ProjectVersion("bar", "2.0.0.RELEASE"),
+						new ProjectVersion("baz", "3.0.0.RELEASE")),
+				new ProjectVersion("sc-release", "Edgware.RELEASE"));
+
+		BDDMockito.then(github).shouldHaveZeroInteractions();
+	}
+
+	@Test
+	public void should_file_an_issue_for_release_version_when_updating_startspringio()
+			throws IOException {
+		setupStartSpringIo();
+		GithubIssues issues = new GithubIssues(this.github, withToken());
+
+		issues.fileIssueInStartSpringIo(
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
+						new ProjectVersion("bar", "2.0.0.RELEASE"),
+						new ProjectVersion("baz", "3.0.0.RELEASE")),
+				new ProjectVersion("sc-release", "Edgware.RELEASE"));
+
+		then(this.capture.toString()).doesNotContain("will occur only");
+		Issue issue = this.github.repos()
+				.get(new Coordinates.Simple("spring-io", "start.spring.io")).issues()
+				.get(1);
+		then(issue.exists()).isTrue();
+		Issue.Smart smartIssue = new Issue.Smart(issue);
+		then(smartIssue.title())
+				.isEqualTo("Edgware.RELEASE Spring Cloud Release took place");
+		then(smartIssue.body()).contains("Spring Cloud [Edgware.RELEASE]")
+				.contains("foo : `1.0.0.RELEASE`").contains("bar : `2.0.0.RELEASE`")
+				.contains("baz : `3.0.0.RELEASE`");
+	}
+
+	@Test
+	public void should_throw_exception_when_no_token_was_passed_when_updating_startspringio()
+			throws IOException {
+		setupStartSpringIo();
+		GithubIssues issues = new GithubIssues(new ReleaserProperties());
+
+		thenThrownBy(() -> issues.fileIssueInStartSpringIo(
+				new Projects(Collections.emptySet()), nonGaSleuthProject()))
+						.isInstanceOf(IllegalArgumentException.class)
 						.hasMessageContaining(
 								"You have to pass Github OAuth token for milestone closing to be operational");
 	}
@@ -124,6 +205,10 @@ public class GithubIssuesTests {
 	private Repo createGettingStartedGuides(MkGithub github) throws IOException {
 		return github.repos()
 				.create(new Repos.RepoCreate("getting-started-guides", false));
+	}
+
+	private Repo createStartSpringIo(MkGithub github) throws IOException {
+		return github.repos().create(new Repos.RepoCreate("start.spring.io", false));
 	}
 
 	private ProjectVersion nonGaSleuthProject() {

@@ -71,6 +71,11 @@ final class Tasks {
 				args.releaser.updateSpringGuides(args.versionFromScRelease, args.projects,
 						args.processedProjects);
 			}, TaskType.POST_RELEASE);
+	static Task UPDATE_START_SPRING_IO = task("updateStartSpringIo", "us",
+			"UPDATE START.SPRING.IO", "Updating start.spring.io", args -> {
+				args.releaser.updateStartSpringIo(args.versionFromScRelease,
+						args.projects);
+			}, TaskType.POST_RELEASE);
 	static Task UPDATE_SAGAN = task("updateSagan", "g", "UPDATE SAGAN",
 			"Updating Sagan with release info", args -> {
 				args.releaser.updateSagan(args.project, args.versionFromScRelease);
@@ -113,6 +118,7 @@ final class Tasks {
 
 	static final List<Task> DEFAULT_TASKS_PER_RELEASE = Stream
 			.of(Tasks.RUN_UPDATED_SAMPLES, Tasks.CREATE_TEMPLATES, Tasks.UPDATE_GUIDES,
+					Tasks.UPDATE_START_SPRING_IO,
 					Tasks.UPDATE_RELEASE_TRAIN_DOCUMENTATION, Tasks.UPDATE_DOCUMENTATION,
 					Tasks.UPDATE_RELEASE_TRAIN_WIKI, Tasks.UPDATE_ALL_SAMPLES)
 			.collect(Collectors.toList());

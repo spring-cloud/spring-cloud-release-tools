@@ -42,6 +42,7 @@ After project release
 - Generates a release notes template under `target/notes.md` (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Updates project information in Sagan (https://spring.io) (ONLY FOR SNAPSHOT / RELEASE VERSIONS)
 - For `GA`/ `SR` release will create an issue in Spring Guides under https://github.com/spring-guides/getting-started-guides/issues/
+- For `GA`/ `SR` release will create an issue in start.spring.io under https://github.com/spring-io/start.spring.io/issues/
 - For `GA`/ `SR` release will update the links under https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current
 - Will update the release train project page (for Spring Cloud it will be `https://github.com/spring-projects/spring-cloud`)
 
@@ -285,6 +286,7 @@ Defaults to Sleuth and Contract samples.
 - `releaser.git.release-train-docs-branch` - Branch to check out for release train documentation. Defaults to `master`.
 - `releaser.git.update-release-train-docs` - If `true` then will update the release train documentation project and run the generation. Defaults to `true`.
 - `releaser.git.update-spring-guides` - If `true` then will update Spring Guides with the current release train. Defaults to `true`.
+- `releaser.git.update-start-spring-io` - If `true` then will update start.spring.io with the current release train. Defaults to `true`.
 
 The following properties are used for both meta release and a release of an individual module.
 

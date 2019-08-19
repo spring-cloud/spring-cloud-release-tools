@@ -58,44 +58,61 @@ class GithubIssues {
 		this.properties = properties;
 	}
 
-	void fileIssue(Projects projects, ProjectVersion version) {
+	void fileIssueInSpringGuides(Projects projects, ProjectVersion version) {
 		if (!this.properties.getGit().isUpdateSpringGuides()) {
 			log.info("Will not file an issue to Spring Guides, since the switch to do so "
 					+ "is off. Set [releaser.git.update-spring-guides] to [true] to change that");
 			return;
 		}
+		fileAGitHubIssue("spring-guides", "getting-started-guides", projects, version);
+		// iterate over projects, checkout the tag, build the guides project
+		// only with -Pintegration,guides profile
+	}
+
+	void fileIssueInStartSpringIo(Projects projects, ProjectVersion version) {
+		if (!this.properties.getGit().isUpdateStartSpringIo()) {
+			log.info(
+					"Will not file an issue to Start Spring Io, since the switch to do so "
+							+ "is off. Set [releaser.git.update-start-spring-io] to [true] to change that");
+			return;
+		}
+		fileAGitHubIssue("spring-io", "start.spring.io", projects, version);
+		// iterate over projects, checkout the tag, build the guides project
+		// only with -Pintegration,guides profile
+	}
+
+	private void fileAGitHubIssue(String user, String repo, Projects projects,
+			ProjectVersion version) {
 		Assert.hasText(this.properties.getGit().getOauthToken(),
 				"You have to pass Github OAuth token for milestone closing to be operational");
 		// do this only for RELEASE & SR
 		String releaseVersion = parsedVersion();
 		if (!(version.isRelease() || version.isServiceRelease())) {
 			log.info(
-					"Guide issue creation will occur only for Release or Service Release versions. Your version is [{}]",
+					"Github issue creation will occur only for Release or Service Release versions. Your version is [{}]",
 					releaseVersion);
 			return;
 		}
-		fileAGithubIssue(projects, releaseVersion);
-		// iterate over projects, checkout the tag, build the guides project
-		// only with -Pintegration,guides profile
+		fileAGithubIssue(user, repo, projects, releaseVersion);
 	}
 
-	private void fileAGithubIssue(Projects projects, String releaseVersion) {
-		Repo springGuides = this.github.repos()
-				.get(new Coordinates.Simple("spring-guides", "getting-started-guides"));
+	private void fileAGithubIssue(String user, String repo, Projects projects,
+			String releaseVersion) {
+		Repo ghRepo = this.github.repos().get(new Coordinates.Simple(user, repo));
 		String issueTitle = StringUtils.capitalize(releaseVersion) + " "
 				+ GITHUB_ISSUE_TITLE;
 		// check if the issue is not already there
-		boolean issueAlreadyFiled = issueAlreadyFiled(springGuides, issueTitle);
+		boolean issueAlreadyFiled = issueAlreadyFiled(ghRepo, issueTitle);
 		if (issueAlreadyFiled) {
 			log.info("Issue already filed, will not do that again");
 			return;
 		}
 		try {
-			int number = springGuides.issues().create(issueTitle, issueText(projects))
-					.number();
-			log.info("Successfully created an issue with "
-					+ "title [{}] in Spring Guides under: https://github.com/spring-guides/getting-started-guides/issues/"
-					+ number, issueTitle);
+			int number = ghRepo.issues().create(issueTitle, issueText(projects)).number();
+			log.info(
+					"Successfully created an issue with "
+							+ "title [{}] for the [{}/{}] GitHub repository" + number,
+					issueTitle, user, repo);
 		}
 		catch (IOException e) {
 			log.error("Exception occurred while trying to create the issue in guides", e);

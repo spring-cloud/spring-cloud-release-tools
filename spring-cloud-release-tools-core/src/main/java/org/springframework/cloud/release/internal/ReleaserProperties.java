@@ -361,6 +361,11 @@ public class ReleaserProperties implements Serializable {
 		private boolean updateSpringGuides = true;
 
 		/**
+		 * If set to {@code false}, will not update start.spring.io for a release train.
+		 */
+		private boolean updateStartSpringIo = true;
+
+		/**
 		 * If set to {@code false}, will not update the Spring Project for a release
 		 * train. E.g. for Spring Cloud will not update https://cloud.spring.io .
 		 */
@@ -537,6 +542,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setUpdateSpringGuides(boolean updateSpringGuides) {
 			this.updateSpringGuides = updateSpringGuides;
+		}
+
+		public boolean isUpdateStartSpringIo() {
+			return this.updateStartSpringIo;
+		}
+
+		public void setUpdateStartSpringIo(boolean updateStartSpringIo) {
+			this.updateStartSpringIo = updateStartSpringIo;
 		}
 
 		public boolean isUpdateSpringProject() {

@@ -239,6 +239,7 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganClient).should(BDDMockito.never())
 				.deleteRelease("spring-cloud-build", "2.0.0.M8");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
+		then(this.gitHandler.issueCreatedInStartSpringIo).isTrue();
 		then(text(new File(this.documentationFolder, "current/index.html")))
 				.doesNotContain("Angel.SR3").contains("Camden.SR5");
 		thenRunUpdatedTestsWereCalled();
@@ -458,6 +459,7 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganClient).should(BDDMockito.never())
 				.deleteRelease("spring-cloud-build", "2.0.0.M8");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
+		then(this.gitHandler.issueCreatedInStartSpringIo).isTrue();
 		then(text(new File(this.documentationFolder, "current/index.html")))
 				.doesNotContain("Angel.SR3").contains("Camden.SR5");
 	}
@@ -508,6 +510,7 @@ public class AcceptanceTests {
 				"1.2.0.RC1");
 		// we update guides only for SR / RELEASE
 		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
+		then(this.gitHandler.issueCreatedInStartSpringIo).isFalse();
 		// haven't even checked out the branch
 		then(new File(this.documentationFolder, "current/index.html")).doesNotExist();
 	}
@@ -544,6 +547,7 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganClient).should(BDDMockito.never())
 				.updateRelease(BDDMockito.anyString(), BDDMockito.anyList());
 		then(this.gitHandler.issueCreatedInSpringGuides).isFalse();
+		then(this.gitHandler.issueCreatedInStartSpringIo).isFalse();
 	}
 
 	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -855,6 +859,8 @@ public class AcceptanceTests {
 
 		boolean issueCreatedInSpringGuides = false;
 
+		boolean issueCreatedInStartSpringIo = false;
+
 		TestProjectGitHandler(ReleaserProperties properties, String expectedVersion,
 				String projectName) {
 			super(properties);
@@ -875,6 +881,12 @@ public class AcceptanceTests {
 		}
 
 		@Override
+		public void createIssueInStartSpringIo(Projects projects,
+				ProjectVersion version) {
+			this.issueCreatedInStartSpringIo = true;
+		}
+
+		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
 			return "https://foo.bar.com/" + releaseVersion.toString();
 		}
@@ -886,6 +898,8 @@ public class AcceptanceTests {
 		boolean closedMilestones = false;
 
 		boolean issueCreatedInSpringGuides = false;
+
+		boolean issueCreatedInStartSpringIo = false;
 
 		List<File> clonedProjects = new ArrayList<>();
 
@@ -901,6 +915,12 @@ public class AcceptanceTests {
 		@Override
 		public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
 			this.issueCreatedInSpringGuides = true;
+		}
+
+		@Override
+		public void createIssueInStartSpringIo(Projects projects,
+				ProjectVersion version) {
+			this.issueCreatedInStartSpringIo = true;
 		}
 
 		@Override
