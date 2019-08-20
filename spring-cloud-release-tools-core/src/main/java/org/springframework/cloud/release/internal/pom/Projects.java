@@ -19,6 +19,7 @@ package org.springframework.cloud.release.internal.pom;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -43,13 +44,27 @@ public class Projects extends HashSet<ProjectVersion> {
 				.collect(Collectors.toList())));
 	}
 
-	public static Projects forRollback(Projects projects,
-			ProjectVersion originalVersion) {
-		Projects newProjects = new Projects();
-		newProjects.add(new ProjectVersion(originalVersion.projectName,
-				originalVersion.bumpedVersion()));
-		newProjects
-				.addAll(projects.forNameStartingWith(SpringCloudConstants.SPRING_BOOT));
+	public Projects(List<ProjectVersion> versions) {
+		addAll(versions.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+	}
+
+	public static Projects forRollback(ReleaserProperties properties, Projects projects) {
+		List<ProjectVersion> foundProjectsToBump = new LinkedList<>();
+		List<ProjectVersion> foundProjectsToSkip = new LinkedList<>();
+		projects.forEach(projectVersion -> {
+			if (properties.getMetaRelease().getProjectsToSkip().stream()
+					.anyMatch(projectVersion.projectName::startsWith)) {
+				foundProjectsToSkip.add(projectVersion);
+			}
+			else {
+				foundProjectsToBump.add(projectVersion);
+			}
+		});
+		Projects newProjects = new Projects(foundProjectsToSkip);
+		foundProjectsToBump.forEach(projectVersion -> newProjects
+				.add(new ProjectVersion(projectVersion.projectName,
+						projectVersion.postReleaseSnapshotVersion())));
+		newProjects.addAll(foundProjectsToSkip);
 		return newProjects;
 	}
 

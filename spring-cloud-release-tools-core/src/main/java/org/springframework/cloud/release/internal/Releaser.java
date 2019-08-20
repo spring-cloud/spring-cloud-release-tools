@@ -39,13 +39,15 @@ import org.springframework.util.Assert;
 /**
  * @author Marcin Grzejszczak
  */
-public class Releaser {
+public class Releaser implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory.getLogger(Releaser.class);
 
 	private static boolean ASSERT_SNAPSHOTS = true;
 
 	private static boolean SKIP_SNAPSHOT_ASSERTION = false;
+
+	private ReleaserProperties releaserProperties;
 
 	private final ProjectPomUpdater projectPomUpdater;
 
@@ -63,11 +65,13 @@ public class Releaser {
 
 	private final PostReleaseActions postReleaseActions;
 
-	public Releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
+	public Releaser(ReleaserProperties releaserProperties,
+			ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
 			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
 			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
 			DocumentationUpdater documentationUpdater,
 			PostReleaseActions postReleaseActions) {
+		this.releaserProperties = releaserProperties;
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectBuilder = projectBuilder;
 		this.projectGitHandler = projectGitHandler;
@@ -136,16 +140,24 @@ public class Releaser {
 		log.info("Original project version is [{}]", originalVersion);
 		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease())
 				&& originalVersion.isSnapshot()) {
-			Projects newProjects = Projects.forRollback(projects, originalVersion);
+			Projects newProjects = Projects.forRollback(releaserProperties, projects);
 			updateProjectFromBom(project, newProjects, originalVersion,
 					SKIP_SNAPSHOT_ASSERTION);
-			this.projectGitHandler.commitAfterBumpingVersions(project, originalVersion);
+			ProjectVersion bumpedProject = bumpProject(originalVersion, newProjects);
+			this.projectGitHandler.commitAfterBumpingVersions(project, bumpedProject);
 			log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 		}
 		else {
 			log.info(
 					"\nSuccessfully reverted the commit and came back to snapshot versions");
 		}
+	}
+
+	private ProjectVersion bumpProject(ProjectVersion originalVersion,
+			Projects newProjects) {
+		return newProjects.containsProject(originalVersion.projectName)
+				? newProjects.forName(originalVersion.projectName) : new ProjectVersion(
+						originalVersion.projectName, originalVersion.bumpedVersion());
 	}
 
 	ProjectVersion originalVersion(File project) {
@@ -368,6 +380,11 @@ public class Releaser {
 	public void updateReleaseTrainWiki(Projects projects) {
 		this.documentationUpdater.updateReleaseTrainWiki(projects);
 		log.info("\nSuccessfully updated project wiki");
+	}
+
+	@Override
+	public void setReleaserProperties(ReleaserProperties properties) {
+		this.releaserProperties = properties;
 	}
 
 }

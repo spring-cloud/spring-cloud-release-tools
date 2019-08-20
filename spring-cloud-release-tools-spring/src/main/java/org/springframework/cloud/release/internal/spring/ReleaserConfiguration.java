@@ -111,10 +111,11 @@ class ReleaserConfiguration {
 			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
 			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
 			DocumentationUpdater documentationUpdater,
-			PostReleaseActions postReleaseActions) {
-		return new Releaser(projectPomUpdater, projectBuilder, projectGitHandler,
-				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater,
-				postReleaseActions);
+			PostReleaseActions postReleaseActions,
+			ReleaserProperties releaserProperties) {
+		return new Releaser(releaserProperties, projectPomUpdater, projectBuilder,
+				projectGitHandler, templateGenerator, gradleUpdater, saganUpdater,
+				documentationUpdater, postReleaseActions);
 	}
 
 	@Bean

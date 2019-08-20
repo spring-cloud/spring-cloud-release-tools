@@ -86,15 +86,14 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void commitAfterBumpingVersions(File project, ProjectVersion version) {
-		if (version.isSnapshot()) {
+	public void commitAfterBumpingVersions(File project, ProjectVersion bumpedVersion) {
+		if (bumpedVersion.isSnapshot()) {
 			log.info("Snapshot version [{}] found. Will only commit the changed poms",
-					version);
-			commit(project,
-					String.format(POST_RELEASE_BUMP_MSG, version.bumpedVersion()));
+					bumpedVersion);
+			commit(project, String.format(POST_RELEASE_BUMP_MSG, bumpedVersion));
 		}
 		else {
-			log.info("Non snapshot version [{}] found. Won't do anything", version);
+			log.info("Non snapshot version [{}] found. Won't do anything", bumpedVersion);
 		}
 	}
 

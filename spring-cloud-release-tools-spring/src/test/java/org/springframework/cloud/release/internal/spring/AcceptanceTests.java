@@ -33,6 +33,7 @@ import java.util.Map;
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.After;
@@ -193,6 +194,8 @@ public class AcceptanceTests {
 
 	@Test
 	public void should_perform_a_release_of_consul() throws Exception {
+		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout()
+				.setName("Greenwich").call();
 		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				this.springCloudConsulProject);
 		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
@@ -200,48 +203,42 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = releaser(project, "spring-cloud-consul", "vCamden.SR5",
-				"1.1.2.RELEASE");
+		SpringReleaser releaser = releaser(project, "spring-cloud-consul",
+				"vGreenwich.SR2", "2.1.2.RELEASE");
 
 		releaser.release();
 
 		Iterable<RevCommit> commits = listOfCommits(project);
 		Iterator<RevCommit> iterator = commits.iterator();
-		tagIsPresentInOrigin(origin, "v1.1.2.RELEASE");
+		tagIsPresentInOrigin(origin, "v2.1.2.RELEASE");
 		commitIsPresent(iterator,
-				"Bumping versions to 1.2.1.BUILD-SNAPSHOT after release");
+				"Bumping versions to 2.1.3.BUILD-SNAPSHOT after release");
 		commitIsPresent(iterator, "Going back to snapshots");
-		commitIsPresent(iterator, "Update SNAPSHOT to 1.1.2.RELEASE");
-		pomVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
-		consulPomParentVersionIsEqualTo(project, "1.2.1.BUILD-SNAPSHOT");
+		commitIsPresent(iterator, "Update SNAPSHOT to 2.1.2.RELEASE");
+		pomVersionIsEqualTo(project, "2.1.3.BUILD-SNAPSHOT");
+		consulPomParentVersionIsEqualTo(project, "2.1.3.BUILD-SNAPSHOT");
 		then(this.gitHandler.closedMilestones).isTrue();
 		then(emailTemplate()).exists();
-		then(emailTemplateContents()).contains("Spring Cloud Camden.SR5 available")
-				.contains("Spring Cloud Camden SR5 Train release");
+		then(emailTemplateContents()).contains("Spring Cloud Greenwich.SR2 available")
+				.contains("Spring Cloud Greenwich SR2 Train release");
 		then(blogTemplate()).exists();
 		then(blogTemplateContents())
-				.contains("I am pleased to announce that the Service Release 5 (SR5)");
+				.contains("I am pleased to announce that the Service Release 2 (SR2)");
 		then(releaseNotesTemplate()).exists();
-		then(releaseNotesTemplateContents()).contains("Camden.SR5").contains(
-				"- Spring Cloud Config `1.2.2.RELEASE` ([issues](https://foo.bar.com/1.2.2.RELEASE))")
+		then(releaseNotesTemplateContents()).contains("Greenwich.SR2").contains(
+				"- Spring Cloud Config `2.1.3.RELEASE` ([issues](https://foo.bar.com/2.1.3.RELEASE))")
 				.contains(
-						"- Spring Cloud Aws `1.1.3.RELEASE` ([issues](https://foo.bar.com/1.1.3.RELEASE))");
+						"- Spring Cloud Aws `2.1.2.RELEASE` ([issues](https://foo.bar.com/2.1.2.RELEASE))");
 		// once for updating GA
 		// second time to update SNAPSHOT
 		BDDMockito.then(this.saganClient).should(BDDMockito.times(2)).updateRelease(
 				BDDMockito.eq("spring-cloud-consul"), BDDMockito.anyList());
 		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-consul",
-				"1.1.2.BUILD-SNAPSHOT");
-		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-consul",
-				"1.1.0.M8");
-		BDDMockito.then(this.saganClient).should(BDDMockito.never())
-				.deleteRelease("spring-cloud-build", "1.0.0.M8");
-		BDDMockito.then(this.saganClient).should(BDDMockito.never())
-				.deleteRelease("spring-cloud-build", "2.0.0.M8");
+				"2.1.2.BUILD-SNAPSHOT");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 		then(this.gitHandler.issueCreatedInStartSpringIo).isTrue();
 		then(text(new File(this.documentationFolder, "current/index.html")))
-				.doesNotContain("Angel.SR3").contains("Camden.SR5");
+				.doesNotContain("Angel.SR3").contains("Greenwich.SR2");
 		thenRunUpdatedTestsWereCalled();
 	}
 
@@ -249,6 +246,8 @@ public class AcceptanceTests {
 	public void should_perform_a_meta_release_of_sc_release_and_consul()
 			throws Exception {
 		// simulates an org
+		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout()
+				.setName("Edgware").call();
 		SpringReleaser releaser = metaReleaser(edgwareSr10());
 
 		releaser.release(new OptionsBuilder().metaRelease(true).options());
@@ -260,7 +259,7 @@ public class AcceptanceTests {
 		thenSaganWasCalled();
 		thenDocumentationWasUpdated();
 		BDDAssertions.then(clonedProject("spring-cloud-consul").tagList().call())
-				.extracting("name").contains("refs/tags/v1.3.5.RELEASE");
+				.extracting("name").contains("refs/tags/v5.3.5.RELEASE");
 		thenRunUpdatedTestsWereCalled();
 		thenUpdateReleaseTrainDocsWasCalled();
 	}
@@ -277,24 +276,24 @@ public class AcceptanceTests {
 
 	private Map<String, String> edgwareSr10() {
 		Map<String, String> versions = new LinkedHashMap<>();
-		versions.put("spring-boot", "1.5.16.RELEASE");
-		versions.put("spring-cloud-build", "1.3.11.RELEASE");
-		versions.put("spring-cloud-commons", "1.3.5.RELEASE");
-		versions.put("spring-cloud-stream", "Ditmars.SR4");
-		versions.put("spring-cloud-task", "1.2.3.RELEASE");
-		versions.put("spring-cloud-function", "1.0.1.RELEASE");
-		versions.put("spring-cloud-aws", "1.2.3.RELEASE");
-		versions.put("spring-cloud-bus", "1.3.4.RELEASE");
-		versions.put("spring-cloud-config", "1.4.5.RELEASE");
-		versions.put("spring-cloud-netflix", "1.4.6.RELEASE");
-		versions.put("spring-cloud-cloudfoundry", "1.1.2.RELEASE");
-		versions.put("spring-cloud-gateway", "1.0.2.RELEASE");
-		versions.put("spring-cloud-security", "1.2.3.RELEASE");
-		versions.put("spring-cloud-consul", "1.3.5.RELEASE");
-		versions.put("spring-cloud-zookeeper", "1.2.2.RELEASE");
-		versions.put("spring-cloud-sleuth", "1.3.5.RELEASE");
-		versions.put("spring-cloud-contract", "1.2.6.RELEASE");
-		versions.put("spring-cloud-vault", "1.1.2.RELEASE");
+		versions.put("spring-boot", "5.5.16.RELEASE");
+		versions.put("spring-cloud-build", "5.3.11.RELEASE");
+		versions.put("spring-cloud-commons", "5.3.5.RELEASE");
+		versions.put("spring-cloud-stream", "Xitmars.SR4");
+		versions.put("spring-cloud-task", "5.2.3.RELEASE");
+		versions.put("spring-cloud-function", "5.0.1.RELEASE");
+		versions.put("spring-cloud-aws", "5.2.3.RELEASE");
+		versions.put("spring-cloud-bus", "5.3.4.RELEASE");
+		versions.put("spring-cloud-config", "5.4.5.RELEASE");
+		versions.put("spring-cloud-netflix", "5.4.6.RELEASE");
+		versions.put("spring-cloud-cloudfoundry", "5.1.2.RELEASE");
+		versions.put("spring-cloud-gateway", "5.0.2.RELEASE");
+		versions.put("spring-cloud-security", "5.2.3.RELEASE");
+		versions.put("spring-cloud-consul", "5.3.5.RELEASE");
+		versions.put("spring-cloud-zookeeper", "5.2.2.RELEASE");
+		versions.put("spring-cloud-sleuth", "5.3.5.RELEASE");
+		versions.put("spring-cloud-contract", "5.2.6.RELEASE");
+		versions.put("spring-cloud-vault", "5.1.2.RELEASE");
 		versions.put("spring-cloud-release", "Edgware.SR10");
 		return versions;
 	}
@@ -417,6 +416,8 @@ public class AcceptanceTests {
 	// issue #74
 	@Test
 	public void should_perform_a_release_of_sc_build() throws Exception {
+		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout()
+				.setName("vGreenwich.SR2").call();
 		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				new File(AcceptanceTests.class.getResource("/projects/spring-cloud-build")
 						.toURI()));
@@ -426,22 +427,22 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-build"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = releaser(project, "spring-cloud-build", "vCamden.SR5",
-				"1.2.2.RELEASE");
+		SpringReleaser releaser = releaser(project, "spring-cloud-build",
+				"vGreenwich.SR2", "2.1.6.RELEASE");
 
 		releaser.release();
 
 		Iterable<RevCommit> commits = listOfCommits(project);
 		Iterator<RevCommit> iterator = commits.iterator();
-		tagIsPresentInOrigin(origin, "v1.2.2.RELEASE");
+		tagIsPresentInOrigin(origin, "v2.1.6.RELEASE");
 		// we're running against camden sc-release
 		commitIsPresent(iterator,
-				"Bumping versions to 1.3.8.BUILD-SNAPSHOT after release");
+				"Bumping versions to 2.1.7.BUILD-SNAPSHOT after release");
 		commitIsPresent(iterator, "Going back to snapshots");
-		commitIsPresent(iterator, "Update SNAPSHOT to 1.2.2.RELEASE");
-		pomVersionIsEqualTo(project, "1.3.8.BUILD-SNAPSHOT");
+		commitIsPresent(iterator, "Update SNAPSHOT to 2.1.6.RELEASE");
+		pomVersionIsEqualTo(project, "2.1.7.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(project, "spring-cloud-build-dependencies",
-				"1.4.4.RELEASE");
+				"2.1.6.RELEASE");
 		then(this.gitHandler.closedMilestones).isTrue();
 		then(emailTemplate()).exists();
 		then(blogTemplate()).exists();
@@ -451,17 +452,11 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganClient).should(BDDMockito.times(2))
 				.updateRelease(BDDMockito.eq("spring-cloud-build"), BDDMockito.anyList());
 		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-build",
-				"1.2.2.BUILD-SNAPSHOT");
-		BDDMockito.then(this.saganClient).should().deleteRelease("spring-cloud-build",
-				"1.2.0.M8");
-		BDDMockito.then(this.saganClient).should(BDDMockito.never())
-				.deleteRelease("spring-cloud-build", "1.1.0.M8");
-		BDDMockito.then(this.saganClient).should(BDDMockito.never())
-				.deleteRelease("spring-cloud-build", "2.0.0.M8");
+				"2.1.6.BUILD-SNAPSHOT");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 		then(this.gitHandler.issueCreatedInStartSpringIo).isTrue();
 		then(text(new File(this.documentationFolder, "current/index.html")))
-				.doesNotContain("Angel.SR3").contains("Camden.SR5");
+				.doesNotContain("Angel.SR3").contains("Greenwich.SR2");
 	}
 
 	@Test
@@ -473,7 +468,10 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = releaser(project, "spring-cloud-consul", "Dalston.RC1",
+		Git git = GitTestUtils.openGitProject(file("/projects/spring-cloud-release/"));
+		git.reset().setMode(ResetCommand.ResetType.HARD).setRef("vDalston.RC1").call();
+		git.checkout().setName("vDalston.RC1").call();
+		SpringReleaser releaser = releaser(project, "spring-cloud-consul", "vDalston.RC1",
 				"1.2.0.RC1");
 
 		releaser.release();
@@ -517,6 +515,8 @@ public class AcceptanceTests {
 
 	@Test
 	public void should_generate_templates_only() throws Exception {
+		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout()
+				.setName("vDalston.RC1").call();
 		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				this.springCloudConsulProject);
 		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
@@ -525,7 +525,7 @@ public class AcceptanceTests {
 				tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		SpringReleaser releaser = templateOnlyReleaser(project, "spring-cloud-consul",
-				"Dalston.RC1", "1.2.0.RC1");
+				"vDalston.RC1", "1.2.0.RC1");
 
 		releaser.release();
 
@@ -716,9 +716,9 @@ public class AcceptanceTests {
 				return file;
 			}
 		};
-		Releaser releaser = new Releaser(pomUpdater, projectBuilder, handler,
-				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater,
-				this.postReleaseActions);
+		Releaser releaser = new Releaser(releaserProperties, pomUpdater, projectBuilder,
+				handler, templateGenerator, gradleUpdater, saganUpdater,
+				documentationUpdater, this.postReleaseActions);
 		this.gitHandler = handler;
 		return releaser;
 	}
@@ -755,9 +755,9 @@ public class AcceptanceTests {
 						return file;
 					}
 				});
-		Releaser releaser = Mockito.spy(new Releaser(pomUpdater, projectBuilder, handler,
-				templateGenerator, gradleUpdater, saganUpdater, documentationUpdater,
-				this.postReleaseActions));
+		Releaser releaser = Mockito.spy(new Releaser(releaserProperties, pomUpdater,
+				projectBuilder, handler, templateGenerator, gradleUpdater, saganUpdater,
+				documentationUpdater, this.postReleaseActions));
 		this.nonAssertingGitHandler = handler;
 		this.templateGenerator = templateGenerator;
 		this.saganUpdater = saganUpdater;

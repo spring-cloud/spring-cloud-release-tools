@@ -88,9 +88,10 @@ public class ReleaserTests {
 	}
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
-		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater, this.postReleaseActions) {
+		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
+				this.projectBuilder, this.projectGitHandler, this.templateGenerator,
+				this.gradleUpdater, this.saganUpdater, this.documentationUpdater,
+				this.postReleaseActions) {
 			@Override
 			ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
@@ -99,9 +100,10 @@ public class ReleaserTests {
 	}
 
 	Releaser releaser() {
-		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater, this.postReleaseActions);
+		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
+				this.projectBuilder, this.projectGitHandler, this.templateGenerator,
+				this.gradleUpdater, this.saganUpdater, this.documentationUpdater,
+				this.postReleaseActions);
 	}
 
 	@Test
