@@ -3,10 +3,8 @@
 	filemode = true
 	bare = false
 	logallrefupdates = true
-	ignorecase = true
-	precomposeunicode = true
 [remote "origin"]
 [branch "master"]
-[branch "Camden.x"]
-[branch "Brixton"]
-[branch "Dalston.RC1"]
+[branch "Edgware"]
+[branch "Dalston"]
+[branch "Finchley"]

@@ -42,6 +42,14 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 
 	private static final String RC_REGEX = "^.*[\\.|\\-]RC.*$";
 
+	private static final String RELEASE_REGEX = "^.*[\\.|\\-]RELEASE.*$";
+
+	private static final String SR_REGEX = "^.*[\\.|\\-]SR[0-9]+.*$";
+
+	private static final List<Pattern> VALID_PATTERNS = Arrays.asList(SNAPSHOT_PATTERN,
+			Pattern.compile(MILESTONE_REGEX), Pattern.compile(RC_REGEX),
+			Pattern.compile(RELEASE_REGEX), Pattern.compile(SR_REGEX));
+
 	/**
 	 * Name of the project.
 	 */
@@ -92,30 +100,82 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	}
 
 	public String bumpedVersion() {
-		return bumpedVersion(assertVersion());
+		return bumpedVersion(assertVersion()).print();
 	}
 
-	private String bumpedVersion(String[] splitVersion) {
-		if (splitVersion.length == 2 && !isNumeric(splitVersion[0])) {
-			return this.version;
+	private SplitVersion bumpedVersion(SplitVersion splitVersion) {
+		if (splitVersion.isReleaseTrain()) {
+			return splitVersion;
 		}
-		Integer incrementedPatch = Integer.valueOf(splitVersion[2]) + 1;
-		return String.format("%s.%s.%s.%s", splitVersion[0], splitVersion[1],
-				incrementedPatch, splitVersion[3]);
+		return splitVersion.fullVersionWithIncrementedPatch();
 	}
 
-	private String[] assertVersion() {
+	private SplitVersion assertVersion() {
 		if (this.version == null) {
 			throw new IllegalStateException("Version can't be null!");
 		}
-		// 1.0.0.BUILD-SNAPSHOT
-		String[] splitVersion = this.version.split("\\.");
-		if (splitVersion.length < 4 && isNumeric(splitVersion[0])
-				|| splitVersion.length == 1 && !isNumeric(splitVersion[0])) {
-			throw new IllegalStateException(
-					"Version is invalid. Should be of format [1.2.3.A]");
+		SplitVersion splitByHyphen = tryHyphenSeparatedVersion();
+		if (splitByHyphen != null) {
+			return splitByHyphen;
 		}
-		return splitVersion;
+		return dotSeparatedReleaseTrainsAndVersions();
+	}
+
+	private SplitVersion tryHyphenSeparatedVersion() {
+		// Check for hyphen separated BOMs versioning
+		// Dysprosium-BUILD-SNAPSHOT or Dysprosium-RELEASE
+		// 1.0.0-BUILD-SNAPSHOT or 1.0.0-RELEASE
+		String[] splitByHyphen = this.version.split("\\-");
+		int splitByHyphens = splitByHyphen.length;
+		int numberOfHyphens = splitByHyphens - 1;
+		int indexOfFirstHyphen = this.version.indexOf("-");
+		boolean buildSnapshot = this.version.endsWith("BUILD-SNAPSHOT");
+		if (numberOfHyphens == 1 && !buildSnapshot
+				|| (numberOfHyphens > 1 && buildSnapshot)) {
+			// Dysprosium or 1.0.0
+			String versionName = this.version.substring(0, indexOfFirstHyphen);
+			boolean hasDots = versionName.contains(".");
+			// BUILD-SNAPSHOT
+			String versionType = this.version.substring(indexOfFirstHyphen + 1);
+			// Dysprosium-BUILD-SNAPSHOT
+			if (splitByHyphens > 1 && !hasDots && validVersionType()) {
+				return SplitVersion.hyphen(versionName, versionType);
+			}
+			// Dysprosium-RELEASE
+			else if (splitByHyphens == 1 && !hasDots && validVersionType()) {
+				return SplitVersion.hyphen(splitByHyphen[0], splitByHyphen[1]);
+			}
+			// 1.0.0-RELEASE or 1.0.0-BUILD-SNAPSHOT
+			else if (splitByHyphens >= 1 && hasDots) {
+				String[] newArray = combinedArrays(versionName, versionType);
+				return SplitVersion.hyphen(newArray);
+			}
+			else {
+				throw new UnsupportedOperationException(
+						"Unknown version [" + this.version + "]");
+			}
+		}
+		return null;
+	}
+
+	private boolean validVersionType() {
+		return VALID_PATTERNS.stream().anyMatch(p -> p.matcher(this.version).matches());
+	}
+
+	private String[] combinedArrays(String versionName, String versionType) {
+		String[] split = versionName.split("\\.");
+		String[] newArray = new String[split.length + 1];
+		for (int i = 0; i < split.length; i++) {
+			newArray[i] = split[i];
+		}
+		newArray[split.length] = versionType;
+		return newArray;
+	}
+
+	private SplitVersion dotSeparatedReleaseTrainsAndVersions() {
+		// Hoxton.BUILD-SNAPSHOT or 1.0.0.BUILD-SNAPSHOT
+		String[] splitVersion = this.version.split("\\.");
+		return SplitVersion.dot(splitVersion);
 	}
 
 	/**
@@ -124,21 +184,11 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	 * @return the post release snapshot version
 	 */
 	public String postReleaseSnapshotVersion() {
-		String[] strings = assertVersion();
+		SplitVersion splitVersion = assertVersion();
 		if (isReleaseOrServiceRelease()) {
-			String bumpedVersion = bumpedVersion(strings);
-			return appendBuildSnapshot(bumpedVersion);
+			return bumpedVersion(splitVersion).withBuildSnapshot().print();
 		}
-		return appendBuildSnapshot(this.version);
-	}
-
-	private String appendBuildSnapshot(String bumpedVersion) {
-		int lastIndexOfDot = bumpedVersion.lastIndexOf(".");
-		return bumpedVersion.substring(0, lastIndexOfDot) + ".BUILD-SNAPSHOT";
-	}
-
-	private boolean isNumeric(String string) {
-		return string.matches("[0-9]+");
+		return splitVersion.withBuildSnapshot().print();
 	}
 
 	public String groupId() {
@@ -166,7 +216,7 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	}
 
 	public String major() {
-		return this.assertVersion()[0];
+		return this.assertVersion().major;
 	}
 
 	public boolean isSnapshot() {
@@ -281,6 +331,143 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	public int compareTo(ProjectVersion o) {
 		// very simple comparison
 		return this.version.compareTo(o.version);
+	}
+
+	private static final class SplitVersion {
+
+		private static final String DOT = ".";
+
+		private static final String HYPHEN = "-";
+
+		private static final String BUILD_SNAPSHOT_SUFFIX = "BUILD-SNAPSHOT";
+
+		final String major;
+
+		final String minor;
+
+		final String patch;
+
+		final String delimiter;
+
+		final String suffix;
+
+		// 1.0.0.RELEASE
+		// 1.0.0-RELEASE
+		private SplitVersion(String major, String minor, String patch, String delimiter,
+				String suffix) {
+			this.major = major;
+			this.minor = minor;
+			this.patch = patch;
+			this.delimiter = delimiter;
+			this.suffix = suffix;
+			assertIfValid();
+		}
+
+		private void assertIfValid() {
+			if (isInvalid()) {
+				throw new IllegalStateException(
+						"Version is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
+			}
+		}
+
+		// Hoxton.RELEASE
+		// Hoxton-RELEASE
+		private SplitVersion(String major, String delimiter, String suffix) {
+			this(major, "", "", delimiter, suffix);
+		}
+
+		private SplitVersion(String[] args, String delimiter) {
+			this.major = orDefault(args, 0);
+			this.minor = orDefault(args, 1);
+			this.patch = orDefault(args, 2);
+			this.delimiter = delimiter;
+			this.suffix = orDefault(args, 3);
+			assertIfValid();
+		}
+
+		private boolean isInvalid() {
+			return wrongReleaseTrainVersion() || wrongLibraryVersion() || wrongDelimiter()
+					|| noSuffix();
+		}
+
+		private boolean noSuffix() {
+			return StringUtils.isEmpty(suffix);
+		}
+
+		// Hoxton.BUILD-SNAPSHOT or Hoxton-BUILD-SNAPSHOT
+		private boolean isReleaseTrain() {
+			return !isNumeric(this.major);
+		}
+
+		private SplitVersion fullVersionWithIncrementedPatch() {
+			int incrementedPatch = Integer.parseInt(patch) + 1;
+			return new SplitVersion(major, minor, Integer.toString(incrementedPatch),
+					delimiter, suffix);
+		}
+
+		private String print() {
+			// Finchley.SR2
+			if (StringUtils.isEmpty(minor)) {
+				return String.format("%s%s%s", major, delimiter, suffix);
+			}
+			return String.format("%s.%s.%s%s%s", major, minor, patch, delimiter, suffix);
+		}
+
+		private boolean isNumeric(String string) {
+			return string.matches("[0-9]+");
+		}
+
+		private boolean wrongDelimiter() {
+			return !(DOT.equals(this.delimiter) || HYPHEN.equals(this.delimiter));
+		}
+
+		private boolean wrongLibraryVersion() {
+			// GOOD:
+			// 1.2.3.RELEASE, 1.2.3-RELEASE, Hoxton.BUILD-SNAPSHOT, Hoxton-RELEASE
+			// must have
+			// either major and suffix (release train)
+			// major, minor, patch and suffix
+			return isNumeric(major) && (StringUtils.isEmpty(minor)
+					|| StringUtils.isEmpty(patch) || StringUtils.isEmpty(suffix)
+					|| StringUtils.isEmpty(delimiter));
+		}
+
+		private boolean wrongReleaseTrainVersion() {
+			// BAD: 1.EXAMPLE, GOOD: Hoxton.RELEASE
+			return isNumeric(major) && StringUtils.isEmpty(suffix);
+		}
+
+		private SplitVersion withBuildSnapshot() {
+			return new SplitVersion(major, minor, patch, delimiter,
+					BUILD_SNAPSHOT_SUFFIX);
+		}
+
+		private static String orDefault(String[] args, int argIndex) {
+			return args.length > argIndex ? args[argIndex] : "";
+		}
+
+		static SplitVersion hyphen(String major, String suffix) {
+			return new SplitVersion(major, HYPHEN, suffix);
+		}
+
+		static SplitVersion hyphen(String[] args) {
+			return version(args, HYPHEN);
+		}
+
+		static SplitVersion dot(String[] args) {
+			return version(args, DOT);
+		}
+
+		private static SplitVersion version(String[] args, String delimiter) {
+			if (args.length == 2) {
+				return new SplitVersion(args[0], "", "", delimiter, args[1]);
+			}
+			else if (args.length == 3) {
+				return new SplitVersion(args[0], args[1], "", delimiter, args[2]);
+			}
+			return new SplitVersion(args, delimiter);
+		}
+
 	}
 
 }

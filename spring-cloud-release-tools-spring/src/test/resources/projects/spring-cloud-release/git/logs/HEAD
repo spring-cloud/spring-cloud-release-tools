@@ -1,34 +1,42 @@
-0000000000000000000000000000000000000000 3f8925dcec6d590f62429edea458812128c1c57f Marcin Grzejszczak <marcin@grzejszczak.pl> 1481127445 +0100	clone: from git@github.com:spring-cloud/spring-cloud-release.git
-3f8925dcec6d590f62429edea458812128c1c57f c8bb5894e1e198e5fe646b97bcbb75fe4746d30b Marcin Grzejszczak <marcin@grzejszczak.pl> 1481127532 +0100	checkout: moving from master to Camden.x
-c8bb5894e1e198e5fe646b97bcbb75fe4746d30b 3f8925dcec6d590f62429edea458812128c1c57f Marcin Grzejszczak <marcin@grzejszczak.pl> 1481128710 +0100	checkout: moving from Camden.x to master
-3f8925dcec6d590f62429edea458812128c1c57f 821555cad8a6132fd045755733e6a0ec6d0957f3 Marcin Grzejszczak <marcin@grzejszczak.pl> 1481128769 +0100	commit: Bumping contract for Dalston
-821555cad8a6132fd045755733e6a0ec6d0957f3 6882449721e48f955b102606ae3fc2535ebbd4cb Marcin Grzejszczak <marcin@grzejszczak.pl> 1481883884 +0100	checkout: moving from master to Brixton
-6882449721e48f955b102606ae3fc2535ebbd4cb 821555cad8a6132fd045755733e6a0ec6d0957f3 Marcin Grzejszczak <marcin@grzejszczak.pl> 1482244810 +0100	checkout: moving from Brixton to master
-821555cad8a6132fd045755733e6a0ec6d0957f3 6882449721e48f955b102606ae3fc2535ebbd4cb Marcin Grzejszczak <marcin@grzejszczak.pl> 1482244826 +0100	checkout: moving from master to Brixton
-6882449721e48f955b102606ae3fc2535ebbd4cb c8bb5894e1e198e5fe646b97bcbb75fe4746d30b Marcin Grzejszczak <marcin@grzejszczak.pl> 1482244860 +0100	checkout: moving from Brixton to Camden.x
-c8bb5894e1e198e5fe646b97bcbb75fe4746d30b 821555cad8a6132fd045755733e6a0ec6d0957f3 Marcin Grzejszczak <marcin@grzejszczak.pl> 1482244875 +0100	checkout: moving from Camden.x to master
-821555cad8a6132fd045755733e6a0ec6d0957f3 c8bb5894e1e198e5fe646b97bcbb75fe4746d30b Marcin Grzejszczak <marcin@grzejszczak.pl> 1484220811 +0100	checkout: moving from master to Camden.x
-c8bb5894e1e198e5fe646b97bcbb75fe4746d30b 821555cad8a6132fd045755733e6a0ec6d0957f3 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488793315 +0100	reset: moving to origin/master
-821555cad8a6132fd045755733e6a0ec6d0957f3 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488793321 +0100	pull --rebase origin master: checkout 320597b84bb0312c15228c4d42f46c189b86ed90
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488793321 +0100	rebase finished: returning to refs/heads/Camden.x
-320597b84bb0312c15228c4d42f46c189b86ed90 dd05da06f317a22d8f86911830737b57ca3add5c Marcin Grzejszczak <marcin@grzejszczak.pl> 1488800938 +0100	checkout: moving from Camden.x to vCamden.SR3
-dd05da06f317a22d8f86911830737b57ca3add5c 821555cad8a6132fd045755733e6a0ec6d0957f3 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488809148 +0100	checkout: moving from dd05da06f317a22d8f86911830737b57ca3add5c to master
-821555cad8a6132fd045755733e6a0ec6d0957f3 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488809155 +0100	pull --rebase origin master: checkout 320597b84bb0312c15228c4d42f46c189b86ed90
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488809155 +0100	rebase finished: returning to refs/heads/master
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1488899990 +0100	checkout: moving from master to Camden.x
-320597b84bb0312c15228c4d42f46c189b86ed90 b566ab3bea0506bccaa10f83784a41673606d6ee Marcin Grzejszczak <marcin@grzejszczak.pl> 1488899998 +0100	pull --rebase origin Camden.x: checkout b566ab3bea0506bccaa10f83784a41673606d6ee
-b566ab3bea0506bccaa10f83784a41673606d6ee 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489662682 +0100	reset: moving to origin/master
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489662684 +0100	checkout: moving from 320597b84bb0312c15228c4d42f46c189b86ed90 to master
-320597b84bb0312c15228c4d42f46c189b86ed90 91881ba86e2f7c9cb12ec883c063e391c7e025d2 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663227 +0100	checkout: moving from master to vDalston.M1
-91881ba86e2f7c9cb12ec883c063e391c7e025d2 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663239 +0100	checkout: moving from 91881ba86e2f7c9cb12ec883c063e391c7e025d2 to master
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663258 +0100	rebase: aborting
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663258 +0100	rebase: updating HEAD
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663262 +0100	checkout: moving from Camden.x to master
-320597b84bb0312c15228c4d42f46c189b86ed90 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663275 +0100	pull --rebase origin master: checkout 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9
-0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489663275 +0100	rebase finished: returning to refs/heads/master
-0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 29dde5f8e4c5096612ac8669dd7bfbcc95c7ef39 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489664824 +0100	checkout: moving from master to Dalston.RC1
-29dde5f8e4c5096612ac8669dd7bfbcc95c7ef39 e4d44f5a1a67429e37edbb57d3da96bb6717266c Marcin Grzejszczak <marcin@grzejszczak.pl> 1489668889 +0100	checkout: moving from Dalston.RC1 to vCamden.M1
-e4d44f5a1a67429e37edbb57d3da96bb6717266c 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 Marcin Grzejszczak <marcin@grzejszczak.pl> 1489668895 +0100	checkout: moving from e4d44f5a1a67429e37edbb57d3da96bb6717266c to master
-0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1530201218 +0200	reset: moving to HEAD
-0ccd2833e149e9b8a7974ecf74a5e9e172322ab9 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1530201221 +0200	checkout: moving from master to Camden.x
-320597b84bb0312c15228c4d42f46c189b86ed90 320597b84bb0312c15228c4d42f46c189b86ed90 Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1530201227 +0200	checkout: moving from Camden.x to Camden
+0000000000000000000000000000000000000000 4696b27899c5144635a2e1ab8a7e4d7e90e9a922 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940461 +0100	clone: from git@github.com:spring-cloud/spring-cloud-release.git
+4696b27899c5144635a2e1ab8a7e4d7e90e9a922 4696b27899c5144635a2e1ab8a7e4d7e90e9a922 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940477 +0100	checkout: moving from master to build_for_greenwich
+4696b27899c5144635a2e1ab8a7e4d7e90e9a922 3444ec7655081e8baaa9d67da39003413f152361 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940701 +0100	commit: bumped
+3444ec7655081e8baaa9d67da39003413f152361 25d36c116933e83f5e11c87eb6abba491226a517 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940993 +0100	commit: WAT
+25d36c116933e83f5e11c87eb6abba491226a517 4696b27899c5144635a2e1ab8a7e4d7e90e9a922 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074103 +0100	checkout: moving from build_for_greenwich to master
+4696b27899c5144635a2e1ab8a7e4d7e90e9a922 7eb07fb2cfe5167e7b8f4d1e8b5ca97b2172f337 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074111 +0100	pull --rebase origin master: Fast-forward
+7eb07fb2cfe5167e7b8f4d1e8b5ca97b2172f337 84dcb519ab8b24c170b193d3da3c1d72d2ffff09 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074254 +0100	commit: Bumped Spring Cloud Build
+84dcb519ab8b24c170b193d3da3c1d72d2ffff09 371f4038422970a25bafcab8827f01c86f67915e Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074263 +0100	commit (amend): Bumped Spring Cloud Build
+371f4038422970a25bafcab8827f01c86f67915e f46f941f5869e8bd70041c8842953f6ffd6da7d4 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548417223 +0100	pull --rebase origin master: Fast-forward
+f46f941f5869e8bd70041c8842953f6ffd6da7d4 94e5602cb92e15adbc9de624264647066fb87cd1 Marcin Grzejszczak <marcin@grzejszczak.pl> 1549649256 +0100	commit: Added checkstyle
+94e5602cb92e15adbc9de624264647066fb87cd1 caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976044 +0100	pull --rebase origin master: Fast-forward
+caa72691da75cfb9208264d33b80ac39fc744cd6 caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976053 +0100	checkout: moving from master to Greenwich
+caa72691da75cfb9208264d33b80ac39fc744cd6 caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976062 +0100	checkout: moving from Greenwich to master
+caa72691da75cfb9208264d33b80ac39fc744cd6 01deb507356f4a36ea3209f8e57ddbac348f460b Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976352 +0100	commit: Hoxton
+01deb507356f4a36ea3209f8e57ddbac348f460b 01deb507356f4a36ea3209f8e57ddbac348f460b Marcin Grzejszczak <marcin@grzejszczak.pl> 1552062251 +0100	reset: moving to HEAD
+01deb507356f4a36ea3209f8e57ddbac348f460b a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1552062520 +0100	commit: Updated for Hoxton
+a33643672892641471e4dca82a38f72c8ca3f35f a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520096 +0100	checkout: moving from master to scBuild214
+a33643672892641471e4dca82a38f72c8ca3f35f a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520108 +0100	checkout: moving from scBuild214 to master
+a33643672892641471e4dca82a38f72c8ca3f35f caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520120 +0100	checkout: moving from master to Greenwich
+caa72691da75cfb9208264d33b80ac39fc744cd6 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520129 +0100	pull --rebase origin Greenwich: Fast-forward
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520931 +0100	checkout: moving from Greenwich to scBuild214
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 0dfe0b0d109afe8969c2379a1d9789ae15e80e32 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520937 +0100	commit: BUild 2.1.4
+0dfe0b0d109afe8969c2379a1d9789ae15e80e32 8aa3cb92a11adedbc5acfb300e721e0c7c7cd875 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553521862 +0100	commit: No snapshots
+8aa3cb92a11adedbc5acfb300e721e0c7c7cd875 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553890436 +0100	checkout: moving from scBuild214 to Greenwich
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1557912513 +0200	reset: moving to HEAD
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1557912514 +0200	checkout: moving from Greenwich to master
+a33643672892641471e4dca82a38f72c8ca3f35f a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560176662 +0200	pull --rebase origin master: Fast-forward
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560176674 +0200	checkout: moving from master to springCloudBuildRelease
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560177565 +0200	reset: moving to HEAD
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560177763 +0200	reset: moving to HEAD
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123097 +0200	checkout: moving from springCloudBuildRelease to master
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123103 +0200	reset: moving to HEAD
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 36b1fc71be5c290679009dda8873c960632816d7 Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123107 +0200	checkout: moving from master to vGreenwich.SR2
+36b1fc71be5c290679009dda8873c960632816d7 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1565944802 +0200	checkout: moving from 36b1fc71be5c290679009dda8873c960632816d7 to master
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 4d3656c3411c666e4bab64e1e5b02b5d02c3af7c Marcin Grzejszczak <marcin@grzejszczak.pl> 1565944806 +0200	pull --rebase origin master: Fast-forward
+4d3656c3411c666e4bab64e1e5b02b5d02c3af7c 19cd5760bb235822f58274a95dbf4c2451ece5ca Marcin Grzejszczak <marcin@grzejszczak.pl> 1565944855 +0200	commit: Added spring cloud build to the list of dependencies
+19cd5760bb235822f58274a95dbf4c2451ece5ca 36b1fc71be5c290679009dda8873c960632816d7 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566308875 +0200	checkout: moving from master to vGreenwich.SR2
+36b1fc71be5c290679009dda8873c960632816d7 3a55043d86d982c2ac1f86df7dd6945fa6c41058 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566310550 +0200	checkout: moving from 36b1fc71be5c290679009dda8873c960632816d7 to vEdgware.SR6
+3a55043d86d982c2ac1f86df7dd6945fa6c41058 df9f8dd8313f3b5d9a2a75ffb737bf328c6ca00d Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312025 +0200	checkout: moving from 3a55043d86d982c2ac1f86df7dd6945fa6c41058 to Edgware
+df9f8dd8313f3b5d9a2a75ffb737bf328c6ca00d e112ef52996d7b564d90e9436b50e6d1bd2af740 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312039 +0200	checkout: moving from Edgware to Dalston
+e112ef52996d7b564d90e9436b50e6d1bd2af740 f3fa9e830bcf486accf364eb3fb874dd663f2b49 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312042 +0200	checkout: moving from Dalston to Finchley
+f3fa9e830bcf486accf364eb3fb874dd663f2b49 19cd5760bb235822f58274a95dbf4c2451ece5ca Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312044 +0200	checkout: moving from Finchley to master

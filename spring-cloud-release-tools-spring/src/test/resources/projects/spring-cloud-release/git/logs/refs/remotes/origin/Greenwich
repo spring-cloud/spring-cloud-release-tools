@@ -1,0 +1,5 @@
+0000000000000000000000000000000000000000 caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976061 +0100	update by push
+caa72691da75cfb9208264d33b80ac39fc744cd6 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520129 +0100	pull --rebase origin Greenwich: fast-forward
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 d9aa10887ac48f9a7e67c98b10e415a090fed49d Marcin Grzejszczak <marcin@grzejszczak.pl> 1560179802 +0200	fetch -p: fast-forward
+d9aa10887ac48f9a7e67c98b10e415a090fed49d b081456c6ccea9f316683c7531d16442e7d4d4f8 Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123101 +0200	pull: fast-forward
+b081456c6ccea9f316683c7531d16442e7d4d4f8 f046cfcbf93d23a2e4154270c084f72e527e944c Marcin Grzejszczak <marcin@grzejszczak.pl> 1566308722 +0200	fetch --tags: fast-forward

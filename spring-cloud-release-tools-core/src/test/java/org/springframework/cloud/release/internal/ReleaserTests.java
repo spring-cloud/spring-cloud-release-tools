@@ -88,9 +88,10 @@ public class ReleaserTests {
 	}
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
-		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater, this.postReleaseActions) {
+		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
+				this.projectBuilder, this.projectGitHandler, this.templateGenerator,
+				this.gradleUpdater, this.saganUpdater, this.documentationUpdater,
+				this.postReleaseActions) {
 			@Override
 			ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
@@ -99,9 +100,10 @@ public class ReleaserTests {
 	}
 
 	Releaser releaser() {
-		return new Releaser(this.projectPomUpdater, this.projectBuilder,
-				this.projectGitHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater, this.postReleaseActions);
+		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
+				this.projectBuilder, this.projectGitHandler, this.templateGenerator,
+				this.gradleUpdater, this.saganUpdater, this.documentationUpdater,
+				this.postReleaseActions);
 	}
 
 	@Test
@@ -142,8 +144,11 @@ public class ReleaserTests {
 						scReleaseVersion);
 
 		BDDAssertions.then(this.outputCapture.toString())
-				.contains("Project was successfully updated").contains(
-						"Successfully reverted the commit and bumped snapshot versions");
+				.contains("Project was successfully updated")
+				.contains("Successfully reverted the commit and bumped snapshot versions")
+				.contains("spring-boot-starter=>3.0.0.RELEASE")
+				.contains("spring-cloud-build=>2.0.1.BUILD-SNAPSHOT")
+				.contains("changed=>1.0.1.BUILD-SNAPSHOT");
 	}
 
 	@Test

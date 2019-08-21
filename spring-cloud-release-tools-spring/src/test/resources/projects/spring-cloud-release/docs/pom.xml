@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-starter-build</artifactId>
-		<version>Dalston.BUILD-SNAPSHOT</version>
+		<version>Hoxton.BUILD-SNAPSHOT</version>
 	</parent>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Starter Docs</name>
@@ -15,7 +15,7 @@
 	<properties>
 		<docs.main>spring-cloud-starters</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
-		<docs.whitelisted.branches>Brixton,Camden,Dalston</docs.whitelisted.branches>
+		<docs.whitelisted.branches>Edgware,Finchley,Greenwich</docs.whitelisted.branches>
 	</properties>
 	<build>
 		<plugins>
@@ -31,21 +31,22 @@
 		<profile>
 			<id>docs</id>
 			<build>
-				<plugins>
+				<plugins>				
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+					</plugin>
 					<plugin>
 						<groupId>org.asciidoctor</groupId>
 						<artifactId>asciidoctor-maven-plugin</artifactId>
-						<inherited>false</inherited>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<inherited>false</inherited>
-					</plugin>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<inherited>false</inherited>
 					</plugin>
 				</plugins>
 			</build>

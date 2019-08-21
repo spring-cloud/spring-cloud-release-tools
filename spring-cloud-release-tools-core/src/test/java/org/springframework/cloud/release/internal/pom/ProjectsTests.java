@@ -78,21 +78,26 @@ public class ProjectsTests {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
 		ProjectVersion build = new ProjectVersion("spring-cloud-build", "1.0.0.RELEASE");
 		projectVersions.add(build);
-		ProjectVersion boot = new ProjectVersion("spring-boot-starter", "2.0.0");
+		ProjectVersion boot = new ProjectVersion("spring-boot-starter", "2.0.0.RELEASE");
 		projectVersions.add(boot);
-		ProjectVersion bootDeps = new ProjectVersion("spring-boot-dependencies", "2.0.0");
+		ProjectVersion bootDeps = new ProjectVersion("spring-boot-dependencies",
+				"2.0.0.RELEASE");
 		projectVersions.add(bootDeps);
 		ProjectVersion original = new ProjectVersion("spring-cloud-starter-foo",
 				"3.0.0.BUILD-SNAPSHOT");
 		projectVersions.add(original);
 		Projects projects = new Projects(projectVersions);
 
-		Projects forRollback = Projects.forRollback(projects, original);
+		Projects forRollback = Projects.forRollback(new ReleaserProperties(), projects);
 
-		then(forRollback.forName("spring-boot-starter").version).isEqualTo("2.0.0");
-		then(forRollback.forName("spring-boot-dependencies").version).isEqualTo("2.0.0");
+		then(forRollback.forName("spring-cloud-build").version)
+				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(forRollback.forName("spring-boot-starter").version)
+				.isEqualTo("2.0.0.RELEASE");
+		then(forRollback.forName("spring-boot-dependencies").version)
+				.isEqualTo("2.0.0.RELEASE");
 		then(forRollback.forName("spring-cloud-starter-foo").version)
-				.isEqualTo("3.0.1.BUILD-SNAPSHOT");
+				.isEqualTo("3.0.0.BUILD-SNAPSHOT");
 	}
 
 	@Test

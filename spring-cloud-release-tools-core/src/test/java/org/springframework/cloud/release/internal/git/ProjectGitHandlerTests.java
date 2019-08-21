@@ -78,8 +78,9 @@ public class ProjectGitHandlerTests {
 
 	@Test
 	public void should_commit_when_snapshot_version_is_present_with_post_release_msg() {
-		this.updater.commitAfterBumpingVersions(this.file,
-				projectVersion("1.0.0.BUILD-SNAPSHOT"));
+		ProjectVersion bumped = new ProjectVersion("name",
+				projectVersion("1.0.0.BUILD-SNAPSHOT").bumpedVersion());
+		this.updater.commitAfterBumpingVersions(this.file, bumped);
 
 		then(this.gitRepo).should()
 				.commit(eq("Bumping versions to 1.0.1.BUILD-SNAPSHOT after release"));
