@@ -20,9 +20,9 @@ import java.io.File;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
 /**

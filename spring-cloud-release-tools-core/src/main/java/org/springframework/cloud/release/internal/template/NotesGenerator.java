@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.util.StringUtils;
 
 /**
@@ -29,9 +29,9 @@ import org.springframework.util.StringUtils;
  */
 class NotesGenerator {
 
-	private final ProjectGitHandler handler;
+	private final ProjectGitHubHandler handler;
 
-	NotesGenerator(ProjectGitHandler handler) {
+	NotesGenerator(ProjectGitHubHandler handler) {
 		this.handler = handler;
 	}
 

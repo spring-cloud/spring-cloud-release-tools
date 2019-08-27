@@ -27,10 +27,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.cloud.release.internal.pom.TestUtils;
+import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.buildsystem.TestUtils;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.util.FileSystemUtils;
 
 class VersionsFetcherTests {

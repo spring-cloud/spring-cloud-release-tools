@@ -31,14 +31,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.gradle.GradleUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.cloud.release.internal.post.PostReleaseActions;
-import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
+import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
@@ -59,10 +60,13 @@ public class ReleaserTests {
 	ProjectPomUpdater projectPomUpdater;
 
 	@Mock
-	ProjectBuilder projectBuilder;
+	ProjectCommandExecutor projectCommandExecutor;
 
 	@Mock
 	ProjectGitHandler projectGitHandler;
+
+	@Mock
+	ProjectGitHubHandler projectGitHubHandler;
 
 	@Mock
 	TemplateGenerator templateGenerator;
@@ -89,9 +93,9 @@ public class ReleaserTests {
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
 		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
-				this.projectBuilder, this.projectGitHandler, this.templateGenerator,
-				this.gradleUpdater, this.saganUpdater, this.documentationUpdater,
-				this.postReleaseActions) {
+				this.projectCommandExecutor, this.projectGitHandler,
+				this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
+				this.saganUpdater, this.documentationUpdater, this.postReleaseActions) {
 			@Override
 			ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
@@ -101,9 +105,9 @@ public class ReleaserTests {
 
 	Releaser releaser() {
 		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
-				this.projectBuilder, this.projectGitHandler, this.templateGenerator,
-				this.gradleUpdater, this.saganUpdater, this.documentationUpdater,
-				this.postReleaseActions);
+				this.projectCommandExecutor, this.projectGitHandler,
+				this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
+				this.saganUpdater, this.documentationUpdater, this.postReleaseActions);
 	}
 
 	@Test
@@ -173,7 +177,7 @@ public class ReleaserTests {
 	public void should_not_close_milestone_for_snapshots() {
 		releaser().closeMilestone(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(this.projectGitHandler).should(never())
+		then(this.projectGitHubHandler).should(never())
 				.closeMilestone(any(ProjectVersion.class));
 	}
 

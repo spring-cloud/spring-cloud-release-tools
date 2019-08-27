@@ -47,20 +47,21 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.buildsystem.TestPomReader;
+import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.docs.TestDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.gradle.GradleUpdater;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
-import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.cloud.release.internal.pom.TestPomReader;
-import org.springframework.cloud.release.internal.pom.TestUtils;
-import org.springframework.cloud.release.internal.post.PostReleaseActions;
-import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
+import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.sagan.Project;
 import org.springframework.cloud.release.internal.sagan.Release;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
@@ -94,9 +95,11 @@ public class AcceptanceTests {
 
 	File cloudProjectFolder;
 
-	TestProjectGitHandler gitHandler;
+	TestProjectGitHubHandler gitHandler;
 
 	NonAssertingTestProjectGitHandler nonAssertingGitHandler;
+
+	NonAssertingTestProjectGitHubHandler nonAssertingGitHubHandler;
 
 	SaganClient saganClient = Mockito.mock(SaganClient.class);
 
@@ -695,19 +698,22 @@ public class AcceptanceTests {
 	private Releaser defaultReleaser(String expectedVersion, String projectName,
 			ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
-		TestProjectGitHandler handler = new TestProjectGitHandler(properties,
+		ProjectCommandExecutor projectCommandExecutor = new ProjectCommandExecutor(
+				properties);
+		ProjectGitHandler gitHandler = new ProjectGitHandler(properties);
+		TestProjectGitHubHandler githubHandler = new TestProjectGitHubHandler(properties,
 				expectedVersion, projectName);
-		TemplateGenerator templateGenerator = new TemplateGenerator(properties, handler);
+		TemplateGenerator templateGenerator = new TemplateGenerator(properties,
+				githubHandler);
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
 		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient,
 				this.releaserProperties);
 		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(
 				properties,
 				new TestDocumentationUpdater.TestProjectDocumentationUpdater(properties,
-						handler, "Brixton.SR1"),
+						gitHandler, "Brixton.SR1"),
 				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties,
-						handler, templateGenerator)) {
+						gitHandler, templateGenerator)) {
 			@Override
 			public File updateDocsRepo(ProjectVersion currentProject,
 					String bomReleaseBranch) {
@@ -716,17 +722,21 @@ public class AcceptanceTests {
 				return file;
 			}
 		};
-		Releaser releaser = new Releaser(releaserProperties, pomUpdater, projectBuilder,
-				handler, templateGenerator, gradleUpdater, saganUpdater,
-				documentationUpdater, this.postReleaseActions);
-		this.gitHandler = handler;
+		Releaser releaser = new Releaser(releaserProperties, pomUpdater,
+				projectCommandExecutor, gitHandler, githubHandler, templateGenerator,
+				gradleUpdater, saganUpdater, documentationUpdater,
+				this.postReleaseActions);
+		this.gitHandler = githubHandler;
 		return releaser;
 	}
 
 	private Releaser defaultMetaReleaser(ReleaserProperties properties) {
 		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
-		ProjectBuilder projectBuilder = new ProjectBuilder(properties);
-		NonAssertingTestProjectGitHandler handler = new NonAssertingTestProjectGitHandler(
+		ProjectCommandExecutor projectCommandExecutor = new ProjectCommandExecutor(
+				properties);
+		NonAssertingTestProjectGitHubHandler handler = new NonAssertingTestProjectGitHubHandler(
+				properties);
+		NonAssertingTestProjectGitHandler nonAssertingGitHandler = new NonAssertingTestProjectGitHandler(
 				properties);
 		TemplateGenerator templateGenerator = Mockito
 				.spy(new TemplateGenerator(properties, handler));
@@ -736,9 +746,9 @@ public class AcceptanceTests {
 		DocumentationUpdater documentationUpdater = Mockito
 				.spy(new TestDocumentationUpdater(properties,
 						new TestDocumentationUpdater.TestProjectDocumentationUpdater(
-								properties, handler, "Brixton.SR1"),
+								properties, nonAssertingGitHandler, "Brixton.SR1"),
 						new TestDocumentationUpdater.TestReleaseContentsUpdater(
-								properties, handler, templateGenerator) {
+								properties, nonAssertingGitHandler, templateGenerator) {
 							@Override
 							public File updateProjectRepo(Projects projects) {
 								File file = super.updateProjectRepo(projects);
@@ -755,10 +765,12 @@ public class AcceptanceTests {
 						return file;
 					}
 				});
-		Releaser releaser = Mockito.spy(new Releaser(releaserProperties, pomUpdater,
-				projectBuilder, handler, templateGenerator, gradleUpdater, saganUpdater,
-				documentationUpdater, this.postReleaseActions));
-		this.nonAssertingGitHandler = handler;
+		Releaser releaser = Mockito
+				.spy(new Releaser(releaserProperties, pomUpdater, projectCommandExecutor,
+						nonAssertingGitHandler, handler, templateGenerator, gradleUpdater,
+						saganUpdater, documentationUpdater, this.postReleaseActions));
+		this.nonAssertingGitHubHandler = handler;
+		this.nonAssertingGitHandler = nonAssertingGitHandler;
 		this.templateGenerator = templateGenerator;
 		this.saganUpdater = saganUpdater;
 		this.documentationUpdater = documentationUpdater;
@@ -849,7 +861,7 @@ public class AcceptanceTests {
 		return new String(Files.readAllBytes(file.toPath()));
 	}
 
-	class TestProjectGitHandler extends ProjectGitHandler {
+	class TestProjectGitHubHandler extends ProjectGitHubHandler {
 
 		final String expectedVersion;
 
@@ -861,7 +873,7 @@ public class AcceptanceTests {
 
 		boolean issueCreatedInStartSpringIo = false;
 
-		TestProjectGitHandler(ReleaserProperties properties, String expectedVersion,
+		TestProjectGitHubHandler(ReleaserProperties properties, String expectedVersion,
 				String projectName) {
 			super(properties);
 			this.expectedVersion = expectedVersion;
@@ -893,7 +905,7 @@ public class AcceptanceTests {
 
 	}
 
-	class NonAssertingTestProjectGitHandler extends ProjectGitHandler {
+	class NonAssertingTestProjectGitHubHandler extends ProjectGitHubHandler {
 
 		boolean closedMilestones = false;
 
@@ -901,9 +913,7 @@ public class AcceptanceTests {
 
 		boolean issueCreatedInStartSpringIo = false;
 
-		List<File> clonedProjects = new ArrayList<>();
-
-		NonAssertingTestProjectGitHandler(ReleaserProperties properties) {
+		NonAssertingTestProjectGitHubHandler(ReleaserProperties properties) {
 			super(properties);
 		}
 
@@ -926,6 +936,16 @@ public class AcceptanceTests {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
 			return "https://foo.bar.com/" + releaseVersion.toString();
+		}
+
+	}
+
+	class NonAssertingTestProjectGitHandler extends ProjectGitHandler {
+
+		List<File> clonedProjects = new ArrayList<>();
+
+		NonAssertingTestProjectGitHandler(ReleaserProperties properties) {
+			super(properties);
 		}
 
 		@Override

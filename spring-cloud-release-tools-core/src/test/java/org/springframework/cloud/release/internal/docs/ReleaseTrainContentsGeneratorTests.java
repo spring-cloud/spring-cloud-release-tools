@@ -23,8 +23,8 @@ import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 
 /**
  * @author Marcin Grzejszczak

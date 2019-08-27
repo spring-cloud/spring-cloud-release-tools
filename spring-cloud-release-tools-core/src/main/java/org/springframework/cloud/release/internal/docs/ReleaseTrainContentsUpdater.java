@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.tech.HandlebarsHelper;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.StringUtils;
@@ -42,6 +42,7 @@ import org.springframework.util.StringUtils;
 /**
  * @author Marcin Grzejszczak
  */
+// TODO: [SPRING-CLOUD]
 class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory

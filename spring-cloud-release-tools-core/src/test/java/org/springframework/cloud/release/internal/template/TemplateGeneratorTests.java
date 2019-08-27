@@ -24,9 +24,9 @@ import java.util.HashSet;
 import org.junit.Test;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.project.Projects;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -37,7 +37,7 @@ public class TemplateGeneratorTests {
 
 	ReleaserProperties props = new ReleaserProperties();
 
-	ProjectGitHandler handler = new ProjectGitHandler(this.props) {
+	ProjectGitHubHandler handler = new ProjectGitHubHandler(this.props) {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
 			if (releaseVersion.projectName.equals("spring-cloud-foo")) {
@@ -303,7 +303,7 @@ public class TemplateGeneratorTests {
 	@Test
 	public void should_generate_release_notes_template_when_url_exists()
 			throws IOException {
-		ProjectGitHandler handler = new ProjectGitHandler(this.props) {
+		ProjectGitHubHandler handler = new ProjectGitHubHandler(this.props) {
 			@Override
 			public String milestoneUrl(ProjectVersion releaseVersion) {
 				return "https://foo.bar.com?closed=1";

@@ -25,12 +25,13 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
 
 /**
  * @author Marcin Grzejszczak
  */
+// TODO: [SPRING-CLOUD]
 class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
 	private static final String HTTP_SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";

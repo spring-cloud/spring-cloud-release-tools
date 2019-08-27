@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -54,6 +55,8 @@ public class ReleaserProperties implements Serializable {
 	private Pom pom = new Pom();
 
 	private Maven maven = new Maven();
+
+	private Bash bash = new Bash();
 
 	private Gradle gradle = new Gradle();
 
@@ -110,6 +113,14 @@ public class ReleaserProperties implements Serializable {
 
 	public void setGradle(Gradle gradle) {
 		this.gradle = gradle;
+	}
+
+	public Bash getBash() {
+		return bash;
+	}
+
+	public void setBash(Bash bash) {
+		this.bash = bash;
 	}
 
 	public Map<String, String> getFixedVersions() {
@@ -840,6 +851,121 @@ public class ReleaserProperties implements Serializable {
 
 	}
 
+	public static class Bash implements Serializable {
+
+		/**
+		 * Placeholder for system properties.
+		 */
+		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
+
+		/**
+		 * Command to be executed to build the project.
+		 */
+		private String buildCommand = "echo \"{{systemProps}}\"";
+
+		/**
+		 * Command to be executed to deploy a built project.
+		 */
+		private String deployCommand = "echo \"{{systemProps}}\"";
+
+		/**
+		 * Command to be executed to build and deploy guides project only.
+		 */
+		private String deployGuidesCommand = "echo \"{{systemProps}}\"";
+
+		/**
+		 * Command to be executed to publish documentation. If present "{{version}}" will
+		 * be replaced by the provided version.
+		 */
+		private String[] publishDocsCommands = { "mkdir -p target",
+				"echo \"{{version}}\"" };
+
+		/**
+		 * Command to be executed to generate release train documentation.
+		 */
+		private String generateReleaseTrainDocsCommand = "echo \"{{version}}\"";
+
+		/**
+		 * Additional system properties that should be passed to the build / deploy
+		 * commands. If present in other commands "{{systemProps}}" will be substituted
+		 * with this property.
+		 */
+		private String systemProperties = "";
+
+		/**
+		 * Max wait time in minutes for the process to finish.
+		 */
+		private long waitTimeInMinutes = 20;
+
+		public String getBuildCommand() {
+			return this.buildCommand;
+		}
+
+		public void setBuildCommand(String buildCommand) {
+			this.buildCommand = buildCommand;
+		}
+
+		public long getWaitTimeInMinutes() {
+			return this.waitTimeInMinutes;
+		}
+
+		public void setWaitTimeInMinutes(long waitTimeInMinutes) {
+			this.waitTimeInMinutes = waitTimeInMinutes;
+		}
+
+		public String getDeployCommand() {
+			return this.deployCommand;
+		}
+
+		public void setDeployCommand(String deployCommand) {
+			this.deployCommand = deployCommand;
+		}
+
+		public String getDeployGuidesCommand() {
+			return this.deployGuidesCommand;
+		}
+
+		public void setDeployGuidesCommand(String deployGuidesCommand) {
+			this.deployGuidesCommand = deployGuidesCommand;
+		}
+
+		public String[] getPublishDocsCommands() {
+			return this.publishDocsCommands;
+		}
+
+		public void setPublishDocsCommands(String[] publishDocsCommands) {
+			this.publishDocsCommands = publishDocsCommands;
+		}
+
+		public String getGenerateReleaseTrainDocsCommand() {
+			return this.generateReleaseTrainDocsCommand;
+		}
+
+		public void setGenerateReleaseTrainDocsCommand(
+				String generateReleaseTrainDocsCommand) {
+			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
+		}
+
+		public String getSystemProperties() {
+			return this.systemProperties;
+		}
+
+		public void setSystemProperties(String systemProperties) {
+			this.systemProperties = systemProperties;
+		}
+
+		@Override
+		public String toString() {
+			return "Maven{" + "buildCommand='" + this.buildCommand + '\''
+					+ ", deployCommand='" + this.deployCommand + '\''
+					+ ", publishDocsCommands=" + Arrays.toString(this.publishDocsCommands)
+					+ "generateReleaseTrainDocsCommand='"
+					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes="
+					+ this.waitTimeInMinutes + '}';
+		}
+
+	}
+
 	public static class Gradle implements Serializable {
 
 		/**
@@ -872,6 +998,106 @@ public class ReleaserProperties implements Serializable {
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
 				"^.*samples/standalone/[a-z]+/.*$");
 
+		/**
+		 * Placeholder for system properties.
+		 */
+		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
+
+		/**
+		 * Command to be executed to build the project.
+		 */
+		private String buildCommand = "./gradlew clean build publishToMavenLocal {{systemProps}}";
+
+		/**
+		 * Command to be executed to deploy a built project.
+		 */
+		private String deployCommand = "./gradlew clean build publish {{systemProps}}";
+
+		/**
+		 * Command to be executed to build and deploy guides project only.
+		 */
+		private String deployGuidesCommand = "./gradlew clean build deployGuides {{systemProps}}";
+
+		/**
+		 * Command to be executed to publish documentation. If present "{{version}}" will
+		 * be replaced by the provided version.
+		 */
+		private String[] publishDocsCommands = { "echo 'TODO'" };
+
+		/**
+		 * Command to be executed to generate release train documentation.
+		 */
+		private String generateReleaseTrainDocsCommand = "echo 'TODO'";
+
+		/**
+		 * Additional system properties that should be passed to the build / deploy
+		 * commands. If present in other commands "{{systemProps}}" will be substituted
+		 * with this property.
+		 */
+		private String systemProperties = "";
+
+		/**
+		 * Max wait time in minutes for the process to finish.
+		 */
+		private long waitTimeInMinutes = 20;
+
+		public String getBuildCommand() {
+			return this.buildCommand;
+		}
+
+		public void setBuildCommand(String buildCommand) {
+			this.buildCommand = buildCommand;
+		}
+
+		public long getWaitTimeInMinutes() {
+			return this.waitTimeInMinutes;
+		}
+
+		public void setWaitTimeInMinutes(long waitTimeInMinutes) {
+			this.waitTimeInMinutes = waitTimeInMinutes;
+		}
+
+		public String getDeployCommand() {
+			return this.deployCommand;
+		}
+
+		public void setDeployCommand(String deployCommand) {
+			this.deployCommand = deployCommand;
+		}
+
+		public String getDeployGuidesCommand() {
+			return this.deployGuidesCommand;
+		}
+
+		public void setDeployGuidesCommand(String deployGuidesCommand) {
+			this.deployGuidesCommand = deployGuidesCommand;
+		}
+
+		public String[] getPublishDocsCommands() {
+			return this.publishDocsCommands;
+		}
+
+		public void setPublishDocsCommands(String[] publishDocsCommands) {
+			this.publishDocsCommands = publishDocsCommands;
+		}
+
+		public String getGenerateReleaseTrainDocsCommand() {
+			return this.generateReleaseTrainDocsCommand;
+		}
+
+		public void setGenerateReleaseTrainDocsCommand(
+				String generateReleaseTrainDocsCommand) {
+			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
+		}
+
+		public String getSystemProperties() {
+			return this.systemProperties;
+		}
+
+		public void setSystemProperties(String systemProperties) {
+			this.systemProperties = systemProperties;
+		}
+
 		public Map<String, String> getGradlePropsSubstitution() {
 			return this.gradlePropsSubstitution;
 		}
@@ -891,8 +1117,17 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Gradle{" + "gradlePropsSubstitution=" + this.gradlePropsSubstitution
-					+ ", ignoredGradleRegex=" + this.ignoredGradleRegex + '}';
+			return new StringJoiner(", ", Gradle.class.getSimpleName() + "[", "]")
+					.add("gradlePropsSubstitution=" + gradlePropsSubstitution)
+					.add("ignoredGradleRegex=" + ignoredGradleRegex)
+					.add("buildCommand='" + buildCommand + "'")
+					.add("deployCommand='" + deployCommand + "'")
+					.add("deployGuidesCommand='" + deployGuidesCommand + "'")
+					.add("publishDocsCommands=" + Arrays.toString(publishDocsCommands))
+					.add("generateReleaseTrainDocsCommand='"
+							+ generateReleaseTrainDocsCommand + "'")
+					.add("systemProperties='" + systemProperties + "'")
+					.add("waitTimeInMinutes=" + waitTimeInMinutes).toString();
 		}
 
 	}

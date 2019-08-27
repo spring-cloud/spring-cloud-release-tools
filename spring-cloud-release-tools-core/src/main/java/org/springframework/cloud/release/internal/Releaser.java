@@ -22,15 +22,16 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.gradle.GradleUpdater;
-import org.springframework.cloud.release.internal.pom.ProcessedProject;
-import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.cloud.release.internal.post.PostReleaseActions;
-import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
+import org.springframework.cloud.release.internal.project.ProcessedProject;
+import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
@@ -51,9 +52,11 @@ public class Releaser implements ReleaserPropertiesAware {
 
 	private final ProjectPomUpdater projectPomUpdater;
 
-	private final ProjectBuilder projectBuilder;
+	private final ProjectCommandExecutor projectCommandExecutor;
 
 	private final ProjectGitHandler projectGitHandler;
+
+	private final ProjectGitHubHandler projectGitHubHandler;
 
 	private final TemplateGenerator templateGenerator;
 
@@ -66,15 +69,18 @@ public class Releaser implements ReleaserPropertiesAware {
 	private final PostReleaseActions postReleaseActions;
 
 	public Releaser(ReleaserProperties releaserProperties,
-			ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
-			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
-			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
-			DocumentationUpdater documentationUpdater,
+			ProjectPomUpdater projectPomUpdater,
+			ProjectCommandExecutor projectCommandExecutor,
+			ProjectGitHandler projectGitHandler,
+			ProjectGitHubHandler projectGitHubHandler,
+			TemplateGenerator templateGenerator, GradleUpdater gradleUpdater,
+			SaganUpdater saganUpdater, DocumentationUpdater documentationUpdater,
 			PostReleaseActions postReleaseActions) {
 		this.releaserProperties = releaserProperties;
 		this.projectPomUpdater = projectPomUpdater;
-		this.projectBuilder = projectBuilder;
+		this.projectCommandExecutor = projectCommandExecutor;
 		this.projectGitHandler = projectGitHandler;
+		this.projectGitHubHandler = projectGitHubHandler;
 		this.templateGenerator = templateGenerator;
 		this.gradleUpdater = gradleUpdater;
 		this.saganUpdater = saganUpdater;
@@ -110,7 +116,7 @@ public class Releaser implements ReleaserPropertiesAware {
 	}
 
 	public void buildProject(ProjectVersion versionFromScRelease) {
-		this.projectBuilder.build(versionFromScRelease);
+		this.projectCommandExecutor.build(versionFromScRelease);
 		log.info("\nProject was successfully built");
 	}
 
@@ -120,12 +126,12 @@ public class Releaser implements ReleaserPropertiesAware {
 	}
 
 	public void deploy(ProjectVersion versionFromScRelease) {
-		this.projectBuilder.deploy(versionFromScRelease);
+		this.projectCommandExecutor.deploy(versionFromScRelease);
 		log.info("\nThe artifact was deployed successfully");
 	}
 
 	public void publishDocs(ProjectVersion changedVersion) {
-		this.projectBuilder.publishDocs(changedVersion.version);
+		this.projectCommandExecutor.publishDocs(changedVersion.version);
 		log.info("\nThe docs were published successfully");
 	}
 
@@ -181,7 +187,7 @@ public class Releaser implements ReleaserPropertiesAware {
 			return;
 		}
 		try {
-			this.projectGitHandler.closeMilestone(releaseVersion);
+			this.projectGitHubHandler.closeMilestone(releaseVersion);
 			log.info("\nSuccessfully closed milestone");
 		}
 		catch (Exception ex) {
@@ -267,7 +273,7 @@ public class Releaser implements ReleaserPropertiesAware {
 	private Exception createIssueInSpringGuides(ProjectVersion releaseVersion,
 			Projects projects) {
 		try {
-			this.projectGitHandler.createIssueInSpringGuides(projects, releaseVersion);
+			this.projectGitHubHandler.createIssueInSpringGuides(projects, releaseVersion);
 			log.info("\nSuccessfully created an issue in Spring Guides");
 			return null;
 		}
@@ -281,7 +287,8 @@ public class Releaser implements ReleaserPropertiesAware {
 	private Exception createIssueInStartSpringIo(ProjectVersion releaseVersion,
 			Projects projects) {
 		try {
-			this.projectGitHandler.createIssueInStartSpringIo(projects, releaseVersion);
+			this.projectGitHubHandler.createIssueInStartSpringIo(projects,
+					releaseVersion);
 			log.info("\nSuccessfully created an issue in start.spring.io");
 			return null;
 		}

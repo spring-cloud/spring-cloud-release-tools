@@ -25,19 +25,14 @@ import java.util.Map;
 
 import com.github.jknack.handlebars.Template;
 import com.google.common.collect.ImmutableMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.project.Projects;
 
 /**
  * @author Marcin Grzejszczak
  */
 class ReleaseNotesTemplateGenerator {
-
-	private static final Logger log = LoggerFactory
-			.getLogger(ReleaseNotesTemplateGenerator.class);
 
 	private final Template template;
 
@@ -50,7 +45,7 @@ class ReleaseNotesTemplateGenerator {
 	private final NotesGenerator notesGenerator;
 
 	ReleaseNotesTemplateGenerator(Template template, String releaseVersion,
-			File blogOutput, Projects projects, ProjectGitHandler handler) {
+			File blogOutput, Projects projects, ProjectGitHubHandler handler) {
 		this.template = template;
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;
