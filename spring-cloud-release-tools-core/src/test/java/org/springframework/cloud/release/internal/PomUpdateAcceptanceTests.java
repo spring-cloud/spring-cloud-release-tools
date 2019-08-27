@@ -28,9 +28,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import org.springframework.cloud.release.internal.buildsystem.PomReader;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
-import org.springframework.cloud.release.internal.buildsystem.TestPomReader;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.util.FileSystemUtils;
@@ -44,8 +44,6 @@ public class PomUpdateAcceptanceTests {
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
-
-	TestPomReader testPomReader = new TestPomReader();
 
 	File temporaryFolder;
 
@@ -68,13 +66,12 @@ public class PomUpdateAcceptanceTests {
 				projects.forFile(project), true);
 
 		then(this.temporaryFolder).exists();
-		Model rootPom = this.testPomReader
-				.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
-		Model depsPom = this.testPomReader.readPom(
+		Model rootPom = PomReader.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
+		Model depsPom = PomReader.readPom(
 				tmpFile("/spring-cloud-sleuth/spring-cloud-sleuth-dependencies/pom.xml"));
-		Model corePom = this.testPomReader.readPom(
+		Model corePom = PomReader.readPom(
 				tmpFile("/spring-cloud-sleuth/spring-cloud-sleuth-core/pom.xml"));
-		Model zipkinStreamPom = this.testPomReader.readPom(tmpFile(
+		Model zipkinStreamPom = PomReader.readPom(tmpFile(
 				"/spring-cloud-sleuth/spring-cloud-sleuth-samples/spring-cloud-sleuth-sample-zipkin-stream/pom.xml"));
 		then(rootPom.getVersion()).isEqualTo("1.2.0.BUILD-SNAPSHOT");
 		then(rootPom.getProperties())

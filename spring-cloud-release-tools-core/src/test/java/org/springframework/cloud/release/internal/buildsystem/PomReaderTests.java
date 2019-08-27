@@ -36,8 +36,6 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class PomReaderTests {
 
-	PomReader pomReader = new PomReader();
-
 	File springCloudReleaseProjectPom;
 
 	File springCloudReleaseProject;
@@ -59,7 +57,7 @@ public class PomReaderTests {
 
 	@Test
 	public void should_parse_a_valid_pom() {
-		Model pom = this.pomReader.readPom(this.springCloudReleaseProjectPom);
+		Model pom = PomReader.readPom(this.springCloudReleaseProjectPom);
 
 		then(pom).isNotNull();
 		then(pom.getArtifactId()).isEqualTo("spring-cloud-starter-build");
@@ -67,7 +65,7 @@ public class PomReaderTests {
 
 	@Test
 	public void should_parse_a_valid_pom_when_passing_direcory() {
-		Model pom = this.pomReader.readPom(this.springCloudReleaseProject);
+		Model pom = PomReader.readPom(this.springCloudReleaseProject);
 
 		then(pom).isNotNull();
 		then(pom.getArtifactId()).isEqualTo("spring-cloud-starter-build");
@@ -75,20 +73,20 @@ public class PomReaderTests {
 
 	@Test
 	public void should_return_null_when_file_is_missing() {
-		then(this.pomReader.readPom(new File("foo/bar"))).isNull();
+		then(PomReader.readPom(new File("foo/bar"))).isNull();
 	}
 
 	@Test
 	public void should_throw_exception_when_file_is_invalid() {
-		thenThrownBy(() -> this.pomReader.readPom(this.licenseFile))
+		thenThrownBy(() -> PomReader.readPom(this.licenseFile))
 				.hasMessageStartingWith("Failed to read file: ")
 				.hasCauseInstanceOf(XmlPullParserException.class);
 	}
 
 	@Test
 	public void should_throw_exception_when_file_is_empty() {
-		thenThrownBy(() -> this.pomReader.readPom(this.empty))
-				.hasMessageStartingWith("File [").hasMessageContaining("] is empty")
+		thenThrownBy(() -> PomReader.readPom(this.empty)).hasMessageStartingWith("File [")
+				.hasMessageContaining("] is empty")
 				.hasCauseInstanceOf(EOFException.class);
 	}
 

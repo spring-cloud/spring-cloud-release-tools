@@ -54,7 +54,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 
 	private static final boolean UPDATE_FIXED_VERSIONS = true;
 
-	private static final Map<String, Versions> CACHE = new ConcurrentHashMap<>();
+	private static final Map<String, VersionsFromBom> CACHE = new ConcurrentHashMap<>();
 
 	private final ProjectGitHandler gitRepo;
 
@@ -93,33 +93,32 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	// TODO: I don't like this flag but don't have a better idea
 	public Projects retrieveVersionsFromReleaseTrainBom(String branch,
 			boolean updateFixedVersions) {
-		Versions versions = CACHE.computeIfAbsent(branch, s -> {
+		VersionsFromBom versionsFromBom = CACHE.computeIfAbsent(branch, s -> {
 			File clonedBom = this.gitRepo.cloneReleaseTrainProject();
 			this.gitRepo.checkout(clonedBom, branch);
 			BomParser releaseTrainBomParser = new BomParser(this.properties, clonedBom);
-			return releaseTrainBomParser.allVersions();
+			return releaseTrainBomParser.versionsFromBom();
 		});
 		if (updateFixedVersions) {
 			log.info("Will update the following versions manually [{}]",
 					this.properties.getFixedVersions());
-			this.properties.getFixedVersions().forEach(versions::setVersion);
+			this.properties.getFixedVersions().forEach(versionsFromBom::setVersion);
 		}
-		log.info("Retrieved the following versions\n{}", versions);
-		return versions.toProjectVersions();
+		log.info("Retrieved the following versions\n{}", versionsFromBom);
+		return versionsFromBom.toProjectVersions();
 	}
 
 	/**
 	 * @return map of fixed versions
 	 */
 	public Projects fixedVersions() {
-		Set<ProjectVersion> projectVersions = this.properties.getFixedVersions()
-				.entrySet().stream()
-				.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
+		Set<Project> projects = this.properties.getFixedVersions().entrySet().stream()
+				.map(entry -> new Project(entry.getKey(), entry.getValue()))
 				.collect(Collectors.toSet());
 		if (log.isDebugEnabled()) {
-			log.debug("Will apply the following fixed versions {}", projectVersions);
+			log.debug("Will apply the following fixed versions {}", projects);
 		}
-		return new Versions(projectVersions, this.properties).toProjectVersions();
+		return new VersionsFromBom(this.properties, projects).toProjectVersions();
 	}
 
 	/**
@@ -134,8 +133,9 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	 */
 	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
 			ProjectVersion versionFromReleaseTrain, boolean assertVersions) {
-		Versions versions = new Versions(projects, this.properties);
-		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versions)) {
+		VersionsFromBom versionsFromBom = new VersionsFromBom(this.properties,
+				projects.asProjects());
+		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versionsFromBom)) {
 			log.info("Skipping project updating");
 			return;
 		}
@@ -174,7 +174,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 
 		private final ModelWrapper rootPom;
 
-		private final Versions versions;
+		private final VersionsFromBom versionsFromBom;
 
 		private final PomUpdater pomUpdater;
 
@@ -190,7 +190,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 				ReleaserProperties properties, ProjectVersion versionFromScRelease,
 				boolean assertVersions) {
 			this.rootPom = rootPom;
-			this.versions = new Versions(projects, properties);
+			this.versionsFromBom = new VersionsFromBom(properties, projects.asProjects());
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
 			List<Pattern> unacceptableVersionPatterns = versionFromScRelease
@@ -212,8 +212,8 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 					return FileVisitResult.CONTINUE;
 				}
 				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file,
-						this.versions);
-				this.pomUpdater.overwritePomIfDirty(model, this.versions, file);
+						this.versionsFromBom);
+				this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom, file);
 				if (this.assertVersions && !this.skipVersionAssert
 						&& !this.pomUpdater.hasSkipDeployment(model.model)) {
 					log.debug(

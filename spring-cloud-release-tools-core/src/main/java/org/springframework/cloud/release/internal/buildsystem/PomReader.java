@@ -27,14 +27,22 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
+ * Class that reads poms as {@link Model}.
+ *
  * @author Marcin Grzejszczak
  */
-class PomReader {
+public final class PomReader {
+
+	private PomReader() {
+		throw new IllegalStateException("Shouldn't instantiate a utility class");
+	}
 
 	/**
 	 * Returns a parsed POM.
+	 * @param file location to the pom
+	 * @return parsed model
 	 */
-	Model readPom(File file) {
+	public static Model readPom(File file) {
 		File pom = file;
 		if (file.isDirectory()) {
 			pom = new File(file, "pom.xml");
@@ -58,6 +66,17 @@ class PomReader {
 			throw new IllegalStateException(
 					"Failed to read file: " + pom.getAbsolutePath(), e);
 		}
+	}
+
+	public static Model pom(File projectRoot, String pom) {
+		if (pom == null) {
+			throw new IllegalStateException("Pom is not present");
+		}
+		File pomFile = new File(projectRoot, pom);
+		if (!pomFile.exists()) {
+			throw new IllegalStateException("Pom is not present");
+		}
+		return PomReader.readPom(pomFile);
 	}
 
 }

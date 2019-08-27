@@ -17,7 +17,6 @@
 package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -32,11 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 
-import static org.springframework.cloud.release.internal.buildsystem.SpringCloudConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.buildsystem.SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.buildsystem.SpringCloudConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
-import static org.springframework.cloud.release.internal.buildsystem.SpringCloudConstants.SPRING_BOOT;
-
 /**
  * Parses the poms for a given project and populates versions from a release train.
  *
@@ -48,11 +42,7 @@ class BomParser {
 
 	private final File thisProjectRoot;
 
-	private final String pomWithBootStarterParent;
-
-	private final String thisTrainBom;
-
-	private final PomReader pomReader = new PomReader();
+	private final String thisTrainBomLocation;
 
 	private final Pattern versionPattern;
 
@@ -60,88 +50,36 @@ class BomParser {
 
 	BomParser(ReleaserProperties properties, File thisProjectRoot) {
 		this.thisProjectRoot = thisProjectRoot;
-		this.pomWithBootStarterParent = properties.getPom().getPomWithBootStarterParent();
-		this.thisTrainBom = properties.getPom().getThisTrainBom();
+		this.thisTrainBomLocation = properties.getPom().getThisTrainBom();
 		this.versionPattern = Pattern.compile(properties.getPom().getBomVersionPattern());
 		this.properties = properties;
 	}
 
-	Versions allVersions() {
-		Versions boot = bootVersion();
-		Versions cloud = versionsFromBom();
-		return new Versions(this.properties, allProjects(boot, cloud));
-	}
-
-	private Set<Project> allProjects(Versions boot, Versions cloud) {
-		Set<Project> allProjects = new HashSet<>();
-		allProjects.addAll(boot.projects);
-		allProjects.addAll(cloud.projects);
-		return allProjects;
-	}
-
-	// TODO: [SPRING CLOUD]
-	Versions bootVersion() {
-		Model model = pom(this.pomWithBootStarterParent);
-		if (model == null) {
-			return Versions.EMPTY_VERSION;
-		}
-		String bootArtifactId = model.getParent().getArtifactId();
-		log.debug("Boot artifact id is equal to [{}]", bootArtifactId);
-		if (!SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID
-				.equals(bootArtifactId)) {
-			throw new IllegalStateException("The pom doesn't have a ["
-					+ SpringCloudConstants.BOOT_STARTER_PARENT_ARTIFACT_ID
-					+ "] artifact id");
-		}
-		String bootVersion = model.getParent().getVersion();
-		log.debug("Boot version is equal to [{}]", bootVersion);
-		Versions versions = new Versions(this.properties);
-		versions.add(SPRING_BOOT, bootVersion);
-		versions.add(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion);
-		versions.add(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion);
-		return versions;
-	}
-
-	private Model pom(String pom) {
-		if (pom == null) {
-			throw new IllegalStateException("Pom is not present");
-		}
-		File pomFile = new File(this.thisProjectRoot, pom);
-		if (!pomFile.exists()) {
-			throw new IllegalStateException("Pom is not present");
-		}
-		return this.pomReader.readPom(pomFile);
-	}
-
 	// the BOM contains all versions of projects and its parent MUST be Spring Cloud
 	// Dependencies Parent
-	Versions versionsFromBom() {
-		Model model = pom(this.thisTrainBom);
+	VersionsFromBom versionsFromBom() {
+		Model model = PomReader.pom(thisProjectRoot, this.thisTrainBomLocation);
 		if (model == null) {
-			return Versions.EMPTY_VERSION;
+			return VersionsFromBom.EMPTY_VERSION;
 		}
-		// TODO: [SPRING CLOUD]
-		String buildArtifact = model.getParent().getArtifactId();
-		log.debug("[{}] artifact id is equal to [{}]",
-				CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
-		if (!CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID.equals(buildArtifact)) {
-			throw new IllegalStateException("The pom doesn't have a ["
-					+ CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID + "] artifact id");
-		}
-		String buildVersion = model.getParent().getVersion();
-		log.debug("Spring Cloud Build version is equal to [{}]", buildVersion);
 		Set<Project> projects = model.getProperties().entrySet().stream()
-				.filter(propertyMatchesSCPattern()).map(toProject())
+				.filter(propertyMatchesVersionPattern()).map(toProject())
 				.collect(Collectors.toSet());
 		String releaseTrainProjectVersion = model.getVersion();
 		projects.add(
 				new Project(this.properties.getMetaRelease().getReleaseTrainProjectName(),
 						releaseTrainProjectVersion));
-		projects.add(new Project("spring-cloud-build", buildVersion));
-		return new Versions(this.properties, projects);
+		VersionsFromBom bomVersions = new VersionsFromBom(this.properties, projects);
+		return new VersionsFromBom(properties, bomVersions, customVersions(projects));
 	}
 
-	private Predicate<Map.Entry<Object, Object>> propertyMatchesSCPattern() {
+	private VersionsFromBom customVersions(Set<Project> projects) {
+		CustomBomParser parser = CustomBomParser.parser(this.thisProjectRoot,
+				this.properties, projects);
+		return parser.parseBom(this.thisProjectRoot, this.properties);
+	}
+
+	private Predicate<Map.Entry<Object, Object>> propertyMatchesVersionPattern() {
 		return entry -> this.versionPattern.matcher(entry.getKey().toString()).matches();
 	}
 

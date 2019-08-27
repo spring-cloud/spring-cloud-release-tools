@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitRepoTests;
 import org.springframework.util.FileSystemUtils;
 
@@ -45,11 +46,10 @@ public class PomUpdaterTests {
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
 
-	Versions versions = new Versions("0.0.1", "0.0.2", projects());
+	VersionsFromBom versionsFromBom = new VersionsFromBom(new ReleaserProperties(),
+			projects());
 
 	PomUpdater pomUpdater = new PomUpdater();
-
-	PomReader pomReader = new PomReader();
 
 	File temporaryFolder;
 
@@ -65,7 +65,7 @@ public class PomUpdaterTests {
 		File springCloudReleasePom = file("/projects/spring-cloud-release");
 
 		BDDAssertions.then(this.pomUpdater.shouldProjectBeUpdated(springCloudReleasePom,
-				this.versions)).isFalse();
+				this.versionsFromBom)).isFalse();
 	}
 
 	@Test
@@ -73,8 +73,8 @@ public class PomUpdaterTests {
 			throws Exception {
 		File springCloud = pom("/projects/project", "pom_with_parent_suffix.xml");
 
-		BDDAssertions
-				.then(this.pomUpdater.shouldProjectBeUpdated(springCloud, this.versions))
+		BDDAssertions.then(
+				this.pomUpdater.shouldProjectBeUpdated(springCloud, this.versionsFromBom))
 				.isFalse();
 	}
 
@@ -84,8 +84,8 @@ public class PomUpdaterTests {
 		File springCloud = pom("/projects/project",
 				"pom_matching_with_parent_suffix.xml");
 
-		BDDAssertions
-				.then(this.pomUpdater.shouldProjectBeUpdated(springCloud, this.versions))
+		BDDAssertions.then(
+				this.pomUpdater.shouldProjectBeUpdated(springCloud, this.versionsFromBom))
 				.isTrue();
 	}
 
@@ -95,7 +95,7 @@ public class PomUpdaterTests {
 		File springCloudSleuthPom = file("/projects/spring-cloud-sleuth");
 
 		BDDAssertions.then(this.pomUpdater.shouldProjectBeUpdated(springCloudSleuthPom,
-				this.versions)).isTrue();
+				this.versionsFromBom)).isTrue();
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class PomUpdaterTests {
 		File springCloudSleuthPom = file("/projects/spring-cloud-sleuth/empty-folder");
 
 		BDDAssertions.then(this.pomUpdater.shouldProjectBeUpdated(springCloudSleuthPom,
-				this.versions)).isFalse();
+				this.versionsFromBom)).isFalse();
 	}
 
 	@Test
@@ -113,9 +113,9 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/pom.xml");
 		ModelWrapper rootPom = model("foo");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isEqualTo(asString(originalPom));
@@ -128,13 +128,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/pom_matching_artifact.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 	}
@@ -146,13 +146,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/pom_matching_parent_v2.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(originalPom)).isNotEqualTo(asString(storedPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -166,13 +166,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/pom_matching_parent.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -185,7 +185,7 @@ public class PomUpdaterTests {
 		File springCloudReleasePom = file("/projects/spring-cloud-release");
 
 		BDDAssertions.then(this.pomUpdater.shouldProjectBeUpdated(springCloudReleasePom,
-				this.versions)).isFalse();
+				this.versionsFromBom)).isFalse();
 	}
 
 	@Test
@@ -194,7 +194,7 @@ public class PomUpdaterTests {
 		File springCloudSleuthPom = file("/projects/spring-cloud-sleuth");
 
 		BDDAssertions.then(this.pomUpdater.shouldProjectBeUpdated(springCloudSleuthPom,
-				this.versions)).isTrue();
+				this.versionsFromBom)).isTrue();
 	}
 
 	@Test
@@ -205,13 +205,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/children/pom_matching_parent_v2.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -230,13 +230,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/children/pom_different_group_boot_parent.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -252,13 +252,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/children/pom_different_group.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -277,13 +277,13 @@ public class PomUpdaterTests {
 				"/project/children/pom_different_group_skip_deployment_prop.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -302,13 +302,13 @@ public class PomUpdaterTests {
 				"/project/children/pom_different_group_skip_deployment_plugin.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -327,13 +327,13 @@ public class PomUpdaterTests {
 				"/project/children/pom_different_group_skip_deployment_plugin_mngmnt.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth", "org.springframework.cloud");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -352,13 +352,13 @@ public class PomUpdaterTests {
 		ModelWrapper rootPom = model("spring-cloud-contract",
 				"org.springframework.cloud");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
 				.isEqualTo("0.0.1");
 
@@ -371,13 +371,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/children/pom_matching_parent.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -395,13 +395,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/children/pom_matching_properties.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -418,10 +418,10 @@ public class PomUpdaterTests {
 				"pom_matching_properties.xml");
 		File afterProcessing = tmpFile("/project/children/pom_matching_properties.xml");
 		ModelWrapper model = this.pomUpdater.updateModel(model("spring-cloud-sleuth"),
-				afterProcessing, this.versions);
+				afterProcessing, this.versionsFromBom);
 
 		File processedPom = this.pomUpdater.overwritePomIfDirty(model,
-				Versions.EMPTY_VERSION, afterProcessing);
+				VersionsFromBom.EMPTY_VERSION, afterProcessing);
 
 		String processedPomText = asString(processedPom);
 		String beforeProcessingText = asString(beforeProcessing);
@@ -434,10 +434,10 @@ public class PomUpdaterTests {
 		File beforeProcessing = pom("/projects/project/");
 		File afterProcessing = tmpFile("/project/pom.xml");
 		ModelWrapper model = this.pomUpdater.updateModel(model("foo"), afterProcessing,
-				this.versions);
+				this.versionsFromBom);
 
 		File processedPom = this.pomUpdater.overwritePomIfDirty(model,
-				Versions.EMPTY_VERSION, afterProcessing);
+				VersionsFromBom.EMPTY_VERSION, afterProcessing);
 
 		BDDAssertions.then(asString(processedPom)).isEqualTo(asString(beforeProcessing));
 	}
@@ -449,13 +449,13 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/spring-cloud-contract/pom.xml");
 		ModelWrapper rootPom = model("spring-cloud-contract-parent");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
-		Model overriddenPomModel = this.pomReader.readPom(storedPom);
+		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
@@ -470,9 +470,9 @@ public class PomUpdaterTests {
 		File pomInTemp = tmpFile("/project/pom_matching_artifact_same_version.xml");
 		ModelWrapper rootPom = model("spring-cloud-sleuth");
 		ModelWrapper model = this.pomUpdater.updateModel(rootPom, pomInTemp,
-				this.versions);
+				this.versionsFromBom);
 
-		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versions,
+		File storedPom = this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom,
 				pomInTemp);
 
 		BDDAssertions.then(asString(storedPom)).isEqualTo(asString(originalPom));
@@ -480,6 +480,8 @@ public class PomUpdaterTests {
 
 	Set<Project> projects() {
 		Set<Project> projects = new HashSet<>();
+		projects.add(new Project("spring-boot", "0.0.1"));
+		projects.add(new Project("spring-cloud-build", "0.0.2"));
 		projects.add(new Project("spring-cloud-contract", "0.0.2.BUILD-SNAPSHOT"));
 		projects.add(new Project("spring-cloud-sleuth", "0.0.3.BUILD-SNAPSHOT"));
 		projects.add(new Project("spring-cloud-vault", "0.0.4.BUILD-SNAPSHOT"));

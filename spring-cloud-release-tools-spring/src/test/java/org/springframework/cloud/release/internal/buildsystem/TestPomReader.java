@@ -25,10 +25,8 @@ import org.apache.maven.model.Model;
  */
 public class TestPomReader {
 
-	PomReader pomReader = new PomReader();
-
 	public Model readPom(File pom) {
-		return this.pomReader.readPom(pom);
+		return PomReader.readPom(pom);
 	}
 
 }

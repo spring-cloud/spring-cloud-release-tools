@@ -47,7 +47,7 @@ public class BomParserTests {
 	public void should_throw_exception_when_boot_pom_is_missing() {
 		BomParser parser = new BomParser(this.properties, new File("."));
 
-		thenThrownBy(parser::bootVersion).isInstanceOf(IllegalStateException.class)
+		thenThrownBy(parser::versionsFromBom).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
@@ -57,17 +57,16 @@ public class BomParserTests {
 		this.properties.getPom().setThisTrainBom(null);
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::bootVersion).isInstanceOf(IllegalStateException.class)
+		thenThrownBy(parser::versionsFromBom).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
 	@Test
 	public void should_throw_exception_when_boot_version_is_missing_in_pom() {
 		this.properties.getPom().setPomWithBootStarterParent("pom.xml");
-		this.properties.getPom().setThisTrainBom(null);
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		thenThrownBy(parser::bootVersion).isInstanceOf(IllegalStateException.class)
+		thenThrownBy(parser::versionsFromBom).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining(
 						"The pom doesn't have a [spring-boot-starter-parent] artifact id");
 	}
@@ -76,7 +75,7 @@ public class BomParserTests {
 	public void should_populate_sc_release_version() {
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		String scReleaseVersion = parser.allVersions()
+		String scReleaseVersion = parser.versionsFromBom()
 				.versionForProject("spring-cloud-release");
 
 		then(scReleaseVersion).isEqualTo("Dalston.BUILD-SNAPSHOT");
@@ -86,7 +85,7 @@ public class BomParserTests {
 	public void should_populate_boot_version() {
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		String bootVersion = parser.bootVersion().versionForProject("spring-boot");
+		String bootVersion = parser.versionsFromBom().versionForProject("spring-boot");
 
 		then(bootVersion).isEqualTo("1.5.1.BUILD-SNAPSHOT");
 	}
@@ -111,7 +110,7 @@ public class BomParserTests {
 
 	@Test
 	public void should_throw_exception_when_cloud_version_is_missing_in_pom() {
-		this.properties.getPom().setPomWithBootStarterParent(null);
+		this.properties.getPom().setPomWithBootStarterParent("pom.xml");
 		this.properties.getPom().setThisTrainBom("pom.xml");
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
@@ -124,24 +123,24 @@ public class BomParserTests {
 	public void should_populate_cloud_version() {
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		Versions cloudVersions = parser.versionsFromBom();
+		VersionsFromBom cloudVersionsFromBom = parser.versionsFromBom();
 
-		then(cloudVersions.versionForProject("spring-cloud-build"))
+		then(cloudVersionsFromBom.versionForProject("spring-cloud-build"))
 				.isEqualTo("1.3.1.BUILD-SNAPSHOT");
-		then(cloudVersions.projects).contains(allProjects());
+		then(cloudVersionsFromBom.projects).contains(allProjects());
 	}
 
 	@Test
 	public void should_populate_boot_and_cloud_version() {
 		BomParser parser = new BomParser(this.properties, this.springCloudReleaseProject);
 
-		Versions cloudVersions = parser.allVersions();
+		VersionsFromBom cloudVersionsFromBom = parser.versionsFromBom();
 
-		then(cloudVersions.versionForProject("spring-boot"))
+		then(cloudVersionsFromBom.versionForProject("spring-boot"))
 				.isEqualTo("1.5.1.BUILD-SNAPSHOT");
-		then(cloudVersions.versionForProject("spring-cloud-build"))
+		then(cloudVersionsFromBom.versionForProject("spring-cloud-build"))
 				.isEqualTo("1.3.1.BUILD-SNAPSHOT");
-		then(cloudVersions.projects).contains(allProjects());
+		then(cloudVersionsFromBom.projects).contains(allProjects());
 	}
 
 	private Project[] allProjects() {

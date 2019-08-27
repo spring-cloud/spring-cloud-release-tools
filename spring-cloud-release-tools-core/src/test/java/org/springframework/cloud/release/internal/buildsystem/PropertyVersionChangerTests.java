@@ -27,6 +27,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
@@ -75,8 +77,8 @@ public class PropertyVersionChangerTests {
 				.setPropertyVersionIfApplicable(any(Project.class));
 	}
 
-	Versions versions() {
-		return new Versions("", "", allProjects());
+	VersionsFromBom versions() {
+		return new VersionsFromBom(new ReleaserProperties(), allProjects());
 	}
 
 	@SuppressWarnings("unchecked")

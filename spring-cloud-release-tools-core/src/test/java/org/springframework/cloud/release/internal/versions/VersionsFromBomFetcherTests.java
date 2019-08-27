@@ -33,7 +33,7 @@ import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.util.FileSystemUtils;
 
-class VersionsFetcherTests {
+class VersionsFromBomFetcherTests {
 
 	File temporaryFolder;
 
@@ -52,8 +52,8 @@ class VersionsFetcherTests {
 			throws URISyntaxException {
 		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
 				"2.5.0.RELEASE");
-		URI initilizrUri = VersionsFetcherTests.class.getResource("/raw/initializr.yml")
-				.toURI();
+		URI initilizrUri = VersionsFromBomFetcherTests.class
+				.getResource("/raw/initializr.yml").toURI();
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
@@ -71,8 +71,8 @@ class VersionsFetcherTests {
 			throws URISyntaxException {
 		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
 				"1.0.0.RELEASE");
-		URI initilizrUri = VersionsFetcherTests.class.getResource("/raw/initializr.yml")
-				.toURI();
+		URI initilizrUri = VersionsFromBomFetcherTests.class
+				.getResource("/raw/initializr.yml").toURI();
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
@@ -90,8 +90,8 @@ class VersionsFetcherTests {
 			throws URISyntaxException {
 		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-non-existant",
 				"1.0.0.RELEASE");
-		URI initilizrUri = VersionsFetcherTests.class.getResource("/raw/initializr.yml")
-				.toURI();
+		URI initilizrUri = VersionsFromBomFetcherTests.class
+				.getResource("/raw/initializr.yml").toURI();
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
@@ -137,7 +137,8 @@ class VersionsFetcherTests {
 	}
 
 	private File localFile(String relativePath) throws URISyntaxException {
-		return new File(VersionsFetcherTests.class.getResource(relativePath).toURI());
+		return new File(
+				VersionsFromBomFetcherTests.class.getResource(relativePath).toURI());
 	}
 
 	private File file(String relativePath) {

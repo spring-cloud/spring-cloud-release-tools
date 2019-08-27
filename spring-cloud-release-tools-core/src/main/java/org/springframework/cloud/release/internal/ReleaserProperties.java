@@ -67,8 +67,8 @@ public class ReleaserProperties implements Serializable {
 	private Versions versions = new Versions();
 
 	/**
-	 * Project name to its version - overrides all versions retrieved from a repository
-	 * like Spring Cloud Release.
+	 * Project name to its version - overrides all versions retrieved from a release train
+	 * repository like Spring Cloud Release.
 	 */
 	private Map<String, String> fixedVersions = new LinkedHashMap<>();
 
@@ -273,7 +273,7 @@ public class ReleaserProperties implements Serializable {
 	public static class Git implements Serializable {
 
 		/**
-		 * URL to Spring Cloud Release Git repository.
+		 * URL to a release train repository.
 		 */
 		private String releaseTrainBomUrl = "https://github.com/spring-cloud/spring-cloud-release";
 
@@ -283,7 +283,7 @@ public class ReleaserProperties implements Serializable {
 		private String documentationUrl = "https://github.com/spring-cloud/spring-cloud-static";
 
 		/**
-		 * URL to main release train project repository.
+		 * URL to the release train project page repository.
 		 */
 		private String springProjectUrl = "https://github.com/spring-projects/spring-cloud";
 
@@ -329,8 +329,8 @@ public class ReleaserProperties implements Serializable {
 		private String releaseTrainWikiPagePrefix = "Spring-Cloud";
 
 		/**
-		 * Where should the Spring Cloud Release repo get cloned to. If {@code null}
-		 * defaults to a temporary directory.
+		 * Where should the release train repo get cloned to. If {@code null} defaults to
+		 * a temporary directory.
 		 */
 		private String cloneDestinationDir;
 

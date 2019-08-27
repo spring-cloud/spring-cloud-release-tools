@@ -38,9 +38,9 @@ import org.mockito.BDDMockito;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
+import org.springframework.cloud.release.internal.buildsystem.PomReader;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
-import org.springframework.cloud.release.internal.buildsystem.TestPomReader;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
@@ -60,8 +60,6 @@ public class PostReleaseActionsTests {
 	public TemporaryFolder tmp = new TemporaryFolder();
 
 	File temporaryFolder;
-
-	TestPomReader testPomReader = new TestPomReader();
 
 	GradleUpdater gradleUpdater = BDDMockito.mock(GradleUpdater.class);
 
@@ -143,7 +141,7 @@ public class PostReleaseActionsTests {
 
 		actions.runUpdatedTests(currentGa());
 
-		Model rootPom = this.testPomReader.readPom(new File(this.cloned, "pom.xml"));
+		Model rootPom = PomReader.readPom(new File(this.cloned, "pom.xml"));
 		BDDAssertions.then(rootPom.getVersion()).isEqualTo("Finchley.SR1");
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
@@ -193,7 +191,7 @@ public class PostReleaseActionsTests {
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
-		Model rootPom = this.testPomReader.readPom(new File(this.cloned, "pom.xml"));
+		Model rootPom = PomReader.readPom(new File(this.cloned, "pom.xml"));
 		BDDAssertions.then(rootPom.getVersion()).isEqualTo("Finchley.SR1");
 		BDDAssertions.then(rootPom.getParent().getVersion()).isEqualTo("2.0.4.RELEASE");
 		BDDAssertions.then(sleuthParentPomVersion()).isEqualTo("2.0.4.RELEASE");
@@ -252,7 +250,7 @@ public class PostReleaseActionsTests {
 				.filter(s -> s.getKey().contains("spring-cloud-core-tests")).findFirst()
 				.orElseThrow(() -> new IllegalStateException("Not found"));
 		File clonedFile = entry.getValue().get(0);
-		Model pomWithCloud = this.testPomReader
+		Model pomWithCloud = PomReader
 				.readPom(new File(clonedFile, "zuul-proxy-eureka/pom.xml"));
 		Git git = GitTestUtils.openGitProject(clonedFile);
 		BDDAssertions
@@ -343,8 +341,8 @@ public class PostReleaseActionsTests {
 	}
 
 	private String sleuthParentPomVersion() {
-		return this.testPomReader.readPom(new File(this.cloned, "sleuth/pom.xml"))
-				.getParent().getVersion();
+		return PomReader.readPom(new File(this.cloned, "sleuth/pom.xml")).getParent()
+				.getVersion();
 	}
 
 	Projects currentGa() {

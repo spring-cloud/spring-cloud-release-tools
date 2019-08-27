@@ -81,8 +81,7 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 			this.artifactId = projectName;
 		}
 		else {
-			PomReader pomReader = new PomReader();
-			Model model = pomReader.readPom(project);
+			Model model = PomReader.readPom(project);
 			if (model != null) {
 				this.projectName = nameWithoutParent(model.getArtifactId());
 				this.version = model.getVersion();

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.buildsystem.Project;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 
 /**
@@ -150,6 +151,11 @@ public class Projects extends HashSet<ProjectVersion> {
 	public String asList() {
 		return this.stream().map(version -> version.projectName + ":" + version.version)
 				.collect(Collectors.joining(","));
+	}
+
+	public Set<Project> asProjects() {
+		return this.stream().map(projectVersion -> new Project(projectVersion.projectName,
+				projectVersion.version)).collect(Collectors.toSet());
 	}
 
 	@Override

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.buildsystem;
+package org.springframework.cloud.release.cloud.buildsystem;
 
 /**
  * @author Marcin Grzejszczak
  */
-final class SpringCloudConstants {
+final class BomConstants {
 
 	static final String SPRING_BOOT = "spring-boot";
 	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter";
@@ -29,7 +29,7 @@ final class SpringCloudConstants {
 	static final String CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID = "spring-cloud-dependencies-parent";
 	static final String BUILD_ARTIFACT_ID = "spring-cloud-build";
 
-	private SpringCloudConstants() {
+	private BomConstants() {
 		throw new IllegalStateException("Don't instantiate a utility class");
 	}
 
