@@ -18,21 +18,16 @@ package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
 
-/**
- * Parses the bom and returns all parsed versions.
- */
-public interface BomParser {
+class GradleBomParser implements BomParser {
 
-	/**
-	 * @param clonedBom - location of the cloned BOM repository
-	 * @return {@code true} - when this BOM parser can be applied
-	 */
-	boolean isApplicable(File clonedBom);
+	@Override
+	public boolean isApplicable(File clonedBom) {
+		return new File(clonedBom, "build.gradle").exists();
+	}
 
-	/**
-	 * @param thisProjectRoot - root of the clone project
-	 * @return versions from BOM
-	 */
-	VersionsFromBom versionsFromBom(File thisProjectRoot);
+	@Override
+	public VersionsFromBom versionsFromBom(File thisProjectRoot) {
+		return null;
+	}
 
 }

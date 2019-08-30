@@ -96,8 +96,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 		VersionsFromBom versionsFromBom = CACHE.computeIfAbsent(branch, s -> {
 			File clonedBom = this.gitRepo.cloneReleaseTrainProject();
 			this.gitRepo.checkout(clonedBom, branch);
-			BomParser releaseTrainBomParser = new BomParser(this.properties, clonedBom);
-			return releaseTrainBomParser.versionsFromBom();
+			return new CompositeBomParser(this.properties).versionsFromBom(clonedBom);
 		});
 		if (updateFixedVersions) {
 			log.info("Will update the following versions manually [{}]",
