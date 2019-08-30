@@ -174,6 +174,12 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 			}
 		}
 
+		private boolean pathIgnored(File file) {
+			String path = file.getPath();
+			return this.assertVersions && this.properties.getGradle()
+					.getIgnoredGradleRegex().stream().anyMatch(path::matches);
+		}
+
 		private Properties loadProps(File file) {
 			Properties props = new Properties();
 			try {
@@ -183,12 +189,6 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 				throw new IllegalStateException(e);
 			}
 			return props;
-		}
-
-		private boolean pathIgnored(File file) {
-			String path = file.getPath();
-			return this.assertVersions && this.properties.getGradle()
-					.getIgnoredGradleRegex().stream().anyMatch(path::matches);
 		}
 
 		private String asString(Path path) {

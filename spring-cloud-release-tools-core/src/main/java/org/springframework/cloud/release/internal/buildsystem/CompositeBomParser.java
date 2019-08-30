@@ -19,11 +19,10 @@ package org.springframework.cloud.release.internal.buildsystem;
 import java.io.File;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 
-class CompositeBomParser implements BomParser, ReleaserPropertiesAware {
+class CompositeBomParser implements BomParser {
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	CompositeBomParser(ReleaserProperties releaserProperties) {
 		this.properties = releaserProperties;
@@ -32,7 +31,7 @@ class CompositeBomParser implements BomParser, ReleaserPropertiesAware {
 	@Override
 	public boolean isApplicable(File clonedBom) {
 		return new MavenBomParser(this.properties).isApplicable(clonedBom)
-				|| new GradleBomParser().isApplicable(clonedBom);
+				|| new GradleBomParser(this.properties).isApplicable(clonedBom);
 	}
 
 	@Override
@@ -41,16 +40,11 @@ class CompositeBomParser implements BomParser, ReleaserPropertiesAware {
 	}
 
 	private BomParser firstMatching(File thisProjectRoot) {
-		BomParser gradle = new GradleBomParser();
-		if (new GradleBomParser().isApplicable(thisProjectRoot)) {
+		BomParser gradle = new GradleBomParser(this.properties);
+		if (new GradleBomParser(this.properties).isApplicable(thisProjectRoot)) {
 			return gradle;
 		}
 		return new MavenBomParser(this.properties);
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 }
