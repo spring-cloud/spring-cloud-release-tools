@@ -17,21 +17,19 @@
 package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
-
-import org.springframework.cloud.release.internal.ReleaserProperties;
+import java.util.List;
 
 class CompositeBomParser implements BomParser {
 
-	private final ReleaserProperties properties;
+	private final List<BomParser> parsers;
 
-	CompositeBomParser(ReleaserProperties releaserProperties) {
-		this.properties = releaserProperties;
+	CompositeBomParser(List<BomParser> parsers) {
+		this.parsers = parsers;
 	}
 
 	@Override
 	public boolean isApplicable(File clonedBom) {
-		return new MavenBomParser(this.properties).isApplicable(clonedBom)
-				|| new GradleBomParser(this.properties).isApplicable(clonedBom);
+		return this.parsers.stream().anyMatch(b -> b.isApplicable(clonedBom));
 	}
 
 	@Override
@@ -40,11 +38,9 @@ class CompositeBomParser implements BomParser {
 	}
 
 	private BomParser firstMatching(File thisProjectRoot) {
-		BomParser gradle = new GradleBomParser(this.properties);
-		if (new GradleBomParser(this.properties).isApplicable(thisProjectRoot)) {
-			return gradle;
-		}
-		return new MavenBomParser(this.properties);
+		return this.parsers.stream().filter(b -> b.isApplicable(thisProjectRoot))
+				.findFirst().orElseThrow(
+						() -> new IllegalStateException("Can't find a matching parser"));
 	}
 
 }

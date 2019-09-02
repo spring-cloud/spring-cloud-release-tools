@@ -697,7 +697,7 @@ public class AcceptanceTests {
 
 	private Releaser defaultReleaser(String expectedVersion, String projectName,
 			ReleaserProperties properties) {
-		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
+		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties, bomParsers);
 		ProjectCommandExecutor projectCommandExecutor = new ProjectCommandExecutor(
 				properties);
 		ProjectGitHandler gitHandler = new ProjectGitHandler(properties);
@@ -710,7 +710,7 @@ public class AcceptanceTests {
 				this.releaserProperties);
 		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(
 				properties,
-				new TestDocumentationUpdater.TestProjectDocumentationUpdater(properties,
+				new TestDocumentationUpdater.TestCustomProjectDocumentationUpdater(properties,
 						gitHandler, "Brixton.SR1"),
 				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties,
 						gitHandler, templateGenerator)) {
@@ -731,7 +731,7 @@ public class AcceptanceTests {
 	}
 
 	private Releaser defaultMetaReleaser(ReleaserProperties properties) {
-		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties);
+		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties, bomParsers);
 		ProjectCommandExecutor projectCommandExecutor = new ProjectCommandExecutor(
 				properties);
 		NonAssertingTestProjectGitHubHandler handler = new NonAssertingTestProjectGitHubHandler(
@@ -745,7 +745,7 @@ public class AcceptanceTests {
 				.spy(new SaganUpdater(this.saganClient, this.releaserProperties));
 		DocumentationUpdater documentationUpdater = Mockito
 				.spy(new TestDocumentationUpdater(properties,
-						new TestDocumentationUpdater.TestProjectDocumentationUpdater(
+						new TestDocumentationUpdater.TestCustomProjectDocumentationUpdater(
 								properties, nonAssertingGitHandler, "Brixton.SR1"),
 						new TestDocumentationUpdater.TestReleaseContentsUpdater(
 								properties, nonAssertingGitHandler, templateGenerator) {

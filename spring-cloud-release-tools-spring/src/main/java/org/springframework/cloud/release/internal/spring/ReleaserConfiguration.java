@@ -63,7 +63,7 @@ class ReleaserConfiguration {
 
 	@Bean
 	ProjectPomUpdater pomUpdater() {
-		return new ProjectPomUpdater(this.properties);
+		return new ProjectPomUpdater(this.properties, bomParsers);
 	}
 
 	@Bean

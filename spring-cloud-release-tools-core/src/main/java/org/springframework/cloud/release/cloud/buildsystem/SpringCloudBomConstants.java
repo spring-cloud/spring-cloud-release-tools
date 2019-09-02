@@ -19,7 +19,7 @@ package org.springframework.cloud.release.cloud.buildsystem;
 /**
  * @author Marcin Grzejszczak
  */
-final class BomConstants {
+final class SpringCloudBomConstants {
 
 	static final String SPRING_BOOT = "spring-boot";
 	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter";
@@ -29,7 +29,7 @@ final class BomConstants {
 	static final String CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID = "spring-cloud-dependencies-parent";
 	static final String BUILD_ARTIFACT_ID = "spring-cloud-build";
 
-	private BomConstants() {
+	private SpringCloudBomConstants() {
 		throw new IllegalStateException("Don't instantiate a utility class");
 	}
 

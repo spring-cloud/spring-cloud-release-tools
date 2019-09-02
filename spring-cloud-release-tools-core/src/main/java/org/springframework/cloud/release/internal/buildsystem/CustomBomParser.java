@@ -17,16 +17,14 @@
 package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.core.io.support.SpringFactoriesLoader;
+import org.springframework.lang.Nullable;
 
 /**
- * Allows to pass in some additional BOM model to Versions mapping.
+ * Allows to pass in some additional gradle files parser.
  */
 public interface CustomBomParser {
 
@@ -39,7 +37,7 @@ public interface CustomBomParser {
 	 * @return {@code true} if the parser should be applied.
 	 */
 	boolean isApplicable(File thisProjectRoot, ReleaserProperties properties,
-			Set<Project> projects);
+			@Nullable Set<Project> projects);
 
 	/**
 	 * When parsing a part of the BOM pom, one can add custom logic to perform project
@@ -63,8 +61,13 @@ public interface CustomBomParser {
 		return new LinkedHashSet<>(projects);
 	}
 
-	List<CustomBomParser> PARSERS = SpringFactoriesLoader
-			.loadFactories(CustomBomParser.class, null);
+	default boolean isMaven(File thisProjectRoot) {
+		return new File(thisProjectRoot, "pom.xml").exists();
+	}
+
+	default boolean isGradle(File thisProjectRoot) {
+		return new File(thisProjectRoot, "build.gradle").exists();
+	}
 
 	CustomBomParser NO_OP = new CustomBomParser() {
 		@Override
@@ -80,24 +83,5 @@ public interface CustomBomParser {
 		}
 
 	};
-
-	static CustomBomParser parser(File thisProjectRoot, ReleaserProperties properties,
-			Set<Project> projects) {
-		for (CustomBomParser parser : PARSERS) {
-			if (parser.isApplicable(thisProjectRoot, properties, projects)) {
-				return parser;
-			}
-		}
-		return NO_OP;
-	}
-
-	static CustomBomParser parser(ReleaserProperties properties) {
-		return parser(new File(properties.getWorkingDir()), properties,
-				Collections.emptySet());
-	}
-
-	static CustomBomParser parser(ReleaserProperties properties, Set<Project> projects) {
-		return parser(new File(properties.getWorkingDir()), properties, projects);
-	}
 
 }

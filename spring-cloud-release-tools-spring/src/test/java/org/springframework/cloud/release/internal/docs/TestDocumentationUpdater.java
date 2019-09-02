@@ -29,7 +29,7 @@ import org.springframework.cloud.release.internal.template.TemplateGenerator;
 public class TestDocumentationUpdater extends DocumentationUpdater {
 
 	public TestDocumentationUpdater(ReleaserProperties properties,
-			TestProjectDocumentationUpdater updater,
+			TestCustomProjectDocumentationUpdater updater,
 			TestReleaseContentsUpdater testRelease) {
 		super(properties, updater, testRelease);
 	}
@@ -48,12 +48,12 @@ public class TestDocumentationUpdater extends DocumentationUpdater {
 
 	}
 
-	public static class TestProjectDocumentationUpdater
-			extends ProjectDocumentationUpdater {
+	public static class TestCustomProjectDocumentationUpdater
+			extends CustomProjectDocumentationUpdater {
 
 		private final String version;
 
-		public TestProjectDocumentationUpdater(ReleaserProperties properties,
+		public TestCustomProjectDocumentationUpdater(ReleaserProperties properties,
 				ProjectGitHandler gitHandler, String version) {
 			super(properties, gitHandler);
 			this.version = version;

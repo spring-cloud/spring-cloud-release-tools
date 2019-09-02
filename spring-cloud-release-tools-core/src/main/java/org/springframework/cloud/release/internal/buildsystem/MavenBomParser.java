@@ -17,6 +17,7 @@
 package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -46,10 +47,13 @@ class MavenBomParser implements BomParser {
 
 	private final ReleaserProperties properties;
 
-	MavenBomParser(ReleaserProperties properties) {
+	private final List<CustomBomParser> customParsers;
+
+	MavenBomParser(ReleaserProperties properties, List<CustomBomParser> customParsers) {
 		this.thisTrainBomLocation = properties.getPom().getThisTrainBom();
 		this.versionPattern = Pattern.compile(properties.getPom().getBomVersionPattern());
 		this.properties = properties;
+		this.customParsers = customParsers;
 	}
 
 	@Override
@@ -72,15 +76,13 @@ class MavenBomParser implements BomParser {
 		projects.add(
 				new Project(this.properties.getMetaRelease().getReleaseTrainProjectName(),
 						releaseTrainProjectVersion));
-		VersionsFromBom bomVersions = new VersionsFromBom(this.properties, projects);
-		return new VersionsFromBom(properties, bomVersions,
-				customVersions(thisProjectRoot, projects));
-	}
-
-	private VersionsFromBom customVersions(File thisProjectRoot, Set<Project> projects) {
-		CustomBomParser parser = CustomBomParser.parser(thisProjectRoot, this.properties,
-				projects);
-		return parser.parseBom(thisProjectRoot, this.properties);
+		// @formatter:off
+		return new VersionsFromBomBuilder()
+				.releaserProperties(this.properties)
+				.parsers(this.customParsers)
+				.projects(projects)
+				.versionsFromBom();
+		// @formatter:on
 	}
 
 	private Predicate<Map.Entry<Object, Object>> propertyMatchesVersionPattern() {

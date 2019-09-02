@@ -17,6 +17,7 @@
 package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class ProjectPomUpdaterTests {
 				"Finchley.BUILD-SNAPSHOT");
 		properties.getFixedVersions().put("spring-boot", "2.0.3.RELEASE");
 		properties.getFixedVersions().put("spring-cloud-gateway", "2.0.1.BUILD-SNAPSHOT");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 
 		Map<String, String> fixedVersions = updater.fixedVersions().stream()
 				.collect(Collectors.toMap(projectVersion -> projectVersion.projectName,
@@ -84,7 +85,7 @@ public class ProjectPomUpdaterTests {
 	public void should_skip_any_steps_if_there_is_no_pom_xml() {
 		ReleaserProperties properties = new ReleaserProperties();
 		ProjectGitHandler handler = BDDMockito.mock(ProjectGitHandler.class);
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties, handler);
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 
 		updater.updateProjectFromReleaseTrain(new File("target"), new Projects(),
 				new ProjectVersion("foo", "1.0.0.RELEASE"), false);

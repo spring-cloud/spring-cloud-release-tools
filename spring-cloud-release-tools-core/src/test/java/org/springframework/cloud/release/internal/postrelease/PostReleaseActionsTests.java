@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal.postrelease;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +91,7 @@ public class PostReleaseActionsTests {
 		}
 	};
 
-	ProjectPomUpdater updater = new ProjectPomUpdater(this.properties);
+	ProjectPomUpdater updater = new ProjectPomUpdater(this.properties, new ArrayList<>());
 
 	VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 

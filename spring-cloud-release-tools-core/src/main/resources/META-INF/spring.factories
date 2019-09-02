@@ -1,2 +1,0 @@
-org.springframework.cloud.release.internal.buildsystem.CustomBomParser=\
-org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomParser

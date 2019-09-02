@@ -78,7 +78,8 @@ public class PropertyVersionChangerTests {
 	}
 
 	VersionsFromBom versions() {
-		return new VersionsFromBom(new ReleaserProperties(), allProjects());
+		return new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties()).projects(allProjects())
+				.versionsFromBom();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.docs;
+package org.springframework.cloud.release.cloud.docs;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,29 +26,34 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 
 /**
  * @author Marcin Grzejszczak
  */
-// TODO: [SPRING-CLOUD]
-class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
+class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocumentationUpdater, ReleaserPropertiesAware {
 
 	private static final String HTTP_SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";
 
 	private static final String HTTPS_SC_STATIC_URL = "https://cloud.spring.io/spring-cloud-static/";
 
 	private static final Logger log = LoggerFactory
-			.getLogger(ProjectDocumentationUpdater.class);
+			.getLogger(SpringCloudCustomProjectDocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
 
 	private ReleaserProperties properties;
 
-	ProjectDocumentationUpdater(ReleaserProperties properties,
+	SpringCloudCustomProjectDocumentationUpdater(ReleaserProperties properties,
 			ProjectGitHandler gitHandler) {
 		this.gitHandler = gitHandler;
 		this.properties = properties;
+	}
+
+	@Override
+	public boolean isApplicable(File clonedDocumentationProject, ProjectVersion currentProject, String bomBranch) {
+		return clonedDocumentationProject.getName().startsWith("spring-cloud") || currentProject.projectName.startsWith("spring-cloud");
 	}
 
 	/**
@@ -59,7 +64,8 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	File updateDocsRepo(ProjectVersion currentProject, String bomBranch) {
+	@Override
+	public File updateDocsRepo(File clonedDocumentationProject, ProjectVersion currentProject, String bomBranch) {
 		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
 			log.info(
 					"Will not update documentation repository, since the switch to do so "

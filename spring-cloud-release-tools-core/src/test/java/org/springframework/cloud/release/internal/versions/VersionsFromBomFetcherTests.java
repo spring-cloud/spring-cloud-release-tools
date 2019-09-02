@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +59,7 @@ class VersionsFromBomFetcherTests {
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString() + "/");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
 		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
@@ -77,7 +78,7 @@ class VersionsFromBomFetcherTests {
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString() + "/");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
 		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
@@ -96,7 +97,7 @@ class VersionsFromBomFetcherTests {
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString());
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
 		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
@@ -109,7 +110,7 @@ class VersionsFromBomFetcherTests {
 		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
 				"1.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties);
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
 		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
@@ -123,7 +124,7 @@ class VersionsFromBomFetcherTests {
 				"1.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties,
-				new ProjectPomUpdater(properties) {
+				new ProjectPomUpdater(properties, new ArrayList<>()) {
 					@Override
 					public Projects retrieveVersionsFromReleaseTrainBom(String branch,
 							boolean updateFixedVersions) {

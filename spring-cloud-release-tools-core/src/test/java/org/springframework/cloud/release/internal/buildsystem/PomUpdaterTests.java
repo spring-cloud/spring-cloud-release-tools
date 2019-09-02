@@ -46,8 +46,8 @@ public class PomUpdaterTests {
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
 
-	VersionsFromBom versionsFromBom = new VersionsFromBom(new ReleaserProperties(),
-			projects());
+	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
+			.projects(projects()).versionsFromBom();
 
 	PomUpdater pomUpdater = new PomUpdater();
 

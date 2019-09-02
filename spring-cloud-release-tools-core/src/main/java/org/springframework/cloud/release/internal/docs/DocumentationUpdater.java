@@ -30,26 +30,25 @@ import org.springframework.cloud.release.internal.template.TemplateGenerator;
  */
 public class DocumentationUpdater implements ReleaserPropertiesAware {
 
-	private final ProjectDocumentationUpdater projectDocumentationUpdater;
+	private final DefaultProjectDocumentationUpdater defaultProjectDocumentationUpdater;
 
 	private final ReleaseTrainContentsUpdater releaseTrainContentsUpdater;
 
 	private ReleaserProperties properties;
 
 	public DocumentationUpdater(ProjectGitHandler gitHandler,
-			ReleaserProperties properties, TemplateGenerator templateGenerator) {
+			ReleaserProperties properties, TemplateGenerator templateGenerator, DefaultProjectDocumentationUpdater updater) {
 		this.properties = properties;
-		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(
-				this.properties, gitHandler);
+		this.defaultProjectDocumentationUpdater = updater;
 		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(
 				this.properties, gitHandler, templateGenerator);
 	}
 
 	DocumentationUpdater(ReleaserProperties properties,
-			ProjectDocumentationUpdater updater,
+			DefaultProjectDocumentationUpdater updater,
 			ReleaseTrainContentsUpdater contentsUpdater) {
 		this.properties = properties;
-		this.projectDocumentationUpdater = updater;
+		this.defaultProjectDocumentationUpdater = updater;
 		this.releaseTrainContentsUpdater = contentsUpdater;
 	}
 
@@ -62,7 +61,7 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	 * used
 	 */
 	public File updateDocsRepo(ProjectVersion currentProject, String bomReleaseBranch) {
-		return this.projectDocumentationUpdater.updateDocsRepo(currentProject,
+		return this.defaultProjectDocumentationUpdater.updateDocsRepo(currentProject,
 				bomReleaseBranch);
 	}
 
@@ -92,8 +91,8 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	@Override
 	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties = properties;
-		this.projectDocumentationUpdater.setReleaserProperties(properties);
 		this.releaseTrainContentsUpdater.setReleaserProperties(properties);
+		this.defaultProjectDocumentationUpdater.setReleaserProperties(properties);
 	}
 
 }

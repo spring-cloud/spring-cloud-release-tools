@@ -19,8 +19,7 @@ package org.springframework.cloud.release.internal.buildsystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -30,10 +29,16 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 
 class GradleBomParser implements BomParser {
 
+	private static final Pattern VERSION_PATTERN = Pattern
+			.compile("^([a-zA-Z0-9]+)Version$");
+
 	private final ReleaserProperties properties;
 
-	GradleBomParser(ReleaserProperties releaserProperties) {
+	private final List<CustomBomParser> customParsers;
+
+	GradleBomParser(ReleaserProperties releaserProperties, List<CustomBomParser> customParsers) {
 		this.properties = releaserProperties;
+		this.customParsers = customParsers;
 	}
 
 	@Override
@@ -54,7 +59,9 @@ class GradleBomParser implements BomParser {
 		Properties properties = loadProps(gradleProperties);
 		final Map<String, String> substitution = this.properties.getGradle()
 				.getGradlePropsSubstitution();
-		VersionsFromBom versionsFromBom = new VersionsFromBom(this.properties);
+		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().releaserProperties(this.properties)
+				.parsers(this.customParsers)
+				.versionsFromBom();
 		properties.forEach((key, value) -> {
 			String projectName = projectName(substitution, key);
 			versionsFromBom.setVersion(projectName, value.toString());
@@ -62,14 +69,13 @@ class GradleBomParser implements BomParser {
 		return versionsFromBom;
 	}
 
-	String projectName(Map<String, String> substitution, Object key) {
+	private String projectName(Map<String, String> substitution, Object key) {
 		String projectName = key.toString();
 		if (substitution.containsKey(key)) {
 			projectName = substitution.get(key);
 		}
 		else {
-			Pattern versionPattern = Pattern.compile("^([a-zA-Z]+)Version$");
-			Matcher matcher = versionPattern.matcher(projectName);
+			Matcher matcher = VERSION_PATTERN.matcher(projectName);
 			boolean versionMatches = matcher.matches();
 			if (versionMatches) {
 				projectName = matcher.group(1);
@@ -88,15 +94,6 @@ class GradleBomParser implements BomParser {
 			throw new IllegalStateException(e);
 		}
 		return props;
-	}
-
-	private String asString(Path path) {
-		try {
-			return new String(Files.readAllBytes(path));
-		}
-		catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
 	}
 
 }

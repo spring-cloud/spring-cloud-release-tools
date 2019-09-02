@@ -17,6 +17,7 @@
 package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -30,7 +31,7 @@ class GradleBomParserTests {
 
 	@Test
 	void should_read_versions_from_bom_from_properties() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties()) {
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>()) {
 			@Override
 			public boolean isApplicable(File clonedBom) {
 				return true;
@@ -61,7 +62,7 @@ class GradleBomParserTests {
 		gradleSubstitution.put("verifierVersion", "spring-cloud-contract");
 		ReleaserProperties releaserProperties = new ReleaserProperties();
 		releaserProperties.getGradle().setGradlePropsSubstitution(gradleSubstitution);
-		GradleBomParser parser = new GradleBomParser(releaserProperties) {
+		GradleBomParser parser = new GradleBomParser(releaserProperties, new ArrayList<>()) {
 			@Override
 			public boolean isApplicable(File clonedBom) {
 				return true;
@@ -88,14 +89,14 @@ class GradleBomParserTests {
 
 	@Test
 	void should_be_not_applicable_when_no_build_gradle_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties());
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>());
 
 		BDDAssertions.then(parser.isApplicable(new File("."))).isFalse();
 	}
 
 	@Test
 	void should_be_applicable_when_build_gradle_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties()) {
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>()) {
 			@Override
 			File file(File clonedBom, String child) {
 				return clonedBom;
@@ -107,7 +108,7 @@ class GradleBomParserTests {
 
 	@Test
 	void should_return_empty_version_when_no_gradle_properties_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties());
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>());
 
 		VersionsFromBom versionsFromBom = parser.versionsFromBom(new File("."));
 

@@ -35,28 +35,32 @@ import org.springframework.cloud.release.internal.project.Projects;
  */
 public class VersionsFromBom {
 
-	public static final VersionsFromBom EMPTY_VERSION = new VersionsFromBom();
+	public static final VersionsFromBom EMPTY_VERSION = new VersionsFromBomBuilder().versionsFromBom();
 
 	Set<Project> projects = new HashSet<>();
 
 	ReleaserProperties properties;
 
+	CustomBomParser parser = CustomBomParser.NO_OP;
+
 	private VersionsFromBom() {
 		this.properties = new ReleaserProperties();
 	}
 
-	public VersionsFromBom(ReleaserProperties releaserProperties) {
+	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser) {
 		this.properties = releaserProperties;
+		this.parser = parser;
 	}
 
-	public VersionsFromBom(ReleaserProperties releaserProperties, Set<Project> projects) {
+	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser, Set<Project> projects) {
 		this.properties = releaserProperties;
+		this.parser = parser;
 		projects.forEach(project -> setVersion(project.name, project.version));
 	}
 
-	public VersionsFromBom(ReleaserProperties releaserProperties,
-			VersionsFromBom... projects) {
+	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser, VersionsFromBom... projects) {
 		this.properties = releaserProperties;
+		this.parser = parser;
 		Arrays.stream(projects).forEach(p -> this.projects.addAll(p.projects));
 	}
 
@@ -130,7 +134,6 @@ public class VersionsFromBom {
 	}
 
 	public VersionsFromBom setVersion(String projectName, String version) {
-		CustomBomParser parser = CustomBomParser.parser(this.properties);
 		Set<Project> projects = parser.setVersion(this.projects, projectName, version);
 		if (!projects.equals(this.projects)) {
 			this.projects.clear();

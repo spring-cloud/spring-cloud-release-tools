@@ -21,7 +21,7 @@ import java.io.File;
 /**
  * Parses the bom and returns all parsed versions.
  */
-public interface BomParser {
+interface BomParser {
 
 	/**
 	 * @param clonedBom - location of the cloned BOM repository

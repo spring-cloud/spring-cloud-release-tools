@@ -29,29 +29,32 @@ import org.springframework.cloud.release.internal.buildsystem.CustomBomParser;
 import org.springframework.cloud.release.internal.buildsystem.PomReader;
 import org.springframework.cloud.release.internal.buildsystem.Project;
 import org.springframework.cloud.release.internal.buildsystem.VersionsFromBom;
+import org.springframework.cloud.release.internal.buildsystem.VersionsFromBomBuilder;
 
-import static org.springframework.cloud.release.cloud.buildsystem.BomConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
-import static org.springframework.cloud.release.cloud.buildsystem.BomConstants.BOOT_STARTER_PARENT_ARTIFACT_ID;
-import static org.springframework.cloud.release.cloud.buildsystem.BomConstants.BUILD_ARTIFACT_ID;
-import static org.springframework.cloud.release.cloud.buildsystem.BomConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
-import static org.springframework.cloud.release.cloud.buildsystem.BomConstants.SPRING_BOOT;
+import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
+import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.BOOT_STARTER_PARENT_ARTIFACT_ID;
+import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.BUILD_ARTIFACT_ID;
+import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
+import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.SPRING_BOOT;
 
-public class SpringCloudBomParser implements CustomBomParser {
+public class SpringCloudMavenBomParser implements CustomBomParser {
 
-	private static final Logger log = LoggerFactory.getLogger(SpringCloudBomParser.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(SpringCloudMavenBomParser.class);
 
 	@Override
 	public boolean isApplicable(File root, ReleaserProperties properties,
 			Set<Project> projects) {
-		return root.getName().startsWith("spring-cloud") || projects.stream()
-				.anyMatch(project -> BUILD_ARTIFACT_ID.equals(project.name));
+		return isMaven(root) && root.getName().startsWith("spring-cloud") || projects
+				.stream().anyMatch(project -> BUILD_ARTIFACT_ID.equals(project.name));
 	}
 
 	@Override
 	public VersionsFromBom parseBom(File root, ReleaserProperties properties) {
 		VersionsFromBom springCloudBuild = springCloudBuild(root, properties);
 		VersionsFromBom boot = bootVersion(root, properties);
-		return new VersionsFromBom(properties, springCloudBuild, boot);
+		return new VersionsFromBomBuilder().releaserProperties(properties)
+				.projects(springCloudBuild, boot).versionsFromBom();
 	}
 
 	private VersionsFromBom springCloudBuild(File root, ReleaserProperties properties) {
@@ -65,7 +68,8 @@ public class SpringCloudBomParser implements CustomBomParser {
 		}
 		String buildVersion = model.getParent().getVersion();
 		log.debug("Spring Cloud Build version is equal to [{}]", buildVersion);
-		VersionsFromBom scBuild = new VersionsFromBom(properties);
+		VersionsFromBom scBuild = new VersionsFromBomBuilder()
+				.releaserProperties(properties).versionsFromBom();
 		scBuild.add(BUILD_ARTIFACT_ID, buildVersion);
 		scBuild.add(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildVersion);
 		return scBuild;
@@ -80,16 +84,17 @@ public class SpringCloudBomParser implements CustomBomParser {
 		}
 		String bootArtifactId = model.getParent().getArtifactId();
 		log.debug("Boot artifact id is equal to [{}]", bootArtifactId);
-		if (!BomConstants.BOOT_STARTER_PARENT_ARTIFACT_ID.equals(bootArtifactId)) {
+		if (!SpringCloudBomConstants.BOOT_STARTER_PARENT_ARTIFACT_ID.equals(bootArtifactId)) {
 			if (log.isDebugEnabled()) {
 				throw new IllegalStateException("The pom doesn't have a ["
-						+ BomConstants.BOOT_STARTER_PARENT_ARTIFACT_ID + "] artifact id");
+						+ SpringCloudBomConstants.BOOT_STARTER_PARENT_ARTIFACT_ID + "] artifact id");
 			}
 			return VersionsFromBom.EMPTY_VERSION;
 		}
 		String bootVersion = model.getParent().getVersion();
 		log.debug("Boot version is equal to [{}]", bootVersion);
-		VersionsFromBom versionsFromBom = new VersionsFromBom(properties);
+		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
+				.releaserProperties(properties).versionsFromBom();
 		versionsFromBom.add(SPRING_BOOT, bootVersion);
 		versionsFromBom.add(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion);
 		versionsFromBom.add(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion);
