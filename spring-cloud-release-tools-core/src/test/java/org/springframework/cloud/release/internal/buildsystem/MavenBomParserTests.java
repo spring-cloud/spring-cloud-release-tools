@@ -18,7 +18,6 @@ package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,7 @@ public class MavenBomParserTests {
 
 	@Test
 	public void should_throw_exception_when_boot_pom_is_missing() {
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 		File file = new File(".");
 
 		thenThrownBy(() -> parser.versionsFromBom(file))
@@ -58,7 +57,7 @@ public class MavenBomParserTests {
 	public void should_throw_exception_when_null_is_passed_to_boot() {
 		this.properties.getPom().setPomWithBootStarterParent(null);
 		this.properties.getPom().setThisTrainBom(null);
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
 				.isInstanceOf(IllegalStateException.class)
@@ -68,7 +67,7 @@ public class MavenBomParserTests {
 	@Test
 	public void should_throw_exception_when_boot_version_is_missing_in_pom() {
 		this.properties.getPom().setPomWithBootStarterParent("pom.xml");
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
 				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
@@ -77,7 +76,7 @@ public class MavenBomParserTests {
 
 	@Test
 	public void should_populate_sc_release_version() {
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		String scReleaseVersion = parser.versionsFromBom(this.springCloudReleaseProject)
 				.versionForProject("spring-cloud-release");
@@ -87,7 +86,7 @@ public class MavenBomParserTests {
 
 	@Test
 	public void should_populate_boot_version() {
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		String bootVersion = parser.versionsFromBom(this.springCloudReleaseProject)
 				.versionForProject("spring-boot");
@@ -97,7 +96,7 @@ public class MavenBomParserTests {
 
 	@Test
 	public void should_throw_exception_when_cloud_pom_is_missing() {
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		thenThrownBy(() -> parser.versionsFromBom(new File(".")))
 				.isInstanceOf(IllegalStateException.class)
@@ -108,7 +107,7 @@ public class MavenBomParserTests {
 	public void should_throw_exception_when_null_is_passed_to_cloud() {
 		this.properties.getPom().setPomWithBootStarterParent(null);
 		this.properties.getPom().setThisTrainBom(null);
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
 				.isInstanceOf(IllegalStateException.class)
@@ -119,7 +118,7 @@ public class MavenBomParserTests {
 	public void should_throw_exception_when_cloud_version_is_missing_in_pom() {
 		this.properties.getPom().setPomWithBootStarterParent("pom.xml");
 		this.properties.getPom().setThisTrainBom("pom.xml");
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
 				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
@@ -128,7 +127,7 @@ public class MavenBomParserTests {
 
 	@Test
 	public void should_populate_cloud_version() {
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		VersionsFromBom cloudVersionsFromBom = parser
 				.versionsFromBom(this.springCloudReleaseProject);
@@ -140,7 +139,7 @@ public class MavenBomParserTests {
 
 	@Test
 	public void should_populate_boot_and_cloud_version() {
-		MavenBomParser parser = new MavenBomParser(this.properties, new ArrayList<>());
+		BomParser parser = MavenBomParserAccessor.cloudMavenBomParser(this.properties);
 
 		VersionsFromBom cloudVersionsFromBom = parser
 				.versionsFromBom(this.springCloudReleaseProject);

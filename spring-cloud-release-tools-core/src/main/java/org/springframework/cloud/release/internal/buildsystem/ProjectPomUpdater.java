@@ -91,11 +91,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	// TODO: I don't like this flag but don't have a better idea
 	public Projects retrieveVersionsFromReleaseTrainBom(String branch,
 			boolean updateFixedVersions) {
-		VersionsFromBom versionsFromBom = CACHE.computeIfAbsent(branch, s -> {
-			File clonedBom = this.gitRepo.cloneReleaseTrainProject();
-			this.gitRepo.checkout(clonedBom, branch);
-			return new CompositeBomParser(this.bomParsers).versionsFromBom(clonedBom);
-		});
+		VersionsFromBom versionsFromBom = cachedVersionFromBom(branch);
 		if (updateFixedVersions) {
 			log.info("Will update the following versions manually [{}]",
 					this.properties.getFixedVersions());
@@ -103,6 +99,18 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 		}
 		log.info("Retrieved the following versions\n{}", versionsFromBom);
 		return versionsFromBom.toProjectVersions();
+	}
+
+	private VersionsFromBom cachedVersionFromBom(String branch) {
+		return CACHE.computeIfAbsent(branch, s -> {
+			File clonedBom = this.gitRepo.cloneReleaseTrainProject();
+			this.gitRepo.checkout(clonedBom, branch);
+			return compositeBomParser().versionsFromBom(clonedBom);
+		});
+	}
+
+	private CompositeBomParser compositeBomParser() {
+		return new CompositeBomParser(this.bomParsers);
 	}
 
 	/**
@@ -116,7 +124,8 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 			log.debug("Will apply the following fixed versions {}", projects);
 		}
 		return new VersionsFromBomBuilder().releaserProperties(this.properties)
-				.projects(projects).versionsFromBom().toProjectVersions();
+				.parsers(compositeBomParser().customBomParsers()).projects(projects)
+				.merged().toProjectVersions();
 	}
 
 	/**
@@ -132,16 +141,16 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
 			ProjectVersion versionFromReleaseTrain, boolean assertVersions) {
 		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-				.releaserProperties(this.properties).projects(projects.asProjects())
-				.versionsFromBom();
+				.thisProjectRoot(projectRoot).releaserProperties(this.properties)
+				.projects(projects.asProjects()).merged();
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versionsFromBom)) {
 			log.info("Skipping project updating");
 			return;
 		}
-		updatePoms(projectRoot, projects, versionFromReleaseTrain, assertVersions);
+		updatePoms(projectRoot, versionsFromBom, versionFromReleaseTrain, assertVersions);
 	}
 
-	private void updatePoms(File projectRoot, Projects projects,
+	private void updatePoms(File projectRoot, VersionsFromBom projects,
 			ProjectVersion versionFromScRelease, boolean assertVersions) {
 		File rootPom = new File(projectRoot, "pom.xml");
 		if (!rootPom.exists()) {
@@ -185,13 +194,11 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 
 		private final List<Pattern> unacceptableVersionPatterns;
 
-		private PomWalker(ModelWrapper rootPom, Projects projects, PomUpdater pomUpdater,
-				ReleaserProperties properties, ProjectVersion versionFromScRelease,
-				boolean assertVersions) {
+		private PomWalker(ModelWrapper rootPom, VersionsFromBom projects,
+				PomUpdater pomUpdater, ReleaserProperties properties,
+				ProjectVersion versionFromScRelease, boolean assertVersions) {
 			this.rootPom = rootPom;
-			this.versionsFromBom = new VersionsFromBomBuilder()
-					.releaserProperties(properties).projects(projects.asProjects())
-					.versionsFromBom();
+			this.versionsFromBom = projects;
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
 			List<Pattern> unacceptableVersionPatterns = versionFromScRelease

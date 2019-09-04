@@ -79,6 +79,10 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		}
 	}
 
+	static void clearCache() {
+		CACHE.clear();
+	}
+
 	public void commitAfterBumpingVersions(File project, ProjectVersion bumpedVersion) {
 		if (bumpedVersion.isSnapshot()) {
 			log.info("Snapshot version [{}] found. Will only commit the changed poms",

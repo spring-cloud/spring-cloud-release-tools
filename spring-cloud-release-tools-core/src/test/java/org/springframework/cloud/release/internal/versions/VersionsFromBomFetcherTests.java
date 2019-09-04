@@ -22,12 +22,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.buildsystem.MavenBomParserAccessor;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
@@ -59,7 +61,8 @@ class VersionsFromBomFetcherTests {
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString() + "/");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections
+				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties)));
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
 		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
@@ -78,7 +81,8 @@ class VersionsFromBomFetcherTests {
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString() + "/");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections
+				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties)));
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
 		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import org.springframework.cloud.release.cloud.buildsystem.SpringCloudMavenBomParser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -32,13 +33,16 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public class VersionsFromBomTests {
 
-	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
-			.projects(projects()).versionsFromBom();
+	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
+			.releaserProperties(new ReleaserProperties()).projects(projects())
+			.retrieveFromBom();
 
 	@Test
 	public void should_add_boot_to_versions_when_version_is_created() {
-		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
-				.versionsFromBom();
+		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
+				.releaserProperties(new ReleaserProperties())
+				.parsers(Collections.singletonList(new SpringCloudMavenBomParser()))
+				.retrieveFromBom();
 		versionsFromBom.setVersion("spring-boot", "1.2.3.RELEASE");
 
 		then(versionsFromBom.projects).contains(
@@ -241,13 +245,14 @@ public class VersionsFromBomTests {
 	}
 
 	private VersionsFromBom mixedVersions() {
-		return new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties()).projects(mixedProjects())
-				.versionsFromBom();
+		return new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
+				.parsers(Collections.singletonList(new SpringCloudMavenBomParser()))
+				.projects(mixedProjects()).merged();
 	}
 
 	private VersionsFromBom mixedVersions(ReleaserProperties properties) {
-		return new VersionsFromBomBuilder().releaserProperties(properties).projects(mixedProjects())
-				.versionsFromBom();
+		return new VersionsFromBomBuilder().releaserProperties(properties)
+				.projects(mixedProjects()).retrieveFromBom();
 	}
 
 	private ReleaserProperties customBom() {

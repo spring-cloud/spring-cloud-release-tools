@@ -66,7 +66,7 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	private final String artifactId;
 
 	public ProjectVersion(String projectName, String version) {
-		this.projectName = nameWithoutParent(projectName);
+		this.projectName = projectName;
 		this.version = version;
 		this.groupId = "";
 		this.artifactId = "";

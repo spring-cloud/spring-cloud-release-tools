@@ -35,13 +35,13 @@ import org.springframework.cloud.release.internal.project.Projects;
  */
 public class VersionsFromBom {
 
-	public static final VersionsFromBom EMPTY_VERSION = new VersionsFromBomBuilder().versionsFromBom();
+	public static final VersionsFromBom EMPTY_VERSION = new VersionsFromBom();
 
 	Set<Project> projects = new HashSet<>();
 
 	ReleaserProperties properties;
 
-	CustomBomParser parser = CustomBomParser.NO_OP;
+	CustomBomParser parser;
 
 	private VersionsFromBom() {
 		this.properties = new ReleaserProperties();
@@ -52,13 +52,15 @@ public class VersionsFromBom {
 		this.parser = parser;
 	}
 
-	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser, Set<Project> projects) {
+	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser,
+			Set<Project> projects) {
 		this.properties = releaserProperties;
 		this.parser = parser;
 		projects.forEach(project -> setVersion(project.name, project.version));
 	}
 
-	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser, VersionsFromBom... projects) {
+	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser,
+			VersionsFromBom... projects) {
 		this.properties = releaserProperties;
 		this.parser = parser;
 		Arrays.stream(projects).forEach(p -> this.projects.addAll(p.projects));

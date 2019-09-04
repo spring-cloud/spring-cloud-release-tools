@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2019 the original author or authors.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
- *        http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 
+import javax.validation.constraints.NotNull;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,6 +34,7 @@ import org.mockito.BDDMockito;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
+import org.springframework.cloud.release.internal.docs.ProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.util.FileSystemUtils;
 
@@ -78,11 +82,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				file("/projects/spring-cloud-release/").toURI().toString());
 
 		BDDAssertions
-				.thenThrownBy(
-						() -> new SpringCloudCustomProjectDocumentationUpdater(properties,
-								new ProjectGitHandler(properties)).updateDocsRepo(
-										this.clonedDocProject, releaseTrainVersion,
-										"vAngel.SR33"))
+				.thenThrownBy(() -> projectDocumentationUpdaterWithNoIndexHtml(properties)
+						.updateDocsRepo(releaseTrainVersion, "vAngel.SR33"))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("index.html is not present");
 	}
@@ -96,15 +97,18 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(
 				file("/projects/spring-cloud-static/").toURI().toString());
 
-		BDDAssertions.thenThrownBy(
-				() -> new SpringCloudCustomProjectDocumentationUpdater(properties,
-						new ProjectGitHandler(properties)) {
-					@Override
-					String readIndexHtmlContents(File indexHtml) {
-						return "";
-					}
-				}.updateDocsRepo(this.clonedDocProject, releaseTrainVersion,
-						"vAngel.SR33"))
+		SpringCloudCustomProjectDocumentationUpdater customUpdater = new SpringCloudCustomProjectDocumentationUpdater(
+				new ProjectGitHandler(properties)) {
+			@Override
+			String readIndexHtmlContents(File indexHtml) {
+				return "";
+			}
+		};
+
+		BDDAssertions
+				.thenThrownBy(() -> new ProjectDocumentationUpdater(properties,
+						this.handler, Collections.singletonList(customUpdater))
+								.updateDocsRepo(releaseTrainVersion, "vAngel.SR33"))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("The URL to the documentation repo not found");
 	}
@@ -115,11 +119,45 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				"2.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
 
-		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(properties,
-				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
-						releaseTrainVersion, "vAngel.M7");
+		File updatedDocs = projectDocumentationUpdater(properties)
+				.updateDocsRepo(releaseTrainVersion, "vAngel.M7");
 
 		then(updatedDocs).isNull();
+	}
+
+	@NotNull
+	private ProjectDocumentationUpdater projectDocumentationUpdater(
+			ReleaserProperties properties) {
+		return new ProjectDocumentationUpdater(properties, this.handler,
+				Collections.singletonList(
+						new SpringCloudCustomProjectDocumentationUpdater(this.handler) {
+							@Override
+							boolean isNewerOrEqualReleaseTrain(String storedReleaseTrain,
+									String firstLetterOfReleaseTrain,
+									String currentReleaseTrainVersion,
+									String firstLetterOfCurrentReleaseTrain) {
+								return true;
+							}
+						}));
+	}
+
+	@NotNull
+	private ProjectDocumentationUpdater projectDocumentationUpdaterWithNoIndexHtml(
+			ReleaserProperties properties) {
+		return new ProjectDocumentationUpdater(properties, this.handler,
+				Collections.singletonList(
+						new SpringCloudCustomProjectDocumentationUpdater(this.handler) {
+							@Override
+							File indexHtml(File clonedDocumentationProject,
+									String pathToIndexHtml) {
+								return new File("non/existent/file");
+							}
+						}));
+	}
+
+	@NotNull
+	private ProjectGitHandler projectGitHandler(ReleaserProperties properties) {
+		return new ProjectGitHandler(properties);
 	}
 
 	@Test
@@ -131,7 +169,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(
 				file("/projects/spring-cloud-static/").toURI().toString());
 
-		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(properties,
+		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
 				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
 						releaseTrainVersion, "vAngel.SR33");
 
@@ -149,9 +187,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
 
-		new SpringCloudCustomProjectDocumentationUpdater(properties, handler)
-				.updateDocsRepo(this.clonedDocProject, releaseTrainVersion,
-						"vDalston.SR3");
+		new SpringCloudCustomProjectDocumentationUpdater(handler).updateDocsRepo(
+				this.clonedDocProject, releaseTrainVersion, "vDalston.SR3");
 
 		BDDMockito.then(handler).should(BDDMockito.never())
 				.commit(BDDMockito.any(File.class), BDDMockito.anyString());
@@ -165,7 +202,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(properties,
+		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
 				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
 						releaseTrainVersion, "Angel.SR33");
 
@@ -183,9 +220,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(properties,
-				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
-						releaseTrainVersion, "vFinchley.SR33");
+		File updatedDocs = projectDocumentationUpdater(properties)
+				.updateDocsRepo(releaseTrainVersion, "vFinchley.SR33");
 
 		String indexHtmlContent = new String(
 				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
@@ -201,9 +237,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(properties,
-				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
-						releaseTrainVersion, "Finchley.SR33");
+		File updatedDocs = projectDocumentationUpdater(properties)
+				.updateDocsRepo(releaseTrainVersion, "Finchley.SR33");
 
 		String indexHtmlContent = new String(
 				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
@@ -219,9 +254,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 		properties.getGit().setUpdateDocumentationRepo(false);
 
-		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(properties,
-				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
-						releaseTrainVersion, "Finchley.SR33");
+		File updatedDocs = projectDocumentationUpdater(properties)
+				.updateDocsRepo(releaseTrainVersion, "Finchley.SR33");
 
 		then(updatedDocs).isNull();
 	}

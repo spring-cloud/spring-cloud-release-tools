@@ -17,7 +17,7 @@
 package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -66,7 +66,8 @@ public class ProjectPomUpdaterTests {
 				"Finchley.BUILD-SNAPSHOT");
 		properties.getFixedVersions().put("spring-boot", "2.0.3.RELEASE");
 		properties.getFixedVersions().put("spring-cloud-gateway", "2.0.1.BUILD-SNAPSHOT");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections
+				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties)));
 
 		Map<String, String> fixedVersions = updater.fixedVersions().stream()
 				.collect(Collectors.toMap(projectVersion -> projectVersion.projectName,
@@ -76,7 +77,8 @@ public class ProjectPomUpdaterTests {
 				.containsEntry("spring-boot-dependencies", "2.0.3.RELEASE")
 				.containsEntry("spring-boot-starter", "2.0.3.RELEASE")
 				.containsEntry("spring-cloud-build", "2.0.3.BUILD-SNAPSHOT")
-				.containsEntry("spring-cloud-dependencies", "2.0.3.BUILD-SNAPSHOT")
+				.containsEntry("spring-cloud-dependencies-parent", "2.0.3.BUILD-SNAPSHOT")
+				.containsEntry("spring-cloud-dependencies", "Finchley.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud-release", "Finchley.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud", "Finchley.BUILD-SNAPSHOT");
 	}
@@ -85,7 +87,8 @@ public class ProjectPomUpdaterTests {
 	public void should_skip_any_steps_if_there_is_no_pom_xml() {
 		ReleaserProperties properties = new ReleaserProperties();
 		ProjectGitHandler handler = BDDMockito.mock(ProjectGitHandler.class);
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections
+				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties)));
 
 		updater.updateProjectFromReleaseTrain(new File("target"), new Projects(),
 				new ProjectVersion("foo", "1.0.0.RELEASE"), false);

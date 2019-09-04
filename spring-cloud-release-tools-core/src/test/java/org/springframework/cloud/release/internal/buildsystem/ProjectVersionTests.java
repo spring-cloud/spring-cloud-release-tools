@@ -50,14 +50,6 @@ public class ProjectVersionTests {
 	}
 
 	@Test
-	public void should_build_version_from_text_when_parent_suffix_is_present() {
-		ProjectVersion projectVersion = new ProjectVersion("foo-parent", "1.0.0");
-
-		then(projectVersion.version).isEqualTo("1.0.0");
-		then(projectVersion.projectName).isEqualTo("foo");
-	}
-
-	@Test
 	public void should_build_version_from_text() {
 		ProjectVersion projectVersion = new ProjectVersion("foo", "1.0.0");
 

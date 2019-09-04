@@ -252,7 +252,7 @@ public class SpringReleaser {
 		if (this.properties.getGit().isFetchVersionsFromGit()
 				&& !this.properties.getMetaRelease().isEnabled()) {
 			printVersionRetrieval();
-			projectsToUpdate = this.releaser.retrieveVersionsFromSCRelease();
+			projectsToUpdate = this.releaser.retrieveVersionsFromBom();
 			versionFromBom = assertNoSnapshotsForANonSnapshotProject(project,
 					projectsToUpdate);
 		}

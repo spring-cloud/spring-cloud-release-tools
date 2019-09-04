@@ -46,8 +46,11 @@ public class PomUpdaterTests {
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
 
-	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
-			.projects(projects()).versionsFromBom();
+	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
+			.releaserProperties(new ReleaserProperties()).projects(projects())
+			.parsers(MavenBomParserAccessor.cloudMavenBomParser(new ReleaserProperties())
+					.customBomParsers())
+			.retrieveFromBom();
 
 	PomUpdater pomUpdater = new PomUpdater();
 

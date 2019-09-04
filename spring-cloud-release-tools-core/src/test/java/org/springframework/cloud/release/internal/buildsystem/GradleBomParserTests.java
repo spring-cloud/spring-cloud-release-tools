@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,8 @@ class GradleBomParserTests {
 
 	@Test
 	void should_read_versions_from_bom_from_properties() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>()) {
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
+				new ArrayList<>()) {
 			@Override
 			public boolean isApplicable(File clonedBom) {
 				return true;
@@ -62,7 +63,8 @@ class GradleBomParserTests {
 		gradleSubstitution.put("verifierVersion", "spring-cloud-contract");
 		ReleaserProperties releaserProperties = new ReleaserProperties();
 		releaserProperties.getGradle().setGradlePropsSubstitution(gradleSubstitution);
-		GradleBomParser parser = new GradleBomParser(releaserProperties, new ArrayList<>()) {
+		GradleBomParser parser = new GradleBomParser(releaserProperties,
+				new ArrayList<>()) {
 			@Override
 			public boolean isApplicable(File clonedBom) {
 				return true;
@@ -89,14 +91,16 @@ class GradleBomParserTests {
 
 	@Test
 	void should_be_not_applicable_when_no_build_gradle_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>());
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
+				new ArrayList<>());
 
 		BDDAssertions.then(parser.isApplicable(new File("."))).isFalse();
 	}
 
 	@Test
 	void should_be_applicable_when_build_gradle_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>()) {
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
+				new ArrayList<>()) {
 			@Override
 			File file(File clonedBom, String child) {
 				return clonedBom;
@@ -108,7 +112,8 @@ class GradleBomParserTests {
 
 	@Test
 	void should_return_empty_version_when_no_gradle_properties_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>());
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
+				new ArrayList<>());
 
 		VersionsFromBom versionsFromBom = parser.versionsFromBom(new File("."));
 

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,13 @@ public class VersionsFromBomBuilder {
 
 	private List<CustomBomParser> parsers = new ArrayList<>();
 
+	private File thisProjectRoot;
+
+	public VersionsFromBomBuilder thisProjectRoot(File thisProjectRoot) {
+		this.thisProjectRoot = thisProjectRoot;
+		return this;
+	}
+
 	public VersionsFromBomBuilder releaserProperties(
 			ReleaserProperties releaserProperties) {
 		this.releaserProperties = releaserProperties;
@@ -55,15 +62,35 @@ public class VersionsFromBomBuilder {
 		return this;
 	}
 
-	public VersionsFromBom versionsFromBom() {
-		File thisProjectRoot = new File(this.releaserProperties.getWorkingDir());
-		CustomBomParser bomParser = this.parsers
+	public VersionsFromBom merged() {
+		File thisProjectRoot = thisProjectRoot();
+		CustomBomParser bomParser = parser(thisProjectRoot);
+		if (!this.projects.isEmpty()) {
+			return new VersionsFromBom(this.releaserProperties, bomParser, this.projects);
+		}
+		return new VersionsFromBom(this.releaserProperties, bomParser,
+				this.versionsFromBom);
+	}
+
+	public VersionsFromBom retrieveFromBom() {
+		File thisProjectRoot = thisProjectRoot();
+		CustomBomParser bomParser = parser(thisProjectRoot);
+		VersionsFromBom versionsFromBom = versionsFromBom(bomParser);
+		VersionsFromBom customParsing = customParsing(thisProjectRoot, this.projects);
+		return new VersionsFromBom(this.releaserProperties, bomParser, versionsFromBom,
+				customParsing);
+	}
+
+	private File thisProjectRoot() {
+		return this.thisProjectRoot != null ? this.thisProjectRoot
+				: new File(this.releaserProperties.getWorkingDir());
+	}
+
+	private CustomBomParser parser(File thisProjectRoot) {
+		return this.parsers
 				.stream().filter(p -> p.isApplicable(thisProjectRoot,
 						this.releaserProperties, this.projects))
 				.findFirst().orElse(CustomBomParser.NO_OP);
-		VersionsFromBom versionsFromBom = versionsFromBom(bomParser);
-		VersionsFromBom customParsing = customParsing(thisProjectRoot, this.projects);
-		return new VersionsFromBom(this.releaserProperties, bomParser, versionsFromBom, customParsing);
 	}
 
 	private VersionsFromBom versionsFromBom(CustomBomParser bomParser) {
@@ -79,16 +106,15 @@ public class VersionsFromBomBuilder {
 
 	private VersionsFromBom customParsing(File thisProjectRoot, Set<Project> projects) {
 		return this.parsers.stream()
-				.filter(p -> p.isApplicable(thisProjectRoot, this.releaserProperties, projects))
+				.filter(p -> p.isApplicable(thisProjectRoot, this.releaserProperties,
+						projects))
 				.map(p -> p.parseBom(thisProjectRoot, this.releaserProperties))
 				.reduce((versionsFromBom,
 						versionsFromBom2) -> new VersionsFromBomBuilder()
-						.parsers(this.parsers)
-						.releaserProperties(this.releaserProperties)
-						.projects(versionsFromBom, versionsFromBom2)
-						.versionsFromBom())
+								.parsers(this.parsers).thisProjectRoot(thisProjectRoot)
+								.releaserProperties(this.releaserProperties)
+								.projects(versionsFromBom, versionsFromBom2).merged())
 				.orElse(VersionsFromBom.EMPTY_VERSION);
 	}
-
 
 }

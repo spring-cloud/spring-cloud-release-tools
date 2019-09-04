@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,8 +23,6 @@ import java.nio.file.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
@@ -32,7 +30,8 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 /**
  * @author Marcin Grzejszczak
  */
-class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocumentationUpdater, ReleaserPropertiesAware {
+class SpringCloudCustomProjectDocumentationUpdater
+		implements CustomProjectDocumentationUpdater {
 
 	private static final String HTTP_SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";
 
@@ -43,17 +42,15 @@ class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocum
 
 	private final ProjectGitHandler gitHandler;
 
-	private ReleaserProperties properties;
-
-	SpringCloudCustomProjectDocumentationUpdater(ReleaserProperties properties,
-			ProjectGitHandler gitHandler) {
+	SpringCloudCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler) {
 		this.gitHandler = gitHandler;
-		this.properties = properties;
 	}
 
 	@Override
-	public boolean isApplicable(File clonedDocumentationProject, ProjectVersion currentProject, String bomBranch) {
-		return clonedDocumentationProject.getName().startsWith("spring-cloud") || currentProject.projectName.startsWith("spring-cloud");
+	public boolean isApplicable(File clonedDocumentationProject,
+			ProjectVersion currentProject, String bomBranch) {
+		return clonedDocumentationProject.getName().startsWith("spring-cloud")
+				|| currentProject.projectName.startsWith("spring-cloud");
 	}
 
 	/**
@@ -65,28 +62,20 @@ class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocum
 	 * used
 	 */
 	@Override
-	public File updateDocsRepo(File clonedDocumentationProject, ProjectVersion currentProject, String bomBranch) {
-		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
-			log.info(
-					"Will not update documentation repository, since the switch to do so "
-							+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
-			return null;
-		}
-		if (!currentProject.isReleaseOrServiceRelease()) {
-			log.info(
-					"Will not update documentation repository for non release or service release [{}]",
-					currentProject.version);
-			return null;
-		}
-		File documentationProject = this.gitHandler.cloneDocumentationProject();
-		log.debug("Cloning the doc project to [{}]", documentationProject);
+	public File updateDocsRepo(File clonedDocumentationProject,
+			ProjectVersion currentProject, String bomBranch) {
+		log.debug("Cloning the doc project to [{}]", clonedDocumentationProject);
 		String pathToIndexHtml = "current/index.html";
-		File indexHtml = new File(documentationProject, pathToIndexHtml);
+		File indexHtml = indexHtml(clonedDocumentationProject, pathToIndexHtml);
 		if (!indexHtml.exists()) {
 			throw new IllegalStateException(
 					"index.html is not present at [" + pathToIndexHtml + "]");
 		}
-		return updateTheDocsRepo(bomBranch, documentationProject, indexHtml);
+		return updateTheDocsRepo(bomBranch, clonedDocumentationProject, indexHtml);
+	}
+
+	File indexHtml(File clonedDocumentationProject, String pathToIndexHtml) {
+		return new File(clonedDocumentationProject, pathToIndexHtml);
 	}
 
 	private File updateTheDocsRepo(String springCloudReleaseBranch,
@@ -109,10 +98,9 @@ class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocum
 					springCloudReleaseBranch);
 			String firstLetterOfCurrentReleaseTrain = String
 					.valueOf(currentReleaseTrainVersion.charAt(0));
-			boolean newerOrEqualReleaseTrain = (!storedReleaseTrain
-					.equals(currentReleaseTrainVersion))
-					&& firstLetterOfCurrentReleaseTrain
-							.compareToIgnoreCase(firstLetterOfReleaseTrain) >= 0;
+			boolean newerOrEqualReleaseTrain = isNewerOrEqualReleaseTrain(
+					storedReleaseTrain, firstLetterOfReleaseTrain,
+					currentReleaseTrainVersion, firstLetterOfCurrentReleaseTrain);
 			if (!newerOrEqualReleaseTrain) {
 				log.info(
 						"Current release train [{}] is not newer than the stored one [{}]",
@@ -125,6 +113,14 @@ class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocum
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	boolean isNewerOrEqualReleaseTrain(String storedReleaseTrain,
+			String firstLetterOfReleaseTrain, String currentReleaseTrainVersion,
+			String firstLetterOfCurrentReleaseTrain) {
+		return (!storedReleaseTrain.equals(currentReleaseTrainVersion))
+				&& firstLetterOfCurrentReleaseTrain
+						.compareToIgnoreCase(firstLetterOfReleaseTrain) >= 0;
 	}
 
 	private int beginIndex(int httpIndex, int httpsIndex) {
@@ -159,11 +155,6 @@ class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocum
 
 	String readIndexHtmlContents(File indexHtml) throws IOException {
 		return new String(Files.readAllBytes(indexHtml.toPath()));
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 }

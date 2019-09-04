@@ -710,8 +710,8 @@ public class AcceptanceTests {
 				this.releaserProperties);
 		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(
 				properties,
-				new TestDocumentationUpdater.TestCustomProjectDocumentationUpdater(properties,
-						gitHandler, "Brixton.SR1"),
+				new TestDocumentationUpdater.TestCustomProjectDocumentationUpdater(
+						properties, gitHandler, "Brixton.SR1"),
 				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties,
 						gitHandler, templateGenerator)) {
 			@Override

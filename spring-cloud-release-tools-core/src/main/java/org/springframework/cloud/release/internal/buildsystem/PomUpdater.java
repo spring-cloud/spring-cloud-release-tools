@@ -134,7 +134,7 @@ class PomUpdater {
 	}
 
 	ModelWrapper readModel(File pom) {
-		return new ModelWrapper(PomReader.readPom(pom));
+		return new ModelWrapper(PomReader.readPom(pom), pom);
 	}
 
 	/**
@@ -152,7 +152,7 @@ class PomUpdater {
 				sourceChanges);
 		sourceChanges = updateVersionIfPossible(rootPom, versionsFromBom, model,
 				sourceChanges);
-		return new ModelWrapper(model, sourceChanges, versionsFromBom);
+		return new ModelWrapper(model, sourceChanges, versionsFromBom, pom);
 	}
 
 	/**
@@ -267,16 +267,26 @@ class ModelWrapper {
 
 	final List<VersionChange> sourceChanges = new ArrayList<>();
 
+	final File rootFile;
+
 	ModelWrapper(Model model, List<VersionChange> sourceChanges,
-			VersionsFromBom versionsFromBom) {
+			VersionsFromBom versionsFromBom, File rootFile) {
 		this.model = model;
 		this.versionsFromBom = versionsFromBom;
 		this.sourceChanges.addAll(sourceChanges);
+		this.rootFile = rootFile;
+	}
+
+	ModelWrapper(Model model, File rootFile) {
+		this.model = model;
+		this.versionsFromBom = VersionsFromBom.EMPTY_VERSION;
+		this.rootFile = rootFile;
 	}
 
 	ModelWrapper(Model model) {
 		this.model = model;
 		this.versionsFromBom = VersionsFromBom.EMPTY_VERSION;
+		this.rootFile = null;
 	}
 
 	String projectName() {

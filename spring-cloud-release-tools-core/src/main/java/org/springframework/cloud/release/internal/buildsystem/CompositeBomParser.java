@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal.buildsystem;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class CompositeBomParser implements BomParser {
 
@@ -41,6 +42,12 @@ class CompositeBomParser implements BomParser {
 		return this.parsers.stream().filter(b -> b.isApplicable(thisProjectRoot))
 				.findFirst().orElseThrow(
 						() -> new IllegalStateException("Can't find a matching parser"));
+	}
+
+	@Override
+	public List<CustomBomParser> customBomParsers() {
+		return this.parsers.stream().flatMap(b -> b.customBomParsers().stream())
+				.collect(Collectors.toList());
 	}
 
 }

@@ -78,10 +78,11 @@ class MavenBomParser implements BomParser {
 						releaseTrainProjectVersion));
 		// @formatter:off
 		return new VersionsFromBomBuilder()
+				.thisProjectRoot(thisProjectRoot)
 				.releaserProperties(this.properties)
 				.parsers(this.customParsers)
 				.projects(projects)
-				.versionsFromBom();
+				.retrieveFromBom();
 		// @formatter:on
 	}
 
@@ -97,6 +98,11 @@ class MavenBomParser implements BomParser {
 			String name = matcher.group(1);
 			return new Project(name, entry.getValue().toString());
 		};
+	}
+
+	@Override
+	public List<CustomBomParser> customBomParsers() {
+		return this.customParsers;
 	}
 
 }

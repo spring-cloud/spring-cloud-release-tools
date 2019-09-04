@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,8 @@ class GradleBomParser implements BomParser {
 
 	private final List<CustomBomParser> customParsers;
 
-	GradleBomParser(ReleaserProperties releaserProperties, List<CustomBomParser> customParsers) {
+	GradleBomParser(ReleaserProperties releaserProperties,
+			List<CustomBomParser> customParsers) {
 		this.properties = releaserProperties;
 		this.customParsers = customParsers;
 	}
@@ -59,9 +60,9 @@ class GradleBomParser implements BomParser {
 		Properties properties = loadProps(gradleProperties);
 		final Map<String, String> substitution = this.properties.getGradle()
 				.getGradlePropsSubstitution();
-		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().releaserProperties(this.properties)
-				.parsers(this.customParsers)
-				.versionsFromBom();
+		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
+				.thisProjectRoot(thisProjectRoot).releaserProperties(this.properties)
+				.parsers(this.customParsers).retrieveFromBom();
 		properties.forEach((key, value) -> {
 			String projectName = projectName(substitution, key);
 			versionsFromBom.setVersion(projectName, value.toString());
@@ -94,6 +95,11 @@ class GradleBomParser implements BomParser {
 			throw new IllegalStateException(e);
 		}
 		return props;
+	}
+
+	@Override
+	public List<CustomBomParser> customBomParsers() {
+		return this.customParsers;
 	}
 
 }

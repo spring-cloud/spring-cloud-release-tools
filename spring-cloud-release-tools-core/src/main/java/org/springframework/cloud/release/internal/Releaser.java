@@ -92,7 +92,7 @@ public class Releaser implements ReleaserPropertiesAware {
 		return this.projectGitHandler.cloneProjectFromOrg(projectName);
 	}
 
-	public Projects retrieveVersionsFromSCRelease() {
+	public Projects retrieveVersionsFromBom() {
 		return this.projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 	}
 

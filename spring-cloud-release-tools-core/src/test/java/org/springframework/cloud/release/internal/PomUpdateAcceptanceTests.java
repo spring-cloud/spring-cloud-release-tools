@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.ArrayList;
+import java.util.Collections;
 
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import org.springframework.cloud.release.internal.buildsystem.MavenBomParserAccessor;
 import org.springframework.cloud.release.internal.buildsystem.PomReader;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
@@ -59,7 +60,9 @@ public class PomUpdateAcceptanceTests {
 	public void should_update_all_versions_for_a_release_train() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
 		releaserProperties.getFixedVersions().put("checkstyle", "100.0.0.RELEASE");
-		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties, new ArrayList<>());
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections.singletonList(
+						MavenBomParserAccessor.cloudMavenBomParser(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
 
@@ -91,7 +94,9 @@ public class PomUpdateAcceptanceTests {
 	public void should_not_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version()
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
-		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties, new ArrayList<>());
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections.singletonList(
+						MavenBomParserAccessor.cloudMavenBomParser(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		projects.add(new ProjectVersion("spring-cloud-sleuth-samples", "0.0.5.RELEASE"));
 		File project = new File(this.temporaryFolder,
@@ -113,7 +118,9 @@ public class PomUpdateAcceptanceTests {
 	public void should_not_fail_update_when_after_updating_a_release_version_there_still_is_a_snapshot_version_in_a_non_deployable_module()
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
-		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties, new ArrayList<>());
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections.singletonList(
+						MavenBomParserAccessor.cloudMavenBomParser(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = new File(this.temporaryFolder,
 				"/spring-cloud-sleuth-with-unmatched-property");
@@ -129,7 +136,9 @@ public class PomUpdateAcceptanceTests {
 	public void should_update_fail_when_after_updating_a_release_version_there_still_is_a_snapshot_version_for_boot_snapshot_version()
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
-		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties, new ArrayList<>());
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections.singletonList(
+						MavenBomParserAccessor.cloudMavenBomParser(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		projects.removeIf(projectVersion -> projectVersion.projectName
 				.contains("spring-cloud-build"));
@@ -145,7 +154,9 @@ public class PomUpdateAcceptanceTests {
 	@Test
 	public void should_not_update_a_project_that_is_not_on_the_list() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
-		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties, new ArrayList<>());
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections.singletonList(
+						MavenBomParserAccessor.cloudMavenBomParser(releaserProperties)));
 		File beforeProcessing = pom("/projects/project/");
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = tmpFile("/project/");

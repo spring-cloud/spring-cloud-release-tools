@@ -17,7 +17,6 @@
 package org.springframework.cloud.release.internal.docs;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,10 +30,10 @@ import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 /**
  * @author Marcin Grzejszczak
  */
-class DefaultProjectDocumentationUpdater implements ReleaserPropertiesAware {
+public class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory
-			.getLogger(DefaultProjectDocumentationUpdater.class);
+			.getLogger(ProjectDocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
 
@@ -42,19 +41,12 @@ class DefaultProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
 	private final List<CustomProjectDocumentationUpdater> updaters;
 
-	DefaultProjectDocumentationUpdater(ReleaserProperties properties,
+	public ProjectDocumentationUpdater(ReleaserProperties properties,
 			ProjectGitHandler gitHandler,
 			List<CustomProjectDocumentationUpdater> updaters) {
 		this.gitHandler = gitHandler;
 		this.properties = properties;
 		this.updaters = updaters;
-	}
-
-	DefaultProjectDocumentationUpdater(ReleaserProperties properties,
-			ProjectGitHandler gitHandler) {
-		this.gitHandler = gitHandler;
-		this.properties = properties;
-		this.updaters = new ArrayList<>();
 	}
 
 	public File updateDocsRepo(ProjectVersion currentProject, String bomBranch) {
