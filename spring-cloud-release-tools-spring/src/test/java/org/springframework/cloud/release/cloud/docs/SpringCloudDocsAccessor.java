@@ -39,8 +39,7 @@ class TestCustomProjectDocumentationUpdater
 
 	private final String version;
 
-	public TestCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler,
-			String version) {
+	TestCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler, String version) {
 		super(gitHandler);
 		this.version = version;
 	}

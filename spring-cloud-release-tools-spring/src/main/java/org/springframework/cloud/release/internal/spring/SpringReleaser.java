@@ -258,15 +258,14 @@ public class SpringReleaser {
 		}
 		else {
 			ProjectVersion originalVersion = new ProjectVersion(project);
-			String fixedVersionForProject = this.properties.getFixedVersions()
-					.get(project.getName());
+			Projects fixedVersions = this.releaser.fixedVersions();
+			String fixedVersionForProject = fixedVersions
+					.forName(project.getName()).version;
 			versionFromBom = StringUtils.hasText(fixedVersionForProject)
 					? new ProjectVersion(originalVersion.projectName,
 							fixedVersionForProject)
 					: new ProjectVersion(project);
-			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
-					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
-					.collect(Collectors.toCollection(Projects::new));
+			projectsToUpdate = fixedVersions;
 			projectsToUpdate.add(versionFromBom);
 			printSettingVersionFromFixedVersions(projectsToUpdate);
 		}

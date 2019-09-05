@@ -60,6 +60,10 @@ public class SpringCloudMavenBomParser implements CustomBomParser {
 	public VersionsFromBom parseBom(File root, ReleaserProperties properties) {
 		VersionsFromBom springCloudBuild = springCloudBuild(root, properties);
 		VersionsFromBom boot = bootVersion(root, properties);
+		if (log.isDebugEnabled()) {
+			log.debug("Added Spring Cloud Build [{}] and boot versions [{}]",
+					springCloudBuild, boot);
+		}
 		return new VersionsFromBomBuilder().thisProjectRoot(root)
 				.releaserProperties(properties).projects(springCloudBuild, boot).merged();
 	}

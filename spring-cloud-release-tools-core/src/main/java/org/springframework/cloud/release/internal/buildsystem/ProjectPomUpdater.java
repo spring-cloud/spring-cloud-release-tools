@@ -226,7 +226,8 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 						&& !this.pomUpdater.hasSkipDeployment(model.model)) {
 					log.debug(
 							"Update is a non-snapshot one. Checking if no snapshot versions remained in the pom");
-					Scanner scanner = new Scanner(asString(path));
+					String text = asString(path);
+					Scanner scanner = new Scanner(text);
 					int lineNumber = 0;
 					while (scanner.hasNextLine()) {
 						String line = scanner.nextLine();
@@ -238,6 +239,9 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 										&& pattern.matcher(line).matches())
 								.findFirst().orElse(null);
 						if (matchingPattern != null) {
+							if (log.isDebugEnabled()) {
+								log.debug("File text \n" + text);
+							}
 							throw new IllegalStateException("The file [" + path
 									+ "] matches the [ " + matchingPattern.pattern()
 									+ "] pattern in line number [" + lineNumber + "]\n\n"
