@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal;
+package org.springframework.cloud.release;
 
 import java.io.File;
 import java.io.IOException;

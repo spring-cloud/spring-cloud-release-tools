@@ -16,13 +16,18 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
+import org.springframework.cloud.release.internal.docs.ProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
 import org.springframework.cloud.release.internal.options.Parser;
@@ -59,11 +64,6 @@ class ReleaserConfiguration {
 	@Bean
 	ProjectCommandExecutor projectBuilder() {
 		return new ProjectCommandExecutor(this.properties);
-	}
-
-	@Bean
-	ProjectPomUpdater pomUpdater() {
-		return new ProjectPomUpdater(this.properties, bomParsers);
 	}
 
 	@Bean
@@ -106,10 +106,22 @@ class ReleaserConfiguration {
 				projectCommandExecutor, releaserProperties, versionsFetcher);
 	}
 
+	@Autowired(required = false)
+	List<CustomProjectDocumentationUpdater> customProjectDocumentationUpdaters = new ArrayList<>();
+
+	@Bean
+	ProjectDocumentationUpdater projectDocumentationUpdater(
+			ProjectGitHandler projectGitHandler) {
+		return new ProjectDocumentationUpdater(this.properties, projectGitHandler,
+				this.customProjectDocumentationUpdaters);
+	}
+
 	@Bean
 	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
-			ReleaserProperties properties, TemplateGenerator templateGenerator) {
-		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator);
+			ReleaserProperties properties, TemplateGenerator templateGenerator,
+			ProjectDocumentationUpdater projectDocumentationUpdater) {
+		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator,
+				projectDocumentationUpdater);
 	}
 
 	@Bean

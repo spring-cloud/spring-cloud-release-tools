@@ -63,6 +63,8 @@ public class ReleaserApplicationEventTests {
 	@Configuration
 	@EnableAutoConfiguration
 	@ComponentScan({ "org.springframework.cloud.release.internal.options",
+			"org.springframework.cloud.release.cloud",
+			"org.springframework.cloud.release.internal.buildsystem",
 			"org.springframework.cloud.release.internal.sagan",
 			"org.springframework.cloud.release.internal.spring" })
 	static class Config {

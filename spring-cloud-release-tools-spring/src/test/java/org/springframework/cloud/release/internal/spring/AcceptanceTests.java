@@ -45,9 +45,12 @@ import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.cloud.docs.SpringCloudDocsAccessor;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.buildsystem.BomParser;
 import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
+import org.springframework.cloud.release.internal.buildsystem.MavenBomParserAccessor;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.buildsystem.TestPomReader;
@@ -697,7 +700,8 @@ public class AcceptanceTests {
 
 	private Releaser defaultReleaser(String expectedVersion, String projectName,
 			ReleaserProperties properties) {
-		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties, bomParsers);
+		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties,
+				bomParsers(properties));
 		ProjectCommandExecutor projectCommandExecutor = new ProjectCommandExecutor(
 				properties);
 		ProjectGitHandler gitHandler = new ProjectGitHandler(properties);
@@ -710,10 +714,9 @@ public class AcceptanceTests {
 				this.releaserProperties);
 		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(
 				properties,
-				new TestDocumentationUpdater.TestCustomProjectDocumentationUpdater(
-						properties, gitHandler, "Brixton.SR1"),
-				new TestDocumentationUpdater.TestReleaseContentsUpdater(properties,
-						gitHandler, templateGenerator)) {
+				SpringCloudDocsAccessor.testUpdater(gitHandler, "Brixton.SR1"),
+				gitHandler, new TestDocumentationUpdater.TestReleaseContentsUpdater(
+						properties, gitHandler, templateGenerator)) {
 			@Override
 			public File updateDocsRepo(ProjectVersion currentProject,
 					String bomReleaseBranch) {
@@ -731,7 +734,8 @@ public class AcceptanceTests {
 	}
 
 	private Releaser defaultMetaReleaser(ReleaserProperties properties) {
-		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties, bomParsers);
+		ProjectPomUpdater pomUpdater = new ProjectPomUpdater(properties,
+				bomParsers(properties));
 		ProjectCommandExecutor projectCommandExecutor = new ProjectCommandExecutor(
 				properties);
 		NonAssertingTestProjectGitHubHandler handler = new NonAssertingTestProjectGitHubHandler(
@@ -745,8 +749,9 @@ public class AcceptanceTests {
 				.spy(new SaganUpdater(this.saganClient, this.releaserProperties));
 		DocumentationUpdater documentationUpdater = Mockito
 				.spy(new TestDocumentationUpdater(properties,
-						new TestDocumentationUpdater.TestCustomProjectDocumentationUpdater(
-								properties, nonAssertingGitHandler, "Brixton.SR1"),
+						SpringCloudDocsAccessor.testUpdater(nonAssertingGitHandler,
+								"Brixton.SR1"),
+						nonAssertingGitHandler,
 						new TestDocumentationUpdater.TestReleaseContentsUpdater(
 								properties, nonAssertingGitHandler, templateGenerator) {
 							@Override
@@ -775,6 +780,11 @@ public class AcceptanceTests {
 		this.saganUpdater = saganUpdater;
 		this.documentationUpdater = documentationUpdater;
 		return releaser;
+	}
+
+	private List<BomParser> bomParsers(ReleaserProperties properties) {
+		return Collections
+				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties));
 	}
 
 	private ReleaserProperties releaserProperties(File project, String branch)

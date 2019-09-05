@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Parses the bom and returns all parsed versions.
  */
-interface BomParser {
+public interface BomParser {
 
 	/**
 	 * @param clonedBom - location of the cloned BOM repository
