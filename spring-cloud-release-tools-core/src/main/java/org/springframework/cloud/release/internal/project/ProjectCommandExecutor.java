@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.util.StringUtils;
 
 /**
@@ -304,47 +303,6 @@ class CommandPicker {
 
 	private static final Log log = LogFactory.getLog(CommandPicker.class);
 
-	private enum ProjectType {
-
-		MAVEN, GRADLE, BASH;
-
-	}
-
-	/**
-	 * Enumeration over commonly used Maven profiles.
-	 */
-	private enum MavenProfile {
-
-		/**
-		 * Profile used for milestone versions.
-		 */
-		MILESTONE,
-
-		/**
-		 * Profile used for ga versions.
-		 */
-		CENTRAL,
-
-		/**
-		 * Profile used to run integration tests.
-		 */
-		INTEGRATION,
-
-		/**
-		 * Profile used to run guides publishing.
-		 */
-		GUIDES;
-
-		/**
-		 * Converts the profile to lowercase, maven command line property.
-		 * @return profile with prepended -P
-		 */
-		public String asMavenProfile() {
-			return "-P" + this.name().toLowerCase();
-		}
-
-	}
-
 	private final ReleaserProperties releaserProperties;
 
 	private final ProjectType projectType;
@@ -528,6 +486,47 @@ class CommandPicker {
 	private String profilesToString(MavenProfile... profiles) {
 		return Arrays.stream(profiles).map(profile -> "-P" + profile)
 				.collect(Collectors.joining(" "));
+	}
+
+	private enum ProjectType {
+
+		MAVEN, GRADLE, BASH;
+
+	}
+
+	/**
+	 * Enumeration over commonly used Maven profiles.
+	 */
+	private enum MavenProfile {
+
+		/**
+		 * Profile used for milestone versions.
+		 */
+		MILESTONE,
+
+		/**
+		 * Profile used for ga versions.
+		 */
+		CENTRAL,
+
+		/**
+		 * Profile used to run integration tests.
+		 */
+		INTEGRATION,
+
+		/**
+		 * Profile used to run guides publishing.
+		 */
+		GUIDES;
+
+		/**
+		 * Converts the profile to lowercase, maven command line property.
+		 * @return profile with prepended -P
+		 */
+		public String asMavenProfile() {
+			return "-P" + this.name().toLowerCase();
+		}
+
 	}
 
 }

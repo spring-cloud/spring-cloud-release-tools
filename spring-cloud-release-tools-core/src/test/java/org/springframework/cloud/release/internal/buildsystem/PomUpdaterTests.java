@@ -33,6 +33,8 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitRepoTests;
+import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.tech.PomReader;
 import org.springframework.util.FileSystemUtils;
 
 /**

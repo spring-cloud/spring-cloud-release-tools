@@ -27,6 +27,7 @@ import org.mockito.BDDMockito;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
 /**

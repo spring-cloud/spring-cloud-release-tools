@@ -32,7 +32,6 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.util.FileSystemUtils;
 

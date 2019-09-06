@@ -23,8 +23,9 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import org.springframework.cloud.release.cloud.buildsystem.SpringCloudMavenBomParser;
+import org.springframework.cloud.release.cloud.buildsystem.SpringCloudMavenBomParserAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.project.Project;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -41,7 +42,8 @@ public class VersionsFromBomTests {
 	public void should_add_boot_to_versions_when_version_is_created() {
 		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
 				.releaserProperties(new ReleaserProperties())
-				.parsers(Collections.singletonList(new SpringCloudMavenBomParser()))
+				.parsers(Collections
+						.singletonList(SpringCloudMavenBomParserAccessor.cloud()))
 				.retrieveFromBom();
 		versionsFromBom.setVersion("spring-boot", "1.2.3.RELEASE");
 
@@ -246,7 +248,8 @@ public class VersionsFromBomTests {
 
 	private VersionsFromBom mixedVersions() {
 		return new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
-				.parsers(Collections.singletonList(new SpringCloudMavenBomParser()))
+				.parsers(Collections
+						.singletonList(SpringCloudMavenBomParserAccessor.cloud()))
 				.projects(mixedProjects()).merged();
 	}
 

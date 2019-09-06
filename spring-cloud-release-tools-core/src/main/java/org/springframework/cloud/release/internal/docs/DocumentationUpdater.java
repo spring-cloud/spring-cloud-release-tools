@@ -17,11 +17,12 @@
 package org.springframework.cloud.release.internal.docs;
 
 import java.io.File;
+import java.util.List;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
@@ -38,9 +39,10 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 
 	public DocumentationUpdater(ProjectGitHandler gitHandler,
 			ReleaserProperties properties, TemplateGenerator templateGenerator,
-			ProjectDocumentationUpdater updater) {
+			List<CustomProjectDocumentationUpdater> updaters) {
 		this.properties = properties;
-		this.projectDocumentationUpdater = updater;
+		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(properties,
+				gitHandler, updaters);
 		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(
 				this.properties, gitHandler, templateGenerator);
 	}

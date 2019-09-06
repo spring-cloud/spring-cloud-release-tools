@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.tech.PomReader;
 
 /**
  * Parses the poms for a given project and populates versions from a release train.

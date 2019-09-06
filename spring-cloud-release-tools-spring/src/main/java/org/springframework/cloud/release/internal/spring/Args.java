@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.project.ProcessedProject;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;

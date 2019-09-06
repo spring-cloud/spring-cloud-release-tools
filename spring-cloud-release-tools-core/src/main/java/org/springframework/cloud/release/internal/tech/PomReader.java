@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.buildsystem;
+package org.springframework.cloud.release.internal.tech;
 
 import java.io.File;
 import java.io.FileReader;

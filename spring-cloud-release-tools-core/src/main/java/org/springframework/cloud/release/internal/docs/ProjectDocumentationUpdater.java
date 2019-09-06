@@ -24,24 +24,24 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
+class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ProjectDocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
 
-	private ReleaserProperties properties;
-
 	private final List<CustomProjectDocumentationUpdater> updaters;
 
-	public ProjectDocumentationUpdater(ReleaserProperties properties,
+	private ReleaserProperties properties;
+
+	ProjectDocumentationUpdater(ReleaserProperties properties,
 			ProjectGitHandler gitHandler,
 			List<CustomProjectDocumentationUpdater> updaters) {
 		this.gitHandler = gitHandler;

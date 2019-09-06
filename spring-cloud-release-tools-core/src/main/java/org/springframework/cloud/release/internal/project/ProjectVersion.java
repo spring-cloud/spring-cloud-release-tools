@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.buildsystem;
+package org.springframework.cloud.release.internal.project;
 
 import java.io.File;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import org.apache.maven.model.Model;
 
-import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
+import org.springframework.cloud.release.internal.tech.PomReader;
 import org.springframework.util.StringUtils;
 
 /**

@@ -39,7 +39,7 @@ import org.springframework.boot.context.properties.source.MapConfigurationProper
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.util.StringUtils;
@@ -54,11 +54,11 @@ public class VersionsFetcher implements ReleaserPropertiesAware {
 
 	private static final Logger log = LoggerFactory.getLogger(VersionsFetcher.class);
 
-	private ReleaserProperties properties;
-
 	private final ProjectPomUpdater projectPomUpdater;
 
 	private final ToPropertiesConverter toPropertiesConverter;
+
+	private ReleaserProperties properties;
 
 	public VersionsFetcher(ReleaserProperties properties,
 			ProjectPomUpdater projectPomUpdater) {

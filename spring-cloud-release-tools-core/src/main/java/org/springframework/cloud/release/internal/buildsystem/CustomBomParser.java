@@ -21,12 +21,28 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.project.Project;
 import org.springframework.lang.Nullable;
 
 /**
  * Allows to pass in some additional gradle files parser.
  */
 public interface CustomBomParser {
+
+	CustomBomParser NO_OP = new CustomBomParser() {
+		@Override
+		public boolean isApplicable(File thisProjectRoot, ReleaserProperties properties,
+				Set<Project> projects) {
+			return true;
+		}
+
+		@Override
+		public VersionsFromBom parseBom(File thisProjectRoot,
+				ReleaserProperties properties) {
+			return VersionsFromBom.EMPTY_VERSION;
+		}
+
+	};
 
 	/**
 	 * Different projects can have different parsers. This method will tell whether the
@@ -68,20 +84,5 @@ public interface CustomBomParser {
 	default boolean isGradle(File thisProjectRoot) {
 		return new File(thisProjectRoot, "build.gradle").exists();
 	}
-
-	CustomBomParser NO_OP = new CustomBomParser() {
-		@Override
-		public boolean isApplicable(File thisProjectRoot, ReleaserProperties properties,
-				Set<Project> projects) {
-			return true;
-		}
-
-		@Override
-		public VersionsFromBom parseBom(File thisProjectRoot,
-				ReleaserProperties properties) {
-			return VersionsFromBom.EMPTY_VERSION;
-		}
-
-	};
 
 }

@@ -24,13 +24,13 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
 import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProcessedProject;
 import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
@@ -47,8 +47,6 @@ public class Releaser implements ReleaserPropertiesAware {
 	private static boolean ASSERT_SNAPSHOTS = true;
 
 	private static boolean SKIP_SNAPSHOT_ASSERTION = false;
-
-	private ReleaserProperties releaserProperties;
 
 	private final ProjectPomUpdater projectPomUpdater;
 
@@ -67,6 +65,8 @@ public class Releaser implements ReleaserPropertiesAware {
 	private final DocumentationUpdater documentationUpdater;
 
 	private final PostReleaseActions postReleaseActions;
+
+	private ReleaserProperties releaserProperties;
 
 	public Releaser(ReleaserProperties releaserProperties,
 			ProjectPomUpdater projectPomUpdater,

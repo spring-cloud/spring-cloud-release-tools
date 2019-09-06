@@ -25,6 +25,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
 import static org.assertj.core.api.BDDAssertions.then;

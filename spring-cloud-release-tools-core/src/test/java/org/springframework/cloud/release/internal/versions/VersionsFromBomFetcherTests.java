@@ -31,8 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.MavenBomParserAccessor;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.util.FileSystemUtils;
 

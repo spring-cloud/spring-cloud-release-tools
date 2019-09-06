@@ -27,7 +27,6 @@ import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
-import org.springframework.cloud.release.internal.docs.ProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
 import org.springframework.cloud.release.internal.options.Parser;
@@ -110,18 +109,10 @@ class ReleaserConfiguration {
 	List<CustomProjectDocumentationUpdater> customProjectDocumentationUpdaters = new ArrayList<>();
 
 	@Bean
-	ProjectDocumentationUpdater projectDocumentationUpdater(
-			ProjectGitHandler projectGitHandler) {
-		return new ProjectDocumentationUpdater(this.properties, projectGitHandler,
-				this.customProjectDocumentationUpdaters);
-	}
-
-	@Bean
 	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
-			ReleaserProperties properties, TemplateGenerator templateGenerator,
-			ProjectDocumentationUpdater projectDocumentationUpdater) {
+			ReleaserProperties properties, TemplateGenerator templateGenerator) {
 		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator,
-				projectDocumentationUpdater);
+				this.customProjectDocumentationUpdaters);
 	}
 
 	@Bean

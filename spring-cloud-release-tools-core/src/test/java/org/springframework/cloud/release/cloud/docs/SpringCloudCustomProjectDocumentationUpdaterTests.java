@@ -32,10 +32,12 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
-import org.springframework.cloud.release.internal.docs.ProjectDocumentationUpdater;
+import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -54,6 +56,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 
 	ProjectGitHandler handler;
 
+	ProjectGitHubHandler gitHubHandler;
+
 	File clonedDocProject;
 
 	ReleaserProperties properties = new ReleaserProperties();
@@ -69,6 +73,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				file("/projects/spring-cloud-static/").toURI().toString());
 		this.handler = new ProjectGitHandler(this.properties);
 		this.clonedDocProject = this.handler.cloneDocumentationProject();
+		this.gitHubHandler = new ProjectGitHubHandler(this.properties);
 	}
 
 	@Test
@@ -106,8 +111,9 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		};
 
 		BDDAssertions
-				.thenThrownBy(() -> new ProjectDocumentationUpdater(properties,
-						this.handler, Collections.singletonList(customUpdater))
+				.thenThrownBy(() -> new DocumentationUpdater(this.handler, properties,
+						templateGenerator(properties),
+						Collections.singletonList(customUpdater))
 								.updateDocsRepo(releaseTrainVersion, "vAngel.SR33"))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("The URL to the documentation repo not found");
@@ -126,10 +132,10 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@NotNull
-	private ProjectDocumentationUpdater projectDocumentationUpdater(
+	private DocumentationUpdater projectDocumentationUpdater(
 			ReleaserProperties properties) {
-		return new ProjectDocumentationUpdater(properties, this.handler,
-				Collections.singletonList(
+		return new DocumentationUpdater(this.handler, properties,
+				templateGenerator(properties), Collections.singletonList(
 						new SpringCloudCustomProjectDocumentationUpdater(this.handler) {
 							@Override
 							boolean isNewerOrEqualReleaseTrain(String storedReleaseTrain,
@@ -142,10 +148,10 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@NotNull
-	private ProjectDocumentationUpdater projectDocumentationUpdaterWithNoIndexHtml(
+	private DocumentationUpdater projectDocumentationUpdaterWithNoIndexHtml(
 			ReleaserProperties properties) {
-		return new ProjectDocumentationUpdater(properties, this.handler,
-				Collections.singletonList(
+		return new DocumentationUpdater(this.handler, properties,
+				templateGenerator(properties), Collections.singletonList(
 						new SpringCloudCustomProjectDocumentationUpdater(this.handler) {
 							@Override
 							File indexHtml(File clonedDocumentationProject,
@@ -153,6 +159,11 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 								return new File("non/existent/file");
 							}
 						}));
+	}
+
+	@NotNull
+	private TemplateGenerator templateGenerator(ReleaserProperties properties) {
+		return new TemplateGenerator(properties, this.gitHubHandler);
 	}
 
 	@NotNull

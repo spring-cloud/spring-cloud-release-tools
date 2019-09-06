@@ -30,11 +30,11 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.springframework.cloud.release.internal.buildsystem.MavenBomParserAccessor;
-import org.springframework.cloud.release.internal.buildsystem.PomReader;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
+import org.springframework.cloud.release.internal.tech.PomReader;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;

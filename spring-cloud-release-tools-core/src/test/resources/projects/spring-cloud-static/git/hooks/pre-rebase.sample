@@ -17,20 +17,19 @@
 
 publish=next
 basebranch="$1"
-if test "$#" = 2
-then
-	topic="refs/heads/$2"
+if test "$#" = 2; then
+  topic="refs/heads/$2"
 else
-	topic=`git symbolic-ref HEAD` ||
-	exit 0 ;# we do not interrupt rebasing detached HEAD
+  topic=$(git symbolic-ref HEAD) ||
+    exit 0 # we do not interrupt rebasing detached HEAD
 fi
 
 case "$topic" in
-refs/heads/??/*)
-	;;
+refs/heads/??/*) ;;
+
 *)
-	exit 0 ;# we do not interrupt others.
-	;;
+  exit 0 # we do not interrupt others.
+  ;;
 esac
 
 # Now we are dealing with a topic branch being rebased
@@ -38,34 +37,31 @@ esac
 
 # Does the topic really exist?
 git show-ref -q "$topic" || {
-	echo >&2 "No such branch $topic"
-	exit 1
+  echo >&2 "No such branch $topic"
+  exit 1
 }
 
 # Is topic fully merged to master?
-not_in_master=`git rev-list --pretty=oneline ^master "$topic"`
-if test -z "$not_in_master"
-then
-	echo >&2 "$topic is fully merged to master; better remove it."
-	exit 1 ;# we could allow it, but there is no point.
+not_in_master=$(git rev-list --pretty=oneline ^master "$topic")
+if test -z "$not_in_master"; then
+  echo >&2 "$topic is fully merged to master; better remove it."
+  exit 1 # we could allow it, but there is no point.
 fi
 
 # Is topic ever merged to next?  If so you should not be rebasing it.
-only_next_1=`git rev-list ^master "^$topic" ${publish} | sort`
-only_next_2=`git rev-list ^master           ${publish} | sort`
-if test "$only_next_1" = "$only_next_2"
-then
-	not_in_topic=`git rev-list "^$topic" master`
-	if test -z "$not_in_topic"
-	then
-		echo >&2 "$topic is already up to date with master"
-		exit 1 ;# we could allow it, but there is no point.
-	else
-		exit 0
-	fi
+only_next_1=$(git rev-list ^master "^$topic" ${publish} | sort)
+only_next_2=$(git rev-list ^master ${publish} | sort)
+if test "$only_next_1" = "$only_next_2"; then
+  not_in_topic=$(git rev-list "^$topic" master)
+  if test -z "$not_in_topic"; then
+    echo >&2 "$topic is already up to date with master"
+    exit 1 # we could allow it, but there is no point.
+  else
+    exit 0
+  fi
 else
-	not_in_next=`git rev-list --pretty=oneline ^${publish} "$topic"`
-	/usr/bin/perl -e '
+  not_in_next=$(git rev-list --pretty=oneline ^${publish} "$topic")
+  /usr/bin/perl -e '
 		my $topic = $ARGV[0];
 		my $msg = "* $topic has commits already merged to public branch:\n";
 		my (%not_in_next) = map {
@@ -85,7 +81,7 @@ else
 			}
 		}
 	' "$topic" "$not_in_next" "$not_in_master"
-	exit 1
+  exit 1
 fi
 
 <<\DOC_END

@@ -40,6 +40,8 @@ import org.codehaus.stax2.XMLInputFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.tech.PomReader;
 import org.springframework.util.StringUtils;
 
 import static org.springframework.util.StringUtils.hasText;

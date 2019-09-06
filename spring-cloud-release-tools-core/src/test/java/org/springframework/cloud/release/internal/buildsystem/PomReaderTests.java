@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.cloud.release.internal.git.GitRepoTests;
+import org.springframework.cloud.release.internal.tech.PomReader;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;

@@ -30,7 +30,7 @@ import org.junit.rules.TemporaryFolder;
 
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;

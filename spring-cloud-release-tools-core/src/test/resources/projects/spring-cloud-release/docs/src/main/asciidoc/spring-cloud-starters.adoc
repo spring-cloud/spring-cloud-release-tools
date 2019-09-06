@@ -11,7 +11,8 @@ include::intro.adoc[]
 
 == Using Spring Cloud Dependencies with Spring IO Platform
 
-The Spring IO Platform is a modular, enterprise-grade curated set of dependencies. To use the Spring Cloud Starters with Spring IO Platform, you must import the Spring Cloud Dependencies bill of materials (BOM) first.
+The Spring IO Platform is a modular, enterprise-grade curated set of dependencies.
+To use the Spring Cloud Starters with Spring IO Platform, you must import the Spring Cloud Dependencies bill of materials (BOM) first.
 
 To use version {springioplatformversion} of the Spring IO Platform and Spring Cloud Release Train {springcloudversion} with Maven, update the pom.xml as follows:
 

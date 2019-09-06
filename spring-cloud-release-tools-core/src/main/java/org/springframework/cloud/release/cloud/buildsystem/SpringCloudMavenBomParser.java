@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.CustomBomParser;
-import org.springframework.cloud.release.internal.buildsystem.PomReader;
-import org.springframework.cloud.release.internal.buildsystem.Project;
 import org.springframework.cloud.release.internal.buildsystem.VersionsFromBom;
 import org.springframework.cloud.release.internal.buildsystem.VersionsFromBomBuilder;
+import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.tech.PomReader;
 import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.BOOT_DEPENDENCIES_ARTIFACT_ID;
@@ -44,7 +44,7 @@ import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBom
 import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.CLOUD_STARTER_PARENT_ARTIFACT_ID;
 import static org.springframework.cloud.release.cloud.buildsystem.SpringCloudBomConstants.SPRING_BOOT;
 
-public class SpringCloudMavenBomParser implements CustomBomParser {
+class SpringCloudMavenBomParser implements CustomBomParser {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(SpringCloudMavenBomParser.class);

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.tech.TemporaryFileStorage;
 import org.springframework.util.StringUtils;
 
@@ -57,6 +57,10 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		registerShutdownHook();
 	}
 
+	static void clearCache() {
+		CACHE.clear();
+	}
+
 	private void registerShutdownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread(TemporaryFileStorage::cleanup));
 	}
@@ -77,10 +81,6 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 			gitRepo.tag(tagName);
 			gitRepo.pushTag(tagName);
 		}
-	}
-
-	static void clearCache() {
-		CACHE.clear();
 	}
 
 	public void commitAfterBumpingVersions(File project, ProjectVersion bumpedVersion) {

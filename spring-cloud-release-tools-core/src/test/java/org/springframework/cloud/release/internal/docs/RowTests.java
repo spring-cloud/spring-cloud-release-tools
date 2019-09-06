@@ -21,7 +21,7 @@ import java.util.List;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
 
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
 /**

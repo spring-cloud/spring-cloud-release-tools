@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.buildsystem;
+package org.springframework.cloud.release.cloud.buildsystem;
 
-import java.util.Collections;
+import org.springframework.cloud.release.internal.buildsystem.CustomBomParser;
 
-import org.springframework.cloud.release.cloud.buildsystem.SpringCloudMavenBomParserAccessor;
-import org.springframework.cloud.release.internal.ReleaserProperties;
+public class SpringCloudMavenBomParserAccessor {
 
-public class MavenBomParserAccessor {
-
-	public static BomParser cloudMavenBomParser(ReleaserProperties properties) {
-		return new MavenBomParser(properties,
-				Collections.singletonList(SpringCloudMavenBomParserAccessor.cloud()));
+	public static CustomBomParser cloud() {
+		return new SpringCloudMavenBomParser();
 	}
 
 }

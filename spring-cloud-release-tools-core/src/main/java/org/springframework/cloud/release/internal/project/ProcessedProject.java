@@ -17,7 +17,6 @@
 package org.springframework.cloud.release.internal.project;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 
 /**
  * Represents a processed project.

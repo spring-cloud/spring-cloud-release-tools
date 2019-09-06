@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
 /**
@@ -172,6 +174,10 @@ public class VersionsFromBom {
 
 	public void remove(String expectedProjectName) {
 		this.projects.removeIf(project -> expectedProjectName.equals(project.name));
+	}
+
+	public Set<Project> projects() {
+		return this.projects;
 	}
 
 	@Override

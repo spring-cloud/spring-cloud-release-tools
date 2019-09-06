@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.buildsystem;
+package org.springframework.cloud.release.internal.project;
 
 /**
  * Represents a single project.
@@ -23,10 +23,19 @@ package org.springframework.cloud.release.internal.buildsystem;
  */
 public class Project {
 
+	/**
+	 * An empty project.
+	 */
 	public static Project EMPTY_PROJECT = new Project("", "");
 
+	/**
+	 * Project name.
+	 */
 	public final String name;
 
+	/**
+	 * Project version.
+	 */
 	public final String version;
 
 	public Project(String name, String version) {

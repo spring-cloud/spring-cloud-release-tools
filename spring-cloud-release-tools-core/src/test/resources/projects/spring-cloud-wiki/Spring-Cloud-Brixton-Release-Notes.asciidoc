@@ -1,28 +1,40 @@
-
-Spring Cloud Brixton builds on Spring Boot 1.3.x. It adds the following new projects:
+Spring Cloud Brixton builds on Spring Boot 1.3.x.
+It adds the following new projects:
 
 === Spring Cloud Zookeeper
+
 Service discovery and configuration management with Apache Zookeeper.
 
 === Spring Cloud Cloudfoundry
-Integrates your application with Pivotal Cloudfoundry. Provides a service discovery implementation and also makes it easy to implement SSO and OAuth2 protected resources, and also to create a Cloudfoundry service broker.
+
+Integrates your application with Pivotal Cloudfoundry.
+Provides a service discovery implementation and also makes it easy to implement SSO and OAuth2 protected resources, and also to create a Cloudfoundry service broker.
 
 === Spring Cloud Cluster
-Leadership election and common stateful patterns with an abstraction and implementation for Zookeeper, Redis, Hazelcast, Consul. (Now deprecated and superseded by Spring Integration.)
+
+Leadership election and common stateful patterns with an abstraction and implementation for Zookeeper, Redis, Hazelcast, Consul.
+(Now deprecated and superseded by Spring Integration.)
 
 === Spring Cloud Consul
+
 Service discovery and configuration management with Hashicorp Consul.
 
 === Spring Cloud Sleuth
+
 Distributed tracing for Spring Cloud applications, compatible with Zipkin, HTrace and log-based (e.g. ELK) tracing.
 
 === Spring Cloud Stream
-Messaging microservices with Redis, Rabbit or Kafka. Simple declarative model to send and receive messages in a Spring Cloud app.
+
+Messaging microservices with Redis, Rabbit or Kafka.
+Simple declarative model to send and receive messages in a Spring Cloud app.
 
 === Spring Cloud Task
-Short lived microservices. Simple declarative for adding both functional and non-functional features to Spring Boot apps.
+
+Short lived microservices.
+Simple declarative for adding both functional and non-functional features to Spring Boot apps.
 
 === Spring Cloud Zookeeper
+
 Service discovery and configuration management with Apache Zookeeper.
 
 Spring Cloud Brixton builds with Spring Boot 1.3.x but it should work with 1.4.x as well (we do compatibility tests and hope to be able to fix any issues that crop up).
@@ -40,12 +52,17 @@ Some of the highlights of the Brixton release train are:
 * Cluster Leadership election and locks via Spring Cloud Cluster
 * Export of Spring Boot metrics to Amazon Cloudwatch, and native support for Amazon RDS
 
-
 == Notes:
 
-Starting with Brixton, Zuul will no longer automatically send all headers to downstream services. By default `Cookie`, `Set-Cookie` and `Authorization` *are not* sent to downstream services. To return to the Angel behaviour, set `zuul.sensitiveHeaders=""` in the Zuul configuration. See https://cloud.spring.io/spring-cloud-static/Brixton.SR6/#_cookies_and_sensitive_headers[the documentation] for more information.
+Starting with Brixton, Zuul will no longer automatically send all headers to downstream services.
+By default `Cookie`, `Set-Cookie` and `Authorization` *are not* sent to downstream services.
+To return to the Angel behaviour, set `zuul.sensitiveHeaders=""` in the Zuul configuration.
+See https://cloud.spring.io/spring-cloud-static/Brixton.SR6/#_cookies_and_sensitive_headers[the documentation] for more information.
 
-A `@LoadBalanced` `RestTemplate` is no longer created by default. See the https://cloud.spring.io/spring-cloud-static/spring-cloud.html=_spring_resttemplate_as_a_load_balancer_client[updated documentation for details]. You need to create it in your application’s configuration. For example:
+A `@LoadBalanced` `RestTemplate` is no longer created by default.
+See the https://cloud.spring.io/spring-cloud-static/spring-cloud.html=_spring_resttemplate_as_a_load_balancer_client[updated documentation for details].
+You need to create it in your application’s configuration.
+For example:
 
 ```java
 @Configuration
@@ -63,7 +80,9 @@ Please note the correct BOM to use is `spring-cloud-dependencies` not `spring-cl
 
 === Migrating Spring Cloud Hystrix, Turbine and Bus with AMQP
 
-The Bus, Hystrix and Turbine support that used to be implemented on top of Spring AMQP have all been migrated to use Spring Cloud Stream. The old artifacts still exist, but are deprecated and will be removed at some point. Instead of the `spring-cloud-*-amqp` artifacts you should use whatever raw feature you need, plus a stream binder of your choice, e.g. `spring-cloud-netflix-hystrix-stream` and `spring-cloud-starter-stream-rabbit` instead of `spring-cloud-netflix-hystrix-amqp`.
+The Bus, Hystrix and Turbine support that used to be implemented on top of Spring AMQP have all been migrated to use Spring Cloud Stream.
+The old artifacts still exist, but are deprecated and will be removed at some point.
+Instead of the `spring-cloud-*-amqp` artifacts you should use whatever raw feature you need, plus a stream binder of your choice, e.g. `spring-cloud-netflix-hystrix-stream` and `spring-cloud-starter-stream-rabbit` instead of `spring-cloud-netflix-hystrix-amqp`.
 
 |===
 |Angel | Brixton (with AMQP) | Brixton (with Kafka) |
@@ -92,4 +111,5 @@ NOTE: There is still a `spring-cloud-netflix-hystrix-amqp` in the Brixton releas
 - 2016/11/24 - Sleuth version `1.0.11.RELEASE` https://github.com/spring-cloud/spring-cloud-sleuth/milestone/17?closed=1[(issues)]
 - 2016/11/23 - Config version `1.1.3.RELEASE` https://github.com/spring-cloud/spring-cloud-config/milestone/21?closed=1[(issues)]
 
-Note: There was an XXE vulnerability in xstream (which is used by Eureka), so please upgrade to Brixton.SR7 to pull in the latest version of that library which fixed the issue (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3674).
+Note:
+There was an XXE vulnerability in xstream (which is used by Eureka), so please upgrade to Brixton.SR7 to pull in the latest version of that library which fixed the issue (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-3674).

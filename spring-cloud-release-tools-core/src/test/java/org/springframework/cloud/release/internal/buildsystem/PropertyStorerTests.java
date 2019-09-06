@@ -25,6 +25,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import org.springframework.cloud.release.internal.project.Project;
+
 import static org.mockito.BDDMockito.then;
 
 /**

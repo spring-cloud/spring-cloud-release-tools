@@ -26,8 +26,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.Project;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
 
 /**
  * Abstraction over collection of projects.

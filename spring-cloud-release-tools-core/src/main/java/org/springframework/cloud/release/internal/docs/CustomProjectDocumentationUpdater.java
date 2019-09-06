@@ -18,12 +18,29 @@ package org.springframework.cloud.release.internal.docs;
 
 import java.io.File;
 
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 
 /**
  * @author Marcin Grzejszczak
  */
 public interface CustomProjectDocumentationUpdater {
+
+	/**
+	 * NO OP implementation of the updater.
+	 */
+	CustomProjectDocumentationUpdater NO_OP = new CustomProjectDocumentationUpdater() {
+		@Override
+		public boolean isApplicable(File clonedDocumentationProject,
+				ProjectVersion currentProject, String bomBranch) {
+			return true;
+		}
+
+		@Override
+		public File updateDocsRepo(File clonedDocumentationProject,
+				ProjectVersion currentProject, String bomBranch) {
+			return clonedDocumentationProject;
+		}
+	};
 
 	/**
 	 * Different projects can have different documentation updaters. This method will tell
@@ -47,22 +64,5 @@ public interface CustomProjectDocumentationUpdater {
 	 */
 	File updateDocsRepo(File clonedDocumentationProject, ProjectVersion currentProject,
 			String bomBranch);
-
-	/**
-	 * NO OP implementation of the updater.
-	 */
-	CustomProjectDocumentationUpdater NO_OP = new CustomProjectDocumentationUpdater() {
-		@Override
-		public boolean isApplicable(File clonedDocumentationProject,
-				ProjectVersion currentProject, String bomBranch) {
-			return true;
-		}
-
-		@Override
-		public File updateDocsRepo(File clonedDocumentationProject,
-				ProjectVersion currentProject, String bomBranch) {
-			return clonedDocumentationProject;
-		}
-	};
 
 }

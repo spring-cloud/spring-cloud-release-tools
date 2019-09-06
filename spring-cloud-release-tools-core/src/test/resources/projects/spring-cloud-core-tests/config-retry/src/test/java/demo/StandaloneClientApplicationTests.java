@@ -52,6 +52,7 @@ import static org.junit.Assert.fail;
 public class StandaloneClientApplicationTests {
 
 	private static ConfigurableApplicationContext context;
+
 	@Autowired
 	private ConfigServicePropertySourceLocator locator;
 

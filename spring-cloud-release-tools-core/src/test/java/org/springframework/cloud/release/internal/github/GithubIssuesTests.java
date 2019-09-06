@@ -33,7 +33,7 @@ import org.mockito.BDDMockito;
 
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.ProjectVersion;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
 import static org.assertj.core.api.BDDAssertions.then;

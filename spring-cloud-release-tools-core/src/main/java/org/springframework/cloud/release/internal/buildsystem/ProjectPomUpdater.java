@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.project.Project;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
 /**
@@ -60,9 +62,9 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 
 	private final PomUpdater pomUpdater = new PomUpdater();
 
-	private ReleaserProperties properties;
-
 	private final List<BomParser> bomParsers;
+
+	private ReleaserProperties properties;
 
 	public ProjectPomUpdater(ReleaserProperties properties, List<BomParser> bomParsers) {
 		this.properties = properties;

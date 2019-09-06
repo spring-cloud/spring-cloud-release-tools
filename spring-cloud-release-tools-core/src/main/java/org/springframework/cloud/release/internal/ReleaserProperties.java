@@ -969,6 +969,11 @@ public class ReleaserProperties implements Serializable {
 	public static class Gradle implements Serializable {
 
 		/**
+		 * Placeholder for system properties.
+		 */
+		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
+
+		/**
 		 * A mapping that should be applied to {@code gradle.properties} in order to
 		 * perform a substitution of properties. The mapping is from a property inside
 		 * {@code gradle.properties} to the projects name. Example.
@@ -997,11 +1002,6 @@ public class ReleaserProperties implements Serializable {
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
 				"^.*samples/standalone/[a-z]+/.*$");
-
-		/**
-		 * Placeholder for system properties.
-		 */
-		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
 
 		/**
 		 * Command to be executed to build the project.

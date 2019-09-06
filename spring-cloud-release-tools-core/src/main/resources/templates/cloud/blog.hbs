@@ -2,16 +2,17 @@ On behalf of the community, I am pleased to announce that the {{ availability }}
 
 ## Notable Changes in the {{ releaseName }} Release Train
 {{#each projects}}
-### {{ name }}
+    ### {{ name }}
 
-Some text related to project
+    Some text related to project
 {{/each}}
 
 The following modules were updated as part of {{ releaseVersion }}:
 
-| Module	| Version	| Issues
-|---	|---	|---	|---
-{{#each projects}}| {{name}}	| {{version}}	| {{#if closedMilestoneUrl}}([issues]({{{ closedMilestoneUrl }}})){{/if}}{{^closedMilestoneUrl}}&nbsp;{{/closedMilestoneUrl}}
+| Module    | Version    | Issues
+|---    |---    |---    |---
+{{#each projects}}| {{name}}    | {{version}}    | {{#if
+        closedMilestoneUrl}}([issues]({{{ closedMilestoneUrl }}})){{/if}}{{^closedMilestoneUrl}}&nbsp;{{/closedMilestoneUrl}}
 {{/each}}
 
 As always, we welcome feedback on [GitHub](https://github.com/spring-cloud/), on [Gitter](https://gitter.im/spring-cloud/spring-cloud), on [Stack Overflow](https://stackoverflow.com/questions/tagged/spring-cloud), or on [Twitter](https://twitter.com/SpringCloud).
@@ -19,16 +20,17 @@ As always, we welcome feedback on [GitHub](https://github.com/spring-cloud/), on
 To get started with Maven with a BOM (dependency management only):
 
 ```
-{{#if nonRelease}}<repositories>
-    <repository>
-        <id>spring-milestones</id>
-        <name>Spring Milestones</name>
-        <url>https://repo.spring.io/milestone</url>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-    </repository>
-</repositories>{{/if}}
+{{#if nonRelease}}
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>{{/if}}
 <dependencyManagement>
     <dependencies>
         <dependency>
@@ -57,28 +59,28 @@ or with Gradle:
 
 ```
 buildscript {
-    dependencies {
-        classpath "io.spring.gradle:dependency-management-plugin:1.0.2.RELEASE"
-    }
+dependencies {
+classpath "io.spring.gradle:dependency-management-plugin:1.0.2.RELEASE"
+}
 }
 
 {{#if nonRelease}}repositories {
-    maven {
-        url 'https://repo.spring.io/milestone'
-    }
+maven {
+url 'https://repo.spring.io/milestone'
+}
 }{{/if}}
 
 apply plugin: "io.spring.dependency-management"
 
 dependencyManagement {
-    imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:{{ releaseVersion }}'
-    }
+imports {
+mavenBom 'org.springframework.cloud:spring-cloud-dependencies:{{ releaseVersion }}'
+}
 }
 
 dependencies {
-    compile 'org.springframework.cloud:spring-cloud-starter-config'
-    compile 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    ...
+compile 'org.springframework.cloud:spring-cloud-starter-config'
+compile 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+...
 }
 ```
