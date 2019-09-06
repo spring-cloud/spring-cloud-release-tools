@@ -36,6 +36,7 @@ public class ZuulApplicationTests {
 
 	@Value("${local.server.port}")
 	int port;
+
 	private TestRestTemplate restTemplate = new TestRestTemplate();
 
 	@Test

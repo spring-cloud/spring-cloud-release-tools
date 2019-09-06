@@ -306,7 +306,7 @@ initializr:
         - name: Mobile
           id: mobile
           description: Simplify the development of mobile web applications with Spring Mobile
-          versionRange : "[1.5.0.RELEASE, 2.0.0.M1)"
+          versionRange: "[1.5.0.RELEASE, 2.0.0.M1)"
     - name: Template Engines
       content:
         - name: Thymeleaf
@@ -1240,10 +1240,10 @@ initializr:
       id: groovy
       default: false
   bootVersions:
-    - name : Latest SNAPSHOT
+    - name: Latest SNAPSHOT
       id: 2.2.0.BUILD-SNAPSHOT
       default: false
-    - name : 2.1.1.
+    - name: 2.1.1.
       id: 2.1.1.RELEASE
       default: true
 

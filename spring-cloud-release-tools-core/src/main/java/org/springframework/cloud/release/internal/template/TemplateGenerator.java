@@ -23,8 +23,8 @@ import com.github.jknack.handlebars.Template;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
-import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.tech.HandlebarsHelper;
 
 /**
@@ -48,11 +48,11 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 
 	private final File releaseNotesOutput;
 
-	private final ProjectGitHandler handler;
+	private final ProjectGitHubHandler handler;
 
 	private ReleaserProperties props;
 
-	public TemplateGenerator(ReleaserProperties props, ProjectGitHandler handler) {
+	public TemplateGenerator(ReleaserProperties props, ProjectGitHubHandler handler) {
 		this.props = props;
 		this.handler = handler;
 		this.emailOutput = new File("target/email.txt");
@@ -61,7 +61,8 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 		this.releaseNotesOutput = new File("target/notes.md");
 	}
 
-	TemplateGenerator(ReleaserProperties props, File output, ProjectGitHandler handler) {
+	TemplateGenerator(ReleaserProperties props, File output,
+			ProjectGitHubHandler handler) {
 		this.props = props;
 		this.emailOutput = output;
 		this.blogOutput = output;

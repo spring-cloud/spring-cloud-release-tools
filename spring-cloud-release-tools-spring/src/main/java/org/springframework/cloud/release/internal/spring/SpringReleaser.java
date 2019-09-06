@@ -30,9 +30,9 @@ import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
-import org.springframework.cloud.release.internal.pom.ProcessedProject;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.project.ProcessedProject;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.StringUtils;
 
@@ -252,21 +252,20 @@ public class SpringReleaser {
 		if (this.properties.getGit().isFetchVersionsFromGit()
 				&& !this.properties.getMetaRelease().isEnabled()) {
 			printVersionRetrieval();
-			projectsToUpdate = this.releaser.retrieveVersionsFromSCRelease();
+			projectsToUpdate = this.releaser.retrieveVersionsFromBom();
 			versionFromBom = assertNoSnapshotsForANonSnapshotProject(project,
 					projectsToUpdate);
 		}
 		else {
 			ProjectVersion originalVersion = new ProjectVersion(project);
-			String fixedVersionForProject = this.properties.getFixedVersions()
-					.get(project.getName());
+			Projects fixedVersions = this.releaser.fixedVersions();
+			String fixedVersionForProject = fixedVersions
+					.forName(project.getName()).version;
 			versionFromBom = StringUtils.hasText(fixedVersionForProject)
 					? new ProjectVersion(originalVersion.projectName,
 							fixedVersionForProject)
 					: new ProjectVersion(project);
-			projectsToUpdate = this.properties.getFixedVersions().entrySet().stream()
-					.map(entry -> new ProjectVersion(entry.getKey(), entry.getValue()))
-					.collect(Collectors.toCollection(Projects::new));
+			projectsToUpdate = fixedVersions;
 			projectsToUpdate.add(versionFromBom);
 			printSettingVersionFromFixedVersions(projectsToUpdate);
 		}

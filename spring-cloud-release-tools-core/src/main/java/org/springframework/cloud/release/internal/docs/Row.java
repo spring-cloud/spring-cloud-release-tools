@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 
 /**
  * @author Marcin Grzejszczak

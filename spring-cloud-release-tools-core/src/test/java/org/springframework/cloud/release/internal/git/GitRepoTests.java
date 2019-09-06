@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import org.springframework.cloud.release.internal.pom.TestUtils;
+import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.BDDAssertions.then;

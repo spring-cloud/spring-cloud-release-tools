@@ -27,13 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.tech.TemporaryFileStorage;
 import org.springframework.util.StringUtils;
 
 /**
- * Contains business logic around Git & Github operations.
+ * Contains business logic around Git operations.
  *
  * @author Marcin Grzejszczak
  */
@@ -51,17 +50,15 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
 
-	private final GithubMilestones githubMilestones;
-
-	private final GithubIssues githubIssues;
-
 	private ReleaserProperties properties;
 
 	public ProjectGitHandler(ReleaserProperties properties) {
 		this.properties = properties;
-		this.githubMilestones = new GithubMilestones(properties);
-		this.githubIssues = new GithubIssues(properties);
 		registerShutdownHook();
+	}
+
+	static void clearCache() {
+		CACHE.clear();
 	}
 
 	private void registerShutdownHook() {
@@ -265,22 +262,6 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 
 	public void pushCurrentBranch(File project) {
 		gitRepo(project).pushCurrentBranch();
-	}
-
-	public void closeMilestone(ProjectVersion releaseVersion) {
-		this.githubMilestones.closeMilestone(releaseVersion);
-	}
-
-	public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
-		this.githubIssues.fileIssueInSpringGuides(projects, version);
-	}
-
-	public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
-		this.githubIssues.fileIssueInStartSpringIo(projects, version);
-	}
-
-	public String milestoneUrl(ProjectVersion releaseVersion) {
-		return this.githubMilestones.milestoneUrl(releaseVersion);
 	}
 
 	public String currentBranch(File project) {

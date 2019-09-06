@@ -27,8 +27,8 @@ import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.Projects;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.project.Projects;
 
 /**
  * @author Marcin Grzejszczak
@@ -55,7 +55,7 @@ class BlogTemplateGenerator {
 	private final NotesGenerator notesGenerator;
 
 	BlogTemplateGenerator(Template template, String releaseVersion, File blogOutput,
-			Projects projects, ProjectGitHandler handler) {
+			Projects projects, ProjectGitHubHandler handler) {
 		this.template = template;
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;

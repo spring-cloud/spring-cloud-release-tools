@@ -31,7 +31,7 @@ import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;

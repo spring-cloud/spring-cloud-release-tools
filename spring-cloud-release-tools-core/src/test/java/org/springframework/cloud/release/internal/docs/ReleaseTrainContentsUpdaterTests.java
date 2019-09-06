@@ -29,11 +29,12 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.pom.ProjectVersion;
-import org.springframework.cloud.release.internal.pom.Projects;
-import org.springframework.cloud.release.internal.pom.TestUtils;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.FileSystemUtils;
 
@@ -47,15 +48,18 @@ public class ReleaseTrainContentsUpdaterTests {
 
 	ReleaserProperties properties = new ReleaserProperties();
 
-	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties) {
+	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(
+			this.properties) {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
 			return "http://www.foo.com/";
 		}
 	};
 
+	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties);
+
 	TemplateGenerator templateGenerator = new TemplateGenerator(this.properties,
-			this.projectGitHandler);
+			this.projectGitHubHandler);
 
 	ReleaseTrainContentsUpdater updater = new ReleaseTrainContentsUpdater(this.properties,
 			this.projectGitHandler, this.templateGenerator);

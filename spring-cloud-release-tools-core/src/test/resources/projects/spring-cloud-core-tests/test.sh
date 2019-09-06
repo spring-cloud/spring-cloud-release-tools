@@ -1,0 +1,1 @@
+touch generate.log

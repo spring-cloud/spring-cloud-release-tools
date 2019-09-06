@@ -16,17 +16,22 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
+import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
+import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.gradle.GradleUpdater;
+import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
 import org.springframework.cloud.release.internal.options.Parser;
-import org.springframework.cloud.release.internal.pom.ProjectPomUpdater;
-import org.springframework.cloud.release.internal.post.PostReleaseActions;
-import org.springframework.cloud.release.internal.project.ProjectBuilder;
+import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
+import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
@@ -56,13 +61,8 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	ProjectBuilder projectBuilder() {
-		return new ProjectBuilder(this.properties);
-	}
-
-	@Bean
-	ProjectPomUpdater pomUpdater() {
-		return new ProjectPomUpdater(this.properties);
+	ProjectCommandExecutor projectBuilder() {
+		return new ProjectCommandExecutor(this.properties);
 	}
 
 	@Bean
@@ -76,7 +76,12 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	TemplateGenerator templateGenerator(ProjectGitHandler handler) {
+	ProjectGitHubHandler projectGitHubHandler() {
+		return new ProjectGitHubHandler(this.properties);
+	}
+
+	@Bean
+	TemplateGenerator templateGenerator(ProjectGitHubHandler handler) {
 		return new TemplateGenerator(this.properties, handler);
 	}
 
@@ -94,28 +99,34 @@ class ReleaserConfiguration {
 	@Bean
 	PostReleaseActions postReleaseActions(ProjectGitHandler handler,
 			ProjectPomUpdater pomUpdater, GradleUpdater gradleUpdater,
-			ProjectBuilder projectBuilder, ReleaserProperties releaserProperties,
-			VersionsFetcher versionsFetcher) {
-		return new PostReleaseActions(handler, pomUpdater, gradleUpdater, projectBuilder,
-				releaserProperties, versionsFetcher);
+			ProjectCommandExecutor projectCommandExecutor,
+			ReleaserProperties releaserProperties, VersionsFetcher versionsFetcher) {
+		return new PostReleaseActions(handler, pomUpdater, gradleUpdater,
+				projectCommandExecutor, releaserProperties, versionsFetcher);
 	}
+
+	@Autowired(required = false)
+	List<CustomProjectDocumentationUpdater> customProjectDocumentationUpdaters = new ArrayList<>();
 
 	@Bean
 	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
 			ReleaserProperties properties, TemplateGenerator templateGenerator) {
-		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator);
+		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator,
+				this.customProjectDocumentationUpdaters);
 	}
 
 	@Bean
-	Releaser releaser(ProjectPomUpdater projectPomUpdater, ProjectBuilder projectBuilder,
-			ProjectGitHandler projectGitHandler, TemplateGenerator templateGenerator,
-			GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
-			DocumentationUpdater documentationUpdater,
+	Releaser releaser(ProjectPomUpdater projectPomUpdater,
+			ProjectCommandExecutor projectCommandExecutor,
+			ProjectGitHandler projectGitHandler,
+			ProjectGitHubHandler projectGitHubHandler,
+			TemplateGenerator templateGenerator, GradleUpdater gradleUpdater,
+			SaganUpdater saganUpdater, DocumentationUpdater documentationUpdater,
 			PostReleaseActions postReleaseActions,
 			ReleaserProperties releaserProperties) {
-		return new Releaser(releaserProperties, projectPomUpdater, projectBuilder,
-				projectGitHandler, templateGenerator, gradleUpdater, saganUpdater,
-				documentationUpdater, postReleaseActions);
+		return new Releaser(releaserProperties, projectPomUpdater, projectCommandExecutor,
+				projectGitHandler, projectGitHubHandler, templateGenerator, gradleUpdater,
+				saganUpdater, documentationUpdater, postReleaseActions);
 	}
 
 	@Bean
