@@ -13,7 +13,25 @@
 		<docs.main>spring-cloud-release-tools</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
 		<maven.plugin.plugin.version>3.4</maven.plugin.plugin.version>
+		<configprops.inclusionPattern>releaser.*</configprops.inclusionPattern>
 	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-info</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>spring-cloud-release-tools-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>spring-cloud-release-tools-spring</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -59,6 +77,10 @@
 								</configuration>
 							</execution>
 						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
 					</plugin>
 					<plugin>
 						<groupId>org.asciidoctor</groupId>
