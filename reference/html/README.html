@@ -238,6 +238,9 @@ otherwise the application will fail to start
 <p>For <code>GA</code>/ <code>SR</code> release will create an issue in Spring Guides under <a href="https://github.com/spring-guides/getting-started-guides/issues/" class="bare">https://github.com/spring-guides/getting-started-guides/issues/</a></p>
 </li>
 <li>
+<p>For <code>GA</code>/ <code>SR</code> release will create an issue in start.spring.io under <a href="https://github.com/spring-io/start.spring.io/issues/" class="bare">https://github.com/spring-io/start.spring.io/issues/</a></p>
+</li>
+<li>
 <p>For <code>GA</code>/ <code>SR</code> release will update the links under <a href="https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current" class="bare">https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current</a></p>
 </li>
 <li>
@@ -552,179 +555,375 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </div>
 <div class="sect2">
 <h3 id="_project_options"><a class="link" href="#_project_options">Project options</a></h3>
-<div class="ulist">
-<ul>
-<li>
-<p><code>releaser.fixed-versions</code> - A String to String mapping of manually set versions. E.g. <code>"spring-cloud-cli" &#8594; "1.0.0.RELEASE"</code> will set
-the <code>spring-cloud-cli.version</code> to <code>1.0.0.RELEASE</code> regardless of what was set in <code>spring-cloud-release</code> project. Example <code>--releaser.fixed-versions[spring-cloud-cli]=1.0.0.RELEASE</code>.
-Use these properties to provide versions for the meta release.</p>
-</li>
-<li>
-<p><code>releaser.meta-release.enabled</code> - You have to turn it on to enable a meta release. Defaults to <code>false</code></p>
-</li>
-<li>
-<p><code>releaser.meta-release.git-org-url</code> - The URL of the Git organization. We&#8217;ll append each project&#8217;s name to it.
-Defaults to <code><a href="https://github.com/spring-cloud" class="bare">https://github.com/spring-cloud</a></code></p>
-</li>
-<li>
-<p><code>releaser.meta-release.projects-to-skip</code> - List of projects that we should not clone and release. Spring Cloud release
-train depends on projects that got already released. We default this list to <code>[spring-boot, spring-cloud-stream, spring-cloud-task]</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.update-documentation-repo</code> - If <code>true</code> then will update documentation repository with the <code>current</code> URL. Defaults to <code>true</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.spring-project-url</code> - URL to the documentation Git repository. Defaults to <code><a href="https://github.com/spring-projects/spring-cloud" class="bare">https://github.com/spring-projects/spring-cloud</a></code>.</p>
-</li>
-<li>
-<p><code>releaser.git.spring-project-branch</code> - Branch to check out for the documentation project. Defaults to <code>gh-pages</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.update-spring-project</code> - If <code>true</code> then will update Project Sagan with the current release train values. Defaults to <code>true</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.test-samples-project-url</code> - URL to the test samples to be checked against the given release train. Defaults to <code><a href="https://github.com/spring-cloud/spring-cloud-core-tests" class="bare">https://github.com/spring-cloud/spring-cloud-core-tests</a></code>.</p>
-</li>
-<li>
-<p><code>releaser.git.test-samples-project-branch</code> - Branch to check out for test samples. Defaults to <code>master</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.release-train-wiki-url</code> - URL to the project&#8217;s release train wiki page. Defaults to <code><a href="https://github.com/spring-projects/spring-cloud.wiki.git" class="bare">https://github.com/spring-projects/spring-cloud.wiki.git</a></code>.</p>
-</li>
-<li>
-<p><code>releaser.git.update-release-train-wiki</code> - If <code>true</code> then will update the release train wiki page with the current release train values. Defaults to <code>true</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.run-updated-samples</code> - If <code>true</code> then will update samples and run the the build. Defaults to <code>true</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.all-test-samples-urls</code> - URLs to the test samples to be cloned and updated with proper snapshot versions.
-E.g. <code>"--releaser.git.all-test-samples-urls[spring-cloud-sleuth]=https://github.com/spring-cloud-samples/sleuth-issues/,https://github.com/spring-cloud-samples/sleuth-documentation-apps/"</code>.
-Defaults to Sleuth and Contract samples.</p>
-</li>
-<li>
-<p><code>releaser.git.update-all-test-samples</code> - If <code>true</code> then will update samples with bumped snapshots after release. Defaults to <code>true</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.release-train-docs-url</code> - URL to the release train documentation. Defaults to <code><a href="https://github.com/spring-cloud-sample/scripts" class="bare">https://github.com/spring-cloud-sample/scripts</a></code>.</p>
-</li>
-<li>
-<p><code>releaser.git.release-train-docs-branch</code> - Branch to check out for release train documentation. Defaults to <code>master</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.update-release-train-docs</code> - If <code>true</code> then will update the release train documentation project and run the generation. Defaults to <code>true</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.update-spring-guides</code> - If <code>true</code> then will update Spring Guides with the current release train. Defaults to <code>true</code>.</p>
-</li>
-</ul>
-</div>
 <div class="paragraph">
-<p>The following properties are used for both meta release and a release of an individual module.</p>
+<p>Below you can find a table with all the releaser options.</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>releaser.post-release-tasks-only</code> - If set to <code>true</code> will run only post release tasks. Defaults to <code>false</code>.</p>
-</li>
-<li>
-<p><code>releaser.meta-release.release-train-project-name</code> - Name of the project that represents the BOM of the release train. Defaults to <code>spring-cloud-release</code>.</p>
-</li>
-<li>
-<p><code>releaser.meta-release.release-train-dependency-names</code> - Names of the projects that should be updated with the version of the release train. Defaults to <code>[spring-cloud, spring-cloud-dependencies, spring-cloud-starter]</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.fetch-versions-from-git</code> - If <code>true</code> then should fill the map of versions from Git. If <code>false</code> then picks fixed versions.</p>
-</li>
-<li>
-<p><code>releaser.git.clone-destination-dir</code> - Where should the Spring Cloud Release repo get cloned to. If null defaults to a temporary directory.</p>
-</li>
-<li>
-<p><code>releaser.git.release-train-bom-url</code> - URL to a project containing a BOM. Defaults to Spring Cloud Release Git repository: <code><a href="https://github.com/spring-cloud/spring-cloud-release" class="bare">https://github.com/spring-cloud/spring-cloud-release</a></code>.</p>
-</li>
-<li>
-<p><code>releaser.git.documentation-url</code> - URL to the documentation Git repository. Defaults to <code><a href="https://github.com/spring-cloud/spring-cloud-static" class="bare">https://github.com/spring-cloud/spring-cloud-static</a></code>.</p>
-</li>
-<li>
-<p><code>releaser.git.documentation-branch</code> - Branch to check out for the documentation project. Defaults to <code>gh-pages</code>.</p>
-</li>
-<li>
-<p><code>releaser.sagan.update-sagan</code> - If <code>true</code> then will update project sagan with information about this project. Defaults to <code>true</code>.</p>
-</li>
-<li>
-<p><code>releaser.sagan.docs-adocs-file</code> - Folder with asciidoctor files for docs. Defaults to <code>docs/src/main/asciidoc</code>.</p>
-</li>
-<li>
-<p><code>releaser.sagan.index-section-file-name</code> - Name of the ascii doc file with core part of this project&#8217;s Sagan project page. Will search under <code>releaser.sagan.docs-adocs-file</code> folder. Defaults to <code>sagan-index.adoc</code>.</p>
-</li>
-<li>
-<p><code>releaser.sagan.boot-section-file-name</code> - Name of the ascii doc file with boot part of this project&#8217;s Sagan project page. Will search under <code>releaser.sagan.docs-adocs-file</code> folder. Defaults to <code>sagan-boot.adoc</code>.</p>
-</li>
-<li>
-<p><code>releaser.git.oauth-token</code> - GitHub OAuth token to be used to interact with GitHub repo.</p>
-</li>
-<li>
-<p><code>releaser.git.username</code> - Optional Git username. If not passed keys will be used for authentication.</p>
-</li>
-<li>
-<p><code>releaser.git.password</code> - Optional Git password. If not passed keys will be used for authentication.</p>
-</li>
-<li>
-<p><code>releaser.git.number-of-checked-milestones</code> - In order not to iterate endlessly over milestones we introduce a threshold of milestones that
-we will go through to find the matching milestone. Defaults to <code>10</code>.</p>
-</li>
-<li>
-<p><code>releaser.maven.build-command</code> - Command to be executed to build the project. Defaults to <code>./mvnw clean install -Pdocs</code>.</p>
-</li>
-<li>
-<p><code>releaser.maven.deploy-command</code> - Command to be executed to deploy a built project". Defaults to <code>./mvnw deploy -DskipTests -Pfast</code>.</p>
-</li>
-<li>
-<p><code>releaser.maven.publish-docs-commands</code> - Command to be executed to deploy a built project. If present <code>{{version}}</code> will be replaced by the proper version.
-Defaults to the standard Spring Cloud wget and execution of ghpages.</p>
-</li>
-<li>
-<p><code>releaser.maven.system-properties</code> - Additional system properties that should be passed to any commands. If present <code>{{systemProps}}</code> will be replaced by the contents of this property.</p>
-</li>
-<li>
-<p><code>releaser.maven.wait-time-in-minutes</code> - Max wait time in minutes for the process to finish. Defaults to <code>20</code>.</p>
-</li>
-<li>
-<p><code>releaser.gradle.gradle-props-substitution</code> - a map containing a <code>key</code> which is a property key inside <code>gradle.properties</code> and a <code>value</code> of
-a project name. E.g. in <code>gradle.properties</code> you have <code>foo=1.0.0.BUILD-SNAPSHOT</code> and you would like <code>spring-cloud-contract</code> version to
-be set there. Just provide a mapping for the <code>gradle-props-substition</code> looking like this <code>foo=spring-cloud-contract</code> and the result
-(e.g for sc-contract version <code>2.0.0.RELEASE</code>) will be an updated <code>gradle.properties</code> with entry <code>foo=2.0.0.RELEASE</code>.</p>
-</li>
-<li>
-<p><code>releaser.pom.branch</code> - Which branch of Spring Cloud Release should be checked out. Defaults to <code>master</code>.</p>
-</li>
-<li>
-<p><code>releaser.pom.pom-with-boot-starter-parent</code> - What is the location of the <code>pom.xml</code> that contains the <code>spring-boot-starter-parent</code> as its parent pom. Defaults to <code>spring-cloud-starter-parent/pom.xml</code>.</p>
-</li>
-<li>
-<p><code>releaser.pom.this-train-bom</code> - What is the location of the <code>pom.xml</code> that contains all the versions for the release train. Defaults to <code>spring-cloud-dependencies/pom.xml</code>.</p>
-</li>
-<li>
-<p><code>releaser.pom.bom-version-pattern</code> - Regular expression that will match the versions of projects in the BOM pom.xml. Defaults to <code>^(spring-cloud-.*)\.version$</code>.</p>
-</li>
-<li>
-<p><code>releaser.pom.ignored-pom-regex</code> - List of regular expressions of ignored poms. Defaults to test projects and samples.
-Example: <code>"--releaser.pom.ignored-pom-regex=".*\\.git/.*$,.{asterisk}spring-cloud-contract-maven-plugin/src/test/projects/.*$,.*spring-cloud-contract-maven-plugin/target/.*$,.*samples/standalone/[a-z]+/.*$"</code>.</p>
-</li>
-<li>
-<p><code>releaser.working-dir</code> - By default Releaser assumes running the program from the current working directory.</p>
-</li>
-<li>
-<p><code>releaser.template.template-folder</code> - Tells which subfolder with templates to pick for blog, email etc. generation. Defaults to <code>cloud</code>.</p>
-</li>
-<li>
-<p><code>releaser.versions.all-versions-file-url</code> - Url to a file containing all the versions. Defaults to YAML from start.spring.io.</p>
-</li>
-<li>
-<p><code>releaser.versions.bom-name</code> - Name in the YAML from initilizr for BOM mappings. Defaults to <code>spring-cloud</code>.</p>
-</li>
-</ul>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.build-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">echo "{{systemProps}}"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.deploy-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">echo "{{systemProps}}"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.deploy-guides-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">echo "{{systemProps}}"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.generate-release-train-docs-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">echo "{{version}}"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to generate release train documentation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.publish-docs-commands</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[mkdir -p target, echo "{{version}}"]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.system-properties</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.wait-time-in-minutes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max wait time in minutes for the process to finish.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.fixed-versions</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Project name to its version - overrides all versions retrieved from a release train repository like Spring Cloud Release.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.all-test-sample-urls</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Project to urls mapping. For each project will clone the test project and will update its versions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.clone-destination-dir</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Where should the release train repo get cloned to. If {@code null} defaults to a temporary directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.documentation-branch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gh-pages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the documentation project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.documentation-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud/spring-cloud-static" class="bare">https://github.com/spring-cloud/spring-cloud-static</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to the documentation Git repository.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.fetch-versions-from-git</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If {@code true} then should fill the map of versions from Git. If {@code false} then picks fixed versions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.number-of-checked-milestones</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">In order not to iterate endlessly over milestones we introduce a threshold of milestones that we will go through to find the matching milestone.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.oauth-token</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GitHub OAuth token to be used to interact with GitHub repo.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.password</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional Git password. If not passed keys will be used for authentication.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-bom-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud/spring-cloud-release" class="bare">https://github.com/spring-cloud/spring-cloud-release</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to a release train repository.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-docs-branch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">master</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the release train docs.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-docs-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud-samples/scripts" class="bare">https://github.com/spring-cloud-samples/scripts</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to the release train documentation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-wiki-page-prefix</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spring-Cloud</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Page prefix for the release train wiki. E.g. for [Spring-Cloud-Finchley-Release-Notes] it would be [Spring-Cloud].</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-wiki-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-projects/spring-cloud.wiki" class="bare">https://github.com/spring-projects/spring-cloud.wiki</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to the release train wiki.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.run-updated-samples</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update the test samples.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.spring-project-branch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gh-pages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the release train project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.spring-project-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-projects/spring-cloud" class="bare">https://github.com/spring-projects/spring-cloud</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to the release train project page repository.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.test-samples-branch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">master</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the test samples.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.test-samples-project-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud/spring-cloud-core-tests" class="bare">https://github.com/spring-cloud/spring-cloud-core-tests</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to test samples.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-all-test-samples</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not clone and update the samples for all projects.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-documentation-repo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If {@code false}, will not update the documentation repository.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-release-train-docs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update the release train docs.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-release-train-wiki</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not clone and update the release train wiki.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-spring-guides</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update Spring Guides for a release train.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-spring-project</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update the Spring Project for a release train. E.g. for Spring Cloud will not update <a href="https://cloud.spring.io" class="bare">https://cloud.spring.io</a> .</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-start-spring-io</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update start.spring.io for a release train.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.username</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional Git username. If not passed keys will be used for authentication.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.build-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build publishToMavenLocal {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.deploy-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build publish {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.deploy-guides-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build deployGuides {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.generate-release-train-docs-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">echo 'TODO'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to generate release train documentation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.gradle-props-substitution</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A mapping that should be applied to {@code gradle.properties} in order to perform a substitution of properties. The mapping is from a property inside {@code gradle.properties} to the projects name. Example. In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You want this property to get updated with the value of {@code spring-cloud-contract} version. Then it&#8217;s enough to do the mapping like this for this Releaser&#8217;s property: {@code verifierVersion=spring-cloud-contract}.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.ignored-gradle-regex</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List of regular expressions of ignored gradle props. Defaults to test projects and samples.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.publish-docs-commands</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[echo 'TODO']</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.system-properties</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.wait-time-in-minutes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max wait time in minutes for the process to finish.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.build-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./mvnw clean install -B -Pdocs {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.deploy-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.deploy-guides-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.generate-release-train-docs-command</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bash release_train.sh --retrieveversions --version {{version}} --ghpages --auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to generate release train documentation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.publish-docs-commands</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[mkdir -p target, wget <a href="https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh" class="bare">https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh</a> -O target/gh-pages.sh, chmod +x target/gh-pages.sh, ./target/gh-pages.sh -v {{version}} -c]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.system-properties</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.wait-time-in-minutes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max wait time in minutes for the process to finish.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Are we releasing the whole suite of apps or only one?</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.git-org-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud" class="bare">https://github.com/spring-cloud</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The URL of the Git organization. We&#8217;ll append each project&#8217;s name to it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.projects-to-skip</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Names of projects to skip deployment for meta-release.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.release-train-dependency-names</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">All the names of dependencies that should be updated with the release train project version.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.release-train-project-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud-release</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the release train project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.bom-version-pattern</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">^(spring-cloud-.*)\.version$</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The pattern to match a version property in a BOM.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.branch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">master</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Which branch of release train BOM should be checked out. Defaults to {@code master}.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.ignored-pom-regex</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List of regular expressions of ignored poms. Defaults to test projects and samples.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.pom-with-boot-starter-parent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud-starter-parent/pom.xml</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subfolder of the pom that contains the {@code spring-boot-starer-parent} dependency.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.this-train-bom</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud-dependencies/pom.xml</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subfolder of the pom that contains the versions for the release train.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.post-release-tasks-only</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code true} will run only post release tasks.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.sagan.base-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://spring.io" class="bare">https://spring.io</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to the Sagan API.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.sagan.boot-section-file-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sagan-boot.adoc</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the ascii doc file with boot part of this project&#8217;s Sagan project page. Linked with {@link this#docsAdocsFile}.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.sagan.docs-adocs-file</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">docs/src/main/asciidoc</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Folder with asciidoctor files for docs.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.sagan.index-section-file-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sagan-index.adoc</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the ascii doc file with core part of this project&#8217;s Sagan project page. Linked with {@link this#docsAdocsFile}.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.sagan.update-sagan</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false} will not update Sagan.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.template.template-folder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Folder in which blog, email etc. templates are stored.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.versions.all-versions-file-url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml" class="bare">https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Url to a file containing all the versions. Defaults to YAML from start.spring.io.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.versions.bom-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name in the YAML from initilizr for BOM mappings.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.working-dir</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">By default Releaser assumes running the program from the current working directory. If you want to change this behaviour - just change this value.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -1547,7 +1746,7 @@ The following files can be found in the <a href="https://github.com/spring-cloud
 <div class="ulist">
 <ul>
 <li>
-<p><code>checkstyle.header.file</code> - please point it to the Spring Cloud Build&#8217;s, <code>spring-cloud-build-tools/src/main/resources/checkstyle/checkstyle-header.txt</code> file either in your cloned repo or via the <code><a href="https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/main/resources/checkstyle-header.txt" class="bare">https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/main/resources/checkstyle-header.txt</a></code> URL.</p>
+<p><code>checkstyle.header.file</code> - please point it to the Spring Cloud Build&#8217;s, <code>spring-cloud-build-tools/src/main/resources/checkstyle-header.txt</code> file either in your cloned repo or via the <code><a href="https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/main/resources/checkstyle-header.txt" class="bare">https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/main/resources/checkstyle-header.txt</a></code> URL.</p>
 </li>
 <li>
 <p><code>checkstyle.suppressions.file</code> - default suppressions. Please point it to the Spring Cloud Build&#8217;s, <code>spring-cloud-build-tools/src/checkstyle/checkstyle-suppressions.xml</code> file either in your cloned repo or via the <code><a href="https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/checkstyle/checkstyle-suppressions.xml" class="bare">https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/checkstyle/checkstyle-suppressions.xml</a></code> URL.</p>
