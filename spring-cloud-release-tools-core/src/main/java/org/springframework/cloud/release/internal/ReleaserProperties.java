@@ -1002,6 +1002,7 @@ public class ReleaserProperties implements Serializable {
 		private List<String> ignoredGradleRegex = Arrays.asList(
 				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
 				"^.*spring-cloud-contract-maven-plugin/target/.*$",
+				"^.*src/test/bats/.*$",
 				"^.*samples/standalone/[a-z]+/.*$");
 
 		/**
