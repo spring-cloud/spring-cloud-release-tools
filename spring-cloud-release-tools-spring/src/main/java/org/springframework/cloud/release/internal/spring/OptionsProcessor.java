@@ -95,11 +95,15 @@ class OptionsProcessor {
 			}
 			return;
 		}
-		if (options.fullRelease && !options.interactive) {
+		if (options.fullRelease && options.dryRun) {
+			log.info("Executing a full release in dry run mode");
+			dryRunTask().execute(args);
+		}
+		else if (options.fullRelease && !options.interactive) {
 			log.info("Executing a full release in non-interactive mode");
 			releaseTask().execute(args);
 		}
-		else if (options.fullRelease && options.interactive) {
+		else if (options.fullRelease) {
 			log.info("Executing a full release in interactive mode");
 			releaseVerboseTask().execute(args);
 		}
@@ -137,6 +141,10 @@ class OptionsProcessor {
 
 	Task releaseTask() {
 		return Tasks.RELEASE;
+	}
+
+	Task dryRunTask() {
+		return Tasks.DRY_RUN;
 	}
 
 	Task releaseVerboseTask() {
