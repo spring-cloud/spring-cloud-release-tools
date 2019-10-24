@@ -116,6 +116,9 @@ final class Tasks {
 					Tasks.CLOSE_MILESTONE, Tasks.UPDATE_SAGAN)
 			.collect(Collectors.toList());
 
+	static final List<Task> DEFAULT_DRY_RUN_TASKS_PER_PROJECT = Stream
+			.of(Tasks.UPDATING_POMS, Tasks.BUILD_PROJECT).collect(Collectors.toList());
+
 	static final List<Task> DEFAULT_TASKS_PER_RELEASE = Stream
 			.of(Tasks.RUN_UPDATED_SAMPLES, Tasks.CREATE_TEMPLATES, Tasks.UPDATE_GUIDES,
 					Tasks.UPDATE_START_SPRING_IO,
@@ -133,6 +136,12 @@ final class Tasks {
 	static Task RELEASE = Tasks.task("release", "fr", "FULL RELEASE",
 			"Perform a full release of this project without interruptions",
 			args -> new CompositeConsumer(DEFAULT_TASKS_PER_PROJECT).accept(args));
+
+	static Task DRY_RUN = Tasks.task("dryRun", "dr", "DRY RUN",
+			"Perform a dry run release of a single project - bumps versions and installs them locally",
+			args -> new CompositeConsumer(DEFAULT_DRY_RUN_TASKS_PER_PROJECT)
+					.accept(args));
+
 	static Task POST_RELEASE = Tasks.task("postRelease", "pr", "POST RELEASE TASKS",
 			"Perform post release tasks for this release without interruptions",
 			args -> new CompositeConsumer(DEFAULT_TASKS_PER_RELEASE).accept(args),
@@ -146,9 +155,14 @@ final class Tasks {
 			args -> new CompositeConsumer(DEFAULT_TASKS_PER_PROJECT,
 					(args1 -> args.properties.getMetaRelease().setEnabled(true)))
 							.accept(args));
+	static Task META_RELEASE_DRY_RUN = Tasks.task("metaReleaseDryRun", "xdr",
+			"META RELEASE DRY RUN", "Perform a meta release dry run of projects",
+			args -> new CompositeConsumer(DEFAULT_DRY_RUN_TASKS_PER_PROJECT,
+					(args1 -> args.properties.getMetaRelease().setEnabled(true)))
+							.accept(args));
 
-	static final List<Task> COMPOSITE_TASKS = Stream
-			.of(RELEASE, RELEASE_VERBOSE, META_RELEASE, POST_RELEASE)
+	static final List<Task> COMPOSITE_TASKS = Stream.of(RELEASE, RELEASE_VERBOSE, DRY_RUN,
+			META_RELEASE, POST_RELEASE, META_RELEASE_DRY_RUN)
 			.collect(Collectors.toList());
 
 	static final List<Task> ALL_TASKS_PER_PROJECT = Stream

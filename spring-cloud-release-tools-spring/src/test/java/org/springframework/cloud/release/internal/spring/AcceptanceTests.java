@@ -270,14 +270,43 @@ public class AcceptanceTests {
 		thenUpdateReleaseTrainDocsWasCalled();
 	}
 
+	@Test
+	public void should_perform_a_meta_release_dry_run_of_sc_release_and_consul()
+			throws Exception {
+		// simulates an org
+		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout()
+				.setName("Edgware").call();
+		SpringReleaser releaser = metaReleaserDryRun(edgwareSr10());
+
+		releaser.release(new OptionsBuilder().metaRelease(true).dryRun(true).options());
+
+		// consul, release
+		then(this.nonAssertingGitHandler.clonedProjects).hasSize(2);
+		thenAllDryRunStepsWereExecutedForEachProject();
+		thenSaganWasNotCalled();
+		thenDocumentationWasNotUpdated();
+		BDDAssertions.then(clonedProject("spring-cloud-consul").tagList().call())
+				.extracting("name").doesNotContain("refs/tags/v5.3.5.RELEASE");
+		thenRunUpdatedTestsWereNotCalled();
+		thenUpdateReleaseTrainDocsWasNotCalled();
+	}
+
 	private void thenRunUpdatedTestsWereCalled() {
 		BDDMockito.then(this.postReleaseActions).should()
 				.runUpdatedTests(BDDMockito.any(Projects.class));
 	}
 
+	private void thenRunUpdatedTestsWereNotCalled() {
+		BDDMockito.then(this.postReleaseActions).shouldHaveNoInteractions();
+	}
+
 	private void thenUpdateReleaseTrainDocsWasCalled() {
 		BDDMockito.then(this.postReleaseActions).should()
 				.generateReleaseTrainDocumentation(BDDMockito.any(Projects.class));
+	}
+
+	private void thenUpdateReleaseTrainDocsWasNotCalled() {
+		BDDMockito.then(this.postReleaseActions).shouldHaveNoInteractions();
 	}
 
 	private Map<String, String> edgwareSr10() {
@@ -320,6 +349,10 @@ public class AcceptanceTests {
 				BDDMockito.any(ProjectVersion.class));
 	}
 
+	private void thenSaganWasNotCalled() {
+		BDDMockito.then(this.saganUpdater).shouldHaveNoInteractions();
+	}
+
 	private void thenAllStepsWereExecutedForEachProject() {
 		this.nonAssertingGitHandler.clonedProjects.stream()
 				.filter(f -> !f.getName().contains("angel")
@@ -330,6 +363,20 @@ public class AcceptanceTests {
 									.contains(pom(project).getArtifactId());
 					then(this.capture.toString()).contains("executed_build",
 							"executed_deploy", "executed_docs");
+				});
+	}
+
+	private void thenAllDryRunStepsWereExecutedForEachProject() {
+		this.nonAssertingGitHandler.clonedProjects.stream()
+				.filter(f -> !f.getName().contains("angel")
+						&& !f.getName().equals("spring-cloud"))
+				.forEach(project -> {
+					then(Arrays.asList("spring-cloud-starter-build",
+							"spring-cloud-consul"))
+									.contains(pom(project).getArtifactId());
+					then(this.capture.toString()).contains("executed_build");
+					then(this.capture.toString()).doesNotContain("executed_deploy",
+							"executed_docs");
 				});
 	}
 
@@ -412,6 +459,10 @@ public class AcceptanceTests {
 	private void thenDocumentationWasUpdated() {
 		BDDMockito.then(this.documentationUpdater).should().updateDocsRepo(
 				BDDMockito.any(ProjectVersion.class), BDDMockito.anyString());
+	}
+
+	private void thenDocumentationWasNotUpdated() {
+		BDDMockito.then(this.documentationUpdater).shouldHaveNoInteractions();
 	}
 
 	private void thenWikiPageWasUpdated() {
@@ -636,6 +687,12 @@ public class AcceptanceTests {
 		return metaReleaserWithFullDeployment(properties);
 	}
 
+	private SpringReleaser metaReleaserDryRun(Map<String, String> versions)
+			throws Exception {
+		ReleaserProperties properties = metaReleaserProperties(versions);
+		return metaReleaserWithDryRun(properties);
+	}
+
 	private SpringReleaser releaserWithFullDeployment(String expectedVersion,
 			String projectName, ReleaserProperties properties) throws Exception {
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
@@ -672,6 +729,25 @@ public class AcceptanceTests {
 		}, this.updater, this.applicationEventPublisher);
 	}
 
+	private SpringReleaser metaReleaserWithDryRun(ReleaserProperties properties)
+			throws Exception {
+		Releaser releaser = defaultMetaReleaser(properties);
+		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+				properties, this.applicationEventPublisher) {
+			@Override
+			String chosenOption() {
+				// meta release dry run
+				return String.valueOf(TaskUtils.indexOf(Tasks.META_RELEASE_DRY_RUN));
+			}
+
+			@Override
+			void postReleaseOptions(Options options, Args defaultArgs) {
+				options.interactive = false;
+				super.postReleaseOptions(options, defaultArgs);
+			}
+		}, this.updater, this.applicationEventPublisher);
+	}
+
 	private SpringReleaser releaserWithSnapshotScRelease(File projectFile,
 			String projectName, String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = snapshotScReleaseReleaserProperties(projectFile,
@@ -687,7 +763,7 @@ public class AcceptanceTests {
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
-				return "13";
+				return String.valueOf(TaskUtils.indexOf(Tasks.CREATE_TEMPLATES));
 			}
 
 			@Override

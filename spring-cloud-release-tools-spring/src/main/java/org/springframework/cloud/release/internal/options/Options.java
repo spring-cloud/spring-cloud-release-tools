@@ -40,6 +40,11 @@ public class Options {
 	public Boolean interactive;
 
 	/**
+	 * Is dry run set.
+	 */
+	public Boolean dryRun;
+
+	/**
 	 * List of task names to release.
 	 */
 	public List<String> taskNames;
@@ -54,11 +59,12 @@ public class Options {
 	 */
 	public String range = "";
 
-	Options(Boolean metaRelease, Boolean fullRelease, Boolean interactive,
+	Options(Boolean metaRelease, Boolean fullRelease, Boolean interactive, Boolean dryRun,
 			List<String> taskNames, String startFrom, String range) {
 		this.metaRelease = metaRelease;
 		this.fullRelease = fullRelease;
 		this.interactive = interactive;
+		this.dryRun = dryRun;
 		this.taskNames = taskNames.stream().map(this::removeQuotingChars)
 				.collect(Collectors.toList());
 		this.startFrom = removeQuotingChars(startFrom);
@@ -75,9 +81,9 @@ public class Options {
 	@Override
 	public String toString() {
 		return "Options{" + "metaRelease=" + this.metaRelease + ", fullRelease="
-				+ this.fullRelease + ", interactive=" + this.interactive + ", taskNames="
-				+ this.taskNames + ", startFrom='" + this.startFrom + '\'' + ", range='"
-				+ this.range + '\'' + '}';
+				+ this.fullRelease + ", interactive=" + this.interactive + ", dryRun="
+				+ this.dryRun + ", taskNames=" + this.taskNames + ", startFrom='"
+				+ this.startFrom + '\'' + ", range='" + this.range + '\'' + '}';
 	}
 
 }

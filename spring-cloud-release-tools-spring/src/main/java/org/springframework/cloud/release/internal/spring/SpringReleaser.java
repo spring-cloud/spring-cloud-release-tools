@@ -121,7 +121,7 @@ public class SpringReleaser {
 		List<ProcessedProject> processedProjects = new ArrayList<>();
 		if (options.metaRelease) {
 			ReleaserProperties original = this.properties.copy();
-			log.debug("The following properties were found [{}]", original);
+			log.trace("The following properties were found [{}]", original);
 			processedProjects = metaReleaseProjects(options).stream()
 					.map(project -> processProjectForMetaRelease(original.copy(), options,
 							project))
@@ -133,8 +133,10 @@ public class SpringReleaser {
 			File projectFolder = projectFolder();
 			projectsAndVersion = processProject(options, projectFolder, TaskType.RELEASE);
 		}
-		this.optionsProcessor.postReleaseOptions(options,
-				postReleaseOptionsAgs(options, projectsAndVersion, processedProjects));
+		if (!options.dryRun) {
+			this.optionsProcessor.postReleaseOptions(options, postReleaseOptionsAgs(
+					options, projectsAndVersion, processedProjects));
+		}
 	}
 
 	private void prepareForMetaRelease(Options options) {
@@ -146,7 +148,7 @@ public class SpringReleaser {
 
 	ProcessedProject processProjectForMetaRelease(ReleaserProperties copy,
 			Options options, String project) {
-		log.info("Original properties [\n\n{}\n\n]", copy);
+		log.trace("Original properties [\n\n{}\n\n]", copy);
 		File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
 		copy = updatePropertiesIfCustomConfigPresent(copy, clonedProjectFromOrg);
 		log.info("Successfully cloned the project [{}] to [{}]", project,
@@ -289,7 +291,7 @@ public class SpringReleaser {
 				projectsAndVersion.projectVersions, originalVersion,
 				projectsAndVersion.versionFromBom, this.properties, options.interactive,
 				taskType, this.applicationEventPublisher);
-		log.debug("Processing project [{}] with args [{}]", project, defaultArgs);
+		log.trace("Processing project [{}] with args [{}]", project, defaultArgs);
 		this.optionsProcessor.processOptions(options, defaultArgs);
 		return projectsAndVersion;
 	}

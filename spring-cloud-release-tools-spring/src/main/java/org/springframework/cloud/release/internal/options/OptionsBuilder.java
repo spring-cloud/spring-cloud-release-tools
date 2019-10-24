@@ -27,6 +27,8 @@ public class OptionsBuilder {
 
 	private Boolean interactive = true;
 
+	private Boolean dryRun = false;
+
 	private List<String> taskNames = new ArrayList<>();
 
 	private String startFrom = "";
@@ -48,6 +50,11 @@ public class OptionsBuilder {
 		return this;
 	}
 
+	public OptionsBuilder dryRun(Boolean dryRun) {
+		this.dryRun = dryRun;
+		return this;
+	}
+
 	public OptionsBuilder taskNames(List<String> taskNames) {
 		this.taskNames = taskNames;
 		return this;
@@ -65,7 +72,7 @@ public class OptionsBuilder {
 
 	public Options options() {
 		return new Options(this.metaRelease, this.fullRelease, this.interactive,
-				this.taskNames, this.startFrom, this.range);
+				this.dryRun, this.taskNames, this.startFrom, this.range);
 	}
 
 }

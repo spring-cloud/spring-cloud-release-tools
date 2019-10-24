@@ -58,6 +58,10 @@ class OptionsParser implements Parser {
 					Arrays.asList("i", "interactive"),
 					"Do you want to set the properties from the command line of a single project?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(true);
+			ArgumentAcceptingOptionSpec<Boolean> dryRunOpt = parser.acceptsAll(
+					Arrays.asList("dr", "dry-run"),
+					"Do you want to do the release / meta release with build and install projects locally only?")
+					.withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 			Tasks.NON_COMPOSITE_TASKS.forEach(
 					task -> parser.acceptsAll(Arrays.asList(task.shortName, task.name),
 							task.description).withOptionalArg());
@@ -85,6 +89,7 @@ class OptionsParser implements Parser {
 			}
 			Boolean metaRelease = options.valueOf(metaReleaseOpt);
 			Boolean interactive = options.valueOf(interactiveOpt);
+			Boolean dryRun = options.valueOf(dryRunOpt);
 			Boolean fullRelease = options.has(fullReleaseOpt);
 			List<String> providedTaskNames = StringUtils.hasText(options
 					.valueOf(taskNamesOpt)) ? Arrays.asList(
@@ -107,7 +112,7 @@ class OptionsParser implements Parser {
 			String startFrom = options.valueOf(startFromOpt);
 			String range = options.valueOf(rangeOpt);
 			Options buildOptions = new OptionsBuilder().metaRelease(metaRelease)
-					.fullRelease(fullRelease).interactive(interactive)
+					.fullRelease(fullRelease).interactive(interactive).dryRun(dryRun)
 					.taskNames(taskNames).startFrom(startFrom).range(range).options();
 			log.info(
 					"\n\nWill use the following options to process the project\n\n{}\n\n",
