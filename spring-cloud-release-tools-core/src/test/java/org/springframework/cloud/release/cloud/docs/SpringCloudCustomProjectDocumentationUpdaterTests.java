@@ -20,10 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.Collections;
 
 import javax.validation.constraints.NotNull;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 
+import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
@@ -73,7 +74,9 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				file("/projects/spring-cloud-static/").toURI().toString());
 		this.handler = new ProjectGitHandler(this.properties);
 		this.clonedDocProject = this.handler.cloneDocumentationProject();
-		this.gitHubHandler = new ProjectGitHubHandler(this.properties);
+		this.gitHubHandler = new ProjectGitHubHandler(this.properties,
+				Collections.singletonList(
+						SpringCloudGithubIssuesAccessor.springCloud(this.properties)));
 	}
 
 	@Test

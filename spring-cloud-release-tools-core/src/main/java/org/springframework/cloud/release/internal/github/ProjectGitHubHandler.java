@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.release.internal.github;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +42,11 @@ public class ProjectGitHubHandler implements ReleaserPropertiesAware {
 
 	private ReleaserProperties properties;
 
-	public ProjectGitHubHandler(ReleaserProperties properties) {
+	public ProjectGitHubHandler(ReleaserProperties properties,
+			List<CustomGithubIssues> customGithubIssues) {
 		this.properties = properties;
 		this.githubMilestones = new GithubMilestones(properties);
-		this.githubIssues = new GithubIssues(properties);
+		this.githubIssues = new GithubIssues(properties, customGithubIssues);
 		registerShutdownHook();
 	}
 

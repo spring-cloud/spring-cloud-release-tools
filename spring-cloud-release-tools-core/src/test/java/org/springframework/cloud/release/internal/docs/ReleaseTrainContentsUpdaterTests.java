@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.Collections;
 
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -28,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
@@ -48,8 +50,9 @@ public class ReleaseTrainContentsUpdaterTests {
 
 	ReleaserProperties properties = new ReleaserProperties();
 
-	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(
-			this.properties) {
+	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(this.properties,
+			Collections.singletonList(
+					SpringCloudGithubIssuesAccessor.springCloud(this.properties))) {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
 			return "http://www.foo.com/";

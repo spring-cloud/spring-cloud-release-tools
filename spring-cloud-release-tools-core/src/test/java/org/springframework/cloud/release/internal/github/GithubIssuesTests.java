@@ -32,6 +32,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
@@ -72,7 +73,8 @@ public class GithubIssuesTests {
 	@Test
 	public void should_not_do_anything_for_non_release_train_version() {
 		Github github = BDDMockito.mock(Github.class);
-		GithubIssues issues = new GithubIssues(github, withToken());
+		GithubIssues issues = new GithubIssues(withToken(), Collections.singletonList(
+				SpringCloudGithubIssuesAccessor.springCloud(github, withToken())));
 
 		issues.fileIssueInSpringGuides(
 				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
@@ -86,7 +88,8 @@ public class GithubIssuesTests {
 		Github github = BDDMockito.mock(Github.class);
 		ReleaserProperties properties = withToken();
 		properties.getGit().setUpdateSpringGuides(false);
-		GithubIssues issues = new GithubIssues(github, properties);
+		GithubIssues issues = new GithubIssues(properties, Collections.singletonList(
+				SpringCloudGithubIssuesAccessor.springCloud(github, properties)));
 
 		issues.fileIssueInSpringGuides(
 				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
@@ -99,10 +102,11 @@ public class GithubIssuesTests {
 
 	@Test
 	public void should_file_an_issue_for_release_version() throws IOException {
-		GithubIssues issues = new GithubIssues(this.github, withToken());
+		GithubIssues issues = new GithubIssues(withToken(), Collections.singletonList(
+				SpringCloudGithubIssuesAccessor.springCloud(github, withToken())));
 
 		issues.fileIssueInSpringGuides(
-				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
+				new Projects(new ProjectVersion("spring-cloud-foo", "1.0.0.RELEASE"),
 						new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.RELEASE"));
@@ -114,17 +118,18 @@ public class GithubIssuesTests {
 				.issues().get(1);
 		then(issue.exists()).isTrue();
 		Issue.Smart smartIssue = new Issue.Smart(issue);
-		then(smartIssue.title()).isEqualTo(
-				"[Edgware.RELEASE] release of the [spring-cloud-release] release train took place");
+		then(smartIssue.title()).isEqualTo("Upgrade to Spring Cloud Edgware.RELEASE");
 		then(smartIssue.body()).contains(
 				"Release train [spring-cloud-release] in version [Edgware.RELEASE] released with the following projects")
-				.contains("foo : `1.0.0.RELEASE`").contains("bar : `2.0.0.RELEASE`")
-				.contains("baz : `3.0.0.RELEASE`");
+				.contains("spring-cloud-foo : `1.0.0.RELEASE`")
+				.contains("bar : `2.0.0.RELEASE`").contains("baz : `3.0.0.RELEASE`");
 	}
 
 	@Test
 	public void should_throw_exception_when_no_token_was_passed() {
-		GithubIssues issues = new GithubIssues(new ReleaserProperties());
+		GithubIssues issues = new GithubIssues(new ReleaserProperties(),
+				Collections.singletonList(SpringCloudGithubIssuesAccessor
+						.springCloud(new ReleaserProperties())));
 
 		thenThrownBy(() -> issues.fileIssueInSpringGuides(
 				new Projects(Collections.emptySet()), nonGaSleuthProject()))
@@ -138,7 +143,8 @@ public class GithubIssuesTests {
 			throws IOException {
 		setupStartSpringIo();
 		Github github = BDDMockito.mock(Github.class);
-		GithubIssues issues = new GithubIssues(github, withToken());
+		GithubIssues issues = new GithubIssues(withToken(), Collections.singletonList(
+				SpringCloudGithubIssuesAccessor.springCloud(github, withToken())));
 
 		issues.fileIssueInStartSpringIo(
 				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
@@ -154,7 +160,8 @@ public class GithubIssuesTests {
 		Github github = BDDMockito.mock(Github.class);
 		ReleaserProperties properties = withToken();
 		properties.getGit().setUpdateStartSpringIo(false);
-		GithubIssues issues = new GithubIssues(github, properties);
+		GithubIssues issues = new GithubIssues(properties, Collections.singletonList(
+				SpringCloudGithubIssuesAccessor.springCloud(github, properties)));
 
 		issues.fileIssueInStartSpringIo(
 				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
@@ -169,12 +176,14 @@ public class GithubIssuesTests {
 	public void should_file_an_issue_for_release_version_when_updating_startspringio()
 			throws IOException {
 		setupStartSpringIo();
-		GithubIssues issues = new GithubIssues(this.github, withToken());
+		GithubIssues issues = new GithubIssues(withToken(), Collections.singletonList(
+				SpringCloudGithubIssuesAccessor.springCloud(github, withToken())));
 
 		issues.fileIssueInStartSpringIo(
-				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
+				new Projects(new ProjectVersion("spring-cloud-foo", "1.0.0.RELEASE"),
 						new ProjectVersion("bar", "2.0.0.RELEASE"),
-						new ProjectVersion("baz", "3.0.0.RELEASE")),
+						new ProjectVersion("baz", "3.0.0.RELEASE"),
+						new ProjectVersion("spring-boot", "1.2.3.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.RELEASE"));
 
 		then(this.capture.toString()).doesNotContain("will occur only");
@@ -183,19 +192,18 @@ public class GithubIssuesTests {
 				.get(1);
 		then(issue.exists()).isTrue();
 		Issue.Smart smartIssue = new Issue.Smart(issue);
-		then(smartIssue.title()).isEqualTo(
-				"[Edgware.RELEASE] release of the [spring-cloud-release] release train took place");
+		then(smartIssue.title()).isEqualTo("Upgrade to Spring Cloud Edgware.RELEASE");
 		then(smartIssue.body()).contains(
-				"Release train [spring-cloud-release] in version [Edgware.RELEASE] released with the following projects")
-				.contains("foo : `1.0.0.RELEASE`").contains("bar : `2.0.0.RELEASE`")
-				.contains("baz : `3.0.0.RELEASE`");
+				"Release train [spring-cloud-release] in version [Edgware.RELEASE] released with the Spring Boot version [`1.2.3.RELEASE`]");
 	}
 
 	@Test
 	public void should_throw_exception_when_no_token_was_passed_when_updating_startspringio()
 			throws IOException {
 		setupStartSpringIo();
-		GithubIssues issues = new GithubIssues(new ReleaserProperties());
+		GithubIssues issues = new GithubIssues(new ReleaserProperties(),
+				Collections.singletonList(SpringCloudGithubIssuesAccessor
+						.springCloud(new ReleaserProperties())));
 
 		thenThrownBy(() -> issues.fileIssueInStartSpringIo(
 				new Projects(Collections.emptySet()), nonGaSleuthProject()))

@@ -46,6 +46,7 @@ import org.mockito.Mockito;
 
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.cloud.docs.SpringCloudDocsAccessor;
+import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.BomParser;
@@ -961,7 +962,8 @@ public class AcceptanceTests {
 
 		TestProjectGitHubHandler(ReleaserProperties properties, String expectedVersion,
 				String projectName) {
-			super(properties);
+			super(properties, Collections.singletonList(
+					SpringCloudGithubIssuesAccessor.springCloud(properties)));
 			this.expectedVersion = expectedVersion;
 			this.projectName = projectName;
 		}
@@ -1000,7 +1002,8 @@ public class AcceptanceTests {
 		boolean issueCreatedInStartSpringIo = false;
 
 		NonAssertingTestProjectGitHubHandler(ReleaserProperties properties) {
-			super(properties);
+			super(properties, Collections.singletonList(
+					SpringCloudGithubIssuesAccessor.springCloud(properties)));
 		}
 
 		@Override

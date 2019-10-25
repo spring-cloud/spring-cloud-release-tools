@@ -28,6 +28,7 @@ import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.github.CustomGithubIssues;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
 import org.springframework.cloud.release.internal.options.Parser;
 import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
@@ -75,9 +76,12 @@ class ReleaserConfiguration {
 		return new ProjectGitHandler(this.properties);
 	}
 
+	@Autowired(required = false)
+	List<CustomGithubIssues> customGithubIssues = new ArrayList<>();
+
 	@Bean
 	ProjectGitHubHandler projectGitHubHandler() {
-		return new ProjectGitHubHandler(this.properties);
+		return new ProjectGitHubHandler(this.properties, this.customGithubIssues);
 	}
 
 	@Bean
