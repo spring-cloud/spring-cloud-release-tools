@@ -140,9 +140,12 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 						return;
 					}
 					ProjectVersion value = this.projects.forName(projectName);
-					log.info("Replacing [{}->{}] with [{}->{}]", key, value1, key, value);
-					changedString.set(changedString.get().replace(key + "=" + value1,
-							key + "=" + value));
+					if (!value.version.equalsIgnoreCase(value1.toString())) {
+						log.info("Replacing [{}->{}] with [{}->{}]", key, value1, key,
+								value);
+						changedString.set(changedString.get().replace(key + "=" + value1,
+								key + "=" + value));
+					}
 				});
 				storeString(path, changedString.get());
 				assertNoSnapshotsArePresent(path);

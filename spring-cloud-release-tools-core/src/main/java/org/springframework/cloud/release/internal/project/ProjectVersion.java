@@ -27,6 +27,7 @@ import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.tech.PomReader;
 import org.springframework.util.StringUtils;
 
@@ -79,11 +80,13 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	public ProjectVersion(File project) {
 		File buildGradle = new File(project, "build.gradle");
 		if (buildGradle.exists()) {
+			ReleaserProperties properties = new ReleaserProperties();
+			properties.setWorkingDir(project.getAbsolutePath());
 			log.info("Retrieving fresh Gradle project version information");
 			ProjectVersion projectVersion = gradleProject(buildGradle);
 			this.projectName = projectVersion.projectName;
 			this.version = projectVersion.version;
-			this.groupId = new ProjectCommandExecutor().groupId();
+			this.groupId = new ProjectCommandExecutor(properties).groupId();
 			this.artifactId = projectName;
 		}
 		else {
@@ -114,7 +117,9 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	public static ProjectVersion gradleProject(File file) {
 		File parentFolder = file.getParentFile() != null ? file.getParentFile() : file;
 		String name = parentFolder.getName();
-		String version = new ProjectCommandExecutor().version();
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.setWorkingDir(parentFolder.getAbsolutePath());
+		String version = new ProjectCommandExecutor(properties).version();
 		return new ProjectVersion(nameWithoutParent(name), version);
 	}
 
