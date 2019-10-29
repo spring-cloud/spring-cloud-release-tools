@@ -40,7 +40,7 @@ class BuildsystemConfiguration {
 
 	@Bean
 	BomParser gradleBomParser() {
-		return new MavenBomParser(this.releaserProperties, this.customBomParsers);
+		return new GradleBomParser(this.releaserProperties, this.customBomParsers);
 	}
 
 	@Bean

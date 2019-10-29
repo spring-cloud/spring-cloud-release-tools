@@ -248,9 +248,9 @@ public class SpringReleaser {
 		}
 		ProjectVersion versionFromBom;
 		Projects projectsToUpdate;
-		log.info("Fetch from git [{}], meta release [{}]",
+		log.info("Fetch from git [{}], meta release [{}], project [{}]",
 				this.properties.getGit().isFetchVersionsFromGit(),
-				this.properties.getMetaRelease().isEnabled());
+				this.properties.getMetaRelease().isEnabled(), project);
 		if (this.properties.getGit().isFetchVersionsFromGit()
 				&& !this.properties.getMetaRelease().isEnabled()) {
 			printVersionRetrieval();
@@ -285,6 +285,7 @@ public class SpringReleaser {
 	}
 
 	ProjectsAndVersion processProject(Options options, File project, TaskType taskType) {
+		log.info("Processing the project in file [{}]", project);
 		ProjectsAndVersion projectsAndVersion = projects(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		final Args defaultArgs = new Args(this.releaser, project,
@@ -303,10 +304,8 @@ public class SpringReleaser {
 	}
 
 	private void printVersionRetrieval() {
-		log.info(
-				"\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone Spring Cloud Release"
-						+ " to retrieve all versions for the branch [{}]",
-				this.properties.getPom().getBranch());
+		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone the bom"
+				+ " to retrieve all versions");
 	}
 
 	private void printSettingVersionFromFixedVersions(Projects projectsToUpdate) {

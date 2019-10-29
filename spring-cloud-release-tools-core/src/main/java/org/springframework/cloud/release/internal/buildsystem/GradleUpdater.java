@@ -98,11 +98,13 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 
 		private final List<Pattern> unacceptableVersionPatterns;
 
+		private final GradleProjectNameExtractor extractor = new GradleProjectNameExtractor();
+
 		private GradlePropertiesWalker(ReleaserProperties properties, Projects projects,
-				ProjectVersion versionFromScRelease, boolean assertVersions) {
+				ProjectVersion versionFromBom, boolean assertVersions) {
 			this.properties = properties;
 			this.projects = projects;
-			List<Pattern> unacceptableVersionPatterns = versionFromScRelease
+			List<Pattern> unacceptableVersionPatterns = versionFromBom
 					.unacceptableVersionPatterns();
 			this.unacceptableVersionPatterns = unacceptableVersionPatterns;
 			this.skipVersionAssert = !assertVersions
@@ -120,6 +122,7 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 							file);
 					return FileVisitResult.CONTINUE;
 				}
+				String parentName = file.getParentFile().getName();
 				log.info("Will process the file [{}] and update its gradle properties",
 						file);
 				final String fileContents = asString(path);
@@ -128,26 +131,36 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 				Properties props = loadProps(file);
 				final Map<String, String> substitution = this.properties.getGradle()
 						.getGradlePropsSubstitution();
+				// TODO: Automatically should search for e.g. [reactor-pool] ->
+				// [reactorPoolVersion]
+				// TODO: [version] -> current project version
+				// reactorPoolVersion, 1.0.0.BUILD-SNAPSHOT
 				props.forEach((key, value1) -> {
-					if (substitution.containsKey(key)) {
-						String projectName = substitution.get(key);
-						if (!this.projects.containsProject(projectName)) {
-							log.warn(
-									"Should update project with name [{}] but it wasn't found in the list of projects [{}]",
-									projectName, this.projects.asList());
-							return;
-						}
-						ProjectVersion value = this.projects.forName(projectName);
-						log.info("Replacing [{}->{}] with [{}->{}]", key, value1, key,
-								value);
-						changedString.set(changedString.get().replace(key + "=" + value1,
-								key + "=" + value));
+					String projectName = projectName(parentName, substitution, key);
+					if (!this.projects.containsProject(projectName)) {
+						log.warn(
+								"Should update project with name [{}] but it wasn't found in the list of projects [{}]",
+								projectName, this.projects.asList());
+						return;
 					}
+					ProjectVersion value = this.projects.forName(projectName);
+					log.info("Replacing [{}->{}] with [{}->{}]", key, value1, key, value);
+					changedString.set(changedString.get().replace(key + "=" + value1,
+							key + "=" + value));
 				});
 				storeString(path, changedString.get());
 				assertNoSnapshotsArePresent(path);
 			}
 			return FileVisitResult.CONTINUE;
+		}
+
+		private String projectName(String parentName, Map<String, String> substitution,
+				Object key) {
+			// version -> current project version
+			if (key.equals("version")) {
+				return parentName;
+			}
+			return this.extractor.projectName(substitution, key);
 		}
 
 		private void assertNoSnapshotsArePresent(Path path) {

@@ -255,7 +255,7 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	String runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
 			String workingDir = this.workingDir;
-			log.info(
+			log.debug(
 					"Will run the command from [{}] via {} and wait for result for [{}] minutes",
 					workingDir, commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
@@ -289,7 +289,15 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	}
 
 	ProcessBuilder builder(String[] commands, String workingDir) {
-		return new ProcessBuilder(commands).directory(new File(workingDir)).inheritIO();
+		// TODO: Improve this to not pass arrays in the first place
+		String lastArg = String.join(" ", commands);
+		String[] commandsWithBash = commandToExecute(lastArg);
+		return new ProcessBuilder(commandsWithBash).directory(new File(workingDir))
+				.inheritIO();
+	}
+
+	String[] commandToExecute(String lastArg) {
+		return new String[] { "/bin/bash", "-c", lastArg };
 	}
 
 	@Override
@@ -383,7 +391,7 @@ class CommandPicker {
 	String groupId() {
 		// makes more sense to use PomReader
 		if (projectType == ProjectType.GRADLE) {
-			return "./gradlew groupId | tail -1";
+			return "./gradlew groupId -q | tail -1";
 		}
 		return "./mvnw -q" + " -Dexec.executable=\"echo\""
 				+ " -Dexec.args=\"\\${project.groupId}\"" + " --non-recursive"
@@ -445,7 +453,7 @@ class CommandPicker {
 		if (command.contains(ReleaserProperties.Gradle.SYSTEM_PROPS_PLACEHOLDER)) {
 			return command;
 		}
-		return command + " " + ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
+		return command + " " + ReleaserProperties.Gradle.SYSTEM_PROPS_PLACEHOLDER;
 	}
 
 	private String mavenCommandWithSystemProps(String command, ProjectVersion version,
@@ -469,18 +477,30 @@ class CommandPicker {
 		String trimmedCommand = command.trim();
 		if (version.isMilestone() || version.isRc()) {
 			log.info("Adding the milestone profile to the Maven build");
-			return trimmedCommand + " " + MavenProfile.MILESTONE.asMavenProfile()
-					+ profilesToString(profiles);
+			return withProfile(trimmedCommand, MavenProfile.MILESTONE.asMavenProfile(),
+					profiles);
 		}
 		else if (version.isRelease() || version.isServiceRelease()) {
 			log.info("Adding the central profile to the Maven build");
-			return trimmedCommand + " " + MavenProfile.CENTRAL.asMavenProfile()
-					+ profilesToString(profiles);
+			return withProfile(trimmedCommand, MavenProfile.CENTRAL.asMavenProfile(),
+					profiles);
 		}
 		else {
 			log.info("The build is a snapshot one - will not add any profiles");
 		}
 		return trimmedCommand;
+	}
+
+	private String withProfile(String command, String profile, MavenProfile... profiles) {
+		if (command.contains(ReleaserProperties.Maven.PROFILE_PROPS_PLACEHOLDER)) {
+			return command.replace(ReleaserProperties.Maven.PROFILE_PROPS_PLACEHOLDER,
+					profile + appendProfiles(profiles));
+		}
+		return command + " " + profile + appendProfiles(profiles);
+	}
+
+	private String appendProfiles(MavenProfile[] profiles) {
+		return profiles.length > 0 ? " " + profilesToString(profiles) : "";
 	}
 
 	private String profilesToString(MavenProfile... profiles) {

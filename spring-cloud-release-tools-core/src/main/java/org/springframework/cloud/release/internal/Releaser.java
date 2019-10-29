@@ -107,6 +107,7 @@ public class Releaser implements ReleaserPropertiesAware {
 
 	private void updateProjectFromBom(File project, Projects versions,
 			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+		log.info("Will update the project with versions [{}]", versions);
 		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
 				versionFromScRelease, assertSnapshots);
 		this.gradleUpdater.updateProjectFromBom(project, versions, versionFromScRelease,

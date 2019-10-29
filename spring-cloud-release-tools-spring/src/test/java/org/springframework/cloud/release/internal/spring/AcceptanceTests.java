@@ -44,7 +44,6 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 
-import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.cloud.release.cloud.docs.SpringCloudDocsAccessor;
 import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.Releaser;
@@ -85,9 +84,6 @@ public class AcceptanceTests {
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
-
-	@Rule
-	public OutputCapture capture = new OutputCapture();
 
 	TestPomReader testPomReader = new TestPomReader();
 
@@ -135,6 +131,9 @@ public class AcceptanceTests {
 		BDDMockito.given(this.saganClient.getProject(anyString()))
 				.willReturn(newProject());
 		Task.stepSkipper = () -> false;
+		new File("/tmp/executed_build").delete();
+		new File("/tmp/executed_deploy").delete();
+		new File("/tmp/executed_docs").delete();
 	}
 
 	@After
@@ -362,8 +361,9 @@ public class AcceptanceTests {
 					then(Arrays.asList("spring-cloud-starter-build",
 							"spring-cloud-consul"))
 									.contains(pom(project).getArtifactId());
-					then(this.capture.toString()).contains("executed_build",
-							"executed_deploy", "executed_docs");
+					then(new File("/tmp/executed_build")).exists();
+					then(new File("/tmp/executed_deploy")).exists();
+					then(new File("/tmp/executed_docs")).exists();
 				});
 	}
 
@@ -375,9 +375,9 @@ public class AcceptanceTests {
 					then(Arrays.asList("spring-cloud-starter-build",
 							"spring-cloud-consul"))
 									.contains(pom(project).getArtifactId());
-					then(this.capture.toString()).contains("executed_build");
-					then(this.capture.toString()).doesNotContain("executed_deploy",
-							"executed_docs");
+					then(new File("/tmp/executed_build")).exists();
+					then(new File("/tmp/executed_deploy")).doesNotExist();
+					then(new File("/tmp/executed_docs")).doesNotExist();
 				});
 	}
 
@@ -421,8 +421,9 @@ public class AcceptanceTests {
 				.filter(file -> file.getName().equals("spring-cloud-consul"))
 				.forEach(project -> {
 					then(pom(project).getArtifactId()).isEqualTo("spring-cloud-consul");
-					then(this.capture.toString()).contains("executed_build",
-							"executed_deploy", "executed_docs");
+					then(new File("/tmp/executed_build")).exists();
+					then(new File("/tmp/executed_deploy")).exists();
+					then(new File("/tmp/executed_docs")).exists();
 				});
 		thenSaganWasCalled();
 		thenDocumentationWasUpdated();
@@ -449,8 +450,9 @@ public class AcceptanceTests {
 				.forEach(project -> {
 					then(Collections.singletonList("spring-cloud-consul"))
 							.contains(pom(project).getArtifactId());
-					then(this.capture.toString()).contains("executed_build",
-							"executed_deploy", "executed_docs");
+					then(new File("/tmp/executed_build")).exists();
+					then(new File("/tmp/executed_deploy")).exists();
+					then(new File("/tmp/executed_docs")).exists();
 				});
 		thenSaganWasCalled();
 		thenDocumentationWasUpdated();
@@ -903,10 +905,12 @@ public class AcceptanceTests {
 				file("/projects/spring-cloud-static-angel/").toURI().toString());
 		releaserProperties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString());
-		releaserProperties.getMaven().setBuildCommand("echo executed_build");
-		releaserProperties.getMaven().setDeployCommand("echo executed_deploy");
 		releaserProperties.getMaven()
-				.setPublishDocsCommands(new String[] { "echo executed_docs" });
+				.setBuildCommand("echo '{{profiles}}' > /tmp/executed_build");
+		releaserProperties.getMaven()
+				.setDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy");
+		releaserProperties.getMaven().setPublishDocsCommands(
+				new String[] { "echo '{{profiles}}' > /tmp/executed_docs" });
 		releaserProperties.getMetaRelease()
 				.setGitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath());
 		releaserProperties.getMetaRelease().setEnabled(true);

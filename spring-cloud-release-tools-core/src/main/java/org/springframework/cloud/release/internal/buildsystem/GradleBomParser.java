@@ -22,19 +22,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 
 class GradleBomParser implements BomParser {
 
-	private static final Pattern VERSION_PATTERN = Pattern
-			.compile("^([a-zA-Z0-9]+)Version$");
-
 	private final ReleaserProperties properties;
 
 	private final List<CustomBomParser> customParsers;
+
+	private final GradleProjectNameExtractor extractor = new GradleProjectNameExtractor();
 
 	GradleBomParser(ReleaserProperties releaserProperties,
 			List<CustomBomParser> customParsers) {
@@ -64,26 +61,10 @@ class GradleBomParser implements BomParser {
 				.thisProjectRoot(thisProjectRoot).releaserProperties(this.properties)
 				.parsers(this.customParsers).retrieveFromBom();
 		properties.forEach((key, value) -> {
-			String projectName = projectName(substitution, key);
+			String projectName = this.extractor.projectName(substitution, key);
 			versionsFromBom.setVersion(projectName, value.toString());
 		});
 		return versionsFromBom;
-	}
-
-	private String projectName(Map<String, String> substitution, Object key) {
-		String projectName = key.toString();
-		if (substitution.containsKey(key)) {
-			projectName = substitution.get(key);
-		}
-		else {
-			Matcher matcher = VERSION_PATTERN.matcher(projectName);
-			boolean versionMatches = matcher.matches();
-			if (versionMatches) {
-				projectName = matcher.group(1);
-			}
-		}
-		projectName = projectName.replaceAll("([A-Z])", "-$1").toLowerCase();
-		return projectName;
 	}
 
 	Properties loadProps(File file) {

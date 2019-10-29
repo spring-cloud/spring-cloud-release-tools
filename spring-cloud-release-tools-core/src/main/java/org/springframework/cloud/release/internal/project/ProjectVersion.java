@@ -73,8 +73,9 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	}
 
 	public ProjectVersion(File project) {
-		if (new File(project, "build.gradle").exists()) {
-			ProjectVersion projectVersion = gradleProject(project);
+		File buildGradle = new File(project, "build.gradle");
+		if (buildGradle.exists()) {
+			ProjectVersion projectVersion = gradleProject(buildGradle);
 			this.projectName = projectVersion.projectName;
 			this.version = projectVersion.version;
 			this.groupId = new ProjectCommandExecutor().groupId();

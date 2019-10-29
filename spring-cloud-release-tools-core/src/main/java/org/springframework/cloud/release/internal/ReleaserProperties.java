@@ -392,6 +392,7 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private boolean updateReleaseTrainDocs = true;
 
+		// TODO: Spring Cloud specific?
 		/**
 		 * If set to {@code false}, will not clone and update the release train wiki.
 		 */
@@ -740,6 +741,11 @@ public class ReleaserProperties implements Serializable {
 		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
 
 		/**
+		 * Placeholder for profile. If not used, profile will be appended at the end.
+		 */
+		public static final String PROFILE_PROPS_PLACEHOLDER = "{{profile}}";
+
+		/**
 		 * Command to be executed to build the project.
 		 */
 		private String buildCommand = "./mvnw clean install -B -Pdocs {{systemProps}}";
@@ -1006,17 +1012,17 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Command to be executed to build the project.
 		 */
-		private String buildCommand = "./gradlew clean build publishToMavenLocal {{systemProps}}";
+		private String buildCommand = "./gradlew clean build publishToMavenLocal --console=plain {{systemProps}}";
 
 		/**
 		 * Command to be executed to deploy a built project.
 		 */
-		private String deployCommand = "./gradlew clean build publish {{systemProps}}";
+		private String deployCommand = "./gradlew clean build publish --console=plain {{systemProps}}";
 
 		/**
 		 * Command to be executed to build and deploy guides project only.
 		 */
-		private String deployGuidesCommand = "./gradlew clean build deployGuides {{systemProps}}";
+		private String deployGuidesCommand = "./gradlew clean build deployGuides --console=plain {{systemProps}}";
 
 		/**
 		 * Command to be executed to publish documentation. If present "{{version}}" will

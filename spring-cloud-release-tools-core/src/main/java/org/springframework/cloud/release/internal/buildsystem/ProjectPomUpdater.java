@@ -146,7 +146,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 				.thisProjectRoot(projectRoot).releaserProperties(this.properties)
 				.projects(projects.asProjects()).merged();
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versionsFromBom)) {
-			log.info("Skipping project updating");
+			log.debug("Skipping project updating");
 			return;
 		}
 		updatePoms(projectRoot, versionsFromBom, versionFromReleaseTrain, assertVersions);

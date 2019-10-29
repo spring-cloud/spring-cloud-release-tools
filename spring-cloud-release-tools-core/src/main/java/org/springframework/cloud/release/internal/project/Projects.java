@@ -76,7 +76,7 @@ public class Projects extends HashSet<ProjectVersion> {
 	}
 
 	private static String additionalErrorMessage(String projectName) {
-		return "Either put it in the Spring Cloud Release project or set it via the [--releaser.fixed-versions["
+		return "Either put it in the BOM or set it via the [--releaser.fixed-versions["
 				+ projectName + "]=1.0.0.RELEASE] property";
 	}
 
