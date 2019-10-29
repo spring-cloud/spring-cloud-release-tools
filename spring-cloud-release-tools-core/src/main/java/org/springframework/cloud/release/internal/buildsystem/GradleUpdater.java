@@ -131,10 +131,6 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 				Properties props = loadProps(file);
 				final Map<String, String> substitution = this.properties.getGradle()
 						.getGradlePropsSubstitution();
-				// TODO: Automatically should search for e.g. [reactor-pool] ->
-				// [reactorPoolVersion]
-				// TODO: [version] -> current project version
-				// reactorPoolVersion, 1.0.0.BUILD-SNAPSHOT
 				props.forEach((key, value1) -> {
 					String projectName = projectName(parentName, substitution, key);
 					if (!this.projects.containsProject(projectName)) {

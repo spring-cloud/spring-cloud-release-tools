@@ -24,6 +24,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.tech.PomReader;
 import org.springframework.util.StringUtils;
@@ -35,6 +37,8 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 public class ProjectVersion implements Comparable<ProjectVersion> {
+
+	private static final Logger log = LoggerFactory.getLogger(ProjectVersion.class);
 
 	private static final Pattern SNAPSHOT_PATTERN = Pattern
 			.compile("^.*[\\.|\\-](BUILD-)?SNAPSHOT.*$");
@@ -75,6 +79,7 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 	public ProjectVersion(File project) {
 		File buildGradle = new File(project, "build.gradle");
 		if (buildGradle.exists()) {
+			log.info("Retrieving fresh Gradle project version information");
 			ProjectVersion projectVersion = gradleProject(buildGradle);
 			this.projectName = projectVersion.projectName;
 			this.version = projectVersion.version;

@@ -113,7 +113,7 @@ public class Releaser implements ReleaserPropertiesAware {
 		this.gradleUpdater.updateProjectFromBom(project, versions, versionFromScRelease,
 				assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
-		log.info("\n\nProject was successfully updated to [{}]", changedVersion);
+		log.info("\n\nProject was successfully updated to [{}]", changedVersion.version);
 	}
 
 	public void buildProject(ProjectVersion versionFromScRelease) {

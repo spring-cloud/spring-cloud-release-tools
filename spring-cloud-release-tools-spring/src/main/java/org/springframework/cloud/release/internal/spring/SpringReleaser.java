@@ -304,7 +304,7 @@ public class SpringReleaser {
 	}
 
 	private void printVersionRetrieval() {
-		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone the bom"
+		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone the BOM project"
 				+ " to retrieve all versions");
 	}
 

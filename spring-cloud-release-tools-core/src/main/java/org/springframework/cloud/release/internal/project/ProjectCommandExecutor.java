@@ -255,7 +255,7 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	String runCommand(String[] commands, long waitTimeInMinutes) {
 		try {
 			String workingDir = this.workingDir;
-			log.debug(
+			log.info(
 					"Will run the command from [{}] via {} and wait for result for [{}] minutes",
 					workingDir, commands, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
