@@ -88,45 +88,6 @@ public class ReleaseTrainContentsUpdaterTests {
 	}
 
 	@Test
-	public void should_do_nothing_when_switch_is_off() {
-		this.properties.getGit().setUpdateSpringProject(false);
-
-		File file = this.updater.updateProjectRepo(oldReleaseTrain());
-
-		BDDAssertions.then(file).isNull();
-	}
-
-	@Test
-	public void should_not_update_the_contents_of_spring_project_repo_when_release_train_smaller()
-			throws GitAPIException {
-		this.properties.getGit()
-				.setSpringProjectUrl(this.springCloudRepo.getAbsolutePath() + "/");
-
-		File file = this.updater.updateProjectRepo(oldReleaseTrain());
-
-		BDDAssertions.then(file).isNotNull();
-		BDDAssertions
-				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
-						.getShortMessage())
-				.doesNotContain("Updating project page to release train");
-	}
-
-	@Test
-	public void should_update_the_contents_of_spring_project_repo_when_release_train_greater()
-			throws GitAPIException {
-		this.properties.getGit()
-				.setSpringProjectUrl(this.springCloudRepo.getAbsolutePath() + "/");
-
-		File file = this.updater.updateProjectRepo(newReleaseTrain());
-
-		BDDAssertions.then(file).isNotNull();
-		BDDAssertions
-				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
-						.getShortMessage())
-				.contains("Updating project page to release train [Edgware.SR7]");
-	}
-
-	@Test
 	public void should_do_nothing_when_switch_is_off_for_wiki_update() {
 		this.properties.getGit().setUpdateReleaseTrainWiki(false);
 

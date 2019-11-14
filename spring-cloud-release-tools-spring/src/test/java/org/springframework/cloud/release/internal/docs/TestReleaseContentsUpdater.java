@@ -16,21 +16,18 @@
 
 package org.springframework.cloud.release.internal.docs;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
+import org.springframework.cloud.release.internal.template.TemplateGenerator;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class TestDocumentationUpdater extends DocumentationUpdater {
+public class TestReleaseContentsUpdater extends ReleaseTrainContentsUpdater {
 
-	public TestDocumentationUpdater(ReleaserProperties properties,
-			CustomProjectDocumentationUpdater updater, ProjectGitHandler handler,
-			TestReleaseContentsUpdater testRelease) {
-		super(properties, new ProjectDocumentationUpdater(properties, handler,
-				Collections.singletonList(updater)), testRelease);
+	public TestReleaseContentsUpdater(ReleaserProperties properties,
+			ProjectGitHandler handler, TemplateGenerator templateGenerator) {
+		super(properties, handler, templateGenerator);
 	}
 
 }

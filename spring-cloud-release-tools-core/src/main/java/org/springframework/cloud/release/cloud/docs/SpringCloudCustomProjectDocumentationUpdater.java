@@ -18,6 +18,7 @@ package org.springframework.cloud.release.cloud.docs;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -37,6 +40,10 @@ class SpringCloudCustomProjectDocumentationUpdater
 
 	private static final String HTTPS_SC_STATIC_URL = "https://cloud.spring.io/spring-cloud-static/";
 
+	public static final String NO_PROJECT_NAME = "";
+
+	private final File indexHtmlTemplate;
+
 	private static final Logger log = LoggerFactory
 			.getLogger(SpringCloudCustomProjectDocumentationUpdater.class);
 
@@ -44,6 +51,13 @@ class SpringCloudCustomProjectDocumentationUpdater
 
 	SpringCloudCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler) {
 		this.gitHandler = gitHandler;
+		try {
+			this.indexHtmlTemplate = new File(CustomProjectDocumentationUpdater.class
+					.getResource("/cloud/index.html").toURI());
+		}
+		catch (URISyntaxException ex) {
+			throw new IllegalStateException(ex);
+		}
 	}
 
 	@Override
@@ -63,71 +77,141 @@ class SpringCloudCustomProjectDocumentationUpdater
 	 */
 	@Override
 	public File updateDocsRepo(File clonedDocumentationProject,
-			ProjectVersion currentProject, String bomBranch) {
+			ProjectVersion currentProject, Projects projects, String bomBranch) {
 		log.debug("Cloning the doc project to [{}]", clonedDocumentationProject);
 		String pathToIndexHtml = "current/index.html";
-		File indexHtml = indexHtml(clonedDocumentationProject, pathToIndexHtml);
+		File indexHtml = indexHtmlWithRedirection(clonedDocumentationProject, "",
+				bomBranch, pathToIndexHtml);
+		File docsRepo = updateTheDocsRepo(NO_PROJECT_NAME, bomBranch,
+				clonedDocumentationProject, indexHtml);
+		log.info(
+				"Updating all current links to documentation for release train projects");
+		projects.forEach(projectVersion -> {
+			File index = indexHtmlWithRedirection(clonedDocumentationProject,
+					projectVersion.projectName, projectVersion.version, pathToIndexHtml);
+			try {
+				updateTheDocsRepo(projectVersion.projectName, projectVersion.version,
+						clonedDocumentationProject, index);
+				log.info("Processed [{}] for project with name [{}]", index,
+						projectVersion.projectName);
+			}
+			catch (Exception ex) {
+				log.warn(
+						"Exception occurred while trying o update the index html of a project ["
+								+ projectVersion.projectName + "]",
+						ex);
+			}
+		});
+		return pushChanges(docsRepo);
+	}
+
+	private File indexHtmlWithRedirection(File clonedDocumentationProject,
+			String projectName, String version, String pathToIndexHtml) {
+		File indexHtml = indexHtml(clonedDocumentationProject,
+				combinedPathToIndexHtml(projectName, version, pathToIndexHtml));
 		if (!indexHtml.exists()) {
-			throw new IllegalStateException(
-					"index.html is not present at [" + pathToIndexHtml + "]");
+			return generateIndexHtml(projectName, version, pathToIndexHtml, indexHtml);
 		}
-		return updateTheDocsRepo(bomBranch, clonedDocumentationProject, indexHtml);
+		return indexHtml;
+	}
+
+	private File generateIndexHtml(String projectName, String projectVersion,
+			String pathToIndexHtml, File indexHtml) {
+		try {
+			log.info("No file [{}] found, will create one", indexHtml);
+			indexHtml.getParentFile().mkdirs();
+			indexHtml.createNewFile();
+			String newIndex = new String(Files.readAllBytes(indexHtmlTemplate.toPath()))
+					.replaceAll("\\{\\{URL}}",
+							"https://cloud.spring.io/spring-cloud-static/"
+									+ concreteVersionIndexHtml(projectName,
+											branchToReleaseVersion(projectVersion),
+											"index.html"));
+			Files.write(indexHtml.toPath(), newIndex.getBytes());
+			return indexHtml;
+		}
+		catch (IOException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	private String combinedPathToIndexHtml(String projectName, String projectVersion,
+			String pathToIndexHtml) {
+		boolean releaseTrain = new ProjectVersion(projectName, projectVersion)
+				.isReleaseTrain();
+		// release train -> static/current/index.html
+		// project -> static/spring-cloud-sleuth/current/index.html
+		String prefix = releaseTrain ? ""
+				: (StringUtils.hasText(projectName) ? projectName : "") + "/";
+		return prefix + pathToIndexHtml;
+	}
+
+	private String concreteVersionIndexHtml(String projectName, String projectVersion,
+			String pathToIndexHtml) {
+		boolean releaseTrain = new ProjectVersion(projectName, projectVersion)
+				.isReleaseTrain();
+		// release train -> static/current/index.html
+		// project -> static/spring-cloud-sleuth/current/index.html
+		String prefix = releaseTrain ? projectVersion
+				: (projectName + "/" + projectVersion);
+		return prefix + "/" + pathToIndexHtml;
+	}
+
+	private File pushChanges(File docsRepo) {
+		this.gitHandler.pushCurrentBranch(docsRepo);
+		log.info("Committed and pushed changes to the documentation project");
+		return docsRepo;
 	}
 
 	File indexHtml(File clonedDocumentationProject, String pathToIndexHtml) {
 		return new File(clonedDocumentationProject, pathToIndexHtml);
 	}
 
-	private File updateTheDocsRepo(String springCloudReleaseBranch,
+	private File updateTheDocsRepo(String projectName, String version,
 			File documentationProject, File indexHtml) {
 		try {
 			String indexHtmlText = readIndexHtmlContents(indexHtml);
-			int httpIndex = indexHtmlText.indexOf(HTTP_SC_STATIC_URL);
-			int httpsIndex = indexHtmlText.indexOf(HTTPS_SC_STATIC_URL);
+			String httpSubstring = HTTP_SC_STATIC_URL
+					+ (StringUtils.hasText(projectName) ? (projectName + "/") : "");
+			String httpsSubstring = HTTPS_SC_STATIC_URL
+					+ (StringUtils.hasText(projectName) ? (projectName + "/") : "");
+			int httpIndex = indexHtmlText.indexOf(httpSubstring);
+			int httpsIndex = indexHtmlText.indexOf(httpsSubstring);
 			if (httpIndex == -1 && httpsIndex == -1) {
 				throw new IllegalStateException(
 						"The URL to the documentation repo not found in the index.html file");
 			}
-			int beginIndex = beginIndex(httpIndex, httpsIndex);
-			String storedReleaseTrainLine = indexHtmlText.substring(beginIndex);
-			String storedReleaseTrain = storedReleaseTrainLine.substring(0,
-					storedReleaseTrainLine.indexOf("/"));
-			String firstLetterOfReleaseTrain = String
-					.valueOf(storedReleaseTrain.charAt(0));
-			String currentReleaseTrainVersion = branchToReleaseVersion(
-					springCloudReleaseBranch);
-			String firstLetterOfCurrentReleaseTrain = String
-					.valueOf(currentReleaseTrainVersion.charAt(0));
-			boolean newerOrEqualReleaseTrain = isNewerOrEqualReleaseTrain(
-					storedReleaseTrain, firstLetterOfReleaseTrain,
-					currentReleaseTrainVersion, firstLetterOfCurrentReleaseTrain);
-			if (!newerOrEqualReleaseTrain) {
-				log.info(
-						"Current release train [{}] is not newer than the stored one [{}]",
-						currentReleaseTrainVersion, storedReleaseTrain);
+			int beginIndex = beginIndex(httpIndex, httpSubstring, httpsIndex,
+					httpsSubstring);
+			String storedVersionLine = indexHtmlText.substring(beginIndex);
+			String storedVersion = storedVersionLine.substring(0,
+					storedVersionLine.indexOf("/"));
+			String currentVersion = branchToReleaseVersion(version);
+			boolean newerVersion = isMoreMature(storedVersion, currentVersion);
+			if (!newerVersion) {
+				log.info("Current version [{}] is not newer than the stored one [{}]",
+						currentVersion, storedVersion);
 				return documentationProject;
 			}
-			return pushCommitedChanges(currentReleaseTrainVersion, documentationProject,
-					indexHtml, indexHtmlText, storedReleaseTrain);
+			return commitChanges(currentVersion, documentationProject, indexHtml,
+					indexHtmlText, storedVersion);
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	boolean isNewerOrEqualReleaseTrain(String storedReleaseTrain,
-			String firstLetterOfReleaseTrain, String currentReleaseTrainVersion,
-			String firstLetterOfCurrentReleaseTrain) {
-		return (!storedReleaseTrain.equals(currentReleaseTrainVersion))
-				&& firstLetterOfCurrentReleaseTrain
-						.compareToIgnoreCase(firstLetterOfReleaseTrain) >= 0;
+	boolean isMoreMature(String storedVersion, String currentVersion) {
+		return new ProjectVersion("project", currentVersion)
+				.isMoreMature(new ProjectVersion("project", storedVersion));
 	}
 
-	private int beginIndex(int httpIndex, int httpsIndex) {
+	private int beginIndex(int httpIndex, String httpSubstring, int httpsIndex,
+			String httpsSubstring) {
 		if (httpIndex != -1) {
-			return httpIndex + HTTP_SC_STATIC_URL.length();
+			return httpIndex + httpSubstring.length();
 		}
-		return httpsIndex + HTTPS_SC_STATIC_URL.length();
+		return httpsIndex + httpsSubstring.length();
 	}
 
 	private String branchToReleaseVersion(String springCloudReleaseBranch) {
@@ -137,19 +221,16 @@ class SpringCloudCustomProjectDocumentationUpdater
 		return springCloudReleaseBranch;
 	}
 
-	private File pushCommitedChanges(String currentReleaseTrainVersion,
-			File documentationProject, File indexHtml, String indexHtmlText,
-			String storedReleaseTrain) throws IOException {
+	private File commitChanges(String currentVersion, File documentationProject,
+			File indexHtml, String indexHtmlText, String storedReleaseTrain)
+			throws IOException {
 		String replacedIndexHtml = indexHtmlText.replace(storedReleaseTrain,
-				currentReleaseTrainVersion);
+				currentVersion);
 		Files.write(indexHtml.toPath(), replacedIndexHtml.getBytes());
-		log.info("Stored the release train [{}] in [{}]", currentReleaseTrainVersion,
+		log.info("Stored the version URL [{}] in [{}]", currentVersion,
 				indexHtml.getAbsolutePath());
 		this.gitHandler.commit(documentationProject,
-				"Updating the link to the current version to ["
-						+ currentReleaseTrainVersion + "]");
-		this.gitHandler.pushCurrentBranch(documentationProject);
-		log.info("Committed and pushed changes to the documentation project");
+				"Updating the link to the current version to [" + currentVersion + "]");
 		return documentationProject;
 	}
 

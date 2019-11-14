@@ -19,6 +19,7 @@ package org.springframework.cloud.release.internal.docs;
 import java.io.File;
 
 import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 
 /**
  * @author Marcin Grzejszczak
@@ -37,7 +38,7 @@ public interface CustomProjectDocumentationUpdater {
 
 		@Override
 		public File updateDocsRepo(File clonedDocumentationProject,
-				ProjectVersion currentProject, String bomBranch) {
+				ProjectVersion currentProject, Projects projects, String bomBranch) {
 			return clonedDocumentationProject;
 		}
 	};
@@ -58,11 +59,12 @@ public interface CustomProjectDocumentationUpdater {
 	 * Updates the documentation repository.
 	 * @param clonedDocumentationProject path to the cloned documentation project
 	 * @param currentProject project to update the docs repo for
+	 * @param projects list of projects to update versions for
 	 * @param bomBranch the bom project branch
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
 	File updateDocsRepo(File clonedDocumentationProject, ProjectVersion currentProject,
-			String bomBranch);
+			Projects projects, String bomBranch);
 
 }

@@ -26,6 +26,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 
 /**
  * @author Marcin Grzejszczak
@@ -49,7 +50,8 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		this.updaters = updaters;
 	}
 
-	public File updateDocsRepo(ProjectVersion currentProject, String bomBranch) {
+	public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
+			String bomBranch) {
 		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
 			log.info(
 					"Will not update documentation repository, since the switch to do so "
@@ -67,7 +69,8 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		CustomProjectDocumentationUpdater updater = this.updaters.stream().filter(
 				u -> u.isApplicable(documentationProject, currentProject, bomBranch))
 				.findFirst().orElse(CustomProjectDocumentationUpdater.NO_OP);
-		return updater.updateDocsRepo(documentationProject, currentProject, bomBranch);
+		return updater.updateDocsRepo(documentationProject, currentProject, projects,
+				bomBranch);
 	}
 
 	@Override

@@ -1017,7 +1017,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Command to be executed to deploy a built project.
 		 */
-		private String deployCommand = "./gradlew clean build publish --console=plain {{systemProps}}";
+		private String deployCommand = "./gradlew publish --console=plain {{systemProps}}";
 
 		/**
 		 * Command to be executed to build and deploy guides project only.

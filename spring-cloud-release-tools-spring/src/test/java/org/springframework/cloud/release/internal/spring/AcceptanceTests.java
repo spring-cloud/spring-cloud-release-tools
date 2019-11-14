@@ -56,6 +56,7 @@ import org.springframework.cloud.release.internal.buildsystem.TestPomReader;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.docs.TestDocumentationUpdater;
+import org.springframework.cloud.release.internal.docs.TestReleaseContentsUpdater;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
@@ -92,8 +93,6 @@ public class AcceptanceTests {
 	File temporaryFolder;
 
 	File documentationFolder;
-
-	File cloudProjectFolder;
 
 	TestProjectGitHubHandler gitHandler;
 
@@ -461,7 +460,8 @@ public class AcceptanceTests {
 
 	private void thenDocumentationWasUpdated() {
 		BDDMockito.then(this.documentationUpdater).should().updateDocsRepo(
-				BDDMockito.any(ProjectVersion.class), BDDMockito.anyString());
+				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class),
+				BDDMockito.anyString());
 	}
 
 	private void thenDocumentationWasNotUpdated() {
@@ -791,15 +791,17 @@ public class AcceptanceTests {
 		GradleUpdater gradleUpdater = new GradleUpdater(properties);
 		SaganUpdater saganUpdater = new SaganUpdater(this.saganClient,
 				this.releaserProperties);
+		TestReleaseContentsUpdater testReleaseContentsUpdater = new TestReleaseContentsUpdater(properties, gitHandler,
+				templateGenerator);
 		DocumentationUpdater documentationUpdater = new TestDocumentationUpdater(
 				properties,
 				SpringCloudDocsAccessor.testUpdater(gitHandler, "Brixton.SR1"),
-				gitHandler, new TestDocumentationUpdater.TestReleaseContentsUpdater(
-						properties, gitHandler, templateGenerator)) {
+				gitHandler, testReleaseContentsUpdater) {
 			@Override
-			public File updateDocsRepo(ProjectVersion currentProject,
+			public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
 					String bomReleaseBranch) {
-				File file = super.updateDocsRepo(currentProject, bomReleaseBranch);
+				File file = super.updateDocsRepo(projects, currentProject,
+						bomReleaseBranch);
 				AcceptanceTests.this.documentationFolder = file;
 				return file;
 			}
@@ -830,20 +832,12 @@ public class AcceptanceTests {
 				.spy(new TestDocumentationUpdater(properties,
 						SpringCloudDocsAccessor.testUpdater(nonAssertingGitHandler,
 								"Brixton.SR1"),
-						nonAssertingGitHandler,
-						new TestDocumentationUpdater.TestReleaseContentsUpdater(
-								properties, nonAssertingGitHandler, templateGenerator) {
-							@Override
-							public File updateProjectRepo(Projects projects) {
-								File file = super.updateProjectRepo(projects);
-								AcceptanceTests.this.cloudProjectFolder = file;
-								return file;
-							}
-						}) {
+						nonAssertingGitHandler, new TestReleaseContentsUpdater(properties,
+								nonAssertingGitHandler, templateGenerator)) {
 					@Override
-					public File updateDocsRepo(ProjectVersion currentProject,
-							String bomReleaseBranch) {
-						File file = super.updateDocsRepo(currentProject,
+					public File updateDocsRepo(Projects projects,
+							ProjectVersion currentProject, String bomReleaseBranch) {
+						File file = super.updateDocsRepo(projects, currentProject,
 								bomReleaseBranch);
 						AcceptanceTests.this.documentationFolder = file;
 						return file;
