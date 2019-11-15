@@ -162,6 +162,29 @@ public class ProjectGitHandlerTests {
 	}
 
 	@Test
+	public void should_check_out_a_branch_if_it_exists_when_cloning_from_org_and_its_a_release_train_version_with_a_dash() {
+		this.properties.getFixedVersions().put("spring-cloud-release", "Finchley-SR6");
+		given(this.gitRepo.hasBranch(anyString())).willReturn(false);
+		given(this.gitRepo.hasBranch("Finchley")).willReturn(true);
+
+		this.updater.cloneProjectFromOrg("spring-cloud-release");
+
+		then(this.gitRepo).should().checkout("Finchley");
+	}
+
+	@Test
+	public void should_check_out_a_branch_if_it_exists_when_cloning_from_org_and_its_a_release_train_version_with_at_least_one_dash() {
+		this.properties.getFixedVersions().put("spring-cloud-release",
+				"Finchley-BUILD-SNAPSHOT");
+		given(this.gitRepo.hasBranch(anyString())).willReturn(false);
+		given(this.gitRepo.hasBranch("Finchley")).willReturn(true);
+
+		this.updater.cloneProjectFromOrg("spring-cloud-release");
+
+		then(this.gitRepo).should().checkout("Finchley");
+	}
+
+	@Test
 	public void should_not_check_out_a_branch_if_it_does_not_exist_when_cloning_and_guessing_branch() {
 		given(this.gitRepo.hasBranch(anyString())).willReturn(true);
 		given(this.gitRepo.hasBranch("2.3.x")).willReturn(false);

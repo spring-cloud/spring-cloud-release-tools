@@ -233,8 +233,13 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	// exists. If not, then we will assume that `master` contains it
 	private String branchFromVersion(String version) {
 		// 2.3.4.RELEASE -> 2.3.4
+		// 2.3.4-RELEASE -> 2.3.4
 		// Camden.RELEASE -> Camden
-		String versionTillPatch = version.substring(0, version.lastIndexOf("."));
+		// Camden-SR -> Camden
+		int indexOfDot = version.lastIndexOf(".");
+		int indexOfDash = version.indexOf("-");
+		int indexToPick = indexOfDot > 0 ? indexOfDot : indexOfDash;
+		String versionTillPatch = version.substring(0, indexToPick);
 		// 2.3.4 -> [2,3,4]
 		// Camden -> [Camden]
 		String[] splitVersion = versionTillPatch.split("\\.");
