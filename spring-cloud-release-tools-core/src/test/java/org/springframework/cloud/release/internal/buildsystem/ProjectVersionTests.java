@@ -353,6 +353,115 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_compare_builds_in_terms_of_maturity_for_projects() {
+		String thisVersion = "1.3.2.RELEASE";
+
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("1.3.1.BUILD-SNAPSHOT"))).isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1.M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1.RC1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1.RELEASE")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("1.3.3.BUILD-SNAPSHOT"))).isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3.M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3.RC1")))
+				.isTrue();
+	}
+
+	@Test
+	public void should_compare_builds_in_terms_of_maturity_for_trains() {
+		String thisVersion = "Hoxton.SR1";
+
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("Hoxton.BUILD-SNAPSHOT"))).isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RC1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RELEASE")))
+				.isTrue();
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("Iexample.BUILD-SNAPSHOT"))).isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RC1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.SR1")))
+				.isFalse();
+
+		thisVersion = "Hoxton.BUILD-SNAPSHOT";
+
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("Hoxton.BUILD-SNAPSHOT"))).isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.M1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RC1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("Iexample.BUILD-SNAPSHOT"))).isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.M1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RC1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.SR1")))
+				.isFalse();
+
+		thisVersion = "1.0.1.RELEASE";
+
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("1.0.1.BUILD-SNAPSHOT"))).isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RC1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("1.0.2.BUILD-SNAPSHOT"))).isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RC1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.SR1")))
+				.isFalse();
+
+		thisVersion = "1.0.1.BUILD-SNAPSHOT";
+
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("1.0.1.BUILD-SNAPSHOT"))).isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.M1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RC1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion)
+				.isMoreMature(projectVersion("1.0.2.BUILD-SNAPSHOT"))).isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.M1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RC1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RELEASE")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.SR1")))
+				.isFalse();
+	}
+
+	@Test
 	public void should_return_empty_group_id_when_it_is_missing() {
 		ProjectVersion projectVersion = projectVersion("1.0.0.RC1");
 

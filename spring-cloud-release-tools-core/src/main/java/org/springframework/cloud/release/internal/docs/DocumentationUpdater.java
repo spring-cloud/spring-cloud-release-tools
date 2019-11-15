@@ -58,27 +58,16 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	/**
 	 * Updates the documentation repository if current release train version is greater or
 	 * equal than the one stored in the repo.
+	 * @param projects list of projects with updated versions
 	 * @param currentProject the project we're parsing
 	 * @param bomReleaseBranch branch of the BOM
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	public File updateDocsRepo(ProjectVersion currentProject, String bomReleaseBranch) {
-		return this.projectDocumentationUpdater.updateDocsRepo(currentProject,
+	public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
+			String bomReleaseBranch) {
+		return this.projectDocumentationUpdater.updateDocsRepo(projects, currentProject,
 				bomReleaseBranch);
-	}
-
-	/**
-	 * Updates the project page if current release train version is greater or equal than
-	 * the one stored in the repo.
-	 * @param projects list of projects to update versions for
-	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
-	 * used or the switch is turned off
-	 * @deprecated - index.html doesn't look like this anymore
-	 */
-	@Deprecated
-	public File updateProjectRepo(Projects projects) {
-		return this.releaseTrainContentsUpdater.updateProjectRepo(projects);
 	}
 
 	/**

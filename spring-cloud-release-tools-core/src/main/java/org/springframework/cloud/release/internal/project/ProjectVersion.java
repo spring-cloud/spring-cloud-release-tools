@@ -70,11 +70,14 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 
 	private final String artifactId;
 
+	private final ReleaseType releaseType;
+
 	public ProjectVersion(String projectName, String version) {
 		this.projectName = projectName;
 		this.version = version;
 		this.groupId = "";
 		this.artifactId = "";
+		this.releaseType = toReleaseType();
 	}
 
 	public ProjectVersion(File project) {
@@ -105,6 +108,7 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 				this.artifactId = projectVersion.artifactId;
 			}
 		}
+		this.releaseType = toReleaseType();
 	}
 
 	public static ProjectVersion notMavenProject(File file) {
@@ -271,12 +275,57 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 		return this.version != null && this.version.contains("RELEASE");
 	}
 
+	public boolean isReleaseTrain() {
+		SplitVersion splitVersion = assertVersion();
+		return splitVersion.isReleaseTrain();
+	}
+
 	public boolean isReleaseOrServiceRelease() {
 		return isRelease() || isServiceRelease();
 	}
 
 	public boolean isServiceRelease() {
 		return this.version != null && this.version.matches(".*.SR[0-9]+");
+	}
+
+	private ReleaseType toReleaseType() {
+		if (isMilestone()) {
+			return ReleaseType.M;
+		}
+		else if (isRc()) {
+			return ReleaseType.RC;
+		}
+		else if (isRelease()) {
+			return ReleaseType.RELEASE;
+		}
+		else if (isServiceRelease()) {
+			return ReleaseType.SR;
+		}
+		return ReleaseType.SNAPSHOT;
+	}
+
+	/*
+	 * E.g. 1.0.1.RELEASE is more mature than 1.0.2.RC2
+	 */
+	public boolean isMoreMature(ProjectVersion that) {
+		SplitVersion thisSplit = assertVersion();
+		SplitVersion thatSplit = that.assertVersion();
+		int releaseTypeComparison = this.releaseType.compareTo(that.releaseType);
+		boolean thisReleaseTypeHigher = releaseTypeComparison > 0;
+		boolean bothGa = this.isReleaseOrServiceRelease()
+				&& that.isReleaseOrServiceRelease();
+		// 1.0.1.M2 vs 1.0.0.RELEASE (x)
+		if (thisReleaseTypeHigher && !bothGa) {
+			return true;
+		}
+		int versionComparison = thisSplit.gav().compareTo(thatSplit.gav());
+		if (versionComparison == 0) {
+			// 1.0.0.SR1 vs 1.0.1.RELEASE (x)
+			// Finchley.RELEASE vs Finchley.SR1 (x)
+			return thisReleaseTypeHigher;
+		}
+		// 1.0.0.SR1 vs 1.0.1.RELEASE (x)
+		return versionComparison > 0;
 	}
 
 	public boolean isSameMinor(String version) {
@@ -467,6 +516,15 @@ public class ProjectVersion implements Comparable<ProjectVersion> {
 					delimiter, suffix);
 		}
 
+		private String gav() {
+			// Finchley
+			if (StringUtils.isEmpty(minor)) {
+				return String.format("%s", major);
+			}
+			// 1.0.1
+			return String.format("%s.%s.%s", major, minor, patch);
+		}
+
 		private String print() {
 			// Finchley.SR2
 			if (StringUtils.isEmpty(minor)) {
@@ -538,5 +596,11 @@ class TrainVersionNumber implements Comparable<TrainVersionNumber> {
 		Integer thatNumber = Integer.valueOf(thatVersion);
 		return thisNumber.compareTo(thatNumber);
 	}
+
+}
+
+enum ReleaseType {
+
+	SNAPSHOT, M, RC, RELEASE, SR
 
 }

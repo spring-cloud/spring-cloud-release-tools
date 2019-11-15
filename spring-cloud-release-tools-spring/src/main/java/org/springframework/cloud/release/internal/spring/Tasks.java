@@ -83,14 +83,9 @@ final class Tasks {
 	static Task UPDATE_DOCUMENTATION = task("updateDocumentation", "ud",
 			"UPDATE DOCUMENTATION", "Updating documentation repository", args -> {
 				args.releaser.updateDocumentationRepository(args.properties,
-						args.versionFromScRelease);
+						args.projects, args.versionFromScRelease);
 			}, TaskType.POST_RELEASE);
 
-	@Deprecated
-	static Task UPDATE_SPRING_PROJECT_PAGE = task("updateSpringProjectPage", "up",
-			"UPDATE SPRING PROJECT PAGE", "Updating Spring Project page", args -> {
-				args.releaser.updateSpringProjectPage(args.projects);
-			}, TaskType.POST_RELEASE);
 	static Task RUN_UPDATED_SAMPLES = task("runUpdatedSample", "ru",
 			"UPDATE AND RUN SAMPLES",
 			"Updates the sample project with versions and runs samples", args -> {

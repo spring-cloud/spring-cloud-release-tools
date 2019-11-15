@@ -359,21 +359,11 @@ public class Releaser implements ReleaserPropertiesAware {
 	}
 
 	public void updateDocumentationRepository(ReleaserProperties properties,
-			ProjectVersion releaseVersion) {
+			Projects projects, ProjectVersion releaseVersion) {
 		String releaseBranch = properties.getPom().getBranch();
-		this.documentationUpdater.updateDocsRepo(releaseVersion, releaseBranch);
+		this.documentationUpdater.updateDocsRepo(projects, releaseVersion, releaseBranch);
 		log.info("\nSuccessfully updated documentation repository for branch [{}]",
 				releaseBranch);
-	}
-
-	@Deprecated
-	public void updateSpringProjectPage(Projects projects) {
-		if (this.documentationUpdater.updateProjectRepo(projects) != null) {
-			log.info("\nSuccessfully updated Spring project page");
-		}
-		else {
-			throw new MakeBuildUnstableException("Failed to update Spring Project page");
-		}
 	}
 
 	public void runUpdatedSamples(Projects projects) {
