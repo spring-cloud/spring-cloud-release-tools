@@ -293,7 +293,7 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 		String lastArg = String.join(" ", commands);
 		String[] commandsWithBash = commandToExecute(lastArg);
 		log.info(
-				"Will run the command {}", commandsWithBash);
+				"Will run the command [{}]", Arrays.toString(commandsWithBash));
 		return new ProcessBuilder(commandsWithBash).directory(new File(workingDir))
 				.inheritIO();
 	}
