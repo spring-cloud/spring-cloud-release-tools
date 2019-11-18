@@ -256,8 +256,8 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 		try {
 			String workingDir = this.workingDir;
 			log.info(
-					"Will run the command from [{}] via {} and wait for result for [{}] minutes",
-					workingDir, commands, waitTimeInMinutes);
+					"Will run the command from [{}] and wait for result for [{}] minutes",
+					workingDir, waitTimeInMinutes);
 			ProcessBuilder builder = builder(commands, workingDir);
 			Process process = startProcess(builder);
 			boolean finished = process.waitFor(waitTimeInMinutes, TimeUnit.MINUTES);
@@ -292,6 +292,8 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 		// TODO: Improve this to not pass arrays in the first place
 		String lastArg = String.join(" ", commands);
 		String[] commandsWithBash = commandToExecute(lastArg);
+		log.info(
+				"Will run the command {}", commandsWithBash);
 		return new ProcessBuilder(commandsWithBash).directory(new File(workingDir))
 				.inheritIO();
 	}
