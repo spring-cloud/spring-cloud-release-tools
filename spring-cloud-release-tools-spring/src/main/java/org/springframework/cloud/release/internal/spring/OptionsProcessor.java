@@ -275,9 +275,8 @@ class OptionsProcessor {
 
 	private Args args(Args defaultArgs, boolean interactive) {
 		return new Args(this.releaser, defaultArgs.project, defaultArgs.projects,
-				defaultArgs.originalVersion, defaultArgs.versionFromScRelease,
-				this.properties, interactive, defaultArgs.taskType,
-				this.applicationEventPublisher);
+				defaultArgs.originalVersion, defaultArgs.versionFromBom, this.properties,
+				interactive, defaultArgs.taskType, this.applicationEventPublisher);
 	}
 
 	String chosenOption() {

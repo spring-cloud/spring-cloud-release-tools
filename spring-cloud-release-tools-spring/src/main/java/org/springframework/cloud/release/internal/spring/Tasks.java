@@ -36,54 +36,52 @@ final class Tasks {
 	static Task UPDATING_POMS = task("updatePoms", "u", "UPDATING VERSIONS",
 			"Update versions from the BOM",
 			args -> args.releaser.updateProjectFromBom(args.project, args.projects,
-					args.versionFromScRelease));
+					args.versionFromBom));
 	static Task BUILD_PROJECT = task("build", "b", "BUILD PROJECT", "Build the project",
-			args -> args.releaser.buildProject(args.versionFromScRelease));
+			args -> args.releaser.buildProject(args.versionFromBom));
 	static Task COMMIT = task("commit", "c",
 			"COMMITTING (ALL) AND PUSHING TAGS (NON-SNAPSHOTS)",
-			"Commit, tag and push the tag", args -> args.releaser
-					.commitAndPushTags(args.project, args.versionFromScRelease));
+			"Commit, tag and push the tag",
+			args -> args.releaser.commitAndPushTags(args.project, args.versionFromBom));
 	static Task DEPLOY = task("deploy", "d", "ARTIFACT DEPLOYMENT",
-			"Deploy the artifacts",
-			args -> args.releaser.deploy(args.versionFromScRelease));
+			"Deploy the artifacts", args -> args.releaser.deploy(args.versionFromBom));
 	static Task PUBLISH_DOCS = task("docs", "o", "PUBLISHING DOCS", "Publish the docs",
-			args -> args.releaser.publishDocs(args.versionFromScRelease));
+			args -> args.releaser.publishDocs(args.versionFromBom));
 	static Task SNAPSHOTS = task("snapshots", "s",
 			"REVERTING CHANGES & BUMPING VERSION (RELEASE ONLY)",
 			"Go back to snapshots and bump originalVersion by patch",
 			args -> args.releaser.rollbackReleaseVersion(args.project, args.projects,
-					args.versionFromScRelease));
+					args.versionFromBom));
 	static Task PUSH = task("push", "p", "PUSHING CHANGES", "Push the commits",
 			args -> args.releaser.pushCurrentBranch(args.project));
 	static Task CLOSE_MILESTONE = task("closeMilestone", "m", "CLOSING MILESTONE",
 			"Close the milestone at Github",
-			args -> args.releaser.closeMilestone(args.versionFromScRelease));
+			args -> args.releaser.closeMilestone(args.versionFromBom));
 	static Task CREATE_TEMPLATES = task("createTemplates", "t", "CREATING TEMPLATES",
 			"Create email / blog / tweet etc. templates", args -> {
-				args.releaser.createEmail(args.versionFromScRelease, args.projects);
-				args.releaser.createBlog(args.versionFromScRelease, args.projects);
-				args.releaser.createTweet(args.versionFromScRelease, args.projects);
-				args.releaser.createReleaseNotes(args.versionFromScRelease,
-						args.projects);
+				args.releaser.createEmail(args.versionFromBom, args.projects);
+				args.releaser.createBlog(args.versionFromBom, args.projects);
+				args.releaser.createTweet(args.versionFromBom, args.projects);
+				args.releaser.createReleaseNotes(args.versionFromBom, args.projects);
 			}, TaskType.POST_RELEASE);
 	static Task UPDATE_GUIDES = task("updateGuides", "ug", "UPDATE GUIDES",
 			"Updating Spring Guides", args -> {
-				args.releaser.updateSpringGuides(args.versionFromScRelease, args.projects,
+				args.releaser.updateSpringGuides(args.versionFromBom, args.projects,
 						args.processedProjects);
 			}, TaskType.POST_RELEASE);
 	static Task UPDATE_START_SPRING_IO = task("updateStartSpringIo", "us",
 			"UPDATE START.SPRING.IO", "Updating start.spring.io", args -> {
-				args.releaser.updateStartSpringIo(args.versionFromScRelease,
-						args.projects);
+				args.releaser.updateStartSpringIo(args.versionFromBom, args.projects);
 			}, TaskType.POST_RELEASE);
 	static Task UPDATE_SAGAN = task("updateSagan", "g", "UPDATE SAGAN",
 			"Updating Sagan with release info", args -> {
-				args.releaser.updateSagan(args.project, args.versionFromScRelease);
+				args.releaser.updateSagan(args.project, args.versionFromBom,
+						args.projects);
 			});
 	static Task UPDATE_DOCUMENTATION = task("updateDocumentation", "ud",
 			"UPDATE DOCUMENTATION", "Updating documentation repository", args -> {
 				args.releaser.updateDocumentationRepository(args.properties,
-						args.projects, args.versionFromScRelease);
+						args.projects, args.versionFromBom);
 			}, TaskType.POST_RELEASE);
 
 	static Task RUN_UPDATED_SAMPLES = task("runUpdatedSample", "ru",

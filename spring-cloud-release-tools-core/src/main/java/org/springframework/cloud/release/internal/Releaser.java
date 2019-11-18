@@ -345,12 +345,13 @@ public class Releaser implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void updateSagan(File project, ProjectVersion releaseVersion) {
+	public void updateSagan(File project, ProjectVersion releaseVersion,
+			Projects projects) {
 		String currentBranch = this.projectGitHandler.currentBranch(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		try {
 			this.saganUpdater.updateSagan(project, currentBranch, originalVersion,
-					releaseVersion);
+					releaseVersion, projects);
 			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 		}
 		catch (Exception ex) {

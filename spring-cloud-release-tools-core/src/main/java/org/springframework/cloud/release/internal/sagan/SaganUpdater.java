@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.util.StringUtils;
 
 /**
@@ -48,14 +49,16 @@ public class SaganUpdater {
 	}
 
 	public void updateSagan(File projectFile, String branch,
-			ProjectVersion originalVersion, ProjectVersion currentVersion) {
+			ProjectVersion originalVersion, ProjectVersion currentVersion,
+			Projects projects) {
 		if (!this.releaserProperties.getSagan().isUpdateSagan()) {
 			log.info("Will not update sagan, since the switch to do so "
 					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
 			return;
 		}
-		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion);
-		updateSaganForNonSnapshot(branch, originalVersion, currentVersion);
+		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion,
+				projects);
+		updateSaganForNonSnapshot(branch, originalVersion, currentVersion, projects);
 		log.info("Updating Sagan releases with \n\n{}", update);
 		Project project = this.saganClient.updateRelease(currentVersion.projectName,
 				Collections.singletonList(update));
@@ -142,7 +145,7 @@ public class SaganUpdater {
 	}
 
 	private void updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion,
-			ProjectVersion version) {
+			ProjectVersion version, Projects projects) {
 		if (!version.isSnapshot()) {
 			log.info(
 					"Version is non snapshot [{}]. Will remove all older versions and mark this as current",
@@ -156,7 +159,8 @@ public class SaganUpdater {
 			if (version.isRelease() || version.isServiceRelease()) {
 				String bumpedSnapshot = toSnapshot(version.bumpedVersion());
 				ReleaseUpdate snapshotUpdate = releaseUpdate(branch, originalVersion,
-						new ProjectVersion(version.projectName, bumpedSnapshot));
+						new ProjectVersion(version.projectName, bumpedSnapshot),
+						projects);
 				log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
 				this.saganClient.updateRelease(version.projectName,
 						Collections.singletonList(snapshotUpdate));
@@ -183,13 +187,13 @@ public class SaganUpdater {
 	}
 
 	private ReleaseUpdate releaseUpdate(String branch, ProjectVersion originalVersion,
-			ProjectVersion version) {
+			ProjectVersion version, Projects projects) {
 		ReleaseUpdate update = new ReleaseUpdate();
 		update.groupId = originalVersion.groupId();
 		update.artifactId = version.projectName;
 		update.version = version.version;
 		update.releaseStatus = version(version);
-		update.apiDocUrl = referenceUrl(branch, version);
+		update.apiDocUrl = referenceUrl(branch, version, projects);
 		update.refDocUrl = update.apiDocUrl;
 		update.current = true;
 		return update;
@@ -218,7 +222,30 @@ public class SaganUpdater {
 		return "";
 	}
 
-	private String referenceUrl(String branch, ProjectVersion version) {
+	private String releaseTrainVersion(Projects projects) {
+		String releaseTrainProjectName = this.releaserProperties.getMetaRelease()
+				.getReleaseTrainProjectName();
+		return projects.containsProject(releaseTrainProjectName)
+				? projects.forName(releaseTrainProjectName).version : "";
+	}
+
+	private String referenceUrl(String branch, ProjectVersion version,
+			Projects projects) {
+		String releaseTrainVersion = releaseTrainVersion(projects);
+		// up till Greenwich we have a different URL for docs
+		// if there's no release train, will assume that 2.2.x is the version that has the
+		// new docs
+		boolean hasReleaseTrainVersion = StringUtils.hasText(releaseTrainVersion);
+		boolean newDocs = hasReleaseTrainVersion
+				? releaseTrainVersion.toLowerCase().charAt(0) > 'g'
+				: version.version.compareTo("2.2") > 0;
+		if (newDocs) {
+			return newReferenceUrl(branch, version);
+		}
+		return oldReferenceUrl(branch, version);
+	}
+
+	private String newReferenceUrl(String branch, ProjectVersion version) {
 		if (!version.isSnapshot()) {
 			// static/sleuth/{version}/
 			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName
@@ -231,6 +258,21 @@ public class SaganUpdater {
 		// sleuth/1.1.x/
 		return "https://cloud.spring.io/" + version.projectName + "/" + branch
 				+ "/reference/html/";
+	}
+
+	private String oldReferenceUrl(String branch, ProjectVersion version) {
+		if (!version.isSnapshot()) {
+			// static/sleuth/{version}/
+			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName
+					+ "/{version}/";
+		}
+		if (branch.toLowerCase().contains("master")) {
+			// sleuth/
+			return "https://cloud.spring.io/" + version.projectName + "/"
+					+ version.projectName + ".html";
+		}
+		// sleuth/1.1.x/
+		return "https://cloud.spring.io/" + version.projectName + "/" + branch + "/";
 	}
 
 }

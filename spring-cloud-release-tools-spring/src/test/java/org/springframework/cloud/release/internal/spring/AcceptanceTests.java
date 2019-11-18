@@ -345,7 +345,7 @@ public class AcceptanceTests {
 		BDDMockito.then(this.saganUpdater).should(BDDMockito.atLeastOnce()).updateSagan(
 				BDDMockito.any(File.class), BDDMockito.anyString(),
 				BDDMockito.any(ProjectVersion.class),
-				BDDMockito.any(ProjectVersion.class));
+				BDDMockito.any(ProjectVersion.class), BDDMockito.any(Projects.class));
 	}
 
 	private void thenSaganWasNotCalled() {

@@ -46,7 +46,7 @@ class Args {
 
 	final ProjectVersion originalVersion;
 
-	final ProjectVersion versionFromScRelease;
+	final ProjectVersion versionFromBom;
 
 	final ReleaserProperties properties;
 
@@ -59,31 +59,31 @@ class Args {
 	final ApplicationEventPublisher applicationEventPublisher;
 
 	Args(Releaser releaser, File project, Projects projects,
-			ProjectVersion originalVersion, ProjectVersion versionFromScRelease,
+			ProjectVersion originalVersion, ProjectVersion versionFromBom,
 			ReleaserProperties properties, boolean interactive, TaskType taskType,
 			ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.project = project;
 		this.projects = projects;
 		this.originalVersion = originalVersion;
-		this.versionFromScRelease = versionFromScRelease;
+		this.versionFromBom = versionFromBom;
 		this.properties = properties;
 		this.processedProjects = Collections
-				.singletonList(new ProcessedProject(properties, versionFromScRelease));
+				.singletonList(new ProcessedProject(properties, versionFromBom));
 		this.interactive = interactive;
 		this.taskType = taskType;
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
 	// Used by meta-release task
-	Args(Releaser releaser, Projects projects, ProjectVersion versionFromScRelease,
+	Args(Releaser releaser, Projects projects, ProjectVersion versionFromBom,
 			ReleaserProperties properties, List<ProcessedProject> processedProjects,
 			boolean interactive, ApplicationEventPublisher applicationEventPublisher) {
 		this.releaser = releaser;
 		this.project = null;
 		this.projects = projects;
 		this.originalVersion = null;
-		this.versionFromScRelease = versionFromScRelease;
+		this.versionFromBom = versionFromBom;
 		this.properties = properties;
 		this.processedProjects = processedProjects;
 		this.interactive = interactive;
@@ -97,7 +97,7 @@ class Args {
 		this.project = null;
 		this.projects = null;
 		this.originalVersion = null;
-		this.versionFromScRelease = null;
+		this.versionFromBom = null;
 		this.properties = null;
 		this.processedProjects = Collections.emptyList();
 		this.interactive = false;
@@ -121,7 +121,7 @@ class Args {
 	public String toString() {
 		return "Args{" + "releaser=" + this.releaser + ", project=" + this.project
 				+ ", projects=" + this.projects + ", originalVersion="
-				+ this.originalVersion + ", versionFromBom=" + this.versionFromScRelease
+				+ this.originalVersion + ", versionFromBom=" + this.versionFromBom
 				+ ", properties=" + this.properties + ", interactive=" + this.interactive
 				+ ", taskType=" + this.taskType + '}';
 	}
