@@ -244,6 +244,8 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 
 class ProcessExecutor implements ReleaserPropertiesAware {
 
+	private static String[] OS_OPERATORS = { "|", "<", ">", "||", "&&" };
+
 	private static final Logger log = LoggerFactory.getLogger(ProcessExecutor.class);
 
 	private String workingDir;
@@ -289,12 +291,13 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 	}
 
 	ProcessBuilder builder(String[] commands, String workingDir) {
-		// TODO: Improve this to not pass arrays in the first place
+		String[] commandsToRun = commands;
 		String lastArg = String.join(" ", commands);
-		String[] commandsWithBash = commandToExecute(lastArg);
-		log.info(
-				"Will run the command [{}]", Arrays.toString(commandsWithBash));
-		return new ProcessBuilder(commandsWithBash).directory(new File(workingDir))
+		if (Arrays.stream(OS_OPERATORS).anyMatch(lastArg::contains)) {
+			commandsToRun = commandToExecute(lastArg);
+		}
+		log.info("Will run the command [{}]", Arrays.toString(commandsToRun));
+		return new ProcessBuilder(commandsToRun).directory(new File(workingDir))
 				.inheritIO();
 	}
 
