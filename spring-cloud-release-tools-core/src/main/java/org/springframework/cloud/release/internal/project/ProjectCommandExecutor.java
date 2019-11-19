@@ -52,6 +52,10 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 
 	private static final String VERSION_MUSTACHE = "{{version}}";
 
+	private static final String OLD_VERSION_MUSTACHE = "{{oldVersion}}";
+
+	private static final String NEXT_VERSION_MUSTACHE = "{{nextVersion}}";
+
 	private ReleaserProperties properties;
 
 	public ProjectCommandExecutor(ReleaserProperties properties) {
@@ -63,8 +67,9 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		this.properties = new ReleaserProperties();
 	}
 
-	public void build(ProjectVersion versionFromReleaseTrain) {
-		build(versionFromReleaseTrain, this.properties.getWorkingDir());
+	public void build(ProjectVersion originalVersion,
+			ProjectVersion versionFromReleaseTrain) {
+		build(originalVersion, versionFromReleaseTrain, this.properties.getWorkingDir());
 	}
 
 	public String version() {
@@ -93,10 +98,13 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void build(ProjectVersion versionFromReleaseTrain, String projectRoot) {
+	public void build(ProjectVersion originalVersion,
+			ProjectVersion versionFromReleaseTrain, String projectRoot) {
 		try {
-			String[] commands = new CommandPicker(this.properties, projectRoot)
-					.buildCommand(versionFromReleaseTrain).split(" ");
+			String command = new CommandPicker(this.properties, projectRoot)
+					.buildCommand(versionFromReleaseTrain);
+			String[] commands = replaceAllPlaceHolders(originalVersion,
+					versionFromReleaseTrain, command).split(" ");
 			runCommand(projectRoot, commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
 			log.info("No HTML files from docs contain unresolved tags");
@@ -134,19 +142,24 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void deploy(ProjectVersion version) {
-		doDeploy(new CommandPicker(properties, this.properties.getWorkingDir())
-				.deployCommand(version));
+	public void deploy(ProjectVersion originalVersion, ProjectVersion version) {
+		doDeploy(originalVersion, version,
+				new CommandPicker(properties, this.properties.getWorkingDir())
+						.deployCommand(version));
 	}
 
-	public void deployGuides(ProjectVersion version) {
-		doDeploy(new CommandPicker(properties, this.properties.getWorkingDir())
-				.deployGuidesCommand(version));
+	public void deployGuides(ProjectVersion originalVersion, ProjectVersion version) {
+		doDeploy(originalVersion, version,
+				new CommandPicker(properties, this.properties.getWorkingDir())
+						.deployGuidesCommand(version));
 	}
 
-	private void doDeploy(String command) {
+	private void doDeploy(ProjectVersion originalVersion, ProjectVersion changedVersion,
+			String command) {
 		try {
-			String[] commands = command.split(" ");
+			String replacedCommand = replaceAllPlaceHolders(originalVersion,
+					changedVersion, command);
+			String[] commands = replacedCommand.split(" ");
 			runCommand(commands);
 			log.info("The project has successfully been deployed");
 		}
@@ -170,10 +183,12 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		return new ProcessExecutor(workDir);
 	}
 
-	public void publishDocs(String version) {
+	public void publishDocs(ProjectVersion originalVersion,
+			ProjectVersion changedVersion) {
 		try {
 			for (String command : new CommandPicker(properties).publishDocsCommands()) {
-				command = command.replace(VERSION_MUSTACHE, version);
+				command = replaceAllPlaceHolders(originalVersion, changedVersion,
+						command);
 				String[] commands = command.split(" ");
 				runCommand(commands);
 			}
@@ -182,6 +197,13 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	private String replaceAllPlaceHolders(ProjectVersion originalVersion,
+			ProjectVersion changedVersion, String command) {
+		return command.replace(VERSION_MUSTACHE, changedVersion.version)
+				.replace(NEXT_VERSION_MUSTACHE, changedVersion.bumpedVersion())
+				.replace(OLD_VERSION_MUSTACHE, originalVersion.version);
 	}
 
 	/**

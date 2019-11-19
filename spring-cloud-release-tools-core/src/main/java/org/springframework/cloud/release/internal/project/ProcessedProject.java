@@ -37,24 +37,35 @@ public class ProcessedProject {
 	 */
 	public final ProjectVersion newProjectVersion;
 
+	/**
+	 * Version before updating.
+	 */
+	public final ProjectVersion originalProjectVersion;
+
 	public ProcessedProject(ReleaserProperties propertiesForProject,
-			ProjectVersion newProjectVersion) {
+			ProjectVersion newProjectVersion, ProjectVersion originalProjectVersion) {
 		this.propertiesForProject = propertiesForProject;
 		this.newProjectVersion = newProjectVersion;
+		this.originalProjectVersion = originalProjectVersion;
 	}
 
 	@Override
 	public String toString() {
-		return "ProcessedProject{" + "name=" + projectName() + ",version="
-				+ projectVersion() + '}';
+		return "ProcessedProject{" + "name=" + this.newProjectVersion.projectName
+				+ ",version=" + this.newProjectVersion.version + '}'
+				+ ",originalProjectVersion=" + this.originalProjectVersion + '}';
 	}
 
 	public String projectName() {
-		return this.newProjectVersion.projectName;
+		return this.newProjectVersion.version;
 	}
 
-	private String projectVersion() {
+	public String newVersion() {
 		return this.newProjectVersion.version;
+	}
+
+	public String originalVersion() {
+		return this.originalProjectVersion.version;
 	}
 
 }

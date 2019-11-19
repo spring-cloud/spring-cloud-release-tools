@@ -76,7 +76,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
@@ -90,7 +90,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(new File("/foo/bar").getAbsolutePath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
 				tmpFile("/builder/resolved").getPath());
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
@@ -105,7 +105,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.M1"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.M1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
@@ -118,7 +118,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.RC1"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.RC1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo")
 				.doesNotContain("-Pguides");
@@ -132,7 +132,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.RELEASE"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
@@ -145,7 +145,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.SR1"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.SR1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
@@ -159,7 +159,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=world -Dfoo=bar");
@@ -173,7 +173,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
@@ -187,7 +187,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("hello=world foo=bar");
@@ -202,7 +202,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=world -Dfoo=bar bar");
@@ -217,7 +217,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("bar -Dhello=world -Dfoo=bar");
@@ -230,10 +230,9 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(
-				() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-						.hasMessageContaining(
-								"contains a tag that wasn't resolved properly");
+		thenThrownBy(() -> builder.build(original(),
+				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
+						"contains a tag that wasn't resolved properly");
 	}
 
 	@Test
@@ -244,10 +243,9 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(
-				() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-						.hasMessageContaining(
-								"Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.build(original(),
+				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
+						"Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -257,7 +255,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("resolved.log");
@@ -271,7 +269,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.M1"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.M1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo")
 				.doesNotContain("-Pguides");
@@ -287,7 +285,7 @@ public class ProjectCommandExecutorTests {
 				.runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.M1"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.M1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("foo -Pmilestone").doesNotContain("-Pguides");
@@ -301,7 +299,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.RC1"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.RC1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo")
 				.doesNotContain("-Pguides");
@@ -317,7 +315,7 @@ public class ProjectCommandExecutorTests {
 				.runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.RC1"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.RC1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("foo -Pmilestone").doesNotContain("-Pguides");
@@ -331,7 +329,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.RELEASE"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
@@ -346,7 +344,7 @@ public class ProjectCommandExecutorTests {
 				.runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.RELEASE"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("foo -Pcentral");
@@ -360,7 +358,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.SR1"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.SR1"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
@@ -374,7 +372,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=hello-world");
@@ -389,7 +387,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.deploy(original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=hello-world");
@@ -403,16 +401,16 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(
-				() -> builder.deploy(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-						.hasMessageContaining(
-								"Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.deploy(original(),
+				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
+						"Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
 	public void should_successfully_execute_a_publish_docs_command() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash().setPublishDocsCommands(new String[] { "ls -al", "ls -al" });
+		properties.getBash().setPublishDocsCommands(new String[] { "ls -al",
+				"echo {{version}} {{oldVersion}} {{nextVersion}}" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor(properties) {
@@ -422,10 +420,10 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		builder.publishDocs("");
+		builder.publishDocs(original(), new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("resolved.log");
+				.contains("1.0.0.RELEASE 0.100.0.BUILD-SNAPSHOT 1.0.1.RELEASE");
 		then(executor.counter).isEqualTo(2);
 	}
 
@@ -445,7 +443,7 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		builder.publishDocs("");
+		builder.publishDocs(original(), new ProjectVersion("foo", "Finchley.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("-Dhello=world -Dfoo=bar 2");
@@ -467,7 +465,7 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		builder.publishDocs("1.1.0.RELEASE");
+		builder.publishDocs(original(), new ProjectVersion("foo", "1.1.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("1.1.0.RELEASE");
@@ -503,8 +501,9 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.publishDocs(""))
-				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.publishDocs(original(),
+				new ProjectVersion("foo", "1.0.0.RELEASE"))).hasMessageContaining(
+						"Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -524,10 +523,9 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		thenThrownBy(
-				() -> builder.build(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-						.hasMessageContaining(
-								"The process has exited with exit code [1]");
+		thenThrownBy(() -> builder.build(original(),
+				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
+						"The process has exited with exit code [1]");
 	}
 
 	private Process processWithInvalidExitCode() {
@@ -578,6 +576,10 @@ public class ProjectCommandExecutorTests {
 
 	private String asString(File file) throws IOException {
 		return new String(Files.readAllBytes(file.toPath()));
+	}
+
+	private ProjectVersion original() {
+		return new ProjectVersion("foo", "0.100.0.BUILD-SNAPSHOT");
 	}
 
 	class TestProcessExecutor extends ProcessExecutor {

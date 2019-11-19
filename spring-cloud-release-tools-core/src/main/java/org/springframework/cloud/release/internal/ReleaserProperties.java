@@ -746,18 +746,25 @@ public class ReleaserProperties implements Serializable {
 		public static final String PROFILE_PROPS_PLACEHOLDER = "{{profile}}";
 
 		/**
-		 * Command to be executed to build the project.
-		 */
+		 * Command to be executed to build the project. If present "{{version}}" will be
+		 * replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
+		 * version and "{{oldVersion}}" with the version before version updating.
+		 **/
 		private String buildCommand = "./mvnw clean install -B -Pdocs {{systemProps}}";
 
 		/**
-		 * Command to be executed to deploy a built project.
-		 */
+		 * Command to be executed to deploy a built project. If present "{{version}}" will
+		 * be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
+		 * version and "{{oldVersion}}" with the version before version updating.
+		 **/
 		private String deployCommand = "./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}";
 
 		/**
-		 * Command to be executed to build and deploy guides project only.
-		 */
+		 * Command to be executed to build and deploy guides project only. If present
+		 * "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with
+		 * the bumped snapshot version and "{{oldVersion}}" with the version before
+		 * version updating.
+		 **/
 		private String deployGuidesCommand = "./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}";
 
 		/**
@@ -865,23 +872,31 @@ public class ReleaserProperties implements Serializable {
 		public static final String SYSTEM_PROPS_PLACEHOLDER = "{{systemProps}}";
 
 		/**
-		 * Command to be executed to build the project.
+		 * Command to be executed to build the project. If present "{{version}}" will be
+		 * replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
+		 * version and "{{oldVersion}}" with the version before version updating.
 		 */
 		private String buildCommand = "echo \"{{systemProps}}\"";
 
 		/**
-		 * Command to be executed to deploy a built project.
+		 * Command to be executed to deploy a built project. If present "{{version}}" will
+		 * be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
+		 * version and "{{oldVersion}}" with the version before version updating.
 		 */
 		private String deployCommand = "echo \"{{systemProps}}\"";
 
 		/**
-		 * Command to be executed to build and deploy guides project only.
+		 * Command to be executed to build and deploy guides project only. If present
+		 * "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with
+		 * the bumped snapshot version and "{{oldVersion}}" with the version before
+		 * version updating.
 		 */
 		private String deployGuidesCommand = "echo \"{{systemProps}}\"";
 
 		/**
 		 * Command to be executed to publish documentation. If present "{{version}}" will
-		 * be replaced by the provided version.
+		 * be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
+		 * version and "{{oldVersion}}" with the version before version updating.
 		 */
 		private String[] publishDocsCommands = { "mkdir -p target",
 				"echo \"{{version}}\"" };
@@ -1010,19 +1025,21 @@ public class ReleaserProperties implements Serializable {
 				"^.*src/test/bats/.*$", "^.*samples/standalone/[a-z]+/.*$");
 
 		/**
-		 * Command to be executed to build the project.
-		 */
-		private String buildCommand = "./gradlew clean build publishToMavenLocal --console=plain {{systemProps}}";
+		 * Command to be executed to build the project If present "{{version}}" will be
+		 * replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
+		 * version and "{{oldVersion}}" with the version before version updating.
+		 **/
+		private String buildCommand = "./gradlew clean build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}";
 
 		/**
 		 * Command to be executed to deploy a built project.
 		 */
-		private String deployCommand = "./gradlew publish --console=plain {{systemProps}}";
+		private String deployCommand = "./gradlew publish --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}";
 
 		/**
 		 * Command to be executed to build and deploy guides project only.
 		 */
-		private String deployGuidesCommand = "./gradlew clean build deployGuides --console=plain {{systemProps}}";
+		private String deployGuidesCommand = "./gradlew clean build deployGuides --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}";
 
 		/**
 		 * Command to be executed to publish documentation. If present "{{version}}" will

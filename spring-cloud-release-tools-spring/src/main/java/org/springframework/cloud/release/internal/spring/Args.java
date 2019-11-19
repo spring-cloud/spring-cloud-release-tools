@@ -68,8 +68,8 @@ class Args {
 		this.originalVersion = originalVersion;
 		this.versionFromBom = versionFromBom;
 		this.properties = properties;
-		this.processedProjects = Collections
-				.singletonList(new ProcessedProject(properties, versionFromBom));
+		this.processedProjects = Collections.singletonList(
+				new ProcessedProject(properties, versionFromBom, originalVersion));
 		this.interactive = interactive;
 		this.taskType = taskType;
 		this.applicationEventPublisher = applicationEventPublisher;

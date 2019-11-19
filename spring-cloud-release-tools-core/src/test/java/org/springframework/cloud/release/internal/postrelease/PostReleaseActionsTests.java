@@ -333,13 +333,13 @@ public class PostReleaseActionsTests {
 		ProjectVersion projectVersion = new ProjectVersion(
 				new File(projects, "spring-cloud-release"));
 
-		actions.deployGuides(Collections
-				.singletonList(new ProcessedProject(this.properties, projectVersion)));
+		actions.deployGuides(Collections.singletonList(
+				new ProcessedProject(this.properties, projectVersion, projectVersion)));
 
 		Awaitility.await().untilAsserted(() -> {
 			BDDAssertions.then(projectBuilderStub.get()).isNotNull();
 			BDDMockito.then(projectBuilderStub.get()).should()
-					.deployGuides(projectVersion);
+					.deployGuides(projectVersion, projectVersion);
 		});
 	}
 

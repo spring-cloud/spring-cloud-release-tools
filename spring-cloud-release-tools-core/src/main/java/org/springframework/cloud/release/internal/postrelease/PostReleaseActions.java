@@ -117,7 +117,8 @@ public class PostReleaseActions implements Closeable {
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion,
 				releaseTrainVersion);
 		updateWithVersions(file, newProjects);
-		this.projectCommandExecutor.build(projectVersion, file.getAbsolutePath());
+		this.projectCommandExecutor.build(projectVersion, projectVersion,
+				file.getAbsolutePath());
 	}
 
 	/**
@@ -171,8 +172,9 @@ public class PostReleaseActions implements Closeable {
 							File clonedProject = this.projectGitHandler
 									.cloneProjectFromOrg(processedProject.projectName());
 							this.projectGitHandler.checkout(clonedProject, tagName);
-							projectBuilder(processedProject)
-									.deployGuides(processedProject.newProjectVersion);
+							projectBuilder(processedProject).deployGuides(
+									processedProject.originalProjectVersion,
+									processedProject.newProjectVersion);
 						})))
 				.map(this::getSingleResult).collect(Collectors.toList());
 	}

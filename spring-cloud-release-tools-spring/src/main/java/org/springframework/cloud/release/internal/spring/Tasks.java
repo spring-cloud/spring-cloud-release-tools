@@ -38,15 +38,17 @@ final class Tasks {
 			args -> args.releaser.updateProjectFromBom(args.project, args.projects,
 					args.versionFromBom));
 	static Task BUILD_PROJECT = task("build", "b", "BUILD PROJECT", "Build the project",
-			args -> args.releaser.buildProject(args.versionFromBom));
+			args -> args.releaser.buildProject(args.originalVersion,
+					args.versionFromBom));
 	static Task COMMIT = task("commit", "c",
 			"COMMITTING (ALL) AND PUSHING TAGS (NON-SNAPSHOTS)",
 			"Commit, tag and push the tag",
 			args -> args.releaser.commitAndPushTags(args.project, args.versionFromBom));
 	static Task DEPLOY = task("deploy", "d", "ARTIFACT DEPLOYMENT",
-			"Deploy the artifacts", args -> args.releaser.deploy(args.versionFromBom));
+			"Deploy the artifacts",
+			args -> args.releaser.deploy(args.originalVersion, args.versionFromBom));
 	static Task PUBLISH_DOCS = task("docs", "o", "PUBLISHING DOCS", "Publish the docs",
-			args -> args.releaser.publishDocs(args.versionFromBom));
+			args -> args.releaser.publishDocs(args.originalVersion, args.versionFromBom));
 	static Task SNAPSHOTS = task("snapshots", "s",
 			"REVERTING CHANGES & BUMPING VERSION (RELEASE ONLY)",
 			"Go back to snapshots and bump originalVersion by patch",

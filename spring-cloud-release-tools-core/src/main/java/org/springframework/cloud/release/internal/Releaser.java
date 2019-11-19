@@ -101,23 +101,24 @@ public class Releaser implements ReleaserPropertiesAware {
 	}
 
 	public void updateProjectFromBom(File project, Projects versions,
-			ProjectVersion versionFromScRelease) {
-		updateProjectFromBom(project, versions, versionFromScRelease, ASSERT_SNAPSHOTS);
+			ProjectVersion versionFromBom) {
+		updateProjectFromBom(project, versions, versionFromBom, ASSERT_SNAPSHOTS);
 	}
 
 	private void updateProjectFromBom(File project, Projects versions,
-			ProjectVersion versionFromScRelease, boolean assertSnapshots) {
+			ProjectVersion versionFromBom, boolean assertSnapshots) {
 		log.info("Will update the project with versions [{}]", versions);
 		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
-				versionFromScRelease, assertSnapshots);
-		this.gradleUpdater.updateProjectFromBom(project, versions, versionFromScRelease,
+				versionFromBom, assertSnapshots);
+		this.gradleUpdater.updateProjectFromBom(project, versions, versionFromBom,
 				assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion.version);
 	}
 
-	public void buildProject(ProjectVersion versionFromScRelease) {
-		this.projectCommandExecutor.build(versionFromScRelease);
+	public void buildProject(ProjectVersion originalVersion,
+			ProjectVersion versionFromBom) {
+		this.projectCommandExecutor.build(originalVersion, versionFromBom);
 		log.info("\nProject was successfully built");
 	}
 
@@ -126,13 +127,14 @@ public class Releaser implements ReleaserPropertiesAware {
 		log.info("\nCommit was made and tag was pushed successfully");
 	}
 
-	public void deploy(ProjectVersion versionFromScRelease) {
-		this.projectCommandExecutor.deploy(versionFromScRelease);
+	public void deploy(ProjectVersion originalVersion, ProjectVersion versionFromBom) {
+		this.projectCommandExecutor.deploy(originalVersion, versionFromBom);
 		log.info("\nThe artifact was deployed successfully");
 	}
 
-	public void publishDocs(ProjectVersion changedVersion) {
-		this.projectCommandExecutor.publishDocs(changedVersion.version);
+	public void publishDocs(ProjectVersion originalVersion,
+			ProjectVersion changedVersion) {
+		this.projectCommandExecutor.publishDocs(originalVersion, changedVersion);
 		log.info("\nThe docs were published successfully");
 	}
 

@@ -108,7 +108,8 @@ public class SpringReleaser {
 			log.info("Successfully cloned the project [{}] to [{}]", project,
 					clonedProjectFromOrg);
 			ProjectsAndVersion projects = projects(clonedProjectFromOrg);
-			return new ProcessedProject(properties, projects.versionFromBom);
+			ProjectVersion original = new ProjectVersion(clonedProjectFromOrg);
+			return new ProcessedProject(properties, projects.versionFromBom, original);
 		}).collect(Collectors.toList());
 	}
 
@@ -155,9 +156,11 @@ public class SpringReleaser {
 				clonedProjectFromOrg);
 		ProjectsAndVersion projectsAndVersion;
 		try {
+			ProjectVersion original = new ProjectVersion(clonedProjectFromOrg);
 			projectsAndVersion = processProject(options, clonedProjectFromOrg,
 					TaskType.RELEASE);
-			return new ProcessedProject(copy, projectsAndVersion.versionFromBom);
+			return new ProcessedProject(copy, projectsAndVersion.versionFromBom,
+					original);
 		}
 		catch (Exception e) {
 			log.error("\n\n\nBUILD FAILED!!!\n\nException occurred for project <"
