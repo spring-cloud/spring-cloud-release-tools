@@ -16,49 +16,20 @@
 
 package org.springframework.cloud.release.cloud.docs;
 
-import java.io.File;
-
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 
 public class SpringCloudDocsAccessor {
 
-	public static CustomProjectDocumentationUpdater updater(ProjectGitHandler handler) {
-		return new SpringCloudCustomProjectDocumentationUpdater(handler);
+	public static CustomProjectDocumentationUpdater updater(ProjectGitHandler handler, ReleaserProperties releaserProperties) {
+		return new SpringCloudCustomProjectDocumentationUpdater(handler, releaserProperties);
 	}
 
 	public static CustomProjectDocumentationUpdater testUpdater(ProjectGitHandler handler,
 			String version) {
-		return new TestCustomProjectDocumentationUpdater(handler, version);
-	}
-
-}
-
-class TestCustomProjectDocumentationUpdater
-		extends SpringCloudCustomProjectDocumentationUpdater {
-
-	private final String version;
-
-	TestCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler, String version) {
-		super(gitHandler);
-		this.version = version;
-	}
-
-	@Override
-	String readIndexHtmlContents(File indexHtml) {
-		return response();
-	}
-
-	private String response() {
-		return "<!DOCTYPE HTML>\n" + "\n" + "<meta charset=\"UTF-8\">\n"
-				+ "<meta http-equiv=\"refresh\" content=\"1; url=https://cloud.spring.io/spring-cloud-static/"
-				+ this.version + "/\">\n" + "\n" + "<script>\n"
-				+ "  window.location.href = \"https://cloud.spring.io/spring-cloud-static/"
-				+ this.version + "/\"\n" + "</script>\n" + "\n"
-				+ "<title>Page Redirection</title>\n" + "\n"
-				+ "<!-- Note: don't tell people to `click` the link, just tell them that it is a link. -->\n"
-				+ "If you are not redirected automatically, follow the <a href='https://cloud.spring.io/spring-cloud-static/"
-				+ this.version + "/'>link to latest release</a>\n";
+		ReleaserProperties releaserProperties = new ReleaserProperties();
+		return new SpringCloudCustomProjectDocumentationUpdater(handler, releaserProperties);
 	}
 
 }

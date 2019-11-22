@@ -26,7 +26,7 @@ class SpringCloudDocsConfiguration {
 	@Bean
 	SpringCloudCustomProjectDocumentationUpdater springCloudCustomProjectDocumentationUpdater(
 			ProjectGitHandler handler) {
-		return new SpringCloudCustomProjectDocumentationUpdater(handler);
+		return new SpringCloudCustomProjectDocumentationUpdater(handler, releaserProperties);
 	}
 
 }
