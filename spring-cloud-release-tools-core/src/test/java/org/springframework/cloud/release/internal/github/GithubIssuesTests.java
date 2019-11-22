@@ -77,14 +77,15 @@ public class GithubIssuesTests {
 				SpringCloudGithubIssuesAccessor.springCloud(github, withToken())));
 
 		issues.fileIssueInSpringGuides(
-				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
+				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
+						new ProjectVersion("spring-cloud-build", "2.0.0.BUILD-SNAPSHOT")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
 		BDDMockito.then(github).shouldHaveZeroInteractions();
 	}
 
 	@Test
-	public void should_not_do_anything_if_switch_is_not_set() {
+	public void should_not_do_anything_if_not_applicable() {
 		Github github = BDDMockito.mock(Github.class);
 		ReleaserProperties properties = withToken();
 		properties.getGit().setUpdateSpringGuides(false);
@@ -107,6 +108,7 @@ public class GithubIssuesTests {
 
 		issues.fileIssueInSpringGuides(
 				new Projects(new ProjectVersion("spring-cloud-foo", "1.0.0.RELEASE"),
+						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE"),
 						new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.RELEASE"));
@@ -132,8 +134,9 @@ public class GithubIssuesTests {
 						.springCloud(new ReleaserProperties())));
 
 		thenThrownBy(() -> issues.fileIssueInSpringGuides(
-				new Projects(Collections.emptySet()), nonGaSleuthProject()))
-						.isInstanceOf(IllegalArgumentException.class)
+				new Projects(Collections.singletonList(
+						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE"))),
+				nonGaSleuthProject())).isInstanceOf(IllegalArgumentException.class)
 						.hasMessageContaining(
 								"You have to pass Github OAuth token for milestone closing to be operational");
 	}
@@ -147,14 +150,15 @@ public class GithubIssuesTests {
 				SpringCloudGithubIssuesAccessor.springCloud(github, withToken())));
 
 		issues.fileIssueInStartSpringIo(
-				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")),
+				new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
+						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
 		BDDMockito.then(github).shouldHaveZeroInteractions();
 	}
 
 	@Test
-	public void should_not_do_anything_if_switch_is_not_set_when_updating_startspringio()
+	public void should_not_do_anything_if_not_applicable_when_updating_startspringio()
 			throws IOException {
 		setupStartSpringIo();
 		Github github = BDDMockito.mock(Github.class);
@@ -181,6 +185,7 @@ public class GithubIssuesTests {
 
 		issues.fileIssueInStartSpringIo(
 				new Projects(new ProjectVersion("spring-cloud-foo", "1.0.0.RELEASE"),
+						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE"),
 						new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE"),
 						new ProjectVersion("spring-boot", "1.2.3.RELEASE")),
@@ -206,8 +211,9 @@ public class GithubIssuesTests {
 						.springCloud(new ReleaserProperties())));
 
 		thenThrownBy(() -> issues.fileIssueInStartSpringIo(
-				new Projects(Collections.emptySet()), nonGaSleuthProject()))
-						.isInstanceOf(IllegalArgumentException.class)
+				new Projects(Collections.singletonList(
+						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE"))),
+				nonGaSleuthProject())).isInstanceOf(IllegalArgumentException.class)
 						.hasMessageContaining(
 								"You have to pass Github OAuth token for milestone closing to be operational");
 	}
@@ -229,6 +235,8 @@ public class GithubIssuesTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setOauthToken("foo");
 		properties.getPom().setBranch("vEdgware.RELEASE");
+		properties.getGit().setUpdateSpringGuides(true);
+		properties.getGit().setUpdateStartSpringIo(true);
 		return properties;
 	}
 

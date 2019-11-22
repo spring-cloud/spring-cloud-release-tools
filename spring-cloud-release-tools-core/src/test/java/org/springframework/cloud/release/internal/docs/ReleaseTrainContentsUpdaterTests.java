@@ -110,6 +110,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	public void should_not_update_the_contents_of_wiki_repo_when_release_train_smaller()
 			throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setUpdateReleaseTrainWiki(true);
 		this.properties.getGit()
 				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
 
@@ -129,6 +130,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	public void should_update_the_contents_of_wiki_when_release_train_greater()
 			throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setUpdateReleaseTrainWiki(true);
 		this.properties.getGit()
 				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
 
@@ -148,6 +150,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	public void should_generate_the_contents_of_wiki_when_release_train_missing()
 			throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setUpdateReleaseTrainWiki(true);
 		this.properties.getGit()
 				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
 

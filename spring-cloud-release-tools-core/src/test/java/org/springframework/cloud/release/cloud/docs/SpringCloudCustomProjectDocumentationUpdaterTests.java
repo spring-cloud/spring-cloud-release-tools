@@ -190,6 +190,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
 				"Finchley.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUpdateDocumentationRepo(true);
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = projectDocumentationUpdater(properties)
@@ -209,6 +210,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
 				"Finchley.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUpdateDocumentationRepo(true);
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = projectDocumentationUpdater(properties).updateDocsRepo(

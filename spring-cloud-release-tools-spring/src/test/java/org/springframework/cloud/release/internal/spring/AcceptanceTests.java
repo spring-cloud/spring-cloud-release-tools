@@ -886,6 +886,14 @@ public class AcceptanceTests {
 				.setSpringProjectUrl(tmpFile("spring-cloud").getAbsolutePath() + "/");
 		releaserProperties.getGit().setReleaseTrainWikiUrl(
 				tmpFile("spring-cloud-wiki").getAbsolutePath() + "/");
+		releaserProperties.getGit().setRunUpdatedSamples(true);
+		releaserProperties.getGit().setUpdateSpringGuides(true);
+		releaserProperties.getGit().setUpdateStartSpringIo(true);
+		releaserProperties.getGit().setUpdateReleaseTrainWiki(true);
+		releaserProperties.getGit().setUpdateAllTestSamples(true);
+		releaserProperties.getGit().setUpdateDocumentationRepo(true);
+		releaserProperties.getGit().setUpdateReleaseTrainDocs(true);
+		releaserProperties.getSagan().setUpdateSagan(true);
 		URI initilizrUri = AcceptanceTests.class.getResource("/raw/initializr.yml")
 				.toURI();
 		releaserProperties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
@@ -922,6 +930,13 @@ public class AcceptanceTests {
 		releaserProperties.getGit().setReleaseTrainWikiUrl(
 				tmpFile("spring-cloud-wiki").getAbsolutePath() + "/");
 		releaserProperties.setFixedVersions(versions);
+		releaserProperties.getGit().setRunUpdatedSamples(true);
+		releaserProperties.getGit().setUpdateSpringGuides(true);
+		releaserProperties.getGit().setUpdateStartSpringIo(true);
+		releaserProperties.getGit().setUpdateReleaseTrainWiki(true);
+		releaserProperties.getGit().setUpdateAllTestSamples(true);
+		releaserProperties.getGit().setUpdateDocumentationRepo(true);
+		releaserProperties.getGit().setUpdateReleaseTrainDocs(true);
 		URI initilizrUri = AcceptanceTests.class.getResource("/raw/initializr.yml")
 				.toURI();
 		releaserProperties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());

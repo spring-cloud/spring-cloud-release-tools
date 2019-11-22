@@ -364,45 +364,50 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * If {@code false}, will not update the documentation repository.
 		 */
-		private boolean updateDocumentationRepo = true;
+		private boolean updateDocumentationRepo = false;
+
+		/**
+		 * If set to {@code false}, will not update Github milestones.
+		 */
+		private boolean updateGithubMilestones = false;
 
 		/**
 		 * If set to {@code false}, will not update Spring Guides for a release train.
 		 */
-		private boolean updateSpringGuides = true;
+		private boolean updateSpringGuides = false;
 
 		/**
 		 * If set to {@code false}, will not update start.spring.io for a release train.
 		 */
-		private boolean updateStartSpringIo = true;
+		private boolean updateStartSpringIo = false;
 
 		/**
 		 * If set to {@code false}, will not update the Spring Project for a release
 		 * train. E.g. for Spring Cloud will not update https://cloud.spring.io .
 		 */
-		private boolean updateSpringProject = true;
+		private boolean updateSpringProject = false;
 
 		/**
 		 * If set to {@code false}, will not update the test samples.
 		 */
-		private boolean runUpdatedSamples = true;
+		private boolean runUpdatedSamples = false;
 
 		/**
 		 * If set to {@code false}, will not update the release train docs.
 		 */
-		private boolean updateReleaseTrainDocs = true;
+		private boolean updateReleaseTrainDocs = false;
 
 		// TODO: Spring Cloud specific?
 		/**
 		 * If set to {@code false}, will not clone and update the release train wiki.
 		 */
-		private boolean updateReleaseTrainWiki = true;
+		private boolean updateReleaseTrainWiki = false;
 
 		/**
 		 * If set to {@code false}, will not clone and update the samples for all
 		 * projects.
 		 */
-		private boolean updateAllTestSamples = true;
+		private boolean updateAllTestSamples = false;
 
 		/**
 		 * Project to urls mapping. For each project will clone the test project and will
@@ -626,6 +631,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setReleaseTrainWikiPagePrefix(String releaseTrainWikiPagePrefix) {
 			this.releaseTrainWikiPagePrefix = releaseTrainWikiPagePrefix;
+		}
+
+		public boolean isUpdateGithubMilestones() {
+			return this.updateGithubMilestones;
+		}
+
+		public void setUpdateGithubMilestones(boolean updateGithubMilestones) {
+			this.updateGithubMilestones = updateGithubMilestones;
 		}
 
 		@Override
@@ -1160,7 +1173,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * If set to {@code false} will not update Sagan.
 		 */
-		private boolean updateSagan = true;
+		private boolean updateSagan = false;
 
 		/**
 		 * URL to the Sagan API.

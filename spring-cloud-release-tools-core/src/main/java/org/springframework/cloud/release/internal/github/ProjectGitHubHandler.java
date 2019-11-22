@@ -55,14 +55,32 @@ public class ProjectGitHubHandler implements ReleaserPropertiesAware {
 	}
 
 	public void closeMilestone(ProjectVersion releaseVersion) {
+		if (!this.properties.getGit().isUpdateGithubMilestones()) {
+			log.info(
+					"Will not update the release train documentation, since the switch to do so "
+							+ "is off. Set [releaser.git.update-github-milestones] to [true] to change that");
+			return;
+		}
 		this.githubMilestones.closeMilestone(releaseVersion);
 	}
 
 	public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
+		if (!this.properties.getGit().isUpdateSpringGuides()) {
+			log.info(
+					"Will not update the release train documentation, since the switch to do so "
+							+ "is off. Set [releaser.git.update-spring-guides] to [true] to change that");
+			return;
+		}
 		this.githubIssues.fileIssueInSpringGuides(projects, version);
 	}
 
 	public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
+		if (this.properties.getGit().isUpdateStartSpringIo()) {
+			log.info(
+					"Will not update the release train documentation, since the switch to do so "
+							+ "is off. Set [releaser.git.update-start-spring-io] to [true] to change that");
+			return;
+		}
 		this.githubIssues.fileIssueInStartSpringIo(projects, version);
 	}
 

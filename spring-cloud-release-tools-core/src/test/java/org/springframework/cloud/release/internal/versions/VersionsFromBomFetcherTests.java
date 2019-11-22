@@ -58,6 +58,7 @@ class VersionsFromBomFetcherTests {
 		URI initilizrUri = VersionsFromBomFetcherTests.class
 				.getResource("/raw/initializr.yml").toURI();
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUpdateSpringGuides(true);
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString() + "/");
@@ -78,6 +79,7 @@ class VersionsFromBomFetcherTests {
 		URI initilizrUri = VersionsFromBomFetcherTests.class
 				.getResource("/raw/initializr.yml").toURI();
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUpdateSpringGuides(true);
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString() + "/");
@@ -98,6 +100,7 @@ class VersionsFromBomFetcherTests {
 		URI initilizrUri = VersionsFromBomFetcherTests.class
 				.getResource("/raw/initializr.yml").toURI();
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUpdateSpringGuides(true);
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString());
@@ -114,6 +117,7 @@ class VersionsFromBomFetcherTests {
 		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
 				"1.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUpdateSpringGuides(true);
 		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
@@ -127,6 +131,7 @@ class VersionsFromBomFetcherTests {
 		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
 				"1.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUpdateSpringGuides(true);
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties,
 				new ProjectPomUpdater(properties, new ArrayList<>()) {
 					@Override

@@ -46,8 +46,8 @@ class SpringCloudGithubIssues implements CustomGithubIssues {
 	@Override
 	public boolean isApplicable(ReleaserProperties properties, Projects projects,
 			ProjectVersion version) {
-		return version.projectName.startsWith("spring-cloud") || projects.stream()
-				.anyMatch(project -> project.projectName.startsWith("spring-cloud"));
+		return projects.stream()
+				.anyMatch(project -> project.projectName.contains("spring-cloud-build"));
 	}
 
 	@Override

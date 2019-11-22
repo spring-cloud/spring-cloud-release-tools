@@ -48,7 +48,7 @@ public class SaganUpdaterTest {
 
 	ReleaserProperties properties = new ReleaserProperties();
 
-	SaganUpdater saganUpdater = new SaganUpdater(this.saganClient, this.properties);
+	SaganUpdater saganUpdater;
 
 	Projects projects = new Projects();
 
@@ -58,6 +58,8 @@ public class SaganUpdaterTest {
 		project.projectReleases.addAll(Arrays.asList(release("2.2.0.RC1"),
 				release("2.3.0.BUILD-SNAPSHOT"), release("2.2.0.M4")));
 		BDDMockito.given(this.saganClient.getProject(anyString())).willReturn(project);
+		this.properties.getSagan().setUpdateSagan(true);
+		this.saganUpdater = new SaganUpdater(this.saganClient, this.properties);
 	}
 
 	private Release release(String version) {

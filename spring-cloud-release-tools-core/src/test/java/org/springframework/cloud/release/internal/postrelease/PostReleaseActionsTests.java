@@ -134,6 +134,8 @@ public class PostReleaseActionsTests {
 	@Test
 	public void should_update_project_and_run_tests_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setRunUpdatedSamples(true);
+		this.properties.getGit().setUpdateAllTestSamples(true);
 		this.properties.getGit().setTestSamplesProjectUrl(
 				tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setBuildCommand("touch build.log");
@@ -232,6 +234,7 @@ public class PostReleaseActionsTests {
 	public void should_update_test_sample_projects_when_test_samples_update_is_called()
 			throws Exception {
 		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setUpdateAllTestSamples(true);
 		this.properties.getGit().getAllTestSampleUrls().clear();
 		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
 				Collections.singletonList(
@@ -275,6 +278,7 @@ public class PostReleaseActionsTests {
 	public void should_assume_that_project_version_is_snapshot_when_no_pom_is_present()
 			throws Exception {
 		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setUpdateAllTestSamples(true);
 		this.properties.getGit().getAllTestSampleUrls().clear();
 		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
 				Collections.singletonList(
