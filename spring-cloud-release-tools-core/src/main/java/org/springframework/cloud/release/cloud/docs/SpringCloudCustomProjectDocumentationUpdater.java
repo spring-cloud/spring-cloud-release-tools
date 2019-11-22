@@ -18,18 +18,18 @@ package org.springframework.cloud.release.cloud.docs;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -38,21 +38,17 @@ import org.springframework.util.StringUtils;
 class SpringCloudCustomProjectDocumentationUpdater
 		implements CustomProjectDocumentationUpdater {
 
-	private static final String HTTP_SC_STATIC_URL = "http://cloud.spring.io/spring-cloud-static/";
-
-	private static final String HTTPS_SC_STATIC_URL = "https://cloud.spring.io/spring-cloud-static/";
-
-	public static final String NO_PROJECT_NAME = "";
-
-	private byte[] indexHtmlTemplate;
-
 	private static final Logger log = LoggerFactory
 			.getLogger(SpringCloudCustomProjectDocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
 
-	SpringCloudCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler) {
+	private final ReleaserProperties releaserProperties;
+
+	SpringCloudCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler,
+			ReleaserProperties releaserProperties) {
 		this.gitHandler = gitHandler;
+		this.releaserProperties = releaserProperties;
 	}
 
 	@Override
@@ -74,25 +70,30 @@ class SpringCloudCustomProjectDocumentationUpdater
 	public File updateDocsRepo(File clonedDocumentationProject,
 			ProjectVersion currentProject, Projects projects, String bomBranch) {
 		log.debug("Cloning the doc project to [{}]", clonedDocumentationProject);
-		String pathToIndexHtml = "current/index.html";
-		File indexHtml = indexHtmlWithRedirection(clonedDocumentationProject, "",
-				bomBranch, pathToIndexHtml);
-		File docsRepo = updateTheDocsRepo(NO_PROJECT_NAME, bomBranch,
-				clonedDocumentationProject, indexHtml);
+		ProjectVersion releaseTrainProject = new ProjectVersion(
+				this.releaserProperties.getMetaRelease().getReleaseTrainProjectName(),
+				branchToReleaseVersion(bomBranch));
+		File currentReleaseFolder = new File(clonedDocumentationProject, currentFolder(
+				releaseTrainProject.projectName, releaseTrainProject.version));
+		// remove the old way
+		removeAFolderWithRedirection(currentReleaseFolder);
+		File docsRepo = updateTheDocsRepo(releaseTrainProject, clonedDocumentationProject,
+				currentReleaseFolder);
 		log.info(
 				"Updating all current links to documentation for release train projects");
 		projects.forEach(projectVersion -> {
-			File index = indexHtmlWithRedirection(clonedDocumentationProject,
-					projectVersion.projectName, projectVersion.version, pathToIndexHtml);
+			File currentProjectReleaseFolder = new File(clonedDocumentationProject,
+					currentFolder(projectVersion.projectName, projectVersion.version));
+			removeAFolderWithRedirection(currentProjectReleaseFolder);
 			try {
-				updateTheDocsRepo(projectVersion.projectName, projectVersion.version,
-						clonedDocumentationProject, index);
-				log.info("Processed [{}] for project with name [{}]", index,
-						projectVersion.projectName);
+				updateTheDocsRepo(projectVersion, clonedDocumentationProject,
+						currentProjectReleaseFolder);
+				log.info("Processed [{}] for project with name [{}]",
+						currentProjectReleaseFolder, projectVersion.projectName);
 			}
 			catch (Exception ex) {
 				log.warn(
-						"Exception occurred while trying o update the index html of a project ["
+						"Exception occurred while trying o update the symlink of a project ["
 								+ projectVersion.projectName + "]",
 						ex);
 			}
@@ -100,55 +101,53 @@ class SpringCloudCustomProjectDocumentationUpdater
 		return pushChanges(docsRepo);
 	}
 
-	private File indexHtmlWithRedirection(File clonedDocumentationProject,
-			String projectName, String version, String pathToIndexHtml) {
-		File indexHtml = indexHtml(clonedDocumentationProject,
-				combinedPathToIndexHtml(projectName, version, pathToIndexHtml));
-		if (!indexHtml.exists()) {
-			return generateIndexHtml(projectName, version, pathToIndexHtml, indexHtml);
-		}
-		return indexHtml;
-	}
-
-	private File generateIndexHtml(String projectName, String projectVersion,
-			String pathToIndexHtml, File indexHtml) {
-		try {
-			log.info("No file [{}] found, will create one", indexHtml);
-			indexHtml.getParentFile().mkdirs();
-			indexHtml.createNewFile();
-			String newIndex = new String(indexHtmlTemplate()).replaceAll("\\{\\{URL}}",
-					"https://cloud.spring.io/spring-cloud-static/"
-							+ concreteVersionIndexHtml(projectName,
-									branchToReleaseVersion(projectVersion),
-									"index.html"));
-			Files.write(indexHtml.toPath(), newIndex.getBytes());
-			return indexHtml;
-		}
-		catch (IOException ex) {
-			throw new IllegalStateException(ex);
+	private void removeAFolderWithRedirection(File currentReleaseFolder) {
+		if (!isSymbolinkLink(currentReleaseFolder)) {
+			FileSystemUtils.deleteRecursively(currentReleaseFolder);
 		}
 	}
 
-	private String combinedPathToIndexHtml(String projectName, String projectVersion,
-			String pathToIndexHtml) {
+	private boolean isSymbolinkLink(File currentFolder) {
+		return Files.isSymbolicLink(currentFolder.toPath());
+	}
+
+	private String currentFolder(String projectName, String projectVersion) {
 		boolean releaseTrain = new ProjectVersion(projectName, projectVersion)
 				.isReleaseTrain();
-		// release train -> static/current/index.html
-		// project -> static/spring-cloud-sleuth/current/index.html
-		String prefix = releaseTrain ? ""
-				: (StringUtils.hasText(projectName) ? projectName : "") + "/";
-		return prefix + pathToIndexHtml;
+		// release train -> static/current
+		// project -> static/spring-cloud-sleuth/current
+		return releaseTrain ? "current"
+				: (StringUtils.hasText(projectName) ? projectName : "") + "/current";
 	}
 
-	private String concreteVersionIndexHtml(String projectName, String projectVersion,
-			String pathToIndexHtml) {
-		boolean releaseTrain = new ProjectVersion(projectName, projectVersion)
-				.isReleaseTrain();
-		// release train -> static/current/index.html
-		// project -> static/spring-cloud-sleuth/current/index.html
-		String prefix = releaseTrain ? projectVersion
-				: (projectName + "/" + projectVersion);
-		return prefix + "/" + pathToIndexHtml;
+	String linkToVersion(File file) {
+		if (Files.isSymbolicLink(file.toPath())) {
+			try {
+				Path path = Files.readSymbolicLink(file.toPath());
+				// current -> Hoxton.SR2
+				// spring-cloud-sleuth/current -> spring-cloud-sleuth/1.2.3.RELEASE
+				return folderName(path.toString());
+			}
+			catch (IOException ex) {
+				throw new IllegalStateException(ex);
+			}
+		}
+		return "";
+	}
+
+	private String folderName(String path) {
+		int last = path.lastIndexOf(File.separator);
+		return last > 0 ? path.substring(last + 1) : path;
+	}
+
+	private String concreteVersionFolder(ProjectVersion projectVersion) {
+		String projectName = projectVersion.projectName;
+		boolean releaseTrain = projectVersion.isReleaseTrain();
+		// release train -> static/Hoxton.SR2/
+		// project -> static/spring-cloud-sleuth/1.2.3.RELEASE/
+		String prefix = releaseTrain ? projectVersion.version
+				: (projectName + "/" + projectVersion.version);
+		return prefix + "/";
 	}
 
 	private File pushChanges(File docsRepo) {
@@ -157,93 +156,60 @@ class SpringCloudCustomProjectDocumentationUpdater
 		return docsRepo;
 	}
 
-	File indexHtml(File clonedDocumentationProject, String pathToIndexHtml) {
-		return new File(clonedDocumentationProject, pathToIndexHtml);
-	}
-
-	private File updateTheDocsRepo(String projectName, String version,
-			File documentationProject, File indexHtml) {
+	private File updateTheDocsRepo(ProjectVersion projectVersion,
+			File documentationProject, File currentVersionFolder) {
 		try {
-			String indexHtmlText = readIndexHtmlContents(indexHtml);
-			String httpSubstring = HTTP_SC_STATIC_URL
-					+ (StringUtils.hasText(projectName) ? (projectName + "/") : "");
-			String httpsSubstring = HTTPS_SC_STATIC_URL
-					+ (StringUtils.hasText(projectName) ? (projectName + "/") : "");
-			int httpIndex = indexHtmlText.indexOf(httpSubstring);
-			int httpsIndex = indexHtmlText.indexOf(httpsSubstring);
-			if (httpIndex == -1 && httpsIndex == -1) {
-				throw new IllegalStateException(
-						"The URL to the documentation repo not found in the index.html file");
-			}
-			int beginIndex = beginIndex(httpIndex, httpSubstring, httpsIndex,
-					httpsSubstring);
-			String storedVersionLine = indexHtmlText.substring(beginIndex);
-			String storedVersion = storedVersionLine.substring(0,
-					storedVersionLine.indexOf("/"));
-			String currentVersion = branchToReleaseVersion(version);
-			boolean newerVersion = isMoreMature(storedVersion, currentVersion);
+			String storedVersion = linkToVersion(currentVersionFolder);
+			String currentVersion = projectVersion.version;
+			boolean newerVersion = StringUtils.isEmpty(storedVersion)
+					|| isMoreMature(storedVersion, currentVersion);
 			if (!newerVersion) {
 				log.info("Current version [{}] is not newer than the stored one [{}]",
 						currentVersion, storedVersion);
 				return documentationProject;
 			}
-			return commitChanges(currentVersion, documentationProject, indexHtml,
-					indexHtmlText, storedVersion);
+			boolean deleted = Files.deleteIfExists(currentVersionFolder.toPath())
+					|| FileSystemUtils.deleteRecursively(currentVersionFolder.toPath());
+			if (deleted) {
+				log.info("Deleted current version folder link at [{}]",
+						currentVersionFolder);
+			}
+			boolean creatingParentDirs = currentVersionFolder.getParentFile().mkdirs();
+			if (!creatingParentDirs) {
+				log.warn("Failed to create parent directory of [{}]",
+						currentVersionFolder);
+			}
+			File newTarget = new File(documentationProject,
+					concreteVersionFolder(projectVersion));
+			Files.createSymbolicLink(currentVersionFolder.toPath(), newTarget.toPath());
+			log.info("Updated the link [{}] to point to [{}]",
+					currentVersionFolder.toPath(),
+					Files.readSymbolicLink(currentVersionFolder.toPath()));
+			return commitChanges(currentVersion, documentationProject);
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	boolean isMoreMature(String storedVersion, String currentVersion) {
+	private boolean isMoreMature(String storedVersion, String currentVersion) {
 		return new ProjectVersion("project", currentVersion)
 				.isMoreMature(new ProjectVersion("project", storedVersion));
 	}
 
-	private int beginIndex(int httpIndex, String httpSubstring, int httpsIndex,
-			String httpsSubstring) {
-		if (httpIndex != -1) {
-			return httpIndex + httpSubstring.length();
+	private String branchToReleaseVersion(String branch) {
+		if (branch.startsWith("v")) {
+			return branch.substring(1);
 		}
-		return httpsIndex + httpsSubstring.length();
+		return branch;
 	}
 
-	private String branchToReleaseVersion(String springCloudReleaseBranch) {
-		if (springCloudReleaseBranch.startsWith("v")) {
-			return springCloudReleaseBranch.substring(1);
-		}
-		return springCloudReleaseBranch;
-	}
-
-	private File commitChanges(String currentVersion, File documentationProject,
-			File indexHtml, String indexHtmlText, String storedReleaseTrain)
+	private File commitChanges(String currentVersion, File documentationProject)
 			throws IOException {
-		String replacedIndexHtml = indexHtmlText.replace(storedReleaseTrain,
-				currentVersion);
-		Files.write(indexHtml.toPath(), replacedIndexHtml.getBytes());
-		log.info("Stored the version URL [{}] in [{}]", currentVersion,
-				indexHtml.getAbsolutePath());
+		log.info("Updated the symbolic links");
 		this.gitHandler.commit(documentationProject,
 				"Updating the link to the current version to [" + currentVersion + "]");
 		return documentationProject;
-	}
-
-	String readIndexHtmlContents(File indexHtml) throws IOException {
-		return new String(Files.readAllBytes(indexHtml.toPath()));
-	}
-
-	private byte[] indexHtmlTemplate() {
-		if (this.indexHtmlTemplate == null) {
-			try {
-				URI uri = CustomProjectDocumentationUpdater.class
-						.getResource("/cloud/index.html").toURI();
-				this.indexHtmlTemplate = IOUtils.toByteArray(uri);
-			}
-			catch (URISyntaxException | IOException ex) {
-				throw new IllegalStateException(ex);
-			}
-		}
-		return this.indexHtmlTemplate;
 	}
 
 }

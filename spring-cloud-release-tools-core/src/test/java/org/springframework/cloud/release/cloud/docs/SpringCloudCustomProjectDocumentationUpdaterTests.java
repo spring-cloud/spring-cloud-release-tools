@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import javax.validation.constraints.NotNull;
@@ -81,59 +82,9 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@Test
-	public void should_generate_a_new_index_html_when_original_one_is_not_found()
-			throws URISyntaxException, IOException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
-				"Hoxton.SR10");
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationBranch("master");
-		properties.getGit().setDocumentationUrl(
-				file("/projects/spring-cloud-release/").toURI().toString());
-
-		File updatedDocs = projectDocumentationUpdaterWithNoIndexHtml(properties)
-				.updateDocsRepo(projects(), releaseTrainVersion, "vHoxton.SR10");
-
-		String indexHtmlContent = new String(
-				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
-		then(indexHtmlContent)
-				.contains("cloud.spring.io/spring-cloud-static/Hoxton.SR10/");
-		String sleuthIndexHtmlContent = new String(Files.readAllBytes(
-				new File(updatedDocs, "spring-cloud-sleuth/current/index.html")
-						.toPath()));
-		then(sleuthIndexHtmlContent).contains(
-				"cloud.spring.io/spring-cloud-static/spring-cloud-sleuth/1.0.0.RELEASE/");
-	}
-
-	@Test
-	public void should_throw_exception_if_index_found_but_doc_repo_url_missing()
-			throws URISyntaxException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"1.3.4.SR10");
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(
-				file("/projects/spring-cloud-static/").toURI().toString());
-
-		SpringCloudCustomProjectDocumentationUpdater customUpdater = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties)) {
-			@Override
-			String readIndexHtmlContents(File indexHtml) {
-				return "";
-			}
-		};
-
-		BDDAssertions
-				.thenThrownBy(() -> new DocumentationUpdater(this.handler, properties,
-						templateGenerator(properties),
-						Collections.singletonList(customUpdater)).updateDocsRepo(
-								projects(), releaseTrainVersion, "vAngel.SR33"))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("The URL to the documentation repo not found");
-	}
-
-	@Test
 	public void should_not_update_current_version_in_the_docs_if_current_release_is_not_ga_or_sr() {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"2.0.0.BUILD-SNAPSHOT");
+		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
+				"Angel.M7");
 		ReleaserProperties properties = new ReleaserProperties();
 
 		File updatedDocs = projectDocumentationUpdater(properties)
@@ -146,30 +97,10 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	private DocumentationUpdater projectDocumentationUpdater(
 			ReleaserProperties properties) {
 		return new DocumentationUpdater(this.handler, properties,
-				templateGenerator(properties), Collections.singletonList(
-						new SpringCloudCustomProjectDocumentationUpdater(this.handler) {
-							@Override
-							boolean isMoreMature(String first, String second) {
-								return true;
-							}
-						}));
-	}
-
-	@NotNull
-	private DocumentationUpdater projectDocumentationUpdaterWithNoIndexHtml(
-			ReleaserProperties properties) {
-		return new DocumentationUpdater(this.handler, properties,
-				templateGenerator(properties), Collections.singletonList(
-						new SpringCloudCustomProjectDocumentationUpdater(this.handler) {
-							@Override
-							File indexHtml(File clonedDocumentationProject,
-									String pathToIndexHtml) {
-								File file = super.indexHtml(clonedDocumentationProject,
-										pathToIndexHtml);
-								file.delete();
-								return file;
-							}
-						}));
+				templateGenerator(properties),
+				Collections.singletonList(
+						new SpringCloudCustomProjectDocumentationUpdater(this.handler,
+								properties)));
 	}
 
 	@NotNull
@@ -177,40 +108,56 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		return new TemplateGenerator(properties, this.gitHubHandler);
 	}
 
-	@NotNull
-	private ProjectGitHandler projectGitHandler(ReleaserProperties properties) {
-		return new ProjectGitHandler(properties);
-	}
-
 	@Test
 	public void should_not_update_current_version_in_the_docs_if_current_release_starts_with_v_and_then_lower_letter_than_the_stored_release()
 			throws URISyntaxException, IOException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"1.3.4.SR10");
+		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
+				"Finchley.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(
 				file("/projects/spring-cloud-static/").toURI().toString());
 
 		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
-						releaseTrainVersion, projects(), "vAngel.SR33");
+				new ProjectGitHandler(properties), properties).updateDocsRepo(
+						this.clonedDocProject, releaseTrainVersion, projects(),
+						"vFinchley.SR33");
 
-		String indexHtmlContent = new String(
-				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
-		then(indexHtmlContent).doesNotContain(
-				"https://cloud.spring.io/spring-cloud-static/Angel.SR33/");
+		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
+				.doesNotExist();
+		Path current = new File(updatedDocs, "current/").toPath();
+		BDDAssertions.then(current).isSymbolicLink();
+		BDDAssertions.then(Files.readSymbolicLink(current).toString())
+				.endsWith("Finchley.SR33");
+
+		releaseTrainVersion = new ProjectVersion("spring-cloud-release", "Angel.SR33");
+		properties = new ReleaserProperties();
+		properties.getGit().setDocumentationUrl(
+				file("/projects/spring-cloud-static/").toURI().toString());
+
+		updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
+				new ProjectGitHandler(properties), properties).updateDocsRepo(
+						this.clonedDocProject, releaseTrainVersion, projects(),
+						"vAngel.SR33");
+
+		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
+				.doesNotExist();
+		current = new File(updatedDocs, "current/").toPath();
+		BDDAssertions.then(current).isSymbolicLink();
+		BDDAssertions.then(Files.readSymbolicLink(current).toString())
+				.doesNotEndWith("Angel.SR33");
 	}
 
 	@Test
 	public void should_not_commit_if_the_same_version_is_already_there() {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"1.3.4.SR10");
+		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
+				"Dalston.SR3");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
 
-		new SpringCloudCustomProjectDocumentationUpdater(handler).updateDocsRepo(
-				this.clonedDocProject, releaseTrainVersion, projects(), "vDalston.SR3");
+		new SpringCloudCustomProjectDocumentationUpdater(handler, properties)
+				.updateDocsRepo(this.clonedDocProject, releaseTrainVersion, projects(),
+						"vDalston.SR3");
 
 		BDDMockito.then(handler).should(BDDMockito.never())
 				.commit(BDDMockito.any(File.class), BDDMockito.anyString());
@@ -219,59 +166,75 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	@Test
 	public void should_not_update_current_version_in_the_docs_if_current_release_starts_with_lower_letter_than_the_stored_release()
 			throws IOException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"1.3.4.SR10");
+		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
+				"Angel.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties)).updateDocsRepo(this.clonedDocProject,
-						releaseTrainVersion, projects(), "Angel.SR33");
+				new ProjectGitHandler(properties), properties).updateDocsRepo(
+						this.clonedDocProject, releaseTrainVersion, projects(),
+						"Angel.SR33");
 
-		String indexHtmlContent = new String(
-				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
-		then(indexHtmlContent).doesNotContain(
-				"https://cloud.spring.io/spring-cloud-static/Angel.SR33/");
+		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
+				.doesNotExist();
+		Path current = new File(updatedDocs, "current/").toPath();
+		BDDAssertions.then(current).isSymbolicLink();
+		BDDAssertions.then(Files.readSymbolicLink(current).toString())
+				.doesNotEndWith("Angel.SR33");
 	}
 
 	@Test
 	public void should_update_current_version_in_the_docs_if_current_release_starts_with_v_and_then_higher_letter_than_the_stored_release()
 			throws IOException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"2.0.0.SR33");
+		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
+				"Finchley.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = projectDocumentationUpdater(properties)
 				.updateDocsRepo(projects(), releaseTrainVersion, "vFinchley.SR33");
 
-		String indexHtmlContent = new String(
-				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
-		then(indexHtmlContent)
-				.contains("cloud.spring.io/spring-cloud-static/Finchley.SR33/");
+		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
+				.doesNotExist();
+		Path current = new File(updatedDocs, "current/").toPath();
+		BDDAssertions.then(current).isSymbolicLink();
+		BDDAssertions.then(Files.readSymbolicLink(current).toString())
+				.endsWith("spring-cloud-static/Finchley.SR33");
 	}
 
 	@Test
 	public void should_update_current_version_in_the_docs_if_current_release_starts_with_higher_letter_than_the_stored_release()
 			throws IOException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"2.0.0.SR33");
+		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
+				"Finchley.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = projectDocumentationUpdater(properties)
-				.updateDocsRepo(projects(), releaseTrainVersion, "Finchley.SR33");
+		File updatedDocs = projectDocumentationUpdater(properties).updateDocsRepo(
+				new Projects(new ProjectVersion("spring-cloud-sleuth", "2.0.0.RELEASE")),
+				releaseTrainVersion, "vFinchley.SR33");
 
-		String indexHtmlContent = new String(
-				Files.readAllBytes(new File(updatedDocs, "current/index.html").toPath()));
-		then(indexHtmlContent)
-				.contains("cloud.spring.io/spring-cloud-static/Finchley.SR33/");
+		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
+				.doesNotExist();
+		Path current = new File(updatedDocs, "current/").toPath();
+		BDDAssertions.then(current).isSymbolicLink();
+		BDDAssertions.then(Files.readSymbolicLink(current).toString())
+				.endsWith("spring-cloud-static/Finchley.SR33");
+
+		BDDAssertions.then(
+				new File(updatedDocs, "spring-cloud-sleuth/current/index.html").toPath())
+				.doesNotExist();
+		current = new File(updatedDocs, "spring-cloud-sleuth/current/").toPath();
+		BDDAssertions.then(current).isSymbolicLink();
+		BDDAssertions.then(Files.readSymbolicLink(current).toString())
+				.endsWith("spring-cloud-static/spring-cloud-sleuth/2.0.0.RELEASE");
 	}
 
 	@Test
 	public void should_not_update_current_version_in_the_docs_if_switch_is_off() {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-sleuth",
-				"2.0.0.SR33");
+		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
+				"Finchley.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 		properties.getGit().setUpdateDocumentationRepo(false);

@@ -242,8 +242,13 @@ public class AcceptanceTests {
 				"2.1.2.BUILD-SNAPSHOT");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 		then(this.gitHandler.issueCreatedInStartSpringIo).isTrue();
-		then(text(new File(this.documentationFolder, "current/index.html")))
-				.doesNotContain("Angel.SR3").contains("Greenwich.SR2");
+		then(Files.readSymbolicLink(
+				new File(this.documentationFolder, "spring-cloud-consul/current")
+						.toPath())
+				.toString()).endsWith("5.3.5.RELEASE");
+		then(Files
+				.readSymbolicLink(new File(this.documentationFolder, "current").toPath())
+				.toString()).endsWith("Xitmars.SR4");
 		thenRunUpdatedTestsWereCalled();
 	}
 
@@ -515,8 +520,12 @@ public class AcceptanceTests {
 				"2.1.6.BUILD-SNAPSHOT");
 		then(this.gitHandler.issueCreatedInSpringGuides).isTrue();
 		then(this.gitHandler.issueCreatedInStartSpringIo).isTrue();
-		then(text(new File(this.documentationFolder, "current/index.html")))
-				.doesNotContain("Angel.SR3").contains("Greenwich.SR2");
+		then(Files.readSymbolicLink(
+				new File(this.documentationFolder, "spring-cloud-build/current").toPath())
+				.toString()).endsWith("5.3.11.RELEASE");
+		then(Files
+				.readSymbolicLink(new File(this.documentationFolder, "current").toPath())
+				.toString()).endsWith("Xitmars.SR4");
 	}
 
 	@Test

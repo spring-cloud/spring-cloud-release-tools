@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.release.cloud.docs;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +26,9 @@ class SpringCloudDocsConfiguration {
 
 	@Bean
 	SpringCloudCustomProjectDocumentationUpdater springCloudCustomProjectDocumentationUpdater(
-			ProjectGitHandler handler) {
-		return new SpringCloudCustomProjectDocumentationUpdater(handler);
+			ProjectGitHandler handler, ReleaserProperties releaserProperties) {
+		return new SpringCloudCustomProjectDocumentationUpdater(handler,
+				releaserProperties);
 	}
 
 }
