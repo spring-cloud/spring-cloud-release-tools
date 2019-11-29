@@ -586,9 +586,9 @@ class TrainVersionNumber implements Comparable<TrainVersionNumber> {
 			return charComparison;
 		}
 		String thisVersion = this.version.replaceAll("\\D+", "");
-		boolean thisVersionEmpty = StringUtils.isEmpty(this.version);
+		boolean thisVersionEmpty = StringUtils.isEmpty(thisVersion);
 		String thatVersion = o.version.replaceAll("\\D+", "");
-		boolean thatVersionEmpty = StringUtils.isEmpty(o.version);
+		boolean thatVersionEmpty = StringUtils.isEmpty(thatVersion);
 		if (thisVersionEmpty || thatVersionEmpty) {
 			return thisVersion.compareTo(thatVersion);
 		}

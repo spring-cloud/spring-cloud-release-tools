@@ -16,10 +16,15 @@
 
 package org.springframework.cloud.release.internal.spring;
 
-import org.springframework.cloud.release.internal.options.Options;
+import java.util.LinkedList;
 
-public interface SpringReleaser {
-	void release();
+import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 
-	void release(Options options);
+class TasksToRun extends LinkedList<ReleaserTask> {
+	TasksToRun() {
+	}
+
+	TasksToRun(ReleaserTask c) {
+		add(c);
+	}
 }

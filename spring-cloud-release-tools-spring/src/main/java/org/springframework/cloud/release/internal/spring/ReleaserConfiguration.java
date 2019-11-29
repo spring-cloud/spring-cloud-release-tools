@@ -35,10 +35,11 @@ import org.springframework.cloud.release.internal.postrelease.PostReleaseActions
 import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
+import org.springframework.cloud.release.internal.tasks.ReleaserTask;
+import org.springframework.cloud.release.internal.tasks.SingleProjectReleaserTask;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.cloud.release.internal.versions.VersionsFetcher;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -50,15 +51,33 @@ class ReleaserConfiguration {
 	ReleaserProperties properties;
 
 	@Bean
-	TaskCollector taskCollector() {
-		return new TaskCollector();
+	OptionsAndPropertiesFactory optionsAndPropertiesFactory() {
+		return new OptionsAndPropertiesFactory();
 	}
 
 	@Bean
-	SpringReleaser springReleaser(Releaser releaser, ReleaserPropertiesUpdater updater,
-			ApplicationEventPublisher applicationEventPublisher) {
-		return new SpringReleaser(releaser, this.properties, updater,
-				applicationEventPublisher);
+	VersionsToBumpFactory versionsToBumpFactory(Releaser releaser) {
+		return new VersionsToBumpFactory(releaser, properties);
+	}
+
+	@Bean
+	ProjectsToRunFactory projectsToRunFactory(VersionsToBumpFactory versionsToBumpFactory, Releaser releaser, ReleaserPropertiesUpdater updater) {
+		return new ProjectsToRunFactory(versionsToBumpFactory, releaser, updater);
+	}
+
+	@Bean
+	TasksToRunFactory tasksToRunFactory(ApplicationContext context) {
+		return new TasksToRunFactory(context);
+	}
+
+	@Bean
+	FlowRunner flowRunner() {
+		return new SpringBatchFlowRunner();
+	}
+
+	@Bean
+	SpringReleaser springReleaser(OptionsAndPropertiesFactory optionsAndPropertiesFactory, ProjectsToRunFactory projectsToRunFactory, TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner) {
+		return new DefaultSpringReleaser(properties, optionsAndPropertiesFactory, projectsToRunFactory, tasksToRunFactory, flowRunner);
 	}
 
 	@Bean
@@ -139,8 +158,9 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	Parser optionsParser() {
-		return new OptionsParser();
+	Parser optionsParser(List<ReleaserTask> allTasks,
+			List<SingleProjectReleaserTask> singleProjectReleaserTasks) {
+		return new OptionsParser(allTasks, singleProjectReleaserTasks);
 	}
 
 }

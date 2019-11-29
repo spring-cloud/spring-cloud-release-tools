@@ -19,6 +19,7 @@ package org.springframework.cloud.release.internal.spring;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.options.Parser;
+import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
+import org.springframework.cloud.release.internal.tasks.ReleaserTask;
+import org.springframework.cloud.release.internal.tasks.SingleProjectReleaserTask;
 import org.springframework.util.StringUtils;
 
 /**
@@ -39,6 +43,15 @@ import org.springframework.util.StringUtils;
 class OptionsParser implements Parser {
 
 	private static final Logger log = LoggerFactory.getLogger(OptionsParser.class);
+
+	private final List<ReleaserTask> allTasks;
+
+	private final List<SingleProjectReleaserTask> singleProjectReleaserTasks;
+
+	OptionsParser(List<ReleaserTask> allTasks, List<SingleProjectReleaserTask> singleProjectReleaserTasks) {
+		this.allTasks = allTasks;
+		this.singleProjectReleaserTasks = singleProjectReleaserTasks;
+	}
 
 	@Override
 	public Options parse(String[] args) {
@@ -62,9 +75,11 @@ class OptionsParser implements Parser {
 					Arrays.asList("dr", "dry-run"),
 					"Do you want to do the release / meta release with build and install projects locally only?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(false);
-			Tasks.NON_COMPOSITE_TASKS.forEach(
-					task -> parser.acceptsAll(Arrays.asList(task.shortName, task.name),
-							task.description).withOptionalArg());
+			LinkedList<ReleaserTask> nonCompositeTasks = this.allTasks.stream()
+					.filter(releaserTask -> !(releaserTask instanceof CompositeReleaserTask))
+					.collect(Collectors.toCollection(LinkedList::new));
+			nonCompositeTasks.forEach(task -> parser.acceptsAll(Arrays.asList(task.shortName(), task.name()),
+							task.description()).withOptionalArg());
 			ArgumentAcceptingOptionSpec<String> startFromOpt = parser.acceptsAll(
 					Arrays.asList("a", "start-from"),
 					"Starts all release task starting "
@@ -98,11 +113,11 @@ class OptionsParser implements Parser {
 			providedTaskNames = providedTaskNames.stream().map(this::removeQuotingChars)
 					.collect(Collectors.toList());
 			log.info("Passed tasks {} from command line", providedTaskNames);
-			List<String> allTaskNames = Tasks.NON_COMPOSITE_TASKS.stream()
-					.map(task -> task.name).collect(Collectors.toList());
-			List<String> tasksFromOptions = Tasks.NON_COMPOSITE_TASKS.stream()
-					.filter(task -> options.has(task.name) || options.has(task.shortName))
-					.map(task -> task.name).collect(Collectors.toList());
+			List<String> allTaskNames = nonCompositeTasks.stream()
+					.map(ReleaserTask::name).collect(Collectors.toList());
+			List<String> tasksFromOptions = nonCompositeTasks.stream()
+					.filter(task -> options.has(task.name()) || options.has(task.shortName()))
+					.map(ReleaserTask::name).collect(Collectors.toList());
 			if (providedTaskNames.isEmpty()) {
 				providedTaskNames.addAll(tasksFromOptions.isEmpty() && !metaRelease
 						? allTaskNames : tasksFromOptions);
@@ -131,7 +146,7 @@ class OptionsParser implements Parser {
 			return providedTaskNames;
 		}
 		return allTaskNames.stream().filter(providedTaskNames::contains)
-				.collect(Collectors.toList());
+				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	private String removeQuotingChars(String string) {
@@ -170,7 +185,8 @@ class OptionsParser implements Parser {
 
 	private String intro() {
 		return "\nHere you can find the list of tasks in order\n\n["
-				+ Tasks.allTasksInOrder() + "]\n\n";
+				+ this.singleProjectReleaserTasks.stream().map(ReleaserTask::name)
+				.collect(Collectors.joining(",")) + "]\n\n";
 	}
 
 	private String examples() {

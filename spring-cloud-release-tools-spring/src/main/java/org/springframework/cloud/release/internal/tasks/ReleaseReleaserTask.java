@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.spring;
+package org.springframework.cloud.release.internal.tasks;
 
-import org.springframework.cloud.release.internal.options.Options;
+import java.util.Collections;
+import java.util.List;
 
-public interface SpringReleaser {
-	void release();
-
-	void release(Options options);
+public interface ReleaseReleaserTask extends SingleProjectReleaserTask {
+	@Override
+	default List<TaskType> taskTypes() {
+		return Collections.singletonList(TaskType.RELEASE);
+	}
 }

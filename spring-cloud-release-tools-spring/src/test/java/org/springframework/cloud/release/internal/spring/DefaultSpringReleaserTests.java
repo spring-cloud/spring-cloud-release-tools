@@ -50,9 +50,9 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Marcin Grzejszczak
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SpringReleaserTests {
+public class DefaultSpringReleaserTests {
 
-	private static final Logger log = LoggerFactory.getLogger(SpringReleaserTests.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultSpringReleaserTests.class);
 
 	@Mock
 	Releaser releaser;
@@ -77,7 +77,7 @@ public class SpringReleaserTests {
 	File releaserUpdater = new File(ReleaserPropertiesUpdaterTests.class
 			.getResource("/projects/releaser-updater/config/releaser.yml").toURI());
 
-	public SpringReleaserTests() throws URISyntaxException {
+	public DefaultSpringReleaserTests() throws URISyntaxException {
 	}
 
 	@Before
@@ -95,7 +95,7 @@ public class SpringReleaserTests {
 				if (this.counter == 0) {
 					log.info("First run");
 					this.counter = this.counter + 1;
-					return SpringReleaserTests.this.releaserUpdater;
+					return DefaultSpringReleaserTests.this.releaserUpdater;
 				}
 				log.info("Second run");
 				return new File("does/not/exist");
@@ -112,7 +112,7 @@ public class SpringReleaserTests {
 
 	@Test
 	public void should_make_a_copy_of_properties() {
-		SpringReleaser releaser = stubbedSpringReleaser();
+		DefaultSpringReleaser releaser = stubbedSpringReleaser();
 
 		releaser.release(new OptionsBuilder().metaRelease(true).options());
 
@@ -122,7 +122,7 @@ public class SpringReleaserTests {
 
 	@Test
 	public void should_only_call_post_release() {
-		SpringReleaser releaser = stubbedSpringReleaser();
+		DefaultSpringReleaser releaser = stubbedSpringReleaser();
 		this.properties.setPostReleaseTasksOnly(true);
 
 		releaser.release(new OptionsBuilder().metaRelease(false).options());
@@ -144,8 +144,8 @@ public class SpringReleaserTests {
 				.isEqualTo("build");
 	}
 
-	private SpringReleaser stubbedSpringReleaser() {
-		return new SpringReleaser(this.releaser, this.properties, this.optionsProcessor,
+	private DefaultSpringReleaser stubbedSpringReleaser() {
+		return new DefaultSpringReleaser(this.releaser, this.properties, this.optionsProcessor,
 				this.updater, this.applicationEventPublisher) {
 
 			@Override

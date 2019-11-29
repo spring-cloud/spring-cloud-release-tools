@@ -16,10 +16,17 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 
-public interface SpringReleaser {
-	void release();
+class OptionsAndPropertiesFactory {
 
-	void release(Options options);
+	OptionsAndProperties get(ReleaserProperties properties, Options options) {
+		if (options.metaRelease) {
+			properties.getGit().setFetchVersionsFromGit(false);
+			properties.getMetaRelease().setEnabled(true);
+			options.fullRelease = true;
+		}
+		return new OptionsAndProperties(properties, options);
+	}
 }

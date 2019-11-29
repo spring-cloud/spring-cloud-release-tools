@@ -16,10 +16,24 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
+import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 
-public interface SpringReleaser {
-	void release();
+public interface FlowRunner {
+	default Decision beforeTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
+		return Decision.CONTINUE;
+	}
 
-	void release(Options options);
+	default Decision afterTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
+		return Decision.CONTINUE;
+	}
+
+	void executeTasksForProjects(Options options, ReleaserProperties properties, ProjectsToRun projectToRuns, TasksToRun tasksToRun);
+
+	void executePostReleaseTasks(Options options, ReleaserProperties properties, TasksToRun tasksToRun);
+
+	enum Decision {
+		CONTINUE, SKIP
+	}
 }

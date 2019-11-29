@@ -164,7 +164,7 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = releaserWithSnapshotScRelease(project,
+		DefaultSpringReleaser releaser = releaserWithSnapshotScRelease(project,
 				"spring-cloud-consul", "vCamden.SR5.BROKEN", "1.1.2.RELEASE");
 
 		BDDAssertions.thenThrownBy(releaser::release).hasMessageContaining(
@@ -181,7 +181,7 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = templateOnlyReleaser(project, "spring-cloud-consul",
+		DefaultSpringReleaser releaser = templateOnlyReleaser(project, "spring-cloud-consul",
 				"vCamden.SR5", "1.1.2.RELEASE");
 		this.releaserProperties.getGit().setFetchVersionsFromGit(false);
 		this.releaserProperties.getFixedVersions().put("spring-cloud-release",
@@ -208,7 +208,7 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = releaser(project, "spring-cloud-consul",
+		DefaultSpringReleaser releaser = releaser(project, "spring-cloud-consul",
 				"vGreenwich.SR2", "2.1.2.RELEASE");
 
 		releaser.release();
@@ -258,7 +258,7 @@ public class AcceptanceTests {
 		// simulates an org
 		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout()
 				.setName("Edgware").call();
-		SpringReleaser releaser = metaReleaser(edgwareSr10());
+		DefaultSpringReleaser releaser = metaReleaser(edgwareSr10());
 
 		releaser.release(new OptionsBuilder().metaRelease(true).options());
 
@@ -280,7 +280,7 @@ public class AcceptanceTests {
 		// simulates an org
 		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout()
 				.setName("Edgware").call();
-		SpringReleaser releaser = metaReleaserDryRun(edgwareSr10());
+		DefaultSpringReleaser releaser = metaReleaserDryRun(edgwareSr10());
 
 		releaser.release(new OptionsBuilder().metaRelease(true).dryRun(true).options());
 
@@ -391,7 +391,7 @@ public class AcceptanceTests {
 		Map<String, String> versions = new HashMap<>();
 		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
 		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
-		SpringReleaser releaser = metaReleaser(versions);
+		DefaultSpringReleaser releaser = metaReleaser(versions);
 		this.releaserProperties.getMetaRelease().getProjectsToSkip()
 				.add("spring-cloud-release");
 		this.releaserProperties.getMetaRelease().getProjectsToSkip()
@@ -414,7 +414,7 @@ public class AcceptanceTests {
 		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
 		versions.put("spring-cloud-build", "1.1.2.BUILD-SNAPSHOT");
 		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
-		SpringReleaser releaser = metaReleaser(versions);
+		DefaultSpringReleaser releaser = metaReleaser(versions);
 
 		releaser.release(new OptionsBuilder().metaRelease(true)
 				.startFrom("spring-cloud-consul").options());
@@ -442,7 +442,7 @@ public class AcceptanceTests {
 		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
 		versions.put("spring-cloud-build", "1.1.2.BUILD-SNAPSHOT");
 		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
-		SpringReleaser releaser = metaReleaser(versions);
+		DefaultSpringReleaser releaser = metaReleaser(versions);
 
 		releaser.release(new OptionsBuilder().metaRelease(true)
 				.taskNames(Collections.singletonList("spring-cloud-consul")).options());
@@ -492,7 +492,7 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-build"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = releaser(project, "spring-cloud-build",
+		DefaultSpringReleaser releaser = releaser(project, "spring-cloud-build",
 				"vGreenwich.SR2", "2.1.6.RELEASE");
 
 		releaser.release();
@@ -540,7 +540,7 @@ public class AcceptanceTests {
 		Git git = GitTestUtils.openGitProject(file("/projects/spring-cloud-release/"));
 		git.reset().setMode(ResetCommand.ResetType.HARD).setRef("vDalston.RC1").call();
 		git.checkout().setName("vDalston.RC1").call();
-		SpringReleaser releaser = releaser(project, "spring-cloud-consul", "vDalston.RC1",
+		DefaultSpringReleaser releaser = releaser(project, "spring-cloud-consul", "vDalston.RC1",
 				"1.2.0.RC1");
 
 		releaser.release();
@@ -593,7 +593,7 @@ public class AcceptanceTests {
 		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
 				tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		SpringReleaser releaser = templateOnlyReleaser(project, "spring-cloud-consul",
+		DefaultSpringReleaser releaser = templateOnlyReleaser(project, "spring-cloud-consul",
 				"vDalston.RC1", "1.2.0.RC1");
 
 		releaser.release();
@@ -688,27 +688,27 @@ public class AcceptanceTests {
 		return new String(Files.readAllBytes(releaseNotesTemplate().toPath()));
 	}
 
-	private SpringReleaser releaser(File projectFile, String projectName, String branch,
+	private DefaultSpringReleaser releaser(File projectFile, String projectName, String branch,
 			String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
 		return releaserWithFullDeployment(expectedVersion, projectName, properties);
 	}
 
-	private SpringReleaser metaReleaser(Map<String, String> versions) throws Exception {
+	private DefaultSpringReleaser metaReleaser(Map<String, String> versions) throws Exception {
 		ReleaserProperties properties = metaReleaserProperties(versions);
 		return metaReleaserWithFullDeployment(properties);
 	}
 
-	private SpringReleaser metaReleaserDryRun(Map<String, String> versions)
+	private DefaultSpringReleaser metaReleaserDryRun(Map<String, String> versions)
 			throws Exception {
 		ReleaserProperties properties = metaReleaserProperties(versions);
 		return metaReleaserWithDryRun(properties);
 	}
 
-	private SpringReleaser releaserWithFullDeployment(String expectedVersion,
+	private DefaultSpringReleaser releaserWithFullDeployment(String expectedVersion,
 			String projectName, ReleaserProperties properties) throws Exception {
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
-		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
@@ -723,10 +723,10 @@ public class AcceptanceTests {
 		}, this.updater, this.applicationEventPublisher);
 	}
 
-	private SpringReleaser metaReleaserWithFullDeployment(ReleaserProperties properties)
+	private DefaultSpringReleaser metaReleaserWithFullDeployment(ReleaserProperties properties)
 			throws Exception {
 		Releaser releaser = defaultMetaReleaser(properties);
-		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
@@ -741,10 +741,10 @@ public class AcceptanceTests {
 		}, this.updater, this.applicationEventPublisher);
 	}
 
-	private SpringReleaser metaReleaserWithDryRun(ReleaserProperties properties)
+	private DefaultSpringReleaser metaReleaserWithDryRun(ReleaserProperties properties)
 			throws Exception {
 		Releaser releaser = defaultMetaReleaser(properties);
-		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
@@ -760,18 +760,18 @@ public class AcceptanceTests {
 		}, this.updater, this.applicationEventPublisher);
 	}
 
-	private SpringReleaser releaserWithSnapshotScRelease(File projectFile,
+	private DefaultSpringReleaser releaserWithSnapshotScRelease(File projectFile,
 			String projectName, String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = snapshotScReleaseReleaserProperties(projectFile,
 				branch);
 		return releaserWithFullDeployment(expectedVersion, projectName, properties);
 	}
 
-	private SpringReleaser templateOnlyReleaser(File projectFile, String projectName,
+	private DefaultSpringReleaser templateOnlyReleaser(File projectFile, String projectName,
 			String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
-		return new SpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {

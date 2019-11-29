@@ -16,10 +16,14 @@
 
 package org.springframework.cloud.release.internal.spring;
 
-import org.springframework.cloud.release.internal.options.Options;
+import java.util.LinkedList;
 
-public interface SpringReleaser {
-	void release();
+class ProjectsToRun extends LinkedList<ProjectToRun> {
 
-	void release(Options options);
+	ProjectsToRun() {
+	}
+
+	ProjectsToRun(ProjectToRun projectToRun) {
+		add(projectToRun);
+	}
 }

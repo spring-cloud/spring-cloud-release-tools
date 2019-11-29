@@ -30,7 +30,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.Parser;
-import org.springframework.cloud.release.internal.spring.SpringReleaser;
+import org.springframework.cloud.release.internal.spring.DefaultSpringReleaser;
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 import org.springframework.core.NestedExceptionUtils;
 
@@ -40,7 +40,7 @@ public class ReleaserApplication implements CommandLineRunner {
 	private static final Logger log = LoggerFactory.getLogger(ReleaserApplication.class);
 
 	@Autowired
-	SpringReleaser releaser;
+	DefaultSpringReleaser releaser;
 
 	@Autowired
 	Parser parser;

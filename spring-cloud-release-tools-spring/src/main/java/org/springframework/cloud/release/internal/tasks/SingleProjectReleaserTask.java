@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.spring;
+package org.springframework.cloud.release.internal.tasks;
 
-class BuildCompleted extends ReleaserTask {
+import java.util.Arrays;
+import java.util.List;
 
-	/**
-	 * Create a new ApplicationEvent.
-	 * @param source the object on which the event initially occurred (never {@code null})
-	 */
-	BuildCompleted(Object source) {
-		super(source);
+public interface SingleProjectReleaserTask extends ReleaserTask {
+	@Override
+	default List<TaskType> taskTypes() {
+		return Arrays.asList(TaskType.RELEASE, TaskType.PROJECT_POST_RELEASE);
 	}
-
 }

@@ -16,10 +16,18 @@
 
 package org.springframework.cloud.release.internal.spring;
 
-import org.springframework.cloud.release.internal.options.Options;
+import org.springframework.cloud.release.internal.project.ProjectVersion;
+import org.springframework.cloud.release.internal.project.Projects;
 
-public interface SpringReleaser {
-	void release();
+class ProjectsFromBom {
 
-	void release(Options options);
+	final Projects allProjectVersionsFromBom;
+
+	final ProjectVersion currentProjectFromBom;
+
+	ProjectsFromBom(Projects allProjectVersionsFromBom, ProjectVersion currentProjectFromBom) {
+		this.allProjectVersionsFromBom = allProjectVersionsFromBom;
+		this.currentProjectFromBom = currentProjectFromBom;
+	}
+
 }

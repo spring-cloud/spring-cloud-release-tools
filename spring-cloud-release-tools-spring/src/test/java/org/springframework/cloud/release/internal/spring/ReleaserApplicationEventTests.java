@@ -39,10 +39,10 @@ public class ReleaserApplicationEventTests {
 	@Test
 	public void should_throw_exceptions_when_at_least_one_task_is_failing() {
 		this.publisher.publishEvent(
-				new TaskCompleted(this, "foo", TaskAndException.skipped(Tasks.PUSH)));
-		this.publisher.publishEvent(new TaskCompleted(this, "foo",
+				new EventCompleted(this, "foo", TaskAndException.skipped(Tasks.PUSH)));
+		this.publisher.publishEvent(new EventCompleted(this, "foo",
 				TaskAndException.success(Tasks.CLOSE_MILESTONE)));
-		this.publisher.publishEvent(new TaskCompleted(this, "foo",
+		this.publisher.publishEvent(new EventCompleted(this, "foo",
 				TaskAndException.failure(Tasks.DEPLOY, new RuntimeException("boom!"))));
 
 		BDDAssertions.thenThrownBy(() -> {
@@ -53,8 +53,8 @@ public class ReleaserApplicationEventTests {
 	@Test
 	public void should_not_fail_when_all_tasks_not_failing() {
 		this.publisher.publishEvent(
-				new TaskCompleted(this, "foo", TaskAndException.skipped(Tasks.PUSH)));
-		this.publisher.publishEvent(new TaskCompleted(this, "foo",
+				new EventCompleted(this, "foo", TaskAndException.skipped(Tasks.PUSH)));
+		this.publisher.publishEvent(new EventCompleted(this, "foo",
 				TaskAndException.success(Tasks.CLOSE_MILESTONE)));
 
 		this.publisher.publishEvent(new BuildCompleted(this));

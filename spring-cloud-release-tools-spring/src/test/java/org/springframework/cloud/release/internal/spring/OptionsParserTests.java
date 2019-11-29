@@ -31,7 +31,7 @@ public class OptionsParserTests {
 
 	@Test
 	public void should_filter_provided_task_names() {
-		OptionsParser optionsParser = new OptionsParser();
+		OptionsParser optionsParser = new OptionsParser(tasks);
 
 		List<String> taskNames = optionsParser
 				.filterProvidedTaskNames(providedTaskNames(), allTaskNames(), true);

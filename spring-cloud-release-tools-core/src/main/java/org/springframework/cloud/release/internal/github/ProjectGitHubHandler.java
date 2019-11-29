@@ -75,7 +75,7 @@ public class ProjectGitHubHandler implements ReleaserPropertiesAware {
 	}
 
 	public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
-		if (this.properties.getGit().isUpdateStartSpringIo()) {
+		if (!this.properties.getGit().isUpdateStartSpringIo()) {
 			log.info(
 					"Will not update the release train documentation, since the switch to do so "
 							+ "is off. Set [releaser.git.update-start-spring-io] to [true] to change that");
