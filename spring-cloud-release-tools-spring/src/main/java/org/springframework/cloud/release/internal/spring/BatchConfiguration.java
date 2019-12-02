@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *    https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,18 +16,11 @@
 
 package org.springframework.cloud.release.internal.spring;
 
-import java.util.List;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.context.annotation.Configuration;
 
-class TaskUtils {
-
-	static int indexOf(Task task) {
-		List<Task> compositeTasks = Tasks.ALL_TASKS_PER_PROJECT;
-		for (int i = 0; i < compositeTasks.size(); i++) {
-			if (task == compositeTasks.get(i)) {
-				return i;
-			}
-		}
-		return -1;
-	}
+@Configuration
+@EnableBatchProcessing
+class BatchConfiguration {
 
 }

@@ -36,19 +36,13 @@
 			<version>5.0.3</version>
 			<optional>true</optional>
 		</dependency>
-		<!--<dependency>-->
-		<!--<groupId>com.esotericsoftware.yamlbeans</groupId>-->
-		<!--<artifactId>yamlbeans</artifactId>-->
-		<!--<version>1.13</version>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.jakewharton.fliptables</groupId>
-			<artifactId>fliptables</artifactId>
-			<version>1.0.2</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-batch</artifactId>
 		</dependency>
 
 		<dependency>

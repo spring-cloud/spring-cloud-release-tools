@@ -19,6 +19,7 @@ package org.springframework.cloud.release.internal.tasks.composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.spring.Arguments;
 import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
@@ -34,6 +35,8 @@ public class MetaReleaseDryRunCompositeTask implements CompositeReleaserTask {
 	public static final int ORDER = -70;
 
 	private final ApplicationContext context;
+
+	private DryRunCompositeTask dryRunCompositeTask;
 
 	public MetaReleaseDryRunCompositeTask(ApplicationContext context) {
 		this.context = context;
@@ -61,20 +64,26 @@ public class MetaReleaseDryRunCompositeTask implements CompositeReleaserTask {
 
 	@Override
 	public void accept(Arguments args) {
-		//TODO: Use Batch here already
-		args.properties.getMetaRelease().setEnabled(true);
-		// TODO: Let's run all the tasks
-		/*
-				static Task META_RELEASE_DRY_RUN = Tasks.task("metaReleaseDryRun", "xdr",
-			"META RELEASE DRY RUN", "Perform a meta release dry run of projects",
-			args -> new CompositeConsumer(DEFAULT_DRY_RUN_TASKS_PER_PROJECT,
-					(args1 -> args.properties.getMetaRelease().setEnabled(true)))
-							.accept(args));
-		 */
+		dryRunCompositeTask().accept(args);
+	}
+
+	@Override
+	public void setup(Options options, ReleaserProperties properties) {
+		properties.getGit().setFetchVersionsFromGit(false);
+		properties.getMetaRelease().setEnabled(true);
+		options.fullRelease = true;
+		options.dryRun = true;
 	}
 
 	@Override
 	public int getOrder() {
 		return MetaReleaseDryRunCompositeTask.ORDER;
+	}
+
+	private DryRunCompositeTask dryRunCompositeTask() {
+		if (this.dryRunCompositeTask == null) {
+			this.dryRunCompositeTask = this.context.getBean(DryRunCompositeTask.class);
+		}
+		return this.dryRunCompositeTask;
 	}
 }

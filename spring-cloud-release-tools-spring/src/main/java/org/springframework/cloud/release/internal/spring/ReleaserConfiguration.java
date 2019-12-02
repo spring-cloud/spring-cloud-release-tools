@@ -19,6 +19,8 @@ package org.springframework.cloud.release.internal.spring;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.release.internal.Releaser;
@@ -71,8 +73,8 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
-	FlowRunner flowRunner() {
-		return new SpringBatchFlowRunner();
+	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory) {
+		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory);
 	}
 
 	@Bean

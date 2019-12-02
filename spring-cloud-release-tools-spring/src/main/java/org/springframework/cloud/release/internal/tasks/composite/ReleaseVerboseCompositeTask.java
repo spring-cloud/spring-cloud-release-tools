@@ -19,6 +19,8 @@ package org.springframework.cloud.release.internal.tasks.composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.spring.Arguments;
 import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +32,8 @@ public class ReleaseVerboseCompositeTask implements CompositeReleaserTask {
 	public static final int ORDER = -90;
 
 	private final ApplicationContext context;
+
+	private ReleaseCompositeTask releaserCompositeTask;
 
 	public ReleaseVerboseCompositeTask(ApplicationContext context) {
 		this.context = context;
@@ -57,12 +61,24 @@ public class ReleaseVerboseCompositeTask implements CompositeReleaserTask {
 
 	@Override
 	public void accept(Arguments args) {
-		//TODO: Use Batch here already
-		// TODO: How to mark the interactive mode aka the listener
+		releaserCompositeTask().accept(args);
+	}
+
+	@Override
+	public void setup(Options options, ReleaserProperties properties) {
+		options.fullRelease = true;
+		options.interactive = true;
 	}
 
 	@Override
 	public int getOrder() {
 		return ReleaseVerboseCompositeTask.ORDER;
+	}
+
+	private ReleaseCompositeTask releaserCompositeTask() {
+		if (this.releaserCompositeTask == null) {
+			this.releaserCompositeTask = this.context.getBean(ReleaseCompositeTask.class);
+		}
+		return this.releaserCompositeTask;
 	}
 }

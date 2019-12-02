@@ -19,6 +19,8 @@ package org.springframework.cloud.release.internal.tasks;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.spring.Arguments;
 import org.springframework.core.Ordered;
 
@@ -33,6 +35,10 @@ public interface ReleaserTask extends Ordered, Consumer<Arguments> {
 	String description();
 
 	List<TaskType> taskTypes();
+
+	default void setup(Options options, ReleaserProperties properties) {
+
+	}
 
 	enum TaskType {
 		/**

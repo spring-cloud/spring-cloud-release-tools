@@ -44,7 +44,7 @@ class VersionsToBumpFactory {
 		this.properties = properties;
 	}
 
-	ProjectsFromBom get(File project) {
+	ProjectsFromBom withProject(File project) {
 		ProjectsFromBom projectsFromBom = CACHE.get(project);
 		if (projectsFromBom != null) {
 			log.info("Found cached version of projects and version [{}]",
@@ -59,6 +59,12 @@ class VersionsToBumpFactory {
 			return fetchVersionsFromGitForSingleProject(project);
 		}
 		return fetchVersionsFromFixedProjects(project);
+	}
+
+	ProjectsFromBom postRelease() {
+		Projects fixedVersions = this.releaser.fixedVersions();
+		printSettingVersionFromFixedVersions(fixedVersions);
+		return new ProjectsFromBom(fixedVersions);
 	}
 
 	private ProjectsFromBom fetchVersionsFromFixedProjects(File project) {

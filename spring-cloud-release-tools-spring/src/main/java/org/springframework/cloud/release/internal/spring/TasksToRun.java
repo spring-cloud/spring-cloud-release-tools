@@ -16,15 +16,20 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import java.util.Collection;
 import java.util.LinkedList;
 
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 
-class TasksToRun extends LinkedList<ReleaserTask> {
-	TasksToRun() {
+public class TasksToRun extends LinkedList<ReleaserTask> {
+	public TasksToRun() {
 	}
 
-	TasksToRun(ReleaserTask c) {
+	public TasksToRun(Collection<? extends ReleaserTask> c) {
+		super(c);
+	}
+
+	public TasksToRun(ReleaserTask c) {
 		add(c);
 	}
 }

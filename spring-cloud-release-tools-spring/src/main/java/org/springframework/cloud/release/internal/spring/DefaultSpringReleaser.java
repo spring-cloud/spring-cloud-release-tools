@@ -37,7 +37,7 @@ public class DefaultSpringReleaser implements SpringReleaser {
 
 	private final FlowRunner flowRunner;
 
-	public DefaultSpringReleaser(ReleaserProperties properties, OptionsAndPropertiesFactory optionsAndPropertiesFactory, ProjectsToRunFactory projectsToRunFactory, TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner) {
+	public DefaultSpringReleaser(ReleaserProperties properties, OptionsAndPropertiesFactory optionsAndPropertiesFactory, ProjectsToRunFactory projectsToRunFactory, TasksToRunFactory tasksToRunFactory,FlowRunner flowRunner) {
 		this.properties = properties;
 		this.optionsAndPropertiesFactory = optionsAndPropertiesFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
@@ -78,8 +78,9 @@ public class DefaultSpringReleaser implements SpringReleaser {
 	@Override
 	public void release(Options options) {
 		OptionsAndProperties optionsAndProperties = prepareOptionsAndProperties(options, this.properties);
-		ProjectsToRun projectsToRun = takeProjectsFromOptions(optionsAndProperties);
+		// order matters! Tasks will mutate options and properties
 		TasksToRun releaseTasksToRun = takeReleaseTasksFromOptions(optionsAndProperties);
+		ProjectsToRun projectsToRun = takeReleaseProjects(optionsAndProperties);
 		runReleaseTasks(optionsAndProperties, projectsToRun, releaseTasksToRun);
 		TasksToRun postReleaseTasksToRun = takePostReleaseTasksFromOptions();
 		runPostReleaseTasks(optionsAndProperties, postReleaseTasksToRun);
@@ -89,16 +90,12 @@ public class DefaultSpringReleaser implements SpringReleaser {
 		return this.optionsAndPropertiesFactory.get(properties, options);
 	}
 
-	private void runReleaseTasks(OptionsAndProperties optionsAndProperties, ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
-		this.flowRunner.executeTasksForProjects(optionsAndProperties.options, optionsAndProperties.properties, projectsToRun, tasksToRun);
+	private ProjectsToRun takeReleaseProjects(OptionsAndProperties options) {
+		return this.projectsToRunFactory.release(options);
 	}
 
-	private void runPostReleaseTasks(OptionsAndProperties optionsAndProperties, TasksToRun postReleaseTasksToRun) {
-		this.flowRunner.executePostReleaseTasks(optionsAndProperties.options, optionsAndProperties.properties, postReleaseTasksToRun);
-	}
-
-	private ProjectsToRun takeProjectsFromOptions(OptionsAndProperties options) {
-		return this.projectsToRunFactory.get(options);
+	private ProjectsToRun postReleaseProjects(OptionsAndProperties options) {
+		return this.projectsToRunFactory.postRelease(options);
 	}
 
 	private TasksToRun takeReleaseTasksFromOptions(OptionsAndProperties options) {
@@ -107,6 +104,14 @@ public class DefaultSpringReleaser implements SpringReleaser {
 
 	private TasksToRun takePostReleaseTasksFromOptions() {
 		return this.tasksToRunFactory.postRelease();
+	}
+
+	private void runReleaseTasks(OptionsAndProperties optionsAndProperties, ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
+		this.flowRunner.runReleaseTasks(optionsAndProperties.options, optionsAndProperties.properties, projectsToRun, tasksToRun);
+	}
+
+	private void runPostReleaseTasks(OptionsAndProperties optionsAndProperties, TasksToRun postReleaseTasksToRun) {
+		this.flowRunner.runPostReleaseTasks(optionsAndProperties.options, optionsAndProperties.properties, "postRelease", postReleaseTasksToRun, postReleaseProjects(optionsAndProperties));
 	}
 
 }

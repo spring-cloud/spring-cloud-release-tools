@@ -17,7 +17,10 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
@@ -37,17 +40,44 @@ public class Arguments {
 
 	public final ReleaserProperties properties;
 
-	public final List<ProcessedProject> processedProjects;
-
 	public final Options options;
 
-	public Arguments(File project, Projects projects, ProjectVersion originalVersion, ProjectVersion versionFromBom, ReleaserProperties properties, List<ProcessedProject> processedProjects, Options options) {
-		this.project = project;
-		this.projects = projects;
-		this.originalVersion = originalVersion;
-		this.versionFromBom = versionFromBom;
+	public final ProjectToRun projectToRun;
+
+	public final List<ProcessedProject> processedProjects;
+
+	private Arguments(ProjectToRun thisProject, ProjectsFromBom allProjectsFromBom) {
+		this.project = thisProject.thisProjectFolder;
+		this.projects = allProjectsFromBom.allProjectVersionsFromBom;
+		this.originalVersion = thisProject.originalVersion;
+		this.versionFromBom = allProjectsFromBom.currentProjectFromBom;
+		this.properties = thisProject.thisProjectReleaserProperties;
+		this.options = thisProject.options;
+		this.projectToRun = thisProject;
+		this.processedProjects = new LinkedList<>(Collections.singletonList(new ProcessedProject(thisProject.thisProjectReleaserProperties, this.versionFromBom, this.originalVersion)));
+	}
+
+	private Arguments(ReleaserProperties properties, Options options, List<ProcessedProject> processedProjects) {
+		this.project = null;
+		this.projects = new Projects(processedProjects.stream().map(p -> p.newProjectVersion).collect(Collectors.toSet()));
+		this.originalVersion = null;
+		this.versionFromBom = null;
 		this.properties = properties;
-		this.processedProjects = processedProjects;
 		this.options = options;
+		this.projectToRun = null;
+		this.processedProjects = processedProjects;
+	}
+
+	public static Arguments forProject(ProjectToRun thisProject) {
+		return new Arguments(thisProject, thisProject.allProjectsFromBom);
+	}
+
+	public static Arguments forPostRelease(ReleaserProperties properties, Options options, ProjectsToRun projectsToRun) {
+		return new Arguments(properties, options, projectsToRunToProcessedProject(projectsToRun));
+	}
+
+	private static List<ProcessedProject> projectsToRunToProcessedProject(ProjectsToRun projectsToRun) {
+		return projectsToRun.stream().map(ProjectToRun.ProjectToRunSupplier::get).map(p -> new ProcessedProject(p.thisProjectReleaserProperties, p.thisProjectVersionFromBom, p.originalVersion)).collect(Collectors
+				.toCollection(LinkedList::new));
 	}
 }

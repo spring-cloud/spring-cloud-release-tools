@@ -60,7 +60,6 @@ import org.springframework.cloud.release.internal.docs.TestReleaseContentsUpdate
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
-import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProjectCommandExecutor;
@@ -129,7 +128,7 @@ public class AcceptanceTests {
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 		BDDMockito.given(this.saganClient.getProject(anyString()))
 				.willReturn(newProject());
-		Task.stepSkipper = () -> false;
+//		Task.stepSkipper = () -> false;
 		new File("/tmp/executed_build").delete();
 		new File("/tmp/executed_deploy").delete();
 		new File("/tmp/executed_docs").delete();
@@ -137,7 +136,7 @@ public class AcceptanceTests {
 
 	@After
 	public void clean() {
-		Task.stepSkipper = new ConsoleInputStepSkipper();
+//		Task.stepSkipper = new ConsoleInputStepSkipper();
 	}
 
 	private Project newProject() {
@@ -708,7 +707,7 @@ public class AcceptanceTests {
 	private DefaultSpringReleaser releaserWithFullDeployment(String expectedVersion,
 			String projectName, ReleaserProperties properties) throws Exception {
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
-		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		/*return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
@@ -720,13 +719,14 @@ public class AcceptanceTests {
 				options.interactive = false;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		}, this.updater, this.applicationEventPublisher);
+		}, this.updater, versionsToBumpFactory, this.applicationEventPublisher);*/
+		return null;
 	}
 
 	private DefaultSpringReleaser metaReleaserWithFullDeployment(ReleaserProperties properties)
 			throws Exception {
 		Releaser releaser = defaultMetaReleaser(properties);
-		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		/*return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
@@ -738,13 +738,14 @@ public class AcceptanceTests {
 				options.interactive = false;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		}, this.updater, this.applicationEventPublisher);
+		}, this.updater, versionsToBumpFactory, this.applicationEventPublisher);*/
+		return null;
 	}
 
 	private DefaultSpringReleaser metaReleaserWithDryRun(ReleaserProperties properties)
 			throws Exception {
 		Releaser releaser = defaultMetaReleaser(properties);
-		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		/*return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
@@ -757,7 +758,8 @@ public class AcceptanceTests {
 				options.interactive = false;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		}, this.updater, this.applicationEventPublisher);
+		}, this.updater, versionsToBumpFactory, this.applicationEventPublisher);*/
+		return null;
 	}
 
 	private DefaultSpringReleaser releaserWithSnapshotScRelease(File projectFile,
@@ -771,7 +773,7 @@ public class AcceptanceTests {
 			String branch, String expectedVersion) throws Exception {
 		ReleaserProperties properties = releaserProperties(projectFile, branch);
 		Releaser releaser = defaultReleaser(expectedVersion, projectName, properties);
-		return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
+		/*return new DefaultSpringReleaser(releaser, properties, new OptionsProcessor(releaser,
 				properties, this.applicationEventPublisher) {
 			@Override
 			String chosenOption() {
@@ -783,7 +785,8 @@ public class AcceptanceTests {
 				options.interactive = true;
 				super.postReleaseOptions(options, defaultArgs);
 			}
-		}, this.updater, this.applicationEventPublisher);
+		}, this.updater, versionsToBumpFactory, this.applicationEventPublisher);*/
+		return null;
 	}
 
 	private Releaser defaultReleaser(String expectedVersion, String projectName,

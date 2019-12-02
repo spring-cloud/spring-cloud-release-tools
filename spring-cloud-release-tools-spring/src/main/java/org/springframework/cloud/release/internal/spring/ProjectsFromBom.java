@@ -19,15 +19,19 @@ package org.springframework.cloud.release.internal.spring;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
-class ProjectsFromBom {
+public class ProjectsFromBom {
 
-	final Projects allProjectVersionsFromBom;
+	public final Projects allProjectVersionsFromBom;
 
-	final ProjectVersion currentProjectFromBom;
+	public final ProjectVersion currentProjectFromBom;
 
-	ProjectsFromBom(Projects allProjectVersionsFromBom, ProjectVersion currentProjectFromBom) {
+	public ProjectsFromBom(Projects allProjectVersionsFromBom, ProjectVersion currentProjectFromBom) {
 		this.allProjectVersionsFromBom = allProjectVersionsFromBom;
 		this.currentProjectFromBom = currentProjectFromBom;
+	}
+
+	public ProjectsFromBom(Projects allProjectVersionsFromBom) {
+		this(allProjectVersionsFromBom, null);
 	}
 
 }

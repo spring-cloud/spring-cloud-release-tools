@@ -16,20 +16,35 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import java.io.File;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 
-class ProjectToRun {
-	final ProjectsFromBom projectsFromBom;
-	final ProjectVersion projectFromRepo;
-	final ReleaserProperties releaserPropertiesForThisProject;
+public class ProjectToRun {
+	public final File thisProjectFolder;
+	public final ProjectsFromBom allProjectsFromBom;
+	public final ProjectVersion originalVersion;
+	public final ProjectVersion thisProjectVersionFromBom;
+	public final ReleaserProperties thisProjectReleaserProperties;
+	public final Options options;
 
-	ProjectToRun(ProjectsFromBom projectsFromBom, ProjectVersion projectFromRepo, ReleaserProperties releaserPropertiesForThisProject) {
-		this.projectsFromBom = projectsFromBom;
-		this.projectFromRepo = projectFromRepo;
-		this.releaserPropertiesForThisProject = releaserPropertiesForThisProject;
+	public ProjectToRun(File thisProjectFolder, ProjectsFromBom allProjectsFromBom, ProjectVersion originalVersion, ReleaserProperties thisProjectReleaserProperties, Options options) {
+		this.thisProjectFolder = thisProjectFolder;
+		this.allProjectsFromBom = allProjectsFromBom;
+		this.originalVersion = originalVersion;
+		this.thisProjectReleaserProperties = thisProjectReleaserProperties;
+		this.options = options;
+		this.thisProjectVersionFromBom = allProjectsFromBom.currentProjectFromBom;
+	}
+
+	public String name() {
+		return this.thisProjectFolder.getName();
 	}
 
 	@Override
@@ -41,12 +56,53 @@ class ProjectToRun {
 			return false;
 		}
 		ProjectToRun that = (ProjectToRun) o;
-		return Objects.equals(projectsFromBom, that.projectsFromBom) &&
-				Objects.equals(projectFromRepo, that.projectFromRepo);
+		return Objects.equals(originalVersion, that.originalVersion);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(projectsFromBom, projectFromRepo);
+		return Objects.hash(originalVersion);
+	}
+
+	public static class ProjectToRunSupplier implements Supplier<ProjectToRun> {
+
+		private static final Map<String, ProjectToRun> CACHE = new ConcurrentHashMap<>();
+
+		private final String projectName;
+
+		private final Supplier<ProjectToRun> project;
+
+		public ProjectToRunSupplier(String projectName, Supplier<ProjectToRun> project) {
+			this.projectName = projectName;
+			this.project = project;
+		}
+
+		@Override
+		public ProjectToRun get() {
+			ProjectToRun projectToRun = CACHE.get(this.projectName);
+			if (projectToRun != null) {
+				return projectToRun;
+			}
+			projectToRun = this.project.get();
+			CACHE.put(this.projectName, projectToRun);
+			return projectToRun;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			ProjectToRunSupplier that = (ProjectToRunSupplier) o;
+			return Objects.equals(this.projectName, that.projectName);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.projectName);
+		}
 	}
 }

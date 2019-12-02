@@ -18,12 +18,12 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.util.LinkedList;
 
-class ProjectsToRun extends LinkedList<ProjectToRun> {
+public class ProjectsToRun extends LinkedList<ProjectToRun.ProjectToRunSupplier> {
 
-	ProjectsToRun() {
+	public ProjectsToRun() {
 	}
 
-	ProjectsToRun(ProjectToRun projectToRun) {
+	public ProjectsToRun(ProjectToRun.ProjectToRunSupplier projectToRun) {
 		add(projectToRun);
 	}
 }

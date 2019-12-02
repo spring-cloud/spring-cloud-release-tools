@@ -47,6 +47,12 @@ class TasksToRunFactory {
 	}
 
 	TasksToRun release(OptionsAndProperties optionsAndProperties) {
+		TasksToRun tasks = releaseTasks(optionsAndProperties);
+		tasks.forEach(t -> t.setup(optionsAndProperties.options, optionsAndProperties.properties));
+		return tasks;
+	}
+
+	private TasksToRun releaseTasks(OptionsAndProperties optionsAndProperties) {
 		Options options = optionsAndProperties.options;
 		ReleaserProperties properties = optionsAndProperties.properties;
 		if (properties.isPostReleaseTasksOnly()) {
@@ -161,20 +167,18 @@ class TasksToRunFactory {
 
 	TasksToRun taskFromOption(List<ReleaserTask> tasks) {
 		String input = chosenOption();
-		switch (input.toLowerCase()) {
-		case "q":
+		if ("q".equals(input.toLowerCase())) {
 			System.exit(0);
 			return null;
-		default:
-			if (input.contains("-")) {
-				return rangeInteractive(tasks, input);
-			}
-			else if (input.contains(",")) {
-				return tasksInteractive(tasks, input);
-			}
-			else {
-				return singleTask(tasks, input);
-			}
+		}
+		if (input.contains("-")) {
+			return rangeInteractive(tasks, input);
+		}
+		else if (input.contains(",")) {
+			return tasksInteractive(tasks, input);
+		}
+		else {
+			return singleTask(tasks, input);
 		}
 	}
 

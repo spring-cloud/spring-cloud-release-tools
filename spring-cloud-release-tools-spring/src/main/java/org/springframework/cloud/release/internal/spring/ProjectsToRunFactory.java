@@ -44,7 +44,7 @@ class ProjectsToRunFactory {
 		this.updater = updater;
 	}
 
-	ProjectsToRun get(OptionsAndProperties optionsAndProperties) {
+	ProjectsToRun release(OptionsAndProperties optionsAndProperties) {
 		Options options = optionsAndProperties.options;
 		ReleaserProperties properties = optionsAndProperties.properties;
 		if (!options.metaRelease) {
@@ -52,10 +52,23 @@ class ProjectsToRunFactory {
 					"Single project release picked. Will release only the current project");
 			File projectFolder = projectFolder(properties);
 			ProjectVersion version = new ProjectVersion(projectFolder);
-			ProjectsFromBom projectsFromBom = this.versionsToBumpFactory.get(projectFolder);
-			return new ProjectsToRun(new ProjectToRun(projectsFromBom, version, properties));
+			ProjectsFromBom projectsFromBom = this.versionsToBumpFactory.withProject(projectFolder);
+			return new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(version.projectName, () -> new ProjectToRun(projectFolder, projectsFromBom, version, properties, options)));
 		}
+		log.info(
+				"Meta release picked");
 		return metaReleaseProjectsToRun(options, properties);
+	}
+
+	ProjectsToRun postRelease(OptionsAndProperties optionsAndProperties) {
+		Options options = optionsAndProperties.options;
+		ReleaserProperties properties = optionsAndProperties.properties;
+		if (!options.metaRelease) {
+			return new ProjectsToRun();
+		}
+		log.info(
+				"Meta release picked");
+		return metaReleasePostReleaseProjectsToRun(options, properties);
 	}
 
 	private File projectFolder(ReleaserProperties properties) {
@@ -64,16 +77,28 @@ class ProjectsToRunFactory {
 	}
 
 	private ProjectsToRun metaReleaseProjectsToRun(Options options, ReleaserProperties originalProps) {
-		return metaReleaseProjects(options, originalProps).stream().map(project -> {
+		return metaProjectsToRun(options, originalProps, metaReleaseProjects(options, originalProps));
+	}
+
+	private ProjectsToRun metaReleasePostReleaseProjectsToRun(Options options, ReleaserProperties originalProps) {
+		return metaProjectsToRun(options, originalProps, allButSkippedProjects(originalProps));
+	}
+
+	private ProjectsToRun metaProjectsToRun(Options options, ReleaserProperties originalProps, List<String> projectNames) {
+		return projectNames.stream().map(project -> projectSupplier(options, originalProps, project)).collect(Collectors.toCollection(ProjectsToRun::new));
+	}
+
+	private ProjectToRun.ProjectToRunSupplier projectSupplier(Options options, ReleaserProperties originalProps, String project) {
+		return new ProjectToRun.ProjectToRunSupplier(project, () -> {
 			File clonedProjectFromOrg = this.releaser.clonedProjectFromOrg(project);
 			ReleaserProperties properties = updatePropertiesIfCustomConfigPresent(
 					originalProps.copy(), clonedProjectFromOrg);
 			log.info("Successfully cloned the project [{}] to [{}]", project,
 					clonedProjectFromOrg);
-			ProjectVersion version = new ProjectVersion(clonedProjectFromOrg);
-			ProjectsFromBom projectsFromBom = this.versionsToBumpFactory.get(clonedProjectFromOrg);
-			return new ProjectToRun(projectsFromBom, version, properties);
-		}).collect(Collectors.toCollection(ProjectsToRun::new));
+			ProjectVersion originalVersion = new ProjectVersion(clonedProjectFromOrg);
+			ProjectsFromBom projectsFromBom = this.versionsToBumpFactory.withProject(clonedProjectFromOrg);
+			return new ProjectToRun(clonedProjectFromOrg, projectsFromBom, originalVersion, properties, options);
+		});
 	}
 
 	private ReleaserProperties updatePropertiesIfCustomConfigPresent(
@@ -82,12 +107,7 @@ class ProjectsToRunFactory {
 	}
 
 	private List<String> metaReleaseProjects(Options options, ReleaserProperties properties) {
-		List<String> projects = new ArrayList<>(
-				properties.getFixedVersions().keySet());
-		log.info("List of projects that should not be cloned {}",
-				properties.getMetaRelease().getProjectsToSkip());
-		List<String> filteredProjects = filterProjectsToSkip(projects, properties);
-		log.info("List of all projects to clone before filtering {}", filteredProjects);
+		List<String> filteredProjects = allButSkippedProjects(properties);
 		if (StringUtils.hasText(options.startFrom)) {
 			filteredProjects = filterStartFrom(options, filteredProjects);
 		}
@@ -96,6 +116,16 @@ class ProjectsToRunFactory {
 		}
 		log.info("\n\n\nFor meta-release, will release the projects {}\n\n\n",
 				filteredProjects);
+		return filteredProjects;
+	}
+
+	private List<String> allButSkippedProjects(ReleaserProperties properties) {
+		List<String> projects = new ArrayList<>(
+				properties.getFixedVersions().keySet());
+		log.info("List of projects that should not be cloned {}",
+				properties.getMetaRelease().getProjectsToSkip());
+		List<String> filteredProjects = filterProjectsToSkip(projects, properties);
+		log.info("List of all projects to clone before filtering {}", filteredProjects);
 		return filteredProjects;
 	}
 

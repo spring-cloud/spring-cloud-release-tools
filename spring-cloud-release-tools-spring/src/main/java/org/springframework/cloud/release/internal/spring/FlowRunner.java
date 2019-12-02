@@ -21,6 +21,7 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 
 public interface FlowRunner {
+
 	default Decision beforeTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
 		return Decision.CONTINUE;
 	}
@@ -29,11 +30,11 @@ public interface FlowRunner {
 		return Decision.CONTINUE;
 	}
 
-	void executeTasksForProjects(Options options, ReleaserProperties properties, ProjectsToRun projectToRuns, TasksToRun tasksToRun);
+	void runReleaseTasks(Options options, ReleaserProperties properties, ProjectsToRun projectToRuns, TasksToRun tasksToRun);
 
-	void executePostReleaseTasks(Options options, ReleaserProperties properties, TasksToRun tasksToRun);
+	void runPostReleaseTasks(Options options, ReleaserProperties properties, String executingTaskName, TasksToRun tasksToRun, ProjectsToRun projectsToRun);
 
 	enum Decision {
-		CONTINUE, SKIP
+		CONTINUE, SKIP, ABORT
 	}
 }

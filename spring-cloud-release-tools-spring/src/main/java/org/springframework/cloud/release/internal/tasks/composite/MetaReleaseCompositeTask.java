@@ -19,6 +19,7 @@ package org.springframework.cloud.release.internal.tasks.composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.spring.Arguments;
 import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
@@ -34,6 +35,8 @@ public class MetaReleaseCompositeTask implements CompositeReleaserTask {
 	public static final int ORDER = -80;
 
 	private final ApplicationContext context;
+
+	private ReleaseCompositeTask releaserCompositeTask;
 
 	public MetaReleaseCompositeTask(ApplicationContext context) {
 		this.context = context;
@@ -61,20 +64,25 @@ public class MetaReleaseCompositeTask implements CompositeReleaserTask {
 
 	@Override
 	public void accept(Arguments args) {
-		//TODO: Use Batch here already
-		args.properties.getMetaRelease().setEnabled(true);
-		// TODO: Let's run all the tasks
-		/*
-			static Task META_RELEASE = Tasks.task("metaRelease", "x", "META RELEASE",
-			"Perform a meta release of projects",
-			args -> new CompositeConsumer(DEFAULT_TASKS_PER_PROJECT,
-					(args1 -> args.properties.getMetaRelease().setEnabled(true)))
-							.accept(args));
-		 */
+		releaserCompositeTask().accept(args);
+	}
+
+	@Override
+	public void setup(Options options, ReleaserProperties properties) {
+		properties.getGit().setFetchVersionsFromGit(false);
+		properties.getMetaRelease().setEnabled(true);
+		options.fullRelease = true;
 	}
 
 	@Override
 	public int getOrder() {
 		return MetaReleaseCompositeTask.ORDER;
+	}
+
+	private ReleaseCompositeTask releaserCompositeTask() {
+		if (this.releaserCompositeTask == null) {
+			this.releaserCompositeTask = this.context.getBean(ReleaseCompositeTask.class);
+		}
+		return this.releaserCompositeTask;
 	}
 }
