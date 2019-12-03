@@ -107,6 +107,7 @@ class ReleaserConfiguration {
 	ProjectGitHandler projectGitHandler() {
 		return new ProjectGitHandler(this.properties);
 	}
+
 	@Bean
 	@ConditionalOnMissingBean
 	ProjectGitHubHandler projectGitHubHandler(@Autowired(required = false)

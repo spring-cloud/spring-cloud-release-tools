@@ -37,8 +37,14 @@ public interface CustomProjectDocumentationUpdater {
 		}
 
 		@Override
-		public File updateDocsRepo(File clonedDocumentationProject,
+		public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
 				ProjectVersion currentProject, Projects projects, String bomBranch) {
+			return clonedDocumentationProject;
+		}
+
+		@Override
+		public File updateDocsRepoForSingleProject(File clonedDocumentationProject,
+				ProjectVersion currentProject, Projects projects) {
 			return clonedDocumentationProject;
 		}
 	};
@@ -49,14 +55,14 @@ public interface CustomProjectDocumentationUpdater {
 	 * repository.
 	 * @param clonedDocumentationProject path to the cloned documentation project
 	 * @param currentProject project to update the docs repo for
-	 * @param bomBranch the bom project branch
+	 * @param bomBranch the bom project branch - can be null
 	 * @return {@code true} if the parser should be applied.
 	 */
 	boolean isApplicable(File clonedDocumentationProject, ProjectVersion currentProject,
 			String bomBranch);
 
 	/**
-	 * Updates the documentation repository.
+	 * Updates the documentation repository for a release train.
 	 * @param clonedDocumentationProject path to the cloned documentation project
 	 * @param currentProject project to update the docs repo for
 	 * @param projects list of projects to update versions for
@@ -64,7 +70,18 @@ public interface CustomProjectDocumentationUpdater {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	File updateDocsRepo(File clonedDocumentationProject, ProjectVersion currentProject,
+	File updateDocsRepoForReleaseTrain(File clonedDocumentationProject, ProjectVersion currentProject,
 			Projects projects, String bomBranch);
+
+	/**
+	 * Updates the documentation repository for a single project.
+	 * @param clonedDocumentationProject path to the cloned documentation project
+	 * @param currentProject project to update the docs repo for
+	 * @param projects list of projects to update versions for
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
+	 * used
+	 */
+	File updateDocsRepoForSingleProject(File clonedDocumentationProject, ProjectVersion currentProject,
+			Projects projects);
 
 }

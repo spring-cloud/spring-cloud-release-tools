@@ -18,47 +18,46 @@ package org.springframework.cloud.release.internal.tasks.postrelease;
 
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.spring.Arguments;
-import org.springframework.cloud.release.internal.tasks.TrainPostReleaseReleaserTask;
+import org.springframework.cloud.release.internal.tasks.ProjectPostReleaseReleaserTask;
 
-public class UpdateDocsRepositoryTrainPostReleaseTask implements TrainPostReleaseReleaserTask {
+public class UpdateDocsRepositoryProjectPostReleaseTask implements ProjectPostReleaseReleaserTask {
 
-	public static final int ORDER = 110;
+	public static final int ORDER = 105;
 
 	private final Releaser releaser;
 
-	public UpdateDocsRepositoryTrainPostReleaseTask(Releaser releaser) {
+	public UpdateDocsRepositoryProjectPostReleaseTask(Releaser releaser) {
 		this.releaser = releaser;
 	}
 
 	@Override
 	public String name() {
-		return "updateDocumentation";
+		return "updateDocumentationForProject";
 	}
 
 	@Override
 	public String shortName() {
-		return "ud";
+		return "udp";
 	}
 
 	@Override
 	public String header() {
-		return "UPDATE DOCUMENTATION FOR RELEASE TRAIN";
+		return "UPDATE DOCUMENTATION FOR PROJECT";
 	}
 
 	@Override
 	public String description() {
-		return "Updating documentation repository for a release train";
+		return "Updating documentation repository for a single project";
 	}
 
 	@Override
 	public void accept(Arguments args) {
-		this.releaser.updateDocumentationRepositoryForTrain(args.properties,
-				args.projects, args.versionFromBom);
+		this.releaser.updateDocumentationRepositoryForSingleProject(args.projects, args.versionFromBom);
 	}
 
 	@Override
 	public int getOrder() {
-		return UpdateDocsRepositoryTrainPostReleaseTask.ORDER;
+		return UpdateDocsRepositoryProjectPostReleaseTask.ORDER;
 	}
 
 }

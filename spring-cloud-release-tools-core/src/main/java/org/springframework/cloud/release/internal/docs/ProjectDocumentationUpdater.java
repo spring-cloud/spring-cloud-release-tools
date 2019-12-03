@@ -52,16 +52,7 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
 	public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
 			String bomBranch) {
-		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
-			log.info(
-					"Will not update documentation repository, since the switch to do so "
-							+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
-			return null;
-		}
-		if (!currentProject.isReleaseOrServiceRelease()) {
-			log.info(
-					"Will not update documentation repository for non release or service release [{}]",
-					currentProject.version);
+		if (!shouldUpdate(currentProject)) {
 			return null;
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
@@ -69,8 +60,36 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		CustomProjectDocumentationUpdater updater = this.updaters.stream().filter(
 				u -> u.isApplicable(documentationProject, currentProject, bomBranch))
 				.findFirst().orElse(CustomProjectDocumentationUpdater.NO_OP);
-		return updater.updateDocsRepo(documentationProject, currentProject, projects,
+		return updater.updateDocsRepoForReleaseTrain(documentationProject, currentProject, projects,
 				bomBranch);
+	}
+
+	public File updateDocsRepoForSingleProject(Projects projects, ProjectVersion currentProject) {
+		if (!shouldUpdate(currentProject)) {
+			return null;
+		}
+		File documentationProject = this.gitHandler.cloneDocumentationProject();
+		log.debug("Cloning the doc project to [{}]", documentationProject);
+		CustomProjectDocumentationUpdater updater = this.updaters.stream().filter(
+				u -> u.isApplicable(documentationProject, currentProject, null))
+				.findFirst().orElse(CustomProjectDocumentationUpdater.NO_OP);
+		return updater.updateDocsRepoForSingleProject(documentationProject, currentProject, projects);
+	}
+
+	private boolean shouldUpdate(ProjectVersion currentProject) {
+		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
+			log.info(
+					"Will not update documentation repository, since the switch to do so "
+							+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
+			return false;
+		}
+		if (!currentProject.isReleaseOrServiceRelease()) {
+			log.info(
+					"Will not update documentation repository for non release or service release [{}]",
+					currentProject.version);
+			return false;
+		}
+		return true;
 	}
 
 	@Override

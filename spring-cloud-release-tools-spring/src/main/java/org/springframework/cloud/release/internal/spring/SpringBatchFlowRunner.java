@@ -42,6 +42,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
+import org.springframework.cloud.release.internal.tasks.ReleaseReleaserTask;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -79,7 +80,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 				.tasklet((contribution, chunkContext) -> {
 					FlowRunner.Decision decision = beforeTask(args.options, args.properties, releaserTask);
 					if (decision == FlowRunner.Decision.CONTINUE) {
-						releaserTask.accept(args);
+						runTask(releaserTask, args);
 					} else {
 						log.info("Skipping step [{}]", releaserTask.name());
 					}
@@ -87,6 +88,17 @@ class SpringBatchFlowRunner implements FlowRunner {
 				})
 				.listener(releaserListener(args, releaserTask))
 				.build();
+	}
+
+	private void runTask(ReleaserTask releaserTask, Arguments args) {
+		try {
+			releaserTask.accept(args);
+		} catch (Exception ex) {
+			if (releaserTask instanceof ReleaseReleaserTask) {
+				throw ex;
+			}
+			throw new MakeBuildUnstableException(ex);
+		}
 	}
 
 	private StepExecutionListener releaserListener(Arguments args, ReleaserTask releaserTask) {
@@ -122,8 +134,9 @@ class SpringBatchFlowRunner implements FlowRunner {
 	@Override
 	public void runPostReleaseTasks(Options options, ReleaserProperties properties, String taskName, TasksToRun tasksToRun) {
 		ProjectsToRun projectsToRun = postReleaseProjects(new OptionsAndProperties(properties, options));
-		Flow flow = postReleaseFlow(tasksToRun, properties, options, projectsToRun);
+		Flow flow = postReleaseFlow(tasksToRun, properties, projectsToRun);
 		if (flow == null) {
+			log.info("No post release tasks to run, will do nothing");
 			return;
 		}
 		Job job = this.jobBuilderFactory.get(taskName)
@@ -176,7 +189,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 		}
 	}
 
-	private Flow postReleaseFlow(TasksToRun tasksToRun, ReleaserProperties properties, Options options, ProjectsToRun projectsToRun) {
+	private Flow postReleaseFlow(TasksToRun tasksToRun, ReleaserProperties properties, ProjectsToRun projectsToRun) {
 		Iterator<? extends ReleaserTask> iterator = tasksToRun.iterator();
 		if (!iterator.hasNext()) {
 			return null;

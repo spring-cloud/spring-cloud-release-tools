@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.release.internal.git;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
@@ -36,7 +37,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class ProjectGitHandler implements ReleaserPropertiesAware {
+public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 
 	private static final Map<URIish, File> CACHE = new ConcurrentHashMap<>();
 
@@ -55,10 +56,6 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 	public ProjectGitHandler(ReleaserProperties properties) {
 		this.properties = properties;
 		registerShutdownHook();
-	}
-
-	static void clearCache() {
-		CACHE.clear();
 	}
 
 	private void registerShutdownHook() {
@@ -282,4 +279,8 @@ public class ProjectGitHandler implements ReleaserPropertiesAware {
 		this.properties = properties;
 	}
 
+	@Override
+	public void close() {
+		CACHE.clear();
+	}
 }

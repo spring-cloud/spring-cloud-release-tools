@@ -361,12 +361,18 @@ public class Releaser implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void updateDocumentationRepository(ReleaserProperties properties,
+	public void updateDocumentationRepositoryForTrain(ReleaserProperties properties,
 			Projects projects, ProjectVersion releaseVersion) {
 		String releaseBranch = properties.getPom().getBranch();
 		this.documentationUpdater.updateDocsRepo(projects, releaseVersion, releaseBranch);
-		log.info("\nSuccessfully updated documentation repository for branch [{}]",
+		log.info("\nSuccessfully updated documentation repository for train branch [{}]",
 				releaseBranch);
+	}
+
+	public void updateDocumentationRepositoryForSingleProject(
+			Projects projects, ProjectVersion releaseVersion) {
+		this.documentationUpdater.updateDocsRepoForSingleProject(projects, releaseVersion);
+		log.info("\nSuccessfully updated documentation repository for a project with name [{}]", releaseVersion.projectName);
 	}
 
 	public void runUpdatedSamples(Projects projects) {

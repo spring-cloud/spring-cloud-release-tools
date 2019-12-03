@@ -118,7 +118,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				file("/projects/spring-cloud-static/").toURI().toString());
 
 		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties), properties).updateDocsRepo(
+				new ProjectGitHandler(properties), properties).updateDocsRepoForReleaseTrain(
 						this.clonedDocProject, releaseTrainVersion, projects(),
 						"vFinchley.SR33");
 
@@ -135,7 +135,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				file("/projects/spring-cloud-static/").toURI().toString());
 
 		updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties), properties).updateDocsRepo(
+				new ProjectGitHandler(properties), properties).updateDocsRepoForReleaseTrain(
 						this.clonedDocProject, releaseTrainVersion, projects(),
 						"vAngel.SR33");
 
@@ -156,7 +156,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
 
 		new SpringCloudCustomProjectDocumentationUpdater(handler, properties)
-				.updateDocsRepo(this.clonedDocProject, releaseTrainVersion, projects(),
+				.updateDocsRepoForReleaseTrain(this.clonedDocProject, releaseTrainVersion, projects(),
 						"vDalston.SR3");
 
 		BDDMockito.then(handler).should(BDDMockito.never())
@@ -172,7 +172,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties), properties).updateDocsRepo(
+				new ProjectGitHandler(properties), properties).updateDocsRepoForReleaseTrain(
 						this.clonedDocProject, releaseTrainVersion, projects(),
 						"Angel.SR33");
 

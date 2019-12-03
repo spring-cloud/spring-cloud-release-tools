@@ -71,6 +71,18 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	}
 
 	/**
+	 * Updates the documentation repository if current release train version is greater or
+	 * equal than the one stored in the repo.
+	 * @param projects list of projects with updated versions
+	 * @param currentProject the project we're parsing
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
+	 * used
+	 */
+	public File updateDocsRepoForSingleProject(Projects projects, ProjectVersion currentProject) {
+		return this.projectDocumentationUpdater.updateDocsRepoForSingleProject(projects, currentProject);
+	}
+
+	/**
 	 * Updates the release train wiki page.
 	 * @param projects list of projects to update versions for
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is

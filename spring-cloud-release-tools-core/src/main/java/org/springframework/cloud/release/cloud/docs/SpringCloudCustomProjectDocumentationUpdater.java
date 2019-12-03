@@ -67,7 +67,7 @@ class SpringCloudCustomProjectDocumentationUpdater
 	 * used
 	 */
 	@Override
-	public File updateDocsRepo(File clonedDocumentationProject,
+	public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
 			ProjectVersion currentProject, Projects projects, String bomBranch) {
 		log.debug("Cloning the doc project to [{}]", clonedDocumentationProject);
 		ProjectVersion releaseTrainProject = new ProjectVersion(
@@ -79,26 +79,42 @@ class SpringCloudCustomProjectDocumentationUpdater
 		removeAFolderWithRedirection(currentReleaseFolder);
 		File docsRepo = updateTheDocsRepo(releaseTrainProject, clonedDocumentationProject,
 				currentReleaseFolder);
-		log.info(
-				"Updating all current links to documentation for release train projects");
-		projects.forEach(projectVersion -> {
-			File currentProjectReleaseFolder = new File(clonedDocumentationProject,
-					currentFolder(projectVersion.projectName, projectVersion.version));
-			removeAFolderWithRedirection(currentProjectReleaseFolder);
-			try {
-				updateTheDocsRepo(projectVersion, clonedDocumentationProject,
-						currentProjectReleaseFolder);
-				log.info("Processed [{}] for project with name [{}]",
-						currentProjectReleaseFolder, projectVersion.projectName);
-			}
-			catch (Exception ex) {
-				log.warn(
-						"Exception occurred while trying o update the symlink of a project ["
-								+ projectVersion.projectName + "]",
-						ex);
-			}
-		});
 		return pushChanges(docsRepo);
+	}
+
+	/**
+	 * Updates the documentation repository if current release train version is greater or
+	 * equal than the one stored in the repo.
+	 * @param currentProject project to update the docs repo for
+	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
+	 * used
+	 */
+	@Override
+	public File updateDocsRepoForSingleProject(File clonedDocumentationProject,
+			ProjectVersion currentProject, Projects projects) {
+		if (!projects.containsProject(currentProject.projectName)) {
+			log.warn("Can't update the documentation repo for project [{}] cause it's not present on the projects list", projects);
+			return clonedDocumentationProject;
+		}
+		log.info(
+				"Updating link to documentation for project [{}]", currentProject.projectName);
+		ProjectVersion projectVersion = projects.forName(currentProject.projectName);
+		File currentProjectReleaseFolder = new File(clonedDocumentationProject,
+				currentFolder(projectVersion.projectName, projectVersion.version));
+		removeAFolderWithRedirection(currentProjectReleaseFolder);
+		try {
+			updateTheDocsRepo(projectVersion, clonedDocumentationProject,
+					currentProjectReleaseFolder);
+			log.info("Processed [{}] for project with name [{}]",
+					currentProjectReleaseFolder, projectVersion.projectName);
+		}
+		catch (Exception ex) {
+			log.warn(
+					"Exception occurred while trying o update the symlink of a project ["
+							+ projectVersion.projectName + "]",
+					ex);
+		}
+		return pushChanges(clonedDocumentationProject);
 	}
 
 	private void removeAFolderWithRedirection(File currentReleaseFolder) {
@@ -179,8 +195,7 @@ class SpringCloudCustomProjectDocumentationUpdater
 				log.warn("Failed to create parent directory of [{}]",
 						currentVersionFolder);
 			}
-			File newTarget = new File(documentationProject,
-					concreteVersionFolder(projectVersion));
+			File newTarget = new File(projectVersion.version);
 			Files.createSymbolicLink(currentVersionFolder.toPath(), newTarget.toPath());
 			log.info("Updated the link [{}] to point to [{}]",
 					currentVersionFolder.toPath(),

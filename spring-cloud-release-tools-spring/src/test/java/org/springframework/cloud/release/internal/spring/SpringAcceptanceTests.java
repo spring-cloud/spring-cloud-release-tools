@@ -20,17 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.maven.model.Model;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
@@ -44,10 +41,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
-import org.springframework.cloud.release.internal.buildsystem.TestPomReader;
-import org.springframework.cloud.release.internal.buildsystem.TestUtils;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
-import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
@@ -56,8 +50,6 @@ import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
-import org.springframework.cloud.release.internal.sagan.Project;
-import org.springframework.cloud.release.internal.sagan.Release;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
@@ -73,75 +65,53 @@ import static org.mockito.ArgumentMatchers.anyString;
 /**
  * @author Marcin Grzejszczak
  */
-public class SpringAcceptanceTests {
-
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
-	File springCloudConsulProject;
-
-	File temporaryFolder;
-
-	TestPomReader testPomReader = new TestPomReader();
+public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 
 	ApplicationContextRunner runner = new ApplicationContextRunner()
-			.withUserConfiguration(SpringAcceptanceTests.MetaReleaseConfig.class,
-			SpringAcceptanceTests.MetaReleaseScanningConfiguration.class);
+			.withUserConfiguration(SpringAcceptanceTests.SingleProjectReleaseConfig.class,
+			SpringAcceptanceTests.SingleProjectScanningConfiguration.class);
 
-	@Before
-	public void setup() throws Exception {
-		this.temporaryFolder = this.tmp.newFolder();
-		this.springCloudConsulProject = new File(
-				AcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
-		TestUtils.prepareLocalRepo();
-		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
-		new File("/tmp/executed_build").delete();
-		new File("/tmp/executed_deploy").delete();
-		new File("/tmp/executed_docs").delete();
+	@Test
+	public void should_fail_to_perform_a_release_of_consul_when_sc_release_contains_snapshots()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release-with-snapshot/", "vCamden.SR5.BROKEN");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+
+		this.runner
+				.withSystemProperties("debug=true")
+				.withPropertyValues(
+						new ArgsBuilder(project, this.tmp)
+								.releaseTrainUrl("/projects/spring-cloud-release-with-snapshot/")
+								.bomBranch("vCamden.SR5.BROKEN")
+								.expectedVersion("1.1.2.RELEASE")
+								.build())
+				.run(context -> {
+							SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					BDDAssertions.thenThrownBy(releaser::release).hasMessageContaining(
+							"there is at least one SNAPSHOT library version in the Spring Cloud Release project");
+
+						});
 	}
 
 	@Test
 	public void should_perform_a_release_of_consul() throws Exception {
-		GitTestUtils.openGitProject(file("/projects/spring-cloud-release/")).checkout().setName("Greenwich").call();
-		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(), this.springCloudConsulProject);
-		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
-		consulPomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
-		File project = GitTestUtils.clonedProject(this.tmp.newFolder(), tmpFile("spring-cloud-consul"));
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		this.runner
-		.withSystemProperties("debug=true")
-		// @formatter:off
-		.withPropertyValues(
-				"releaser.git.release-train-bom-url=" + file("/projects/spring-cloud-release/").toURI().toString(),
-				"releaser.git.documentation-url=" + file("/projects/spring-cloud-static-angel/").toURI().toString(),
-				"releaser.git.test-samples-project-url=" + this.tmp.newFolder().toString(),
-				"releaser.git.release-train-docs-url=" + this.tmp.newFolder().toString(),
-				"releaser.maven.build-command=echo build",
-				"releaser.maven.deploy-command=echo deploy",
-				"releaser.maven.deploy-guides-command=echo guides",
-				"releaser.maven.publish-docs-commands=echo docs",
-				"releaser.maven.generate-release-train-docs-command=echo releaseTrainDocs",
-				"releaser.working-dir=" + project.getPath(),
-				"releaser.pom.branch=vGreenwich.SR2",
-				"releaser.git.spring-project-url=" + tmpFile("spring-cloud").getAbsolutePath() + "/",
-				"releaser.git.release-train-wiki-url=" + tmpFile("spring-cloud-wiki").getAbsolutePath() + "/",
-				"releaser.git.run-updated-samples=true",
-				"releaser.git.update-spring-guides=true",
-				"releaser.git.update-spring-project=true",
-				"releaser.git.update-start-spring-io=true",
-				"releaser.git.update-release-train-wiki=true",
-				"releaser.git.update-all-test-samples=true",
-				"releaser.git.update-documentation-repo=true",
-				"releaser.git.update-github-milestones=true",
-				"releaser.git.update-release-train-docs=true",
-				"releaser.git.all-test-sample-urls[spring-cloud-consul]=" + this.tmp.newFolder().toString(),
-				"releaser.sagan.update-sagan=true",
-				"releaser.versions.all-versions-file-url="
-						+ SpringAcceptanceTests.class.getResource("/raw/initializr.yml").toURI().toString(),
-				"test.expectedVersion=2.1.2.RELEASE",
-				"test.projectName=spring-cloud-consul")
-				// @formatter:on
+				.withSystemProperties("debug=true")
+				.withPropertyValues(
+					new ArgsBuilder(project, this.tmp)
+						.releaseTrainUrl("/projects/spring-cloud-release/")
+						.bomBranch("vGreenwich.SR2")
+						.expectedVersion("2.1.2.RELEASE")
+					.build())
 				.run(context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
@@ -177,102 +147,95 @@ public class SpringAcceptanceTests {
 					BDDMockito.then(saganClient).should(BDDMockito.times(2))
 							.updateRelease(BDDMockito.eq("spring-cloud-consul"), BDDMockito.anyList());
 					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "2.1.2.BUILD-SNAPSHOT");
-					then(gitHubHandler.issueCreatedInSpringGuides).isTrue();
-					then(gitHubHandler.issueCreatedInStartSpringIo).isTrue();
+					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
+					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
 					then(Files.readSymbolicLink(
 							new File(testDocumentationUpdater.getDocumentationRepo(), "spring-cloud-consul/current")
 									.toPath())
-							.toString()).endsWith("5.3.5.RELEASE");
-					then(Files
-							.readSymbolicLink(
-									new File(testDocumentationUpdater.getDocumentationRepo(), "current").toPath())
-							.toString()).endsWith("Xitmars.SR4");
-					thenRunUpdatedTestsWereCalled(postReleaseActions);
+							.toString()).isEqualTo("2.1.2.RELEASE");
+					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
 				});
 	}
 
-	private void thenRunUpdatedTestsWereCalled(PostReleaseActions postReleaseActions) {
-		BDDMockito.then(postReleaseActions).should().runUpdatedTests(BDDMockito.any(Projects.class));
+	private void assertThatClonedProjectIsInSnapshots(File origin) {
+		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+		consulPomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
 	}
 
-	private Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
-		return GitTestUtils.openGitProject(project).log().call();
-	}
+	class ArgsBuilder {
 
-	private void pomParentVersionIsEqualTo(File project, String child, String expected) {
-		then(pom(new File(project, child)).getParent().getVersion()).isEqualTo(expected);
-	}
+		List<String> args = new LinkedList<>();
 
-	private void consulPomParentVersionIsEqualTo(File project, String expected) {
-		pomParentVersionIsEqualTo(project, "spring-cloud-starter-consul", expected);
-	}
+		private final File project;
 
-	private void pomVersionIsEqualTo(File project, String expected) {
-		then(pom(project).getVersion()).isEqualTo(expected);
-	}
+		private final TemporaryFolder tmp;
 
-	private void commitIsPresent(Iterator<RevCommit> iterator, String expected) {
-		RevCommit commit = iterator.next();
-		then(commit.getShortMessage()).isEqualTo(expected);
-	}
+		ArgsBuilder(File project, TemporaryFolder tmp) throws Exception {
+			this.project = project;
+			this.tmp = tmp;
+			defaults();
+		}
 
-	private void commitIsNotPresent(Iterable<RevCommit> commits, String expected) {
-		for (RevCommit commit : commits) {
-			then(commit.getShortMessage()).isNotEqualTo(expected);
+		ArgsBuilder defaults() throws Exception {
+			// @formatter:off
+			this.args.addAll(Arrays.asList(
+					"releaser.git.documentation-url=" + file("/projects/spring-cloud-static-angel/").toURI().toString(),
+					"releaser.git.test-samples-project-url=" + this.tmp.newFolder().toString(),
+					"releaser.git.release-train-docs-url=" + this.tmp.newFolder().toString(),
+					"releaser.maven.build-command=echo build",
+					"releaser.maven.deploy-command=echo deploy",
+					"releaser.maven.deploy-guides-command=echo guides",
+					"releaser.maven.publish-docs-commands=echo docs",
+					"releaser.maven.generate-release-train-docs-command=echo releaseTrainDocs",
+					"releaser.working-dir=" + project.getPath(),
+					"releaser.git.spring-project-url=" + tmpFile("spring-cloud").getAbsolutePath() + "/",
+					"releaser.git.release-train-wiki-url=" + tmpFile("spring-cloud-wiki").getAbsolutePath() + "/",
+					"releaser.git.run-updated-samples=true",
+					"releaser.git.update-spring-guides=true",
+					"releaser.git.update-spring-project=true",
+					"releaser.git.update-start-spring-io=true",
+					"releaser.git.update-release-train-wiki=true",
+					"releaser.git.update-all-test-samples=true",
+					"releaser.git.update-documentation-repo=true",
+					"releaser.git.update-github-milestones=true",
+					"releaser.git.update-release-train-docs=true",
+					"releaser.git.all-test-sample-urls[spring-cloud-consul]=" + this.tmp.newFolder().toString(),
+					"releaser.sagan.update-sagan=true",
+					"releaser.versions.all-versions-file-url="
+							+ SpringAcceptanceTests.class.getResource("/raw/initializr.yml").toURI().toString(),
+					"test.projectName=spring-cloud-consul"
+			));
+			// @formatter:on
+			return this;
+		}
+
+		ArgsBuilder releaseTrainUrl(String relativePath) throws Exception {
+			this.args.add(
+					"releaser.git.release-train-bom-url=" + file(relativePath).toURI().toString());
+			return this;
+		}
+
+		ArgsBuilder expectedVersion(String expectedVersion) {
+			this.args.add("test.expectedVersion=" + expectedVersion);
+			return this;
+		}
+
+		ArgsBuilder bomBranch(String bomBranch) {
+			this.args.add("releaser.pom.branch=" + bomBranch);
+			return this;
+		}
+
+		String[] build() {
+			return args.toArray(new String[0]);
 		}
 	}
 
-	private void tagIsPresentInOrigin(File origin, String expectedTag) throws GitAPIException {
-		then(GitTestUtils.openGitProject(origin).tagList().call().iterator().next().getName()).endsWith(expectedTag);
+	private String[] springCloudConsulArgs(File project, String bomBranch) throws URISyntaxException, IOException {
+		// @formatter:off
+		return new String[] {
+				};
 	}
-
-	private Model pom(File dir) {
-		return this.testPomReader.readPom(new File(dir, "pom.xml"));
-	}
-
-	private File emailTemplate() {
-		return new File("target/email.txt");
-	}
-
-	private String emailTemplateContents() throws URISyntaxException, IOException {
-		return new String(Files.readAllBytes(emailTemplate().toPath()));
-	}
-
-	private File blogTemplate() {
-		return new File("target/blog.md");
-	}
-
-	private File tweetTemplate() {
-		return new File("target/tweet.txt");
-	}
-
-	private File releaseNotesTemplate() {
-		return new File("target/notes.md");
-	}
-
-	private String blogTemplateContents() throws URISyntaxException, IOException {
-		return new String(Files.readAllBytes(blogTemplate().toPath()));
-	}
-
-	private String tweetTemplateContents() throws URISyntaxException, IOException {
-		return new String(Files.readAllBytes(tweetTemplate().toPath()));
-	}
-
-	private String releaseNotesTemplateContents() throws URISyntaxException, IOException {
-		return new String(Files.readAllBytes(releaseNotesTemplate().toPath()));
-	}
-
-	private File tmpFile(String relativePath) {
-		return new File(this.temporaryFolder, relativePath);
-	}
-
-	private File file(String relativePath) throws URISyntaxException {
-		return new File(SpringAcceptanceTests.class.getResource(relativePath).toURI());
-	}
-
-	private String text(File file) throws IOException {
-		return new String(Files.readAllBytes(file.toPath()));
-	}
+	// @formatter:on
 
 	static class TestProjectGitHubHandler extends ProjectGitHubHandler {
 
@@ -316,110 +279,10 @@ public class SpringAcceptanceTests {
 
 	}
 
-	class NonAssertingTestProjectGitHubHandler extends ProjectGitHubHandler {
-
-		boolean closedMilestones = false;
-
-		boolean issueCreatedInSpringGuides = false;
-
-		boolean issueCreatedInStartSpringIo = false;
-
-		NonAssertingTestProjectGitHubHandler(ReleaserProperties properties) {
-			super(properties, Collections.singletonList(SpringCloudGithubIssuesAccessor.springCloud(properties)));
-		}
-
-		@Override
-		public void closeMilestone(ProjectVersion releaseVersion) {
-			this.closedMilestones = true;
-		}
-
-		@Override
-		public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
-			this.issueCreatedInSpringGuides = true;
-		}
-
-		@Override
-		public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
-			this.issueCreatedInStartSpringIo = true;
-		}
-
-		@Override
-		public String milestoneUrl(ProjectVersion releaseVersion) {
-			return "https://foo.bar.com/" + releaseVersion.toString();
-		}
-
-	}
-
-	static class NonAssertingTestProjectGitHandler extends ProjectGitHandler {
-
-		List<File> clonedProjects = new ArrayList<>();
-
-		NonAssertingTestProjectGitHandler(ReleaserProperties properties) {
-			super(properties);
-		}
-
-		@Override
-		public File cloneReleaseTrainProject() {
-			File file = super.cloneReleaseTrainProject();
-			this.clonedProjects.add(file);
-			return file;
-		}
-
-		@Override
-		public File cloneDocumentationProject() {
-			File file = super.cloneDocumentationProject();
-			this.clonedProjects.add(file);
-			return file;
-		}
-
-		@Override
-		public File cloneSpringDocProject() {
-			File file = super.cloneSpringDocProject();
-			this.clonedProjects.add(file);
-			return file;
-		}
-
-		@Override
-		public File cloneReleaseTrainDocumentationProject() {
-			File file = super.cloneReleaseTrainDocumentationProject();
-			this.clonedProjects.add(file);
-			return file;
-		}
-
-		@Override
-		public File cloneProjectFromOrg(String projectName) {
-			File file = super.cloneProjectFromOrg(projectName);
-			this.clonedProjects.add(file);
-			return file;
-		}
-
-	}
-
-	static class TestDocumentationUpdater extends DocumentationUpdater {
-
-		private File documentationRepo;
-
-		public TestDocumentationUpdater(ProjectGitHandler gitHandler, ReleaserProperties properties,
-				TemplateGenerator templateGenerator, List<CustomProjectDocumentationUpdater> updaters) {
-			super(gitHandler, properties, templateGenerator, updaters);
-		}
-
-		@Override
-		public File updateDocsRepo(Projects projects, ProjectVersion currentProject, String bomReleaseBranch) {
-			File documentationRepo = super.updateDocsRepo(projects, currentProject, bomReleaseBranch);
-			this.documentationRepo = documentationRepo;
-			return documentationRepo;
-		}
-
-		File getDocumentationRepo() {
-			return documentationRepo;
-		}
-
-	}
 
 	@Configuration
 	@EnableAutoConfiguration
-	static class MetaReleaseConfig {
+	static class SingleProjectReleaseConfig {
 
 		@Bean
 		SpringBatchFlowRunner mySpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory, ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
@@ -461,8 +324,8 @@ public class SpringAcceptanceTests {
 		}
 
 		@Bean
-		NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler(ReleaserProperties releaserProperties) {
-			return new NonAssertingTestProjectGitHandler(releaserProperties);
+		NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler(ReleaserProperties releaserProperties, @Value("${test.projectName}") String projectName) {
+			return new NonAssertingTestProjectGitHandler(releaserProperties, file -> FileSystemUtils.deleteRecursively(new File(file, projectName)));
 		}
 
 		@Bean
@@ -476,22 +339,8 @@ public class SpringAcceptanceTests {
 
 	@Configuration
 	@ComponentScan({ "org.springframework.cloud.release.internal", "org.springframework.cloud.release.cloud", })
-	static class MetaReleaseScanningConfiguration {
+	static class SingleProjectScanningConfiguration {
 
-	}
-
-	private static Project newProject() {
-		Project project = new Project();
-		project.projectReleases.addAll(
-				Arrays.asList(release("1.0.0.M8"), release("1.1.0.M8"), release("1.2.0.M8"), release("2.0.0.M8")));
-		return project;
-	}
-
-	private static Release release(String version) {
-		Release release = new Release();
-		release.version = version;
-		release.current = true;
-		return release;
 	}
 
 }

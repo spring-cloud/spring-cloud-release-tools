@@ -81,7 +81,10 @@ class TasksToRunFactory {
 		return tasksToRunForSingleProject(options, tasks);
 	}
 
-	TasksToRun postRelease() {
+	TasksToRun postRelease(Options options) {
+		if (!options.metaRelease) {
+			return new TasksToRun();
+		}
 		List<ReleaserTask> tasks = new LinkedList<>(this.context.getBeansOfType(TrainPostReleaseReleaserTask.class).values());
 		tasks.sort(AnnotationAwareOrderComparator.INSTANCE);
 		return new TasksToRun(tasks);

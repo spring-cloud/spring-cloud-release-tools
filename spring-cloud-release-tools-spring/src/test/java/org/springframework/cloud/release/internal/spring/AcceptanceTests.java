@@ -153,22 +153,6 @@ public class AcceptanceTests {
 		return release;
 	}
 
-	@Test
-	public void should_fail_to_perform_a_release_of_consul_when_sc_release_contains_snapshots()
-			throws Exception {
-		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
-				this.springCloudConsulProject);
-		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
-		consulPomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
-		File project = GitTestUtils.clonedProject(this.tmp.newFolder(),
-				tmpFile("spring-cloud-consul"));
-		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		DefaultSpringReleaser releaser = releaserWithSnapshotScRelease(project,
-				"spring-cloud-consul", "vCamden.SR5.BROKEN", "1.1.2.RELEASE");
-
-		BDDAssertions.thenThrownBy(releaser::release).hasMessageContaining(
-				"there is at least one SNAPSHOT library version in the Spring Cloud Release project");
-	}
 
 	@Test
 	public void should_not_clone_when_option_not_to_clone_was_switched_on()

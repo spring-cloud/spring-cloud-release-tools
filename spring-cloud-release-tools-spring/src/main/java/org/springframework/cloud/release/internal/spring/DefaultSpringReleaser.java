@@ -79,27 +79,27 @@ public class DefaultSpringReleaser implements SpringReleaser {
 	public void release(Options options) {
 		OptionsAndProperties optionsAndProperties = prepareOptionsAndProperties(options, this.properties);
 		// order matters! Tasks will mutate options and properties
-		TasksToRun releaseTasksToRun = takeReleaseTasksFromOptions(optionsAndProperties);
-		ProjectsToRun projectsToRun = takeReleaseProjects(optionsAndProperties);
+		TasksToRun releaseTasksToRun = releaseTasksFromOptions(optionsAndProperties);
+		ProjectsToRun projectsToRun = releaseProjects(optionsAndProperties);
 		runReleaseTasks(optionsAndProperties, projectsToRun, releaseTasksToRun);
-		TasksToRun postReleaseTasksToRun = takePostReleaseTasksFromOptions();
-		runPostReleaseTasks(optionsAndProperties, postReleaseTasksToRun);
+		TasksToRun postReleaseTrainTasksToRun = postReleaseTrainTasksFromOptions(optionsAndProperties);
+		runPostReleaseTasks(optionsAndProperties, postReleaseTrainTasksToRun);
 	}
 
 	private OptionsAndProperties prepareOptionsAndProperties(Options options, ReleaserProperties properties) {
 		return this.optionsAndPropertiesFactory.get(properties, options);
 	}
 
-	private ProjectsToRun takeReleaseProjects(OptionsAndProperties options) {
+	private ProjectsToRun releaseProjects(OptionsAndProperties options) {
 		return this.projectsToRunFactory.release(options);
 	}
 
-	private TasksToRun takeReleaseTasksFromOptions(OptionsAndProperties options) {
+	private TasksToRun releaseTasksFromOptions(OptionsAndProperties options) {
 		return this.tasksToRunFactory.release(options);
 	}
 
-	private TasksToRun takePostReleaseTasksFromOptions() {
-		return this.tasksToRunFactory.postRelease();
+	private TasksToRun postReleaseTrainTasksFromOptions(OptionsAndProperties optionsAndProperties) {
+		return this.tasksToRunFactory.postRelease(optionsAndProperties.options);
 	}
 
 	private void runReleaseTasks(OptionsAndProperties optionsAndProperties, ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
