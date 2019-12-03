@@ -46,38 +46,44 @@ public class Arguments {
 
 	public final List<ProcessedProject> processedProjects;
 
-	private Arguments(ProjectToRun thisProject, ProjectsFromBom allProjectsFromBom) {
+	private Arguments(ProjectToRun thisProject, Projects projects, ProjectVersion currentProjectFromBom) {
 		this.project = thisProject.thisProjectFolder;
-		this.projects = allProjectsFromBom.allProjectVersionsFromBom;
+		this.projects = projects;
 		this.originalVersion = thisProject.originalVersion;
-		this.versionFromBom = allProjectsFromBom.currentProjectFromBom;
+		this.versionFromBom = currentProjectFromBom;
 		this.properties = thisProject.thisProjectReleaserProperties;
 		this.options = thisProject.options;
 		this.projectToRun = thisProject;
 		this.processedProjects = new LinkedList<>(Collections.singletonList(new ProcessedProject(thisProject.thisProjectReleaserProperties, this.versionFromBom, this.originalVersion)));
 	}
 
-	private Arguments(ReleaserProperties properties, Options options, List<ProcessedProject> processedProjects) {
-		this.project = null;
+	// in this case the project will be the BOM
+	private Arguments(ProjectToRun thisProject, List<ProcessedProject> processedProjects) {
+		this.project = thisProject.thisProjectFolder;
 		this.projects = new Projects(processedProjects.stream().map(p -> p.newProjectVersion).collect(Collectors.toSet()));
-		this.originalVersion = null;
-		this.versionFromBom = null;
-		this.properties = properties;
-		this.options = options;
-		this.projectToRun = null;
+		this.originalVersion = thisProject.originalVersion;
+		this.versionFromBom = thisProject.thisProjectVersionFromBom;
+		this.properties = thisProject.thisProjectReleaserProperties;
+		this.options = thisProject.options;
+		this.projectToRun = thisProject;
 		this.processedProjects = processedProjects;
 	}
 
 	public static Arguments forProject(ProjectToRun thisProject) {
-		return new Arguments(thisProject, thisProject.allProjectsFromBom);
+		return new Arguments(thisProject, thisProject.allProjectsFromBom.allProjectVersionsFromBom, thisProject.allProjectsFromBom.currentProjectFromBom);
 	}
 
-	public static Arguments forPostRelease(ReleaserProperties properties, Options options, ProjectsToRun projectsToRun) {
-		return new Arguments(properties, options, projectsToRunToProcessedProject(projectsToRun));
+	public static Arguments forPostRelease(ReleaserProperties properties, ProjectsToRun projectsToRun) {
+		List<ProjectToRun> projects = projectsToRun.stream().map(ProjectToRun.ProjectToRunSupplier::get).collect(Collectors.toCollection(LinkedList::new));
+		List<ProcessedProject> processedProjects = projectsToRunToProcessedProject(projects);
+		ProjectToRun releaseTrainProject = projects.stream()
+				.filter(p -> p.originalVersion.projectName.equals(properties.getMetaRelease().getReleaseTrainProjectName())).findFirst()
+				.orElseThrow(() -> new IllegalStateException("Missing release train version"));
+		return new Arguments(releaseTrainProject, processedProjects);
 	}
 
-	private static List<ProcessedProject> projectsToRunToProcessedProject(ProjectsToRun projectsToRun) {
-		return projectsToRun.stream().map(ProjectToRun.ProjectToRunSupplier::get).map(p -> new ProcessedProject(p.thisProjectReleaserProperties, p.thisProjectVersionFromBom, p.originalVersion)).collect(Collectors
+	private static List<ProcessedProject> projectsToRunToProcessedProject(List<ProjectToRun> projects) {
+		return projects.stream().map(p -> new ProcessedProject(p.thisProjectReleaserProperties, p.thisProjectVersionFromBom, p.originalVersion)).collect(Collectors
 				.toCollection(LinkedList::new));
 	}
 }

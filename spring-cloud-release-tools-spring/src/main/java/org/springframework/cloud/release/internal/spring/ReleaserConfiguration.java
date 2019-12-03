@@ -21,7 +21,9 @@ import java.util.List;
 
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
@@ -53,75 +55,86 @@ class ReleaserConfiguration {
 	ReleaserProperties properties;
 
 	@Bean
+	@ConditionalOnMissingBean
 	OptionsAndPropertiesFactory optionsAndPropertiesFactory() {
 		return new OptionsAndPropertiesFactory();
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	VersionsToBumpFactory versionsToBumpFactory(Releaser releaser) {
 		return new VersionsToBumpFactory(releaser, properties);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ProjectsToRunFactory projectsToRunFactory(VersionsToBumpFactory versionsToBumpFactory, Releaser releaser, ReleaserPropertiesUpdater updater) {
 		return new ProjectsToRunFactory(versionsToBumpFactory, releaser, updater);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	TasksToRunFactory tasksToRunFactory(ApplicationContext context) {
 		return new TasksToRunFactory(context);
 	}
 
 	@Bean
-	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory) {
-		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory);
+	@ConditionalOnMissingBean
+	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory, ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
+		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory, projectsToRunFactory, jobLauncher);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	SpringReleaser springReleaser(OptionsAndPropertiesFactory optionsAndPropertiesFactory, ProjectsToRunFactory projectsToRunFactory, TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner) {
 		return new DefaultSpringReleaser(properties, optionsAndPropertiesFactory, projectsToRunFactory, tasksToRunFactory, flowRunner);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ProjectCommandExecutor projectBuilder() {
 		return new ProjectCommandExecutor(this.properties);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	VersionsFetcher versionsFetcher(ProjectPomUpdater updater) {
 		return new VersionsFetcher(this.properties, updater);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ProjectGitHandler projectGitHandler() {
 		return new ProjectGitHandler(this.properties);
 	}
-
-	@Autowired(required = false)
-	List<CustomGithubIssues> customGithubIssues = new ArrayList<>();
-
 	@Bean
-	ProjectGitHubHandler projectGitHubHandler() {
-		return new ProjectGitHubHandler(this.properties, this.customGithubIssues);
+	@ConditionalOnMissingBean
+	ProjectGitHubHandler projectGitHubHandler(@Autowired(required = false)
+			List<CustomGithubIssues> customGithubIssues) {
+		return new ProjectGitHubHandler(this.properties, customGithubIssues != null ? customGithubIssues : new ArrayList<>());
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	TemplateGenerator templateGenerator(ProjectGitHubHandler handler) {
 		return new TemplateGenerator(this.properties, handler);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	GradleUpdater gradleUpdater() {
 		return new GradleUpdater(this.properties);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	SaganUpdater saganUpdater(SaganClient saganClient,
 			ReleaserProperties releaserProperties) {
 		return new SaganUpdater(saganClient, releaserProperties);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	PostReleaseActions postReleaseActions(ProjectGitHandler handler,
 			ProjectPomUpdater pomUpdater, GradleUpdater gradleUpdater,
 			ProjectCommandExecutor projectCommandExecutor,
@@ -129,18 +142,17 @@ class ReleaserConfiguration {
 		return new PostReleaseActions(handler, pomUpdater, gradleUpdater,
 				projectCommandExecutor, releaserProperties, versionsFetcher);
 	}
-
-	@Autowired(required = false)
-	List<CustomProjectDocumentationUpdater> customProjectDocumentationUpdaters = new ArrayList<>();
-
 	@Bean
+	@ConditionalOnMissingBean
 	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
-			ReleaserProperties properties, TemplateGenerator templateGenerator) {
+			ReleaserProperties properties, TemplateGenerator templateGenerator, @Autowired(required = false)
+			List<CustomProjectDocumentationUpdater> customProjectDocumentationUpdaters) {
 		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator,
-				this.customProjectDocumentationUpdaters);
+				customProjectDocumentationUpdaters != null ? customProjectDocumentationUpdaters : new ArrayList<>());
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	Releaser releaser(ProjectPomUpdater projectPomUpdater,
 			ProjectCommandExecutor projectCommandExecutor,
 			ProjectGitHandler projectGitHandler,
@@ -155,11 +167,13 @@ class ReleaserConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ReleaserPropertiesUpdater releaserPropertiesUpdater(ApplicationContext context) {
 		return new ReleaserPropertiesUpdater(context);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	Parser optionsParser(List<ReleaserTask> allTasks,
 			List<SingleProjectReleaserTask> singleProjectReleaserTasks) {
 		return new OptionsParser(allTasks, singleProjectReleaserTasks);

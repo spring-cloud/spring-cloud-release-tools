@@ -16,7 +16,8 @@
 
 package org.springframework.cloud.release.internal.tasks.composite;
 
-import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.springframework.cloud.release.internal.spring.TasksToRun;
 import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
 import org.springframework.cloud.release.internal.tasks.DryRunReleaseReleaserTask;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 /**
  * Marked by {@link Options#dryRun}
@@ -73,8 +75,9 @@ public class DryRunCompositeTask implements CompositeReleaserTask {
 	@Override
 	public void accept(Arguments args) {
 		Map<String, DryRunReleaseReleaserTask> dryRunTasks = this.context.getBeansOfType(DryRunReleaseReleaserTask.class);
-		log.info("Found the following dry run tasks {}", dryRunTasks);
-		Collection<DryRunReleaseReleaserTask> values = dryRunTasks.values();
+		List<DryRunReleaseReleaserTask> values = new LinkedList<>(dryRunTasks.values());
+		values.sort(AnnotationAwareOrderComparator.INSTANCE);
+		log.info("Found the following dry run tasks {}", values);
 		flowRunner().runReleaseTasks(args.options, args.properties, new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(args.originalVersion.projectName, () -> args.projectToRun)), new TasksToRun(values));
 	}
 

@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.release.internal.tasks.composite;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -24,9 +26,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.spring.Arguments;
+import org.springframework.cloud.release.internal.spring.FlowRunner;
+import org.springframework.cloud.release.internal.spring.TasksToRun;
 import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
+import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 import org.springframework.cloud.release.internal.tasks.TrainPostReleaseReleaserTask;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 /**
  * Marked by {@link Options#metaRelease} and {@link ReleaserProperties#isPostReleaseTasksOnly()}
@@ -38,6 +44,8 @@ public class TrainPostReleaseCompositeTask implements CompositeReleaserTask {
 	public static final int ORDER = -50;
 
 	private final ApplicationContext context;
+
+	private FlowRunner flowRunner;
 
 	public TrainPostReleaseCompositeTask(ApplicationContext context) {
 		this.context = context;
@@ -65,14 +73,28 @@ public class TrainPostReleaseCompositeTask implements CompositeReleaserTask {
 
 	@Override
 	public void accept(Arguments args) {
-		//TODO: Use Batch here already
 		Map<String, TrainPostReleaseReleaserTask> trainPostReleaseReleaserTasks = this.context.getBeansOfType(TrainPostReleaseReleaserTask.class);
-		log.info("Found the following train post release tasks {}", trainPostReleaseReleaserTasks);
-		trainPostReleaseReleaserTasks.values().forEach(t -> t.accept(args));
+		List<ReleaserTask> values = new LinkedList<>(trainPostReleaseReleaserTasks.values());
+		values.sort(AnnotationAwareOrderComparator.INSTANCE);
+		log.info("Found the following post release tasks {}", values);
+		flowRunner().runPostReleaseTasks(args.options, args.properties, this.name(), new TasksToRun(values));
+	}
+
+	@Override
+	public void setup(Options options, ReleaserProperties properties) {
+		options.metaRelease = true;
+		properties.setPostReleaseTasksOnly(true);
 	}
 
 	@Override
 	public int getOrder() {
 		return TrainPostReleaseCompositeTask.ORDER;
+	}
+
+	private FlowRunner flowRunner() {
+		if (this.flowRunner == null) {
+			this.flowRunner = this.context.getBean(FlowRunner.class);
+		}
+		return this.flowRunner;
 	}
 }

@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.release.internal.sagan;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ import org.springframework.web.client.RestTemplate;
 class SaganConfiguration {
 
 	@Bean
+	@ConditionalOnMissingBean
 	SaganClient saganClient(ReleaserProperties properties) {
 		RestTemplate restTemplate = restTemplate(properties);
 		return new RestTemplateSaganClient(restTemplate, properties);

@@ -94,10 +94,6 @@ public class DefaultSpringReleaser implements SpringReleaser {
 		return this.projectsToRunFactory.release(options);
 	}
 
-	private ProjectsToRun postReleaseProjects(OptionsAndProperties options) {
-		return this.projectsToRunFactory.postRelease(options);
-	}
-
 	private TasksToRun takeReleaseTasksFromOptions(OptionsAndProperties options) {
 		return this.tasksToRunFactory.release(options);
 	}
@@ -111,7 +107,7 @@ public class DefaultSpringReleaser implements SpringReleaser {
 	}
 
 	private void runPostReleaseTasks(OptionsAndProperties optionsAndProperties, TasksToRun postReleaseTasksToRun) {
-		this.flowRunner.runPostReleaseTasks(optionsAndProperties.options, optionsAndProperties.properties, "postRelease", postReleaseTasksToRun, postReleaseProjects(optionsAndProperties));
+		this.flowRunner.runPostReleaseTasks(optionsAndProperties.options, optionsAndProperties.properties, "postRelease", postReleaseTasksToRun);
 	}
 
 }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,16 +35,19 @@ class BuildsystemConfiguration {
 	List<CustomBomParser> customBomParsers = new ArrayList<>();
 
 	@Bean
+	@ConditionalOnMissingBean
 	BomParser mavenBomParser() {
 		return new MavenBomParser(this.releaserProperties, this.customBomParsers);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	BomParser gradleBomParser() {
 		return new GradleBomParser(this.releaserProperties, this.customBomParsers);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ProjectPomUpdater pomUpdater(List<BomParser> bomParsers) {
 		return new ProjectPomUpdater(this.releaserProperties, bomParsers);
 	}

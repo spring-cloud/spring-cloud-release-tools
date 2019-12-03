@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal.tasks.composite;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import org.springframework.cloud.release.internal.tasks.ProjectPostReleaseReleas
 import org.springframework.cloud.release.internal.tasks.ReleaseReleaserTask;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 /**
  * Marked by {@link Options#fullRelease}
@@ -77,10 +79,12 @@ public class ReleaseCompositeTask implements CompositeReleaserTask {
 	public void accept(Arguments args) {
 		Map<String, ReleaseReleaserTask> releaseTasks = this.context.getBeansOfType(ReleaseReleaserTask.class);
 		Map<String, ProjectPostReleaseReleaserTask> projectPostReleaseTasks = this.context.getBeansOfType(ProjectPostReleaseReleaserTask.class);
-		log.info("Found the following release tasks {} and project post release tasks {}", releaseTasks, projectPostReleaseTasks);
 		Collection<ReleaserTask> allReleaseTasks = new LinkedList<>(releaseTasks.values());
 		allReleaseTasks.addAll(projectPostReleaseTasks.values());
-		flowRunner().runReleaseTasks(args.options, args.properties, new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(args.originalVersion.projectName, () -> args.projectToRun)), new TasksToRun(allReleaseTasks));
+		List<ReleaserTask> values = new LinkedList<>(allReleaseTasks);
+		values.sort(AnnotationAwareOrderComparator.INSTANCE);
+		log.info("Found the following release and project post release tasks {}", values);
+		flowRunner().runReleaseTasks(args.options, args.properties, new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(args.originalVersion.projectName, () -> args.projectToRun)), new TasksToRun(values));
 	}
 
 	@Override

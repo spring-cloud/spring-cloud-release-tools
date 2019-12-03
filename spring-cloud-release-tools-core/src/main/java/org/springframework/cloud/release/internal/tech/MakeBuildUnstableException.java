@@ -27,22 +27,26 @@ import org.slf4j.LoggerFactory;
  */
 public class MakeBuildUnstableException extends RuntimeException {
 
+	public static final String DESCRIPTION = "[BUILD UNSTABLE] WARNING!";
+
+	public static final String EXIT_CODE = "BUILD_UNSTABLE";
+
 	private static final Logger log = LoggerFactory
 			.getLogger(MakeBuildUnstableException.class);
 
 	public MakeBuildUnstableException(Throwable cause) {
 		super(cause);
-		log.error("\n\n[BUILD UNSTABLE] WARNING!", cause);
+		log.error("\n\n" + DESCRIPTION, cause);
 	}
 
 	public MakeBuildUnstableException(String message) {
 		super(message);
-		log.error("\n\n[BUILD UNSTABLE] WARNING! " + message);
+		log.error("\n\n" + DESCRIPTION + message);
 	}
 
 	public MakeBuildUnstableException(String message, Throwable cause) {
 		super(message, cause);
-		log.error("\n\n[BUILD UNSTABLE] WARNING! " + message, cause);
+		log.error("\n\n" + DESCRIPTION + message, cause);
 	}
 
 }

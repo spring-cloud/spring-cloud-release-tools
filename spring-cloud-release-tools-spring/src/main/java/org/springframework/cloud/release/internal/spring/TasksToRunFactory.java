@@ -34,6 +34,7 @@ import org.springframework.cloud.release.internal.tasks.composite.MetaReleaseCom
 import org.springframework.cloud.release.internal.tasks.composite.MetaReleaseDryRunCompositeTask;
 import org.springframework.cloud.release.internal.tasks.composite.ReleaseCompositeTask;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.StringUtils;
 
 class TasksToRunFactory {
@@ -75,13 +76,15 @@ class TasksToRunFactory {
 					.getBean(ReleaseCompositeTask.class));
 		}
 		// A single project release
-		return tasksToRunForSingleProject(options,
-				new LinkedList<>(this.context.getBeansOfType(ReleaserTask.class).values()));
+		List<ReleaserTask> tasks = new LinkedList<>(this.context.getBeansOfType(ReleaserTask.class).values());
+		tasks.sort(AnnotationAwareOrderComparator.INSTANCE);
+		return tasksToRunForSingleProject(options, tasks);
 	}
 
 	TasksToRun postRelease() {
-		return new TasksToRun(this.context
-				.getBean(TrainPostReleaseReleaserTask.class));
+		List<ReleaserTask> tasks = new LinkedList<>(this.context.getBeansOfType(TrainPostReleaseReleaserTask.class).values());
+		tasks.sort(AnnotationAwareOrderComparator.INSTANCE);
+		return new TasksToRun(tasks);
 	}
 
 	private TasksToRun tasksToRunForSingleProject(Options options, List<ReleaserTask> tasks) {

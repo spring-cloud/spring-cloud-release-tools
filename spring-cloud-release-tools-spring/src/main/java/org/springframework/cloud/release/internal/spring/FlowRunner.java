@@ -32,7 +32,7 @@ public interface FlowRunner {
 
 	void runReleaseTasks(Options options, ReleaserProperties properties, ProjectsToRun projectToRuns, TasksToRun tasksToRun);
 
-	void runPostReleaseTasks(Options options, ReleaserProperties properties, String executingTaskName, TasksToRun tasksToRun, ProjectsToRun projectsToRun);
+	void runPostReleaseTasks(Options options, ReleaserProperties properties, String executingTaskName, TasksToRun tasksToRun);
 
 	enum Decision {
 		CONTINUE, SKIP, ABORT
