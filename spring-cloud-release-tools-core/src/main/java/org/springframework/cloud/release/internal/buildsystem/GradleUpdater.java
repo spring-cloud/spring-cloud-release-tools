@@ -63,7 +63,7 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 	 * @param versionFromBom - version for the project from Spring Cloud Release
 	 * @param assertVersions - should snapshots / milestone / rc presence be asserted
 	 */
-	public void updateProjectFromBom(File projectRoot, Projects projects,
+	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
 			ProjectVersion versionFromBom, boolean assertVersions) {
 		processAllGradleProps(projectRoot, projects, versionFromBom, assertVersions);
 	}

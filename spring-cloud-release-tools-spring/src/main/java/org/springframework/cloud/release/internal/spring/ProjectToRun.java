@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.Map;
 import java.util.Objects;
@@ -64,7 +65,7 @@ public class ProjectToRun {
 		return Objects.hash(originalVersion);
 	}
 
-	public static class ProjectToRunSupplier implements Supplier<ProjectToRun> {
+	public static class ProjectToRunSupplier implements Supplier<ProjectToRun>, Closeable {
 
 		private static final Map<String, ProjectToRun> CACHE = new ConcurrentHashMap<>();
 
@@ -103,6 +104,11 @@ public class ProjectToRun {
 		@Override
 		public int hashCode() {
 			return Objects.hash(this.projectName);
+		}
+
+		@Override
+		public void close() {
+			CACHE.clear();
 		}
 	}
 }

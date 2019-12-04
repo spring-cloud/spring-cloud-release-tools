@@ -250,7 +250,7 @@ public class PostReleaseActions implements Closeable {
 	private void updateWithVersions(File file, Projects newPostRelease) {
 		this.projectPomUpdater.updateProjectFromReleaseTrain(file, newPostRelease,
 				newProjectVersion(file), false);
-		this.gradleUpdater.updateProjectFromBom(file, newPostRelease,
+		this.gradleUpdater.updateProjectFromReleaseTrain(file, newPostRelease,
 				newProjectVersion(file), false);
 	}
 

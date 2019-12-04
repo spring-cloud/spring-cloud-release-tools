@@ -166,6 +166,10 @@ class SpringBatchFlowRunner implements FlowRunner {
 	}
 
 	private void runBatchJob(String name, Arguments args, Iterator<? extends ReleaserTask> iterator, ReleaserTask task) {
+		if (!iterator.hasNext()) {
+			log.info("No jobs to run, will do nothing");
+			return;
+		}
 		JobBuilder builder = this.jobBuilderFactory.get(name);
 		SimpleJobBuilder startedBuilder = builder.start(createStep(task, args));
 		while (iterator.hasNext()) {

@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.release.internal.github;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +56,7 @@ import com.jcabi.github.Stars;
 import com.jcabi.github.Users;
 import com.jcabi.http.Request;
 
-class CachingGithub implements Github {
+class CachingGithub implements Github, Closeable {
 
 	private final AtomicReference<Repos> repos = new AtomicReference<>();
 
@@ -134,9 +135,16 @@ class CachingGithub implements Github {
 		return this.delegate.hashCode();
 	}
 
+	@Override
+	public void close() throws IOException {
+		Repos repos = this.repos.get();
+		if (repos instanceof Closeable) {
+			((Closeable) repos).close();
+		}
+	}
 }
 
-class CachingRepos implements Repos {
+class CachingRepos implements Repos, Closeable {
 
 	private static final Map<Object, Repo> CACHE = new ConcurrentHashMap<>();
 
@@ -182,6 +190,10 @@ class CachingRepos implements Repos {
 		return this.delegate.hashCode();
 	}
 
+	@Override
+	public void close() throws IOException {
+		CACHE.clear();
+	}
 }
 
 class CachingRepo implements Repo {

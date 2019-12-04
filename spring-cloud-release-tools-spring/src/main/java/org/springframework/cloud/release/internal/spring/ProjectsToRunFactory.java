@@ -16,7 +16,9 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,9 +32,11 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.util.StringUtils;
 
-class ProjectsToRunFactory {
+class ProjectsToRunFactory implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectsToRunFactory.class);
+
+	private final ProjectsToRun storedProjects = new ProjectsToRun();
 
 	private final VersionsToBumpFactory versionsToBumpFactory;
 	private final Releaser releaser;
@@ -45,6 +49,12 @@ class ProjectsToRunFactory {
 	}
 
 	ProjectsToRun release(OptionsAndProperties optionsAndProperties) {
+		ProjectsToRun projectsToRun = doRelease(optionsAndProperties);
+		this.storedProjects.addAll(projectsToRun);
+		return projectsToRun;
+	}
+
+	private ProjectsToRun doRelease(OptionsAndProperties optionsAndProperties) {
 		Options options = optionsAndProperties.options;
 		ReleaserProperties properties = optionsAndProperties.properties;
 		if (!options.metaRelease) {
@@ -61,6 +71,12 @@ class ProjectsToRunFactory {
 	}
 
 	ProjectsToRun postRelease(OptionsAndProperties optionsAndProperties) {
+		ProjectsToRun projectsToRun = doPostRelease(optionsAndProperties);
+		this.storedProjects.addAll(projectsToRun);
+		return projectsToRun;
+	}
+
+	private ProjectsToRun doPostRelease(OptionsAndProperties optionsAndProperties) {
 		Options options = optionsAndProperties.options;
 		ReleaserProperties properties = optionsAndProperties.properties;
 		if (!options.metaRelease) {
@@ -162,4 +178,8 @@ class ProjectsToRunFactory {
 		return filteredProjects;
 	}
 
+	@Override
+	public void close() throws IOException {
+		this.storedProjects.forEach(ProjectToRun.ProjectToRunSupplier::close);
+	}
 }

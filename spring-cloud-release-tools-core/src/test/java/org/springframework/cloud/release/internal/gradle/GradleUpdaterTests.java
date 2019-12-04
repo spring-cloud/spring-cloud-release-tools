@@ -68,7 +68,7 @@ public class GradleUpdaterTests {
 				new ProjectVersion("spring-cloud-contract", "1.0.0"),
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		new GradleUpdater(properties).updateProjectFromBom(projectRoot, projects,
+		new GradleUpdater(properties).updateProjectFromReleaseTrain(projectRoot, projects,
 				new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
 
 		then(asString(tmpFile("gradleproject/gradle.properties"))).contains("foo=1.0.0");
@@ -91,7 +91,7 @@ public class GradleUpdaterTests {
 				new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromBom(projectRoot,
+		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromReleaseTrain(projectRoot,
 				projects, new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"),
 				true)).hasMessageContaining(
 						"(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");

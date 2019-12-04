@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -65,18 +66,18 @@ import static org.mockito.ArgumentMatchers.anyString;
 /**
  * @author Marcin Grzejszczak
  */
-public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
+public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptanceTests {
 
 	ApplicationContextRunner runner = new ApplicationContextRunner()
-			.withUserConfiguration(SpringAcceptanceTests.SingleProjectReleaseConfig.class,
-			SpringAcceptanceTests.SingleProjectScanningConfiguration.class);
+			.withUserConfiguration(SpringSingleProjectAcceptanceTests.SingleProjectReleaseConfig.class,
+			SpringSingleProjectAcceptanceTests.SingleProjectScanningConfiguration.class);
 
 	@Test
 	public void should_fail_to_perform_a_release_of_consul_when_sc_release_contains_snapshots()
 			throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release-with-snapshot/", "vCamden.SR5.BROKEN");
 		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
-		assertThatClonedProjectIsInSnapshots(origin);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
@@ -100,7 +101,7 @@ public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 	public void should_perform_a_release_of_consul() throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
 		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
-		assertThatClonedProjectIsInSnapshots(origin);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
@@ -132,16 +133,10 @@ public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 					pomVersionIsEqualTo(project, "2.1.3.BUILD-SNAPSHOT");
 					consulPomParentVersionIsEqualTo(project, "2.1.3.BUILD-SNAPSHOT");
 					then(gitHubHandler.closedMilestones).isTrue();
-					then(emailTemplate()).exists();
-					then(emailTemplateContents()).contains("Spring Cloud Greenwich.SR2 available")
-							.contains("Spring Cloud Greenwich SR2 Train release");
-					then(blogTemplate()).exists();
-					then(blogTemplateContents()).contains("I am pleased to announce that the Service Release 2 (SR2)");
-					then(releaseNotesTemplate()).exists();
-					then(releaseNotesTemplateContents()).contains("Greenwich.SR2").contains(
-							"- Spring Cloud Config `2.1.3.RELEASE` ([issues](https://foo.bar.com/2.1.3.RELEASE))")
-							.contains(
-									"- Spring Cloud Aws `2.1.2.RELEASE` ([issues](https://foo.bar.com/2.1.2.RELEASE))");
+					then(emailTemplate()).doesNotExist();
+					then(blogTemplate()).doesNotExist();
+					then(tweetTemplate()).doesNotExist();
+					then(releaseNotesTemplate()).doesNotExist();
 					// once for updating GA
 					// second time to update SNAPSHOT
 					BDDMockito.then(saganClient).should(BDDMockito.times(2))
@@ -157,9 +152,169 @@ public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 				});
 	}
 
-	private void assertThatClonedProjectIsInSnapshots(File origin) {
+	// issue #74
+	@Test
+	public void should_perform_a_release_of_sc_build() throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "vGreenwich.SR2");
+		File origin = cloneToTemporaryDirectory(this.springCloudBuildProject);
+		assertThatClonedBuildProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-build"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+
+		this.runner
+				.withSystemProperties("debug=true")
+				.withPropertyValues(
+						new ArgsBuilder(project, this.tmp)
+								.releaseTrainUrl("/projects/spring-cloud-release/")
+								.bomBranch("vGreenwich.SR2")
+								.projectName("spring-cloud-build")
+								.expectedVersion("2.1.6.RELEASE")
+								.build())
+				.run(context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
+					SaganClient saganClient = context.getBean(SaganClient.class);
+					TestDocumentationUpdater testDocumentationUpdater = context.getBean(TestDocumentationUpdater.class);
+					PostReleaseActions postReleaseActions = context.getBean(PostReleaseActions.class);
+
+					releaser.release(new OptionsBuilder()
+							.interactive(true)
+							.options());
+
+					Iterable<RevCommit> commits = listOfCommits(project);
+					Iterator<RevCommit> iterator = commits.iterator();
+					tagIsPresentInOrigin(origin, "v2.1.6.RELEASE");
+					// we're running against camden sc-release
+					commitIsPresent(iterator,
+							"Bumping versions to 2.1.7.BUILD-SNAPSHOT after release");
+					commitIsPresent(iterator, "Going back to snapshots");
+					commitIsPresent(iterator, "Update SNAPSHOT to 2.1.6.RELEASE");
+					pomVersionIsEqualTo(project, "2.1.7.BUILD-SNAPSHOT");
+					pomParentVersionIsEqualTo(project, "spring-cloud-build-dependencies",
+							"2.1.6.RELEASE");
+					then(gitHubHandler.closedMilestones).isTrue();
+					then(emailTemplate()).doesNotExist();
+					then(blogTemplate()).doesNotExist();
+					then(tweetTemplate()).doesNotExist();
+					then(releaseNotesTemplate()).doesNotExist();
+					// once for updating GA
+					// second time to update SNAPSHOT
+					BDDMockito.then(saganClient).should(BDDMockito.times(2))
+							.updateRelease(BDDMockito.eq("spring-cloud-build"), BDDMockito.anyList());
+					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-build",
+							"2.1.6.BUILD-SNAPSHOT");
+					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
+					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
+					then(Files.readSymbolicLink(
+							new File(testDocumentationUpdater.getDocumentationRepo(), "spring-cloud-build/current")
+									.toPath())
+							.toString()).isEqualTo("2.1.6.RELEASE");
+					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
+				});
+	}
+
+	@Test
+	public void should_perform_a_release_of_consul_rc1() throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "vDalston.RC1");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+
+		this.runner
+				.withSystemProperties("debug=true")
+				.withPropertyValues(
+						new ArgsBuilder(project, this.tmp)
+								.releaseTrainUrl("/projects/spring-cloud-release/")
+								.bomBranch("vDalston.RC1")
+								.expectedVersion("1.2.0.RC1")
+								.build())
+				.run(context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
+					SaganClient saganClient = context.getBean(SaganClient.class);
+					TestDocumentationUpdater testDocumentationUpdater = context.getBean(TestDocumentationUpdater.class);
+					PostReleaseActions postReleaseActions = context.getBean(PostReleaseActions.class);
+
+					releaser.release(new OptionsBuilder()
+							.interactive(true)
+							.options());
+
+					Iterable<RevCommit> commits = listOfCommits(project);
+					tagIsPresentInOrigin(origin, "v1.2.0.RC1");
+					commitIsNotPresent(commits,
+							"Bumping versions to 1.2.1.BUILD-SNAPSHOT after release");
+					Iterator<RevCommit> iterator = listOfCommits(project).iterator();
+					commitIsPresent(iterator, "Going back to snapshots");
+					commitIsPresent(iterator, "Update SNAPSHOT to 1.2.0.RC1");
+					pomVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
+					consulPomParentVersionIsEqualTo(project, "1.2.0.BUILD-SNAPSHOT");
+					then(gitHubHandler.closedMilestones).isTrue();
+					then(emailTemplate()).doesNotExist();
+					then(blogTemplate()).doesNotExist();
+					then(tweetTemplate()).doesNotExist();
+					then(releaseNotesTemplate()).doesNotExist();
+					BDDMockito.then(saganClient).should().updateRelease(
+							BDDMockito.eq("spring-cloud-consul"), BDDMockito.anyList());
+					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul",
+							"1.2.0.M8");
+					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul",
+							"1.2.0.RC1");
+					// we update guides only for SR / RELEASE
+					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
+					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
+					// haven't even checked out the branch
+					then(new File(testDocumentationUpdater.getDocumentationRepo(), "current/index.html")).doesNotExist();
+					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
+				});
+	}
+
+	@Test
+	public void should_not_clone_when_option_not_to_clone_was_switched_on()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "master");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		final File temporaryDestination = this.tmp.newFolder();
+
+		this.runner
+				.withSystemProperties("debug=true")
+				.withPropertyValues(
+						new ArgsBuilder(project, this.tmp)
+								.releaseTrainUrl("/projects/spring-cloud-release/")
+								.bomBranch("vCamden.SR5")
+								.expectedVersion("1.1.2.RELEASE")
+								// just build
+								.chosenOption("6")
+								.fetchVersionsFromGit(false)
+								.cloneDestinationDirectory(temporaryDestination)
+								.addFixedVersion("spring-cloud-release",
+										"Finchley.RELEASE")
+								.addFixedVersion("spring-cloud-consul",
+										"2.3.4.RELEASE")
+								.build())
+				.run(context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+
+					releaser.release(new OptionsBuilder()
+							.interactive(true)
+							.options());
+
+					then(temporaryDestination.list()).isEmpty();
+				});
+	}
+
+	private void assertThatClonedConsulProjectIsInSnapshots(File origin) {
 		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
 		consulPomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+	}
+
+	private void assertThatClonedBuildProjectIsInSnapshots(File origin) {
+		pomVersionIsEqualTo(origin, "1.3.7.BUILD-SNAPSHOT");
+		pomParentVersionIsEqualTo(origin, "spring-cloud-build-dependencies",
+				"1.5.9.RELEASE");
 	}
 
 	class ArgsBuilder {
@@ -179,6 +334,7 @@ public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 		ArgsBuilder defaults() throws Exception {
 			// @formatter:off
 			this.args.addAll(Arrays.asList(
+					"spring.datasource.url=jdbc:h2:mem:" + new Random().nextInt(),
 					"releaser.git.documentation-url=" + file("/projects/spring-cloud-static-angel/").toURI().toString(),
 					"releaser.git.test-samples-project-url=" + this.tmp.newFolder().toString(),
 					"releaser.git.release-train-docs-url=" + this.tmp.newFolder().toString(),
@@ -202,10 +358,28 @@ public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 					"releaser.git.all-test-sample-urls[spring-cloud-consul]=" + this.tmp.newFolder().toString(),
 					"releaser.sagan.update-sagan=true",
 					"releaser.versions.all-versions-file-url="
-							+ SpringAcceptanceTests.class.getResource("/raw/initializr.yml").toURI().toString(),
-					"test.projectName=spring-cloud-consul"
+							+ SpringSingleProjectAcceptanceTests.class.getResource("/raw/initializr.yml").toURI().toString()
 			));
 			// @formatter:on
+			return fetchVersionsFromGit(true)
+					.projectName("spring-cloud-consul");
+		}
+
+		ArgsBuilder addFixedVersion(String projectName, String projectVersion) throws Exception {
+			this.args.add(
+					"releaser.fixed-versions[" + projectName + "]=" + projectVersion);
+			return this;
+		}
+
+		ArgsBuilder fetchVersionsFromGit(boolean fetch) throws Exception {
+			this.args.add(
+					"releaser.git.fetch-versions-from-git=" + fetch);
+			return this;
+		}
+
+		ArgsBuilder cloneDestinationDirectory(File cloneDestinationDirectory) throws Exception {
+			this.args.add(
+					"releaser.git.clone-destination-dir=" + cloneDestinationDirectory.toString());
 			return this;
 		}
 
@@ -215,8 +389,18 @@ public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 			return this;
 		}
 
+		ArgsBuilder projectName(String projectName) {
+			this.args.add("test.projectName=" + projectName);
+			return this;
+		}
+
 		ArgsBuilder expectedVersion(String expectedVersion) {
 			this.args.add("test.expectedVersion=" + expectedVersion);
+			return this;
+		}
+
+		ArgsBuilder chosenOption(String chosenOption) {
+			this.args.add("test.chosenOption=" + chosenOption);
 			return this;
 		}
 
@@ -295,11 +479,11 @@ public class SpringAcceptanceTests extends AbstractSpringAcceptanceTests {
 		}
 
 		@Bean
-		TasksToRunFactory myTasksToRunFactory(ApplicationContext context) {
+		TasksToRunFactory myTasksToRunFactory(ApplicationContext context, @Value("${test.chosenOption:0}") String chosenOption) {
 			return new TasksToRunFactory(context) {
 				@Override
 				String chosenOption() {
-					return "0";
+					return chosenOption;
 				}
 			};
 		}

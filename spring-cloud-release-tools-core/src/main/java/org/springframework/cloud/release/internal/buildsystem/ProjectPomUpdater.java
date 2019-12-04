@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.release.internal.buildsystem;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -45,7 +46,7 @@ import org.springframework.cloud.release.internal.project.Projects;
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectPomUpdater implements ReleaserPropertiesAware {
+public class ProjectPomUpdater implements ReleaserPropertiesAware, Closeable {
 
 	private static final List<String> IGNORED_SNAPSHOT_LINE_PATTERNS = Arrays.asList(
 			"^.*replace=.*$",
@@ -176,6 +177,11 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware {
 	@Override
 	public void setReleaserProperties(ReleaserProperties properties) {
 		this.properties = properties;
+	}
+
+	@Override
+	public void close() throws IOException {
+		CACHE.clear();
 	}
 
 	private final class PomWalker extends SimpleFileVisitor<Path> {

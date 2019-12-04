@@ -61,6 +61,8 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	File springCloudConsulProject;
 
+	File springCloudBuildProject;
+
 	File temporaryFolder;
 
 	TestPomReader testPomReader = new TestPomReader();
@@ -70,11 +72,17 @@ public abstract class AbstractSpringAcceptanceTests {
 		this.temporaryFolder = this.tmp.newFolder();
 		this.springCloudConsulProject = new File(
 				AcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
+		this.springCloudBuildProject = new File(
+				AcceptanceTests.class.getResource("/projects/spring-cloud-build").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 		new File("/tmp/executed_build").delete();
 		new File("/tmp/executed_deploy").delete();
 		new File("/tmp/executed_docs").delete();
+		blogTemplate().delete();
+		emailTemplate().delete();
+		releaseNotesTemplate().delete();
+		tweetTemplate().delete();
 	}
 
 	void thenRunUpdatedTestsWereCalled(PostReleaseActions postReleaseActions) {
