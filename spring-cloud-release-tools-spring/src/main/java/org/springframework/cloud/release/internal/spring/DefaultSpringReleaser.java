@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,14 +37,16 @@ public class DefaultSpringReleaser implements SpringReleaser {
 
 	private final FlowRunner flowRunner;
 
-	public DefaultSpringReleaser(ReleaserProperties properties, OptionsAndPropertiesFactory optionsAndPropertiesFactory, ProjectsToRunFactory projectsToRunFactory, TasksToRunFactory tasksToRunFactory,FlowRunner flowRunner) {
+	public DefaultSpringReleaser(ReleaserProperties properties,
+			OptionsAndPropertiesFactory optionsAndPropertiesFactory,
+			ProjectsToRunFactory projectsToRunFactory,
+			TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner) {
 		this.properties = properties;
 		this.optionsAndPropertiesFactory = optionsAndPropertiesFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
 		this.tasksToRunFactory = tasksToRunFactory;
 		this.flowRunner = flowRunner;
 	}
-
 
 	/**
 	 * Default behaviour - interactive mode.
@@ -59,34 +61,44 @@ public class DefaultSpringReleaser implements SpringReleaser {
 
 	// RELEASE
 	// which projects to run
-	//   * for meta-release take from the options
-	//   * for single will return a list of one project
+	// * for meta-release take from the options
+	// * for single will return a list of one project
 	// which tasks to run
-	//   * for meta-release will run everything
-	//   * for single will take from the options
+	// * for meta-release will run everything
+	// * for single will take from the options
 	// POST-RELEASE
 	// not applicable for dry-run
-	//   * for single project will run the project post-release tasks
-	//   * for meta-release will pick projects, set the branch to release train version
+	// * for single project will run the project post-release tasks
+	// * for meta-release will pick projects, set the branch to release train version
 
 	// **** take from the options
-	//   * Start from
-	//   * Range
-	//   * Task names
-	//   * Interactive
-	//      * In this mode you haven’t picked what you want to do yet
+	// * Start from
+	// * Range
+	// * Task names
+	// * Interactive
+	// * In this mode you haven’t picked what you want to do yet
 	@Override
 	public void release(Options options) {
-		OptionsAndProperties optionsAndProperties = prepareOptionsAndProperties(options, this.properties);
+		OptionsAndProperties optionsAndProperties = prepareOptionsAndProperties(options,
+				this.properties);
 		// order matters! Tasks will mutate options and properties
 		TasksToRun releaseTasksToRun = releaseTasksFromOptions(optionsAndProperties);
 		ProjectsToRun projectsToRun = releaseProjects(optionsAndProperties);
-		runReleaseTasks(optionsAndProperties, projectsToRun, releaseTasksToRun);
-		TasksToRun postReleaseTrainTasksToRun = postReleaseTrainTasksFromOptions(optionsAndProperties);
-		runPostReleaseTasks(optionsAndProperties, postReleaseTrainTasksToRun);
+		ExecutionResult releaseTasksExecutionResult = runReleaseTasks(
+				optionsAndProperties, projectsToRun, releaseTasksToRun);
+		TasksToRun postReleaseTrainTasksToRun = postReleaseTrainTasksFromOptions(
+				optionsAndProperties);
+		ExecutionResult postReleaseTasksExecutionResult = runPostReleaseTasks(
+				optionsAndProperties, postReleaseTrainTasksToRun);
+		ExecutionResult allTasksExecutionResult = releaseTasksExecutionResult
+				.merge(postReleaseTasksExecutionResult);
+		if (allTasksExecutionResult.isFailureOrUnstable()) {
+			throw allTasksExecutionResult.foundExceptions();
+		}
 	}
 
-	private OptionsAndProperties prepareOptionsAndProperties(Options options, ReleaserProperties properties) {
+	private OptionsAndProperties prepareOptionsAndProperties(Options options,
+			ReleaserProperties properties) {
 		return this.optionsAndPropertiesFactory.get(properties, options);
 	}
 
@@ -98,17 +110,21 @@ public class DefaultSpringReleaser implements SpringReleaser {
 		return this.tasksToRunFactory.release(options);
 	}
 
-	private TasksToRun postReleaseTrainTasksFromOptions(OptionsAndProperties optionsAndProperties) {
+	private TasksToRun postReleaseTrainTasksFromOptions(
+			OptionsAndProperties optionsAndProperties) {
 		return this.tasksToRunFactory.postRelease(optionsAndProperties.options);
 	}
 
-	private void runReleaseTasks(OptionsAndProperties optionsAndProperties, ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
-		this.flowRunner.runReleaseTasks(optionsAndProperties.options, optionsAndProperties.properties, projectsToRun, tasksToRun);
+	private ExecutionResult runReleaseTasks(OptionsAndProperties optionsAndProperties,
+			ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
+		return this.flowRunner.runReleaseTasks(optionsAndProperties.options,
+				optionsAndProperties.properties, projectsToRun, tasksToRun);
 	}
 
-	private void runPostReleaseTasks(OptionsAndProperties optionsAndProperties, TasksToRun postReleaseTasksToRun) {
-		this.flowRunner.runPostReleaseTasks(optionsAndProperties.options, optionsAndProperties.properties, "postRelease", postReleaseTasksToRun);
+	private ExecutionResult runPostReleaseTasks(OptionsAndProperties optionsAndProperties,
+			TasksToRun postReleaseTasksToRun) {
+		return this.flowRunner.runPostReleaseTasks(optionsAndProperties.options,
+				optionsAndProperties.properties, "postRelease", postReleaseTasksToRun);
 	}
 
 }
-

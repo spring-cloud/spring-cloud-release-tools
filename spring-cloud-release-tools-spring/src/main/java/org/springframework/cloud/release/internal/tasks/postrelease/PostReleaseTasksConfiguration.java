@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,35 +27,40 @@ class PostReleaseTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	CreateTemplatesTrainPostReleaseTask createTemplatesTrainPostReleaseTask(Releaser releaser) {
+	CreateTemplatesTrainPostReleaseTask createTemplatesTrainPostReleaseTask(
+			Releaser releaser) {
 		return new CreateTemplatesTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.run-updated-samples")
-	RunUpdatedSamplesTrainPostReleaseTask runUpdatedSamplesTrainPostReleaseTask(Releaser releaser) {
+	RunUpdatedSamplesTrainPostReleaseTask runUpdatedSamplesTrainPostReleaseTask(
+			Releaser releaser) {
 		return new RunUpdatedSamplesTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-all-test-samples")
-	UpdateAllTestSamplesTrainPostReleaseTask updateAllTestSamplesTrainPostReleaseTask(Releaser releaser) {
+	UpdateAllTestSamplesTrainPostReleaseTask updateAllTestSamplesTrainPostReleaseTask(
+			Releaser releaser) {
 		return new UpdateAllTestSamplesTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-documentation-repo")
-	UpdateDocsRepositoryProjectPostReleaseTask updateDocsRepositoryProjectPostReleaseTask(Releaser releaser) {
+	UpdateDocsRepositoryProjectPostReleaseTask updateDocsRepositoryProjectPostReleaseTask(
+			Releaser releaser) {
 		return new UpdateDocsRepositoryProjectPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-documentation-repo")
-	UpdateDocsRepositoryTrainPostReleaseTask updateDocsRepositoryTrainPostReleaseTask(Releaser releaser) {
+	UpdateDocsRepositoryTrainPostReleaseTask updateDocsRepositoryTrainPostReleaseTask(
+			Releaser releaser) {
 		return new UpdateDocsRepositoryTrainPostReleaseTask(releaser);
 	}
 
@@ -69,28 +74,33 @@ class PostReleaseTasksConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-release-train-docs")
-	UpdateReleaseTrainDocsTrainPostReleaseTask updateReleaseTrainDocsTrainPostReleaseTask(Releaser releaser) {
+	UpdateReleaseTrainDocsTrainPostReleaseTask updateReleaseTrainDocsTrainPostReleaseTask(
+			Releaser releaser) {
 		return new UpdateReleaseTrainDocsTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-release-train-wiki")
-	UpdateReleaseTrainWikiTrainPostReleaseTask updateReleaseTrainWikiTrainPostReleaseTask(Releaser releaser) {
+	UpdateReleaseTrainWikiTrainPostReleaseTask updateReleaseTrainWikiTrainPostReleaseTask(
+			Releaser releaser) {
 		return new UpdateReleaseTrainWikiTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.sagan.update-sagan")
-	UpdateSaganProjectPostReleaseTask updateSaganProjectPostReleaseTask(Releaser releaser) {
+	UpdateSaganProjectPostReleaseTask updateSaganProjectPostReleaseTask(
+			Releaser releaser) {
 		return new UpdateSaganProjectPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.sagan.update-start-spring-io")
-	UpdateStartSpringIoTrainPostReleaseTask updateStartSpringIoTrainPostReleaseTask(Releaser releaser) {
+	UpdateStartSpringIoTrainPostReleaseTask updateStartSpringIoTrainPostReleaseTask(
+			Releaser releaser) {
 		return new UpdateStartSpringIoTrainPostReleaseTask(releaser);
 	}
+
 }

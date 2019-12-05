@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,7 +49,8 @@ class TasksToRunFactory {
 
 	TasksToRun release(OptionsAndProperties optionsAndProperties) {
 		TasksToRun tasks = releaseTasks(optionsAndProperties);
-		tasks.forEach(t -> t.setup(optionsAndProperties.options, optionsAndProperties.properties));
+		tasks.forEach(t -> t.setup(optionsAndProperties.options,
+				optionsAndProperties.properties));
 		return tasks;
 	}
 
@@ -61,22 +62,20 @@ class TasksToRunFactory {
 		}
 		if (options.metaRelease) {
 			if (options.dryRun) {
-				return new TasksToRun(this.context
-						.getBean(MetaReleaseDryRunCompositeTask.class));
+				return new TasksToRun(
+						this.context.getBean(MetaReleaseDryRunCompositeTask.class));
 			}
-			return new TasksToRun(this.context
-					.getBean(MetaReleaseCompositeTask.class));
+			return new TasksToRun(this.context.getBean(MetaReleaseCompositeTask.class));
 		}
 		if (options.dryRun) {
-			return new TasksToRun(this.context
-					.getBean(DryRunCompositeTask.class));
+			return new TasksToRun(this.context.getBean(DryRunCompositeTask.class));
 		}
 		else if (options.fullRelease) {
-			return new TasksToRun(this.context
-					.getBean(ReleaseCompositeTask.class));
+			return new TasksToRun(this.context.getBean(ReleaseCompositeTask.class));
 		}
 		// A single project release
-		List<ReleaserTask> tasks = new LinkedList<>(this.context.getBeansOfType(ReleaserTask.class).values());
+		List<ReleaserTask> tasks = new LinkedList<>(
+				this.context.getBeansOfType(ReleaserTask.class).values());
 		tasks.sort(AnnotationAwareOrderComparator.INSTANCE);
 		return tasksToRunForSingleProject(options, tasks);
 	}
@@ -85,12 +84,14 @@ class TasksToRunFactory {
 		if (!options.metaRelease) {
 			return new TasksToRun();
 		}
-		List<ReleaserTask> tasks = new LinkedList<>(this.context.getBeansOfType(TrainPostReleaseReleaserTask.class).values());
+		List<ReleaserTask> tasks = new LinkedList<>(
+				this.context.getBeansOfType(TrainPostReleaseReleaserTask.class).values());
 		tasks.sort(AnnotationAwareOrderComparator.INSTANCE);
 		return new TasksToRun(tasks);
 	}
 
-	private TasksToRun tasksToRunForSingleProject(Options options, List<ReleaserTask> tasks) {
+	private TasksToRun tasksToRunForSingleProject(Options options,
+			List<ReleaserTask> tasks) {
 		if (StringUtils.hasText(options.startFrom)) {
 			return startFrom(tasks, options);
 		}
@@ -114,7 +115,8 @@ class TasksToRunFactory {
 	}
 
 	private TasksToRun tasks(List<ReleaserTask> tasks, List<String> taskNames) {
-		return tasks.stream().filter(t -> taskNames.contains(t.name())).collect(Collectors.toCollection(TasksToRun::new));
+		return tasks.stream().filter(t -> taskNames.contains(t.name()))
+				.collect(Collectors.toCollection(TasksToRun::new));
 	}
 
 	private TasksToRun range(List<ReleaserTask> tasks, String range) {
@@ -156,8 +158,7 @@ class TasksToRunFactory {
 		StringBuilder msg = new StringBuilder();
 		msg.append("\n\n\n=== WHAT DO YOU WANT TO DO? ===\n\n");
 		for (int i = 0; i < allTasks.size(); i++) {
-			msg.append(i).append(") ").append(allTasks.get(i).description())
-					.append("\n");
+			msg.append(i).append(") ").append(allTasks.get(i).description()).append("\n");
 		}
 		msg.append("\n").append(
 				"You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]\n");
@@ -220,4 +221,5 @@ class TasksToRunFactory {
 	String chosenOption() {
 		return System.console() == null ? "-1" : System.console().readLine();
 	}
+
 }

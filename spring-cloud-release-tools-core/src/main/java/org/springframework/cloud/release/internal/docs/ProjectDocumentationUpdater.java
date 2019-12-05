@@ -60,20 +60,22 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		CustomProjectDocumentationUpdater updater = this.updaters.stream().filter(
 				u -> u.isApplicable(documentationProject, currentProject, bomBranch))
 				.findFirst().orElse(CustomProjectDocumentationUpdater.NO_OP);
-		return updater.updateDocsRepoForReleaseTrain(documentationProject, currentProject, projects,
-				bomBranch);
+		return updater.updateDocsRepoForReleaseTrain(documentationProject, currentProject,
+				projects, bomBranch);
 	}
 
-	public File updateDocsRepoForSingleProject(Projects projects, ProjectVersion currentProject) {
+	public File updateDocsRepoForSingleProject(Projects projects,
+			ProjectVersion currentProject) {
 		if (!shouldUpdate(currentProject)) {
 			return null;
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
 		log.debug("Cloning the doc project to [{}]", documentationProject);
-		CustomProjectDocumentationUpdater updater = this.updaters.stream().filter(
-				u -> u.isApplicable(documentationProject, currentProject, null))
+		CustomProjectDocumentationUpdater updater = this.updaters.stream()
+				.filter(u -> u.isApplicable(documentationProject, currentProject, null))
 				.findFirst().orElse(CustomProjectDocumentationUpdater.NO_OP);
-		return updater.updateDocsRepoForSingleProject(documentationProject, currentProject, projects);
+		return updater.updateDocsRepoForSingleProject(documentationProject,
+				currentProject, projects);
 	}
 
 	private boolean shouldUpdate(ProjectVersion currentProject) {

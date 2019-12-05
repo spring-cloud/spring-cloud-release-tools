@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,10 +18,14 @@ package org.springframework.cloud.release.internal.tasks.postrelease;
 
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.spring.Arguments;
+import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.tasks.ProjectPostReleaseReleaserTask;
 
 public class UpdateSaganProjectPostReleaseTask implements ProjectPostReleaseReleaserTask {
 
+	/**
+	 * Order of this task. The higher value, the lower order.
+	 */
 	public static final int ORDER = 100;
 
 	private final Releaser releaser;
@@ -51,9 +55,9 @@ public class UpdateSaganProjectPostReleaseTask implements ProjectPostReleaseRele
 	}
 
 	@Override
-	public void accept(Arguments args) {
-		this.releaser.updateSagan(args.project, args.versionFromBom,
-				args.projects);
+	public ExecutionResult runTask(Arguments args) {
+		this.releaser.updateSagan(args.project, args.versionFromBom, args.projects);
+		return ExecutionResult.success();
 	}
 
 	@Override

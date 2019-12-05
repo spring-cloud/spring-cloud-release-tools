@@ -70,8 +70,8 @@ public interface CustomProjectDocumentationUpdater {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	File updateDocsRepoForReleaseTrain(File clonedDocumentationProject, ProjectVersion currentProject,
-			Projects projects, String bomBranch);
+	File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
+			ProjectVersion currentProject, Projects projects, String bomBranch);
 
 	/**
 	 * Updates the documentation repository for a single project.
@@ -81,7 +81,7 @@ public interface CustomProjectDocumentationUpdater {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	File updateDocsRepoForSingleProject(File clonedDocumentationProject, ProjectVersion currentProject,
-			Projects projects);
+	File updateDocsRepoForSingleProject(File clonedDocumentationProject,
+			ProjectVersion currentProject, Projects projects);
 
 }

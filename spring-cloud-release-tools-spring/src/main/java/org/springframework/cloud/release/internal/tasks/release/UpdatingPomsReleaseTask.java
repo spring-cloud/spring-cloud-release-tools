@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,16 +16,16 @@
 
 package org.springframework.cloud.release.internal.tasks.release;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.spring.Arguments;
+import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.tasks.DryRunReleaseReleaserTask;
-import org.springframework.cloud.release.internal.tasks.ReleaseReleaserTask;
 
-public class UpdatingPomsReleaseTask implements ReleaseReleaserTask, DryRunReleaseReleaserTask {
+public class UpdatingPomsReleaseTask implements DryRunReleaseReleaserTask {
 
+	/**
+	 * Order of this task. The higher value, the lower order.
+	 */
 	public static final int ORDER = 10;
 
 	private final Releaser releaser;
@@ -55,8 +55,10 @@ public class UpdatingPomsReleaseTask implements ReleaseReleaserTask, DryRunRelea
 	}
 
 	@Override
-	public void accept(Arguments args) {
-		this.releaser.updateProjectFromBom(args.project, args.projects, args.versionFromBom);
+	public ExecutionResult runTask(Arguments args) {
+		this.releaser.updateProjectFromBom(args.project, args.projects,
+				args.versionFromBom);
+		return ExecutionResult.success();
 	}
 
 	@Override
@@ -64,8 +66,4 @@ public class UpdatingPomsReleaseTask implements ReleaseReleaserTask, DryRunRelea
 		return UpdatingPomsReleaseTask.ORDER;
 	}
 
-	@Override
-	public List<TaskType> taskTypes() {
-		return Arrays.asList(TaskType.RELEASE, TaskType.DRY_RUN);
-	}
 }

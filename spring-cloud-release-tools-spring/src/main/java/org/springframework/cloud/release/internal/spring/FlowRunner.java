@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,22 +19,32 @@ package org.springframework.cloud.release.internal.spring;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
+import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 
 public interface FlowRunner {
 
-	default Decision beforeTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
+	default Decision beforeTask(Options options, ReleaserProperties properties,
+			ReleaserTask releaserTask) {
 		return Decision.CONTINUE;
 	}
 
-	default Decision afterTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
+	default Decision afterTask(Options options, ReleaserProperties properties,
+			ReleaserTask releaserTask) {
 		return Decision.CONTINUE;
 	}
 
-	void runReleaseTasks(Options options, ReleaserProperties properties, ProjectsToRun projectToRuns, TasksToRun tasksToRun);
+	ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties,
+			ProjectsToRun projectToRuns, TasksToRun tasksToRun)
+			throws MakeBuildUnstableException;
 
-	void runPostReleaseTasks(Options options, ReleaserProperties properties, String executingTaskName, TasksToRun tasksToRun);
+	ExecutionResult runPostReleaseTasks(Options options, ReleaserProperties properties,
+			String executingTaskName, TasksToRun tasksToRun)
+			throws MakeBuildUnstableException;
 
 	enum Decision {
+
 		CONTINUE, SKIP, ABORT
+
 	}
+
 }

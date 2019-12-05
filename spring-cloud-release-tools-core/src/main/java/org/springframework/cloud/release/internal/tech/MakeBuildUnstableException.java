@@ -16,6 +16,9 @@
 
 package org.springframework.cloud.release.internal.tech;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,16 +30,33 @@ import org.slf4j.LoggerFactory;
  */
 public class MakeBuildUnstableException extends RuntimeException {
 
+	/**
+	 * Description of the exception.
+	 */
 	public static final String DESCRIPTION = "[BUILD UNSTABLE] WARNING!";
 
+	/**
+	 * Exit code of the exception.
+	 */
 	public static final String EXIT_CODE = "BUILD_UNSTABLE";
 
 	private static final Logger log = LoggerFactory
 			.getLogger(MakeBuildUnstableException.class);
 
+	/**
+	 * List of exceptions causing this unstability.
+	 */
+	public final List<Throwable> exceptions = new ArrayList<>();
+
 	public MakeBuildUnstableException(Throwable cause) {
 		super(cause);
 		log.error("\n\n" + DESCRIPTION, cause);
+		this.exceptions.add(cause);
+	}
+
+	public MakeBuildUnstableException(String message, List<Throwable> throwables) {
+		this.exceptions.addAll(throwables);
+		log.error("\n\n" + DESCRIPTION + message + " with causes " + throwables);
 	}
 
 	public MakeBuildUnstableException(String message) {
@@ -47,6 +67,7 @@ public class MakeBuildUnstableException extends RuntimeException {
 	public MakeBuildUnstableException(String message, Throwable cause) {
 		super(message, cause);
 		log.error("\n\n" + DESCRIPTION + message, cause);
+		this.exceptions.add(cause);
 	}
 
 }

@@ -91,10 +91,11 @@ public class GradleUpdaterTests {
 				new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromReleaseTrain(projectRoot,
-				projects, new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"),
-				true)).hasMessageContaining(
-						"(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
+		thenThrownBy(() -> new GradleUpdater(properties).updateProjectFromReleaseTrain(
+				projectRoot, projects,
+				new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"), true))
+						.hasMessageContaining(
+								"(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
 	}
 
 	private File file(String relativePath) throws URISyntaxException {

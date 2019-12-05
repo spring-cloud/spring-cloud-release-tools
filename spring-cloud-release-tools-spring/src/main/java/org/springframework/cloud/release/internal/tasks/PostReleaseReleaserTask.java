@@ -16,6 +16,18 @@
 
 package org.springframework.cloud.release.internal.tasks;
 
-public interface ReleaseReleaserTask extends SingleProjectReleaserTask {
+import org.springframework.cloud.release.internal.spring.Arguments;
+import org.springframework.cloud.release.internal.spring.ExecutionResult;
+
+public interface PostReleaseReleaserTask extends ReleaserTask {
+
+	default ExecutionResult apply(Arguments args) {
+		try {
+			return runTask(args);
+		}
+		catch (Exception ex) {
+			return ExecutionResult.unstable(ex);
+		}
+	}
 
 }

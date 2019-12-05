@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.spring.Arguments;
+import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.spring.FlowRunner;
 import org.springframework.cloud.release.internal.spring.ProjectToRun;
 import org.springframework.cloud.release.internal.spring.ProjectsToRun;
@@ -39,12 +40,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 /**
- * Marked by {@link Options#fullRelease}
+ * Marked by {@link Options#fullRelease}.
  */
 public class ReleaseCompositeTask implements CompositeReleaserTask {
 
 	private static final Logger log = LoggerFactory.getLogger(ReleaseCompositeTask.class);
 
+	/**
+	 * Order of this task. The higher value, the lower order.
+	 */
 	public static final int ORDER = -100;
 
 	private final ApplicationContext context;
@@ -76,15 +80,21 @@ public class ReleaseCompositeTask implements CompositeReleaserTask {
 	}
 
 	@Override
-	public void accept(Arguments args) {
-		Map<String, ReleaseReleaserTask> releaseTasks = this.context.getBeansOfType(ReleaseReleaserTask.class);
-		Map<String, ProjectPostReleaseReleaserTask> projectPostReleaseTasks = this.context.getBeansOfType(ProjectPostReleaseReleaserTask.class);
-		Collection<ReleaserTask> allReleaseTasks = new LinkedList<>(releaseTasks.values());
+	public ExecutionResult runTask(Arguments args) {
+		Map<String, ReleaseReleaserTask> releaseTasks = this.context
+				.getBeansOfType(ReleaseReleaserTask.class);
+		Map<String, ProjectPostReleaseReleaserTask> projectPostReleaseTasks = this.context
+				.getBeansOfType(ProjectPostReleaseReleaserTask.class);
+		Collection<ReleaserTask> allReleaseTasks = new LinkedList<>(
+				releaseTasks.values());
 		allReleaseTasks.addAll(projectPostReleaseTasks.values());
 		List<ReleaserTask> values = new LinkedList<>(allReleaseTasks);
 		values.sort(AnnotationAwareOrderComparator.INSTANCE);
 		log.info("Found the following release and project post release tasks {}", values);
-		flowRunner().runReleaseTasks(args.options, args.properties, new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(args.originalVersion.projectName, () -> args.projectToRun)), new TasksToRun(values));
+		return flowRunner().runReleaseTasks(args.options, args.properties,
+				new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(
+						args.originalVersion.projectName, () -> args.projectToRun)),
+				new TasksToRun(values));
 	}
 
 	@Override
@@ -103,4 +113,5 @@ public class ReleaseCompositeTask implements CompositeReleaserTask {
 		}
 		return this.flowRunner;
 	}
+
 }

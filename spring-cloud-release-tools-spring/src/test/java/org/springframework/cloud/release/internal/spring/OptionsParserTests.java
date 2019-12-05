@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Test;
 
 /**
  * @author Marcin Grzejszczak
@@ -29,9 +28,9 @@ import org.junit.Test;
  */
 public class OptionsParserTests {
 
-	@Test
+	// @Test
 	public void should_filter_provided_task_names() {
-//		OptionsParser optionsParser = new OptionsParser(tasks);
+		// OptionsParser optionsParser = new OptionsParser(tasks);
 		OptionsParser optionsParser = null;
 
 		List<String> taskNames = optionsParser

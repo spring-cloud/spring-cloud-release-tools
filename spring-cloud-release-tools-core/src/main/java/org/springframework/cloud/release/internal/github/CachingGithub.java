@@ -142,6 +142,7 @@ class CachingGithub implements Github, Closeable {
 			((Closeable) repos).close();
 		}
 	}
+
 }
 
 class CachingRepos implements Repos, Closeable {
@@ -194,6 +195,7 @@ class CachingRepos implements Repos, Closeable {
 	public void close() throws IOException {
 		CACHE.clear();
 	}
+
 }
 
 class CachingRepo implements Repo {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,25 +28,50 @@ import org.springframework.cloud.release.internal.project.ProcessedProject;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
-public class Arguments {
+public final class Arguments {
 
+	/**
+	 * Cloned location of the project.
+	 */
 	public final File project;
 
+	/**
+	 * All projects taken from the BOM.
+	 */
 	public final Projects projects;
 
+	/**
+	 * Original version of this project before any manipulations.
+	 */
 	public final ProjectVersion originalVersion;
 
+	/**
+	 * Version of this project from the BOM.
+	 */
 	public final ProjectVersion versionFromBom;
 
+	/**
+	 * Releaser properties updated for this project.
+	 */
 	public final ReleaserProperties properties;
 
+	/**
+	 * Options updated for this project.
+	 */
 	public final Options options;
 
+	/**
+	 * Current project to run.
+	 */
 	public final ProjectToRun projectToRun;
 
+	/**
+	 * List of processed projects.
+	 */
 	public final List<ProcessedProject> processedProjects;
 
-	private Arguments(ProjectToRun thisProject, Projects projects, ProjectVersion currentProjectFromBom) {
+	private Arguments(ProjectToRun thisProject, Projects projects,
+			ProjectVersion currentProjectFromBom) {
 		this.project = thisProject.thisProjectFolder;
 		this.projects = projects;
 		this.originalVersion = thisProject.originalVersion;
@@ -54,13 +79,17 @@ public class Arguments {
 		this.properties = thisProject.thisProjectReleaserProperties;
 		this.options = thisProject.options;
 		this.projectToRun = thisProject;
-		this.processedProjects = new LinkedList<>(Collections.singletonList(new ProcessedProject(thisProject.thisProjectReleaserProperties, this.versionFromBom, this.originalVersion)));
+		this.processedProjects = new LinkedList<>(Collections.singletonList(
+				new ProcessedProject(thisProject.thisProjectReleaserProperties,
+						this.versionFromBom, this.originalVersion)));
 	}
 
 	// in this case the project will be the BOM
-	private Arguments(ProjectToRun thisProject, List<ProcessedProject> processedProjects) {
+	private Arguments(ProjectToRun thisProject,
+			List<ProcessedProject> processedProjects) {
 		this.project = thisProject.thisProjectFolder;
-		this.projects = new Projects(processedProjects.stream().map(p -> p.newProjectVersion).collect(Collectors.toSet()));
+		this.projects = new Projects(processedProjects.stream()
+				.map(p -> p.newProjectVersion).collect(Collectors.toSet()));
 		this.originalVersion = thisProject.originalVersion;
 		this.versionFromBom = thisProject.thisProjectVersionFromBom;
 		this.properties = thisProject.thisProjectReleaserProperties;
@@ -70,20 +99,41 @@ public class Arguments {
 	}
 
 	public static Arguments forProject(ProjectToRun thisProject) {
-		return new Arguments(thisProject, thisProject.allProjectsFromBom.allProjectVersionsFromBom, thisProject.allProjectsFromBom.currentProjectFromBom);
+		return new Arguments(thisProject,
+				thisProject.allProjectsFromBom.allProjectVersionsFromBom,
+				thisProject.allProjectsFromBom.currentProjectFromBom);
 	}
 
-	public static Arguments forPostRelease(ReleaserProperties properties, ProjectsToRun projectsToRun) {
-		List<ProjectToRun> projects = projectsToRun.stream().map(ProjectToRun.ProjectToRunSupplier::get).collect(Collectors.toCollection(LinkedList::new));
-		List<ProcessedProject> processedProjects = projectsToRunToProcessedProject(projects);
+	public static Arguments forPostRelease(ReleaserProperties properties,
+			ProjectsToRun projectsToRun) {
+		List<ProjectToRun> projects = projectsToRun.stream()
+				.map(ProjectToRun.ProjectToRunSupplier::get)
+				.collect(Collectors.toCollection(LinkedList::new));
+		List<ProcessedProject> processedProjects = projectsToRunToProcessedProject(
+				projects);
 		ProjectToRun releaseTrainProject = projects.stream()
-				.filter(p -> p.originalVersion.projectName.equals(properties.getMetaRelease().getReleaseTrainProjectName())).findFirst()
-				.orElseThrow(() -> new IllegalStateException("Missing release train version"));
+				.filter(p -> isReleaseTrainProject(properties, p)).findFirst()
+				.orElseThrow(
+						() -> new IllegalStateException("Missing release train version"));
 		return new Arguments(releaseTrainProject, processedProjects);
 	}
 
-	private static List<ProcessedProject> projectsToRunToProcessedProject(List<ProjectToRun> projects) {
-		return projects.stream().map(p -> new ProcessedProject(p.thisProjectReleaserProperties, p.thisProjectVersionFromBom, p.originalVersion)).collect(Collectors
-				.toCollection(LinkedList::new));
+	private static boolean isReleaseTrainProject(ReleaserProperties properties,
+			ProjectToRun p) {
+		return p.originalVersion.projectName
+				.equals(properties.getMetaRelease().getReleaseTrainProjectName())
+				|| properties.getMetaRelease().getReleaseTrainDependencyNames()
+						.contains(p.originalVersion.projectName)
+				|| p.name()
+						.equals(properties.getMetaRelease().getReleaseTrainProjectName());
 	}
+
+	private static List<ProcessedProject> projectsToRunToProcessedProject(
+			List<ProjectToRun> projects) {
+		return projects.stream()
+				.map(p -> new ProcessedProject(p.thisProjectReleaserProperties,
+						p.thisProjectVersionFromBom, p.originalVersion))
+				.collect(Collectors.toCollection(LinkedList::new));
+	}
+
 }

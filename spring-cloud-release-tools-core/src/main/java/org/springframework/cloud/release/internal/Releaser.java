@@ -110,8 +110,8 @@ public class Releaser implements ReleaserPropertiesAware {
 		log.info("Will update the project with versions [{}]", versions);
 		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
 				versionFromBom, assertSnapshots);
-		this.gradleUpdater.updateProjectFromReleaseTrain(project, versions, versionFromBom,
-				assertSnapshots);
+		this.gradleUpdater.updateProjectFromReleaseTrain(project, versions,
+				versionFromBom, assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion.version);
 	}
@@ -369,10 +369,18 @@ public class Releaser implements ReleaserPropertiesAware {
 				releaseBranch);
 	}
 
-	public void updateDocumentationRepositoryForSingleProject(
-			Projects projects, ProjectVersion releaseVersion) {
-		this.documentationUpdater.updateDocsRepoForSingleProject(projects, releaseVersion);
-		log.info("\nSuccessfully updated documentation repository for a project with name [{}]", releaseVersion.projectName);
+	public void updateDocumentationRepositoryForSingleProject(Projects projects,
+			ProjectVersion releaseVersion) {
+		if (releaseVersion.projectName.equals(
+				this.releaserProperties.getMetaRelease().getReleaseTrainProjectName())) {
+			log.info("Will not update documentation for project that is a BOM project");
+			return;
+		}
+		this.documentationUpdater.updateDocsRepoForSingleProject(projects,
+				releaseVersion);
+		log.info(
+				"\nSuccessfully updated documentation repository for a project with name [{}]",
+				releaseVersion.projectName);
 	}
 
 	public void runUpdatedSamples(Projects projects) {

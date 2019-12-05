@@ -93,11 +93,13 @@ class SpringCloudCustomProjectDocumentationUpdater
 	public File updateDocsRepoForSingleProject(File clonedDocumentationProject,
 			ProjectVersion currentProject, Projects projects) {
 		if (!projects.containsProject(currentProject.projectName)) {
-			log.warn("Can't update the documentation repo for project [{}] cause it's not present on the projects list", projects);
+			log.warn(
+					"Can't update the documentation repo for project [{}] cause it's not present on the projects list {}",
+					currentProject.projectName, projects);
 			return clonedDocumentationProject;
 		}
-		log.info(
-				"Updating link to documentation for project [{}]", currentProject.projectName);
+		log.info("Updating link to documentation for project [{}]",
+				currentProject.projectName);
 		ProjectVersion projectVersion = projects.forName(currentProject.projectName);
 		File currentProjectReleaseFolder = new File(clonedDocumentationProject,
 				currentFolder(projectVersion.projectName, projectVersion.version));
@@ -109,10 +111,8 @@ class SpringCloudCustomProjectDocumentationUpdater
 					currentProjectReleaseFolder, projectVersion.projectName);
 		}
 		catch (Exception ex) {
-			log.warn(
-					"Exception occurred while trying o update the symlink of a project ["
-							+ projectVersion.projectName + "]",
-					ex);
+			log.warn("Exception occurred while trying o update the symlink of a project ["
+					+ projectVersion.projectName + "]", ex);
 		}
 		return pushChanges(clonedDocumentationProject);
 	}

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,14 +28,40 @@ import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 
 public class ProjectToRun {
+
+	/**
+	 * Cloned location of this project.
+	 */
 	public final File thisProjectFolder;
+
+	/**
+	 * All projects taken from the BOM.
+	 */
 	public final ProjectsFromBom allProjectsFromBom;
+
+	/**
+	 * The original version of the project.
+	 */
 	public final ProjectVersion originalVersion;
+
+	/**
+	 * The project version of this project taken from the BOM.
+	 */
 	public final ProjectVersion thisProjectVersionFromBom;
+
+	/**
+	 * {@link ReleaserProperties} updated for this project.
+	 */
 	public final ReleaserProperties thisProjectReleaserProperties;
+
+	/**
+	 * {@link Options} updated for this project.
+	 */
 	public final Options options;
 
-	public ProjectToRun(File thisProjectFolder, ProjectsFromBom allProjectsFromBom, ProjectVersion originalVersion, ReleaserProperties thisProjectReleaserProperties, Options options) {
+	public ProjectToRun(File thisProjectFolder, ProjectsFromBom allProjectsFromBom,
+			ProjectVersion originalVersion,
+			ReleaserProperties thisProjectReleaserProperties, Options options) {
 		this.thisProjectFolder = thisProjectFolder;
 		this.allProjectsFromBom = allProjectsFromBom;
 		this.originalVersion = originalVersion;
@@ -65,7 +91,8 @@ public class ProjectToRun {
 		return Objects.hash(originalVersion);
 	}
 
-	public static class ProjectToRunSupplier implements Supplier<ProjectToRun>, Closeable {
+	public static class ProjectToRunSupplier
+			implements Supplier<ProjectToRun>, Closeable {
 
 		private static final Map<String, ProjectToRun> CACHE = new ConcurrentHashMap<>();
 
@@ -110,5 +137,7 @@ public class ProjectToRun {
 		public void close() {
 			CACHE.clear();
 		}
+
 	}
+
 }

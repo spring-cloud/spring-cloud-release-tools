@@ -48,7 +48,8 @@ class OptionsParser implements Parser {
 
 	private final List<SingleProjectReleaserTask> singleProjectReleaserTasks;
 
-	OptionsParser(List<ReleaserTask> allTasks, List<SingleProjectReleaserTask> singleProjectReleaserTasks) {
+	OptionsParser(List<ReleaserTask> allTasks,
+			List<SingleProjectReleaserTask> singleProjectReleaserTasks) {
 		this.allTasks = allTasks;
 		this.singleProjectReleaserTasks = singleProjectReleaserTasks;
 	}
@@ -75,11 +76,13 @@ class OptionsParser implements Parser {
 					Arrays.asList("dr", "dry-run"),
 					"Do you want to do the release / meta release with build and install projects locally only?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(false);
-			LinkedList<ReleaserTask> nonCompositeTasks = this.allTasks.stream()
-					.filter(releaserTask -> !(releaserTask instanceof CompositeReleaserTask))
+			LinkedList<ReleaserTask> nonCompositeTasks = this.allTasks.stream().filter(
+					releaserTask -> !(releaserTask instanceof CompositeReleaserTask))
 					.collect(Collectors.toCollection(LinkedList::new));
-			nonCompositeTasks.forEach(task -> parser.acceptsAll(Arrays.asList(task.shortName(), task.name()),
-							task.description()).withOptionalArg());
+			nonCompositeTasks.forEach(task -> parser
+					.acceptsAll(Arrays.asList(task.shortName(), task.name()),
+							task.description())
+					.withOptionalArg());
 			ArgumentAcceptingOptionSpec<String> startFromOpt = parser.acceptsAll(
 					Arrays.asList("a", "start-from"),
 					"Starts all release task starting "
@@ -113,10 +116,10 @@ class OptionsParser implements Parser {
 			providedTaskNames = providedTaskNames.stream().map(this::removeQuotingChars)
 					.collect(Collectors.toList());
 			log.info("Passed tasks {} from command line", providedTaskNames);
-			List<String> allTaskNames = nonCompositeTasks.stream()
-					.map(ReleaserTask::name).collect(Collectors.toList());
-			List<String> tasksFromOptions = nonCompositeTasks.stream()
-					.filter(task -> options.has(task.name()) || options.has(task.shortName()))
+			List<String> allTaskNames = nonCompositeTasks.stream().map(ReleaserTask::name)
+					.collect(Collectors.toList());
+			List<String> tasksFromOptions = nonCompositeTasks.stream().filter(
+					task -> options.has(task.name()) || options.has(task.shortName()))
 					.map(ReleaserTask::name).collect(Collectors.toList());
 			if (providedTaskNames.isEmpty()) {
 				providedTaskNames.addAll(tasksFromOptions.isEmpty() && !metaRelease
@@ -186,7 +189,8 @@ class OptionsParser implements Parser {
 	private String intro() {
 		return "\nHere you can find the list of tasks in order\n\n["
 				+ this.singleProjectReleaserTasks.stream().map(ReleaserTask::name)
-				.collect(Collectors.joining(",")) + "]\n\n";
+						.collect(Collectors.joining(","))
+				+ "]\n\n";
 	}
 
 	private String examples() {

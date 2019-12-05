@@ -118,16 +118,16 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				file("/projects/spring-cloud-static/").toURI().toString());
 
 		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties), properties).updateDocsRepoForReleaseTrain(
-						this.clonedDocProject, releaseTrainVersion, projects(),
-						"vFinchley.SR33");
+				new ProjectGitHandler(properties), properties)
+						.updateDocsRepoForReleaseTrain(this.clonedDocProject,
+								releaseTrainVersion, projects(), "vFinchley.SR33");
 
 		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
 				.doesNotExist();
 		Path current = new File(updatedDocs, "current/").toPath();
 		BDDAssertions.then(current).isSymbolicLink();
 		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.endsWith("Finchley.SR33");
+				.isEqualTo("Finchley.SR33");
 
 		releaseTrainVersion = new ProjectVersion("spring-cloud-release", "Angel.SR33");
 		properties = new ReleaserProperties();
@@ -135,16 +135,16 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				file("/projects/spring-cloud-static/").toURI().toString());
 
 		updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties), properties).updateDocsRepoForReleaseTrain(
-						this.clonedDocProject, releaseTrainVersion, projects(),
-						"vAngel.SR33");
+				new ProjectGitHandler(properties), properties)
+						.updateDocsRepoForReleaseTrain(this.clonedDocProject,
+								releaseTrainVersion, projects(), "vAngel.SR33");
 
 		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
 				.doesNotExist();
 		current = new File(updatedDocs, "current/").toPath();
 		BDDAssertions.then(current).isSymbolicLink();
 		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.doesNotEndWith("Angel.SR33");
+				.isNotEqualTo("Angel.SR33");
 	}
 
 	@Test
@@ -156,8 +156,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
 
 		new SpringCloudCustomProjectDocumentationUpdater(handler, properties)
-				.updateDocsRepoForReleaseTrain(this.clonedDocProject, releaseTrainVersion, projects(),
-						"vDalston.SR3");
+				.updateDocsRepoForReleaseTrain(this.clonedDocProject, releaseTrainVersion,
+						projects(), "vDalston.SR3");
 
 		BDDMockito.then(handler).should(BDDMockito.never())
 				.commit(BDDMockito.any(File.class), BDDMockito.anyString());
@@ -172,16 +172,16 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
 		File updatedDocs = new SpringCloudCustomProjectDocumentationUpdater(
-				new ProjectGitHandler(properties), properties).updateDocsRepoForReleaseTrain(
-						this.clonedDocProject, releaseTrainVersion, projects(),
-						"Angel.SR33");
+				new ProjectGitHandler(properties), properties)
+						.updateDocsRepoForReleaseTrain(this.clonedDocProject,
+								releaseTrainVersion, projects(), "Angel.SR33");
 
 		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
 				.doesNotExist();
 		Path current = new File(updatedDocs, "current/").toPath();
 		BDDAssertions.then(current).isSymbolicLink();
 		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.doesNotEndWith("Angel.SR33");
+				.isNotEqualTo("Angel.SR33");
 	}
 
 	@Test
@@ -201,7 +201,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		Path current = new File(updatedDocs, "current/").toPath();
 		BDDAssertions.then(current).isSymbolicLink();
 		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.endsWith("spring-cloud-static/Finchley.SR33");
+				.isEqualTo("Finchley.SR33");
 	}
 
 	@Test
@@ -213,16 +213,21 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		properties.getGit().setUpdateDocumentationRepo(true);
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
 
-		File updatedDocs = projectDocumentationUpdater(properties).updateDocsRepo(
-				new Projects(new ProjectVersion("spring-cloud-sleuth", "2.0.0.RELEASE")),
-				releaseTrainVersion, "vFinchley.SR33");
+		DocumentationUpdater updater = projectDocumentationUpdater(properties);
+		ProjectVersion sleuthVersion = new ProjectVersion("spring-cloud-sleuth",
+				"2.0.0.RELEASE");
+		Projects bom = new Projects(sleuthVersion);
+		File updatedDocs = updater.updateDocsRepo(bom, releaseTrainVersion,
+				"vFinchley.SR33");
 
 		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
 				.doesNotExist();
 		Path current = new File(updatedDocs, "current/").toPath();
 		BDDAssertions.then(current).isSymbolicLink();
 		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.endsWith("spring-cloud-static/Finchley.SR33");
+				.isEqualTo("Finchley.SR33");
+
+		updatedDocs = updater.updateDocsRepoForSingleProject(bom, sleuthVersion);
 
 		BDDAssertions.then(
 				new File(updatedDocs, "spring-cloud-sleuth/current/index.html").toPath())
@@ -230,7 +235,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		current = new File(updatedDocs, "spring-cloud-sleuth/current/").toPath();
 		BDDAssertions.then(current).isSymbolicLink();
 		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.endsWith("spring-cloud-static/spring-cloud-sleuth/2.0.0.RELEASE");
+				.isEqualTo("2.0.0.RELEASE");
 	}
 
 	@Test

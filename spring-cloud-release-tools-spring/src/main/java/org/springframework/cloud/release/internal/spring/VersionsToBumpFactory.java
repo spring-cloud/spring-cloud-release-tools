@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,11 +32,13 @@ import org.springframework.util.StringUtils;
 
 class VersionsToBumpFactory {
 
-	private static final Logger log = LoggerFactory.getLogger(VersionsToBumpFactory.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(VersionsToBumpFactory.class);
 
 	private static final Map<File, ProjectsFromBom> CACHE = new ConcurrentHashMap<>();
 
 	private final Releaser releaser;
+
 	private final ReleaserProperties properties;
 
 	VersionsToBumpFactory(Releaser releaser, ReleaserProperties properties) {
@@ -70,11 +72,9 @@ class VersionsToBumpFactory {
 	private ProjectsFromBom fetchVersionsFromFixedProjects(File project) {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects fixedVersions = this.releaser.fixedVersions();
-		String fixedVersionForProject = fixedVersions
-				.forName(project.getName()).version;
+		String fixedVersionForProject = fixedVersions.forName(project.getName()).version;
 		ProjectVersion versionFromBom = StringUtils.hasText(fixedVersionForProject)
-				? new ProjectVersion(originalVersion.projectName,
-				fixedVersionForProject)
+				? new ProjectVersion(originalVersion.projectName, fixedVersionForProject)
 				: new ProjectVersion(project);
 		fixedVersions.add(versionFromBom);
 		printSettingVersionFromFixedVersions(fixedVersions);
@@ -89,8 +89,10 @@ class VersionsToBumpFactory {
 		return cachedProjectsFromBom(project, versionFromBom, projectsToUpdate);
 	}
 
-	private ProjectsFromBom cachedProjectsFromBom(File project, ProjectVersion versionFromBom, Projects projectsToUpdate) {
-		ProjectsFromBom projectsFromBom = new ProjectsFromBom(projectsToUpdate, versionFromBom);
+	private ProjectsFromBom cachedProjectsFromBom(File project,
+			ProjectVersion versionFromBom, Projects projectsToUpdate) {
+		ProjectsFromBom projectsFromBom = new ProjectsFromBom(projectsToUpdate,
+				versionFromBom);
 		CACHE.put(project, projectsFromBom);
 		return projectsFromBom;
 	}
@@ -125,4 +127,5 @@ class VersionsToBumpFactory {
 				projectsToUpdate.stream().map(p -> p.projectName + " => " + p.version)
 						.collect(Collectors.joining("\n")));
 	}
+
 }

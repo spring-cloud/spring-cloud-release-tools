@@ -201,7 +201,7 @@ public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 			// retrieve from cache
 			// reset any changes and fetch the latest data
 			File clonedProject = CACHE.get(urIish);
-			if (clonedProject != null) {
+			if (clonedProject != null && clonedProject.exists()) {
 				log.info(
 						"Project has already been cloned. Will reset the current branch and fetch the latest changes.");
 				gitRepo(clonedProject).reset();
@@ -283,4 +283,5 @@ public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 	public void close() {
 		CACHE.clear();
 	}
+
 }

@@ -78,8 +78,10 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	public File updateDocsRepoForSingleProject(Projects projects, ProjectVersion currentProject) {
-		return this.projectDocumentationUpdater.updateDocsRepoForSingleProject(projects, currentProject);
+	public File updateDocsRepoForSingleProject(Projects projects,
+			ProjectVersion currentProject) {
+		return this.projectDocumentationUpdater.updateDocsRepoForSingleProject(projects,
+				currentProject);
 	}
 
 	/**

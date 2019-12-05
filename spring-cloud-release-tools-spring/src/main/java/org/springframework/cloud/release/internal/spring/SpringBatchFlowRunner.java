@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package org.springframework.cloud.release.internal.spring;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 class SpringBatchFlowRunner implements FlowRunner {
 
-	private static final Logger log = LoggerFactory.getLogger(SpringBatchFlowRunner.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(SpringBatchFlowRunner.class);
 
 	private static final String MSG = "\nPress 'q' to quit, 's' to skip, any key to continue\n\n";
 
@@ -63,7 +65,9 @@ class SpringBatchFlowRunner implements FlowRunner {
 
 	private final JobLauncher jobLauncher;
 
-	SpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory, ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
+	SpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory,
+			JobBuilderFactory jobBuilderFactory,
+			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
 		this.stepBuilderFactory = stepBuilderFactory;
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
@@ -71,37 +75,50 @@ class SpringBatchFlowRunner implements FlowRunner {
 	}
 
 	@Override
-	public Decision beforeTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
+	public Decision beforeTask(Options options, ReleaserProperties properties,
+			ReleaserTask releaserTask) {
 		return decide(options, releaserTask);
 	}
 
 	private Step createStep(ReleaserTask releaserTask, Arguments args) {
 		return this.stepBuilderFactory.get(releaserTask.name())
 				.tasklet((contribution, chunkContext) -> {
-					FlowRunner.Decision decision = beforeTask(args.options, args.properties, releaserTask);
+					FlowRunner.Decision decision = beforeTask(args.options,
+							args.properties, releaserTask);
 					if (decision == FlowRunner.Decision.CONTINUE) {
-						runTask(releaserTask, args);
-					} else {
+						ExecutionResult result = runTask(releaserTask, args);
+						if (result.isUnstable()) {
+							List<Throwable> errors = (List<Throwable>) contribution
+									.getStepExecution().getExecutionContext()
+									.get("errors");
+							if (errors == null) {
+								errors = new LinkedList<>();
+							}
+							errors.add(result.foundExceptions());
+							contribution.getStepExecution().getExecutionContext()
+									.put("errors", errors);
+						}
+						else if (result.isFailure()) {
+							throw result.foundExceptions();
+						}
+					}
+					else {
 						log.info("Skipping step [{}]", releaserTask.name());
 					}
 					return RepeatStatus.FINISHED;
-				})
-				.listener(releaserListener(args, releaserTask))
-				.build();
+				}).listener(releaserListener(args, releaserTask)).build();
 	}
 
-	private void runTask(ReleaserTask releaserTask, Arguments args) {
-		try {
-			releaserTask.accept(args);
-		} catch (Exception ex) {
-			if (releaserTask instanceof ReleaseReleaserTask) {
-				throw ex;
-			}
-			throw new MakeBuildUnstableException(ex);
+	private ExecutionResult runTask(ReleaserTask releaserTask, Arguments args) {
+		ExecutionResult executionResult = releaserTask.apply(args);
+		if (executionResult.isFailure() && releaserTask instanceof ReleaseReleaserTask) {
+			throw executionResult.foundExceptions();
 		}
+		return executionResult;
 	}
 
-	private StepExecutionListener releaserListener(Arguments args, ReleaserTask releaserTask) {
+	private StepExecutionListener releaserListener(Arguments args,
+			ReleaserTask releaserTask) {
 		return new StepExecutionListener() {
 			@Override
 			public void beforeStep(StepExecution stepExecution) {
@@ -110,13 +127,16 @@ class SpringBatchFlowRunner implements FlowRunner {
 
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
-				FlowRunner.Decision decision = afterTask(args.options, args.properties, releaserTask);
+				FlowRunner.Decision decision = afterTask(args.options, args.properties,
+						releaserTask);
 				if (decision == FlowRunner.Decision.ABORT) {
 					return ExitStatus.FAILED;
 				}
-				boolean makeUnstable = stepExecution.getFailureExceptions().stream().anyMatch(t -> t instanceof MakeBuildUnstableException);
+				boolean makeUnstable = stepExecution.getFailureExceptions().stream()
+						.anyMatch(t -> t instanceof MakeBuildUnstableException);
 				if (makeUnstable) {
-					return new ExitStatus(MakeBuildUnstableException.EXIT_CODE, MakeBuildUnstableException.DESCRIPTION);
+					return new ExitStatus(MakeBuildUnstableException.EXIT_CODE,
+							MakeBuildUnstableException.DESCRIPTION);
 				}
 				return stepExecution.getExitStatus();
 			}
@@ -124,84 +144,113 @@ class SpringBatchFlowRunner implements FlowRunner {
 	}
 
 	@Override
-	public void runReleaseTasks(Options options, ReleaserProperties properties, ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
-		projectsToRun.forEach(projectToRun -> {
+	public ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties,
+			ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
+		return projectsToRun.stream().map(projectToRun -> {
 			ProjectToRun startedProject = projectToRun.get();
-			executeReleaseTasks(tasksToRun, startedProject.name(), Arguments.forProject(startedProject));
-		});
+			ExecutionResult result = executeReleaseTasks(tasksToRun,
+					startedProject.name(), Arguments.forProject(startedProject));
+			if (result.isFailure()) {
+				throw result.foundExceptions();
+			}
+			return result;
+		}).reduce(new ExecutionResult(), ExecutionResult::merge);
 	}
 
 	@Override
-	public void runPostReleaseTasks(Options options, ReleaserProperties properties, String taskName, TasksToRun tasksToRun) {
-		ProjectsToRun projectsToRun = postReleaseProjects(new OptionsAndProperties(properties, options));
+	public ExecutionResult runPostReleaseTasks(Options options,
+			ReleaserProperties properties, String taskName, TasksToRun tasksToRun) {
+		ProjectsToRun projectsToRun = postReleaseProjects(
+				new OptionsAndProperties(properties, options));
 		Flow flow = postReleaseFlow(tasksToRun, properties, projectsToRun);
 		if (flow == null) {
 			log.info("No post release tasks to run, will do nothing");
-			return;
+			return ExecutionResult.success();
 		}
-		Job job = this.jobBuilderFactory.get(taskName)
-			.start(flow)
-			.build()
-		.build();
-		runJob(job);
+		Job job = this.jobBuilderFactory.get(taskName + "_" + new Random().nextInt())
+				.start(flow).build().build();
+		return runJob(job);
 	}
 
 	private ProjectsToRun postReleaseProjects(OptionsAndProperties options) {
 		return this.projectsToRunFactory.postRelease(options);
 	}
 
-	private void executeReleaseTasks(TasksToRun tasksToRun, String name, Arguments args) {
+	private ExecutionResult executeReleaseTasks(TasksToRun tasksToRun, String name,
+			Arguments args) {
 		Iterator<? extends ReleaserTask> iterator = tasksToRun.iterator();
 		if (!iterator.hasNext()) {
-			return;
+			return ExecutionResult.success();
 		}
 		ReleaserTask task = iterator.next();
-		// If composite, just run it instead of using Batch (otherwise a job will call another job)
+		// If composite, just run it instead of using Batch (otherwise a job will call
+		// another job)
 		if (task instanceof CompositeReleaserTask) {
-			log.info("Task [{}] is composite, will run it manually instead of calling it via Batch", task);
-			task.accept(args);
-			return;
+			log.info(
+					"Task [{}] is composite, will run it manually instead of calling it via Batch",
+					task);
+			return task.apply(args);
 		}
-		runBatchJob(name, args, iterator, task);
+		return runBatchJob(name, args, iterator, task);
 	}
 
-	private void runBatchJob(String name, Arguments args, Iterator<? extends ReleaserTask> iterator, ReleaserTask task) {
+	private ExecutionResult runBatchJob(String name, Arguments args,
+			Iterator<? extends ReleaserTask> iterator, ReleaserTask task) {
 		if (!iterator.hasNext()) {
 			log.info("No jobs to run, will do nothing");
-			return;
+			return ExecutionResult.success();
 		}
 		JobBuilder builder = this.jobBuilderFactory.get(name);
 		SimpleJobBuilder startedBuilder = builder.start(createStep(task, args));
 		while (iterator.hasNext()) {
 			startedBuilder.next(createStep(iterator.next(), args));
 		}
-		Job job = startedBuilder.build();
-		runJob(job);
+		Job job = startedBuilder.preventRestart().build();
+		return runJob(job);
 	}
 
-	private void runJob(Job job) {
+	private ExecutionResult runJob(Job job) {
 		try {
 			JobExecution execution = this.jobLauncher.run(job, new JobParameters());
-			if (MakeBuildUnstableException.EXIT_CODE.equals(execution.getExitStatus().getExitCode())) {
-				throw new MakeBuildUnstableException(execution.getJobConfigurationName() + " failed!");
-			} else if (!ExitStatus.COMPLETED.equals(execution.getExitStatus())) {
-				throw new IllegalStateException("Job failed to get executed successfully. Failed with exit code [" + execution.getExitStatus().getExitCode() + "] and description [" + execution.getExitStatus().getExitDescription() + "]");
+			if (!ExitStatus.COMPLETED.equals(execution.getExitStatus())) {
+				return ExecutionResult.failure(new IllegalStateException(
+						"Job failed to get executed successfully. Failed with exit code ["
+								+ execution.getExitStatus().getExitCode()
+								+ "] and description ["
+								+ execution.getExitStatus().getExitDescription() + "]"));
 			}
+			List<Throwable> thrownExceptions = exceptionsThrownBySteps(execution);
+			if (thrownExceptions.isEmpty()) {
+				return ExecutionResult.success();
+			}
+			return new ExecutionResult(thrownExceptions);
 		}
 		catch (JobExecutionException ex) {
-			throw new IllegalStateException(ex);
+			return ExecutionResult.failure(ex);
 		}
 	}
 
-	private Flow postReleaseFlow(TasksToRun tasksToRun, ReleaserProperties properties, ProjectsToRun projectsToRun) {
+	@SuppressWarnings("unchecked")
+	private List<Throwable> exceptionsThrownBySteps(JobExecution execution) {
+		return execution.getStepExecutions().stream()
+				.map(e -> e.getExecutionContext().get("errors") != null
+						? (List) e.getExecutionContext().get("errors") : new LinkedList())
+				.reduce(new LinkedList<Throwable>(), (o, o2) -> {
+					o.addAll(o2);
+					return o;
+				});
+	}
+
+	private Flow postReleaseFlow(TasksToRun tasksToRun, ReleaserProperties properties,
+			ProjectsToRun projectsToRun) {
 		Iterator<? extends ReleaserTask> iterator = tasksToRun.iterator();
 		if (!iterator.hasNext()) {
 			return null;
 		}
 		ReleaserTask task = iterator.next();
 		Flow flow = flow(properties, projectsToRun, task);
-		FlowBuilder<Flow> flowBuilder = new FlowBuilder<Flow>("parallelPostRelease")
-				.start(flow);
+		FlowBuilder<Flow> flowBuilder = new FlowBuilder<Flow>(
+				"parallelPostRelease_" + new Random().nextInt()).start(flow);
 		if (!iterator.hasNext()) {
 			return flowBuilder.build();
 		}
@@ -209,17 +258,16 @@ class SpringBatchFlowRunner implements FlowRunner {
 				.split(new SimpleAsyncTaskExecutor());
 		List<Flow> flows = new LinkedList<>();
 		while (iterator.hasNext()) {
-			flows.add(flow(properties, projectsToRun, task));
+			flows.add(flow(properties, projectsToRun, iterator.next()));
 		}
 		Flow[] objects = flows.toArray(new Flow[0]);
-		return builder
-				.add(objects)
-				.build();
+		return builder.add(objects).build();
 	}
 
-	private Flow flow(ReleaserProperties properties, ProjectsToRun projectsToRun, ReleaserTask task) {
-		return new FlowBuilder<Flow>(task.name() + "Flow")
-				.start(createStep(task, Arguments.forPostRelease(properties, projectsToRun)))
+	private Flow flow(ReleaserProperties properties, ProjectsToRun projectsToRun,
+			ReleaserTask task) {
+		return new FlowBuilder<Flow>(task.name() + "Flow").start(
+				createStep(task, Arguments.forPostRelease(properties, projectsToRun)))
 				.build();
 	}
 
@@ -237,6 +285,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 		log.info("\n\n\n=== {} ===\n\n{} {}\n\n", task.header(), task.description(),
 				interactive ? MSG : "");
 	}
+
 }
 
 class ConsoleInputStepSkipper {
