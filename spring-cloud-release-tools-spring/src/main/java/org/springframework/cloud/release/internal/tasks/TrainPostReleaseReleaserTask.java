@@ -16,6 +16,10 @@
 
 package org.springframework.cloud.release.internal.tasks;
 
+/**
+ * Marker interface for a post release task for the whole release train. Example: update
+ * the documentation of the release train.
+ */
 public interface TrainPostReleaseReleaserTask
 		extends ReleaserTask, PostReleaseReleaserTask {
 

@@ -16,6 +16,12 @@
 
 package org.springframework.cloud.release.internal.tasks;
 
+/**
+ * Marker interface for running release tasks in a dry run mode. You should make a task
+ * implement this interface when you want it to be a part of the dry-run option. For
+ * example a typical scenario of a dry-run is to just update the poms / build.gradle
+ * files, build and install the artifacts locally.
+ */
 public interface DryRunReleaseReleaserTask extends ReleaseReleaserTask {
 
 }

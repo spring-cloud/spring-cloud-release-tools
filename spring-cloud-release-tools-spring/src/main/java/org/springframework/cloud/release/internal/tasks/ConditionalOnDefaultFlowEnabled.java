@@ -24,6 +24,10 @@ import java.lang.annotation.Target;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
+/**
+ * Allows to disable the default flow and gives an option to manually setup the whole
+ * releaser flow.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Documented

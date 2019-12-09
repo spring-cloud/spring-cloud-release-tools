@@ -16,6 +16,10 @@
 
 package org.springframework.cloud.release.internal.tasks;
 
+/**
+ * Marker interface for a composite task. Composite tasks are capable of executing other
+ * tasks - e.g. "fullRelease" composite task executes all single project releaser tasks.
+ */
 public interface CompositeReleaserTask extends ReleaserTask {
 
 }

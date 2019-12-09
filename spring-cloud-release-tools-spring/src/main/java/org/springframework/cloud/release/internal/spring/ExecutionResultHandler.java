@@ -18,6 +18,9 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.util.function.Consumer;
 
+/**
+ * Handles the result of the execution of the train or project release.
+ */
 public interface ExecutionResultHandler extends Consumer<ExecutionResult> {
 
 }

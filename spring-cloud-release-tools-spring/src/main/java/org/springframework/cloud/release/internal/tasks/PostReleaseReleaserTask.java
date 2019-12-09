@@ -19,8 +19,17 @@ package org.springframework.cloud.release.internal.tasks;
 import org.springframework.cloud.release.internal.spring.Arguments;
 import org.springframework.cloud.release.internal.spring.ExecutionResult;
 
+/**
+ * Marker interface for running post release tasks.
+ */
 public interface PostReleaseReleaserTask extends ReleaserTask {
 
+	/**
+	 * Executes the task but catches exceptions and converts them into result. When an
+	 * exception is throw will treat it as an instability.
+	 * @param args - arguments to run the task
+	 * @return execution result
+	 */
 	default ExecutionResult apply(Arguments args) {
 		try {
 			return runTask(args);

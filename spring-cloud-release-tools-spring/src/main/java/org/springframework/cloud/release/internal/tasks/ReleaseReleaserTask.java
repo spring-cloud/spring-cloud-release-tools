@@ -16,6 +16,10 @@
 
 package org.springframework.cloud.release.internal.tasks;
 
+/**
+ * Marker interface for a single project release task. Unlike the post release task, if
+ * this one fails, it should fail the release process. Example: build the project.
+ */
 public interface ReleaseReleaserTask extends SingleProjectReleaserTask {
 
 }

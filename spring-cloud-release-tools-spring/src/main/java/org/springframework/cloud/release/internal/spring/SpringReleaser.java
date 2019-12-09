@@ -18,10 +18,22 @@ package org.springframework.cloud.release.internal.spring;
 
 import org.springframework.cloud.release.internal.options.Options;
 
+/**
+ * Contract for releasing a project or train .
+ */
 public interface SpringReleaser {
 
+	/**
+	 * Perform a release with default options.
+	 * @return result of the release
+	 */
 	ExecutionResult release();
 
+	/**
+	 * Perform a release with provided options.
+	 * @param options options for the release
+	 * @return result of the release
+	 */
 	ExecutionResult release(Options options);
 
 }

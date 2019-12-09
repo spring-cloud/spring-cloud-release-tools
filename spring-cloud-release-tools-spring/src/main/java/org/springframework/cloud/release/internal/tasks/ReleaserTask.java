@@ -25,20 +25,47 @@ import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 import org.springframework.core.Ordered;
 
+/**
+ * Describes a single release task.
+ */
 public interface ReleaserTask extends Ordered, Function<Arguments, ExecutionResult> {
 
+	/**
+	 * @return name of the release task
+	 */
 	String name();
 
+	/**
+	 * @return short name of the release task
+	 */
 	String shortName();
 
+	/**
+	 * @return header presented in the logs when running the task
+	 */
 	String header();
 
+	/**
+	 * @return meaningful description of the release task.
+	 */
 	String description();
 
+	/**
+	 * If necessary mutates options and properties for the release task. This can be
+	 * useful for composite tasks that impose certain configuration.
+	 * @param options - options to mutate
+	 * @param properties - properties to mutate
+	 */
 	default void setup(Options options, ReleaserProperties properties) {
 
 	}
 
+	/**
+	 * Executes the task but catches exceptions and converts them into result. Knows how
+	 * to differentiate between a failure and instability.
+	 * @param args - arguments to run the task
+	 * @return execution result
+	 */
 	default ExecutionResult apply(Arguments args) {
 		try {
 			return runTask(args);
@@ -51,6 +78,15 @@ public interface ReleaserTask extends Ordered, Function<Arguments, ExecutionResu
 		}
 	}
 
-	ExecutionResult runTask(Arguments args);
+	/**
+	 * Main task execution logic.
+	 * @param args - arguments for the job
+	 * @return execution result of the job
+	 * @throws MakeBuildUnstableException - when the task failed but the release flow
+	 * shouldn't be stopped (which means that the build is unstable)
+	 * @throws RuntimeException - when the task failed for any other reason
+	 */
+	ExecutionResult runTask(Arguments args)
+			throws MakeBuildUnstableException, RuntimeException;
 
 }

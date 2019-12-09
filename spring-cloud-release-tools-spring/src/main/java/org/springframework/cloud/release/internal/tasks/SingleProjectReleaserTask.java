@@ -16,6 +16,9 @@
 
 package org.springframework.cloud.release.internal.tasks;
 
+/**
+ * Marker interface for a task for a single project.
+ */
 public interface SingleProjectReleaserTask extends ReleaserTask {
 
 }

@@ -26,9 +26,9 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.Parser;
-import org.springframework.cloud.release.internal.spring.DefaultSpringReleaser;
 import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.spring.ExecutionResultHandler;
+import org.springframework.cloud.release.internal.spring.SpringReleaser;
 
 @SpringBootApplication
 public class ReleaserApplication implements CommandLineRunner {
@@ -36,7 +36,7 @@ public class ReleaserApplication implements CommandLineRunner {
 	private static final Logger log = LoggerFactory.getLogger(ReleaserApplication.class);
 
 	@Autowired
-	DefaultSpringReleaser releaser;
+	SpringReleaser releaser;
 
 	@Autowired
 	ExecutionResultHandler executionResultHandler;
