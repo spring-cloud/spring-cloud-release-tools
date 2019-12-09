@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.7.1">
+<meta name="generator" content="Asciidoctor 1.5.8">
 <title>Spring Cloud Release Tools</title>
 <link rel="stylesheet" href="css/spring.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -575,17 +575,17 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.build-command</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">echo "{{systemProps}}"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.deploy-command</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">echo "{{systemProps}}"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.deploy-guides-command</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">echo "{{systemProps}}"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.generate-release-train-docs-command</p></td>
@@ -595,7 +595,7 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.publish-docs-commands</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">[mkdir -p target, echo "{{version}}"]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.bash.system-properties</p></td>
@@ -679,7 +679,7 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.run-updated-samples</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update the test samples.</p></td>
 </tr>
 <tr>
@@ -704,37 +704,42 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-all-test-samples</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not clone and update the samples for all projects.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-documentation-repo</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If {@code false}, will not update the documentation repository.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-github-milestones</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update Github milestones.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-release-train-docs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update the release train docs.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-release-train-wiki</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not clone and update the release train wiki.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-spring-guides</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update Spring Guides for a release train.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-spring-project</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update the Spring Project for a release train. E.g. for Spring Cloud will not update <a href="https://cloud.spring.io" class="bare">https://cloud.spring.io</a> .</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.update-start-spring-io</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false}, will not update start.spring.io for a release train.</p></td>
 </tr>
 <tr>
@@ -744,17 +749,17 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.build-command</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build publishToMavenLocal {{systemProps}}</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.deploy-command</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build publish {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew publish --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.deploy-guides-command</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build deployGuides {{systemProps}}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew clean build deployGuides --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only.</p></td>
 </tr>
 <tr>
@@ -790,17 +795,17 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.build-command</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">./mvnw clean install -B -Pdocs {{systemProps}}</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build the project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.deploy-command</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.deploy-guides-command</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.maven.generate-release-train-docs-command</p></td>
@@ -899,7 +904,7 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.sagan.update-sagan</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false} will not update Sagan.</p></td>
 </tr>
 <tr>
@@ -1099,7 +1104,7 @@ If you&#8217;re doing a e.g. <code>M1</code> release, remember to not have any s
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/releasers.png" alt="Releaser view">
+<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasers.png" alt="Releaser view">
 </div>
 </div>
 <div class="olist arabic">
@@ -1111,7 +1116,7 @@ If you&#8217;re doing a e.g. <code>M1</code> release, remember to not have any s
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/scBuildReleaser.png" alt="Spring Cloud Build Releaser - build with parameters">
+<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/scBuildReleaser.png" alt="Spring Cloud Build Releaser - build with parameters">
 </div>
 </div>
 <div class="olist arabic">
@@ -1123,7 +1128,7 @@ If you&#8217;re doing a e.g. <code>M1</code> release, remember to not have any s
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/runningScBuildReleaser.png" alt="Updated `RELEASER_POM_BRANCH`">
+<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningScBuildReleaser.png" alt="Updated `RELEASER_POM_BRANCH`">
 </div>
 </div>
 <div class="paragraph">
@@ -1221,7 +1226,7 @@ $ git add greenwich_sr2.properties &amp;&amp; git commit -m "Added Greenwich.SR2
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/releasersForMetaRelease.png" alt="Releaser view">
+<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasersForMetaRelease.png" alt="Releaser view">
 </div>
 </div>
 <div class="olist arabic">
@@ -1233,7 +1238,7 @@ $ git add greenwich_sr2.properties &amp;&amp; git commit -m "Added Greenwich.SR2
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/springCloudMetaRelease.png" alt="Spring Cloud Meta Releaser - build with parameters">
+<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/springCloudMetaRelease.png" alt="Spring Cloud Meta Releaser - build with parameters">
 </div>
 </div>
 <div class="olist arabic">
@@ -1245,7 +1250,7 @@ $ git add greenwich_sr2.properties &amp;&amp; git commit -m "Added Greenwich.SR2
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png" alt="Spring Cloud Meta Releaser view">
+<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png" alt="Spring Cloud Meta Releaser view">
 </div>
 </div>
 <div class="paragraph">
