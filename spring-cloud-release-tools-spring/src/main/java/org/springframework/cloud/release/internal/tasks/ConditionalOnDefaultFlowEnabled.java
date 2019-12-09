@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.release.internal.spring;
+package org.springframework.cloud.release.internal.tasks;
 
-import org.springframework.cloud.release.internal.options.Options;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface SpringReleaser {
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-	ExecutionResult release();
-
-	ExecutionResult release(Options options);
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@Documented
+@ConditionalOnProperty(value = "releaser.flow.default-enabled", matchIfMissing = true)
+public @interface ConditionalOnDefaultFlowEnabled {
 
 }

@@ -19,14 +19,17 @@ package org.springframework.cloud.release.internal.tasks.postrelease;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.release.internal.Releaser;
+import org.springframework.cloud.release.internal.tasks.ConditionalOnDefaultFlowEnabled;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnDefaultFlowEnabled
 class PostReleaseTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	@ConditionalOnProperty("releaser.template.enabled")
 	CreateTemplatesTrainPostReleaseTask createTemplatesTrainPostReleaseTask(
 			Releaser releaser) {
 		return new CreateTemplatesTrainPostReleaseTask(releaser);

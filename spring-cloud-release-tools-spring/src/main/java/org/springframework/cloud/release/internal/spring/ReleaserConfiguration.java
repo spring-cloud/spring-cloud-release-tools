@@ -19,9 +19,6 @@ package org.springframework.cloud.release.internal.spring;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -77,15 +74,6 @@ class ReleaserConfiguration {
 	@ConditionalOnMissingBean
 	TasksToRunFactory tasksToRunFactory(ApplicationContext context) {
 		return new TasksToRunFactory(context);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory,
-			JobBuilderFactory jobBuilderFactory,
-			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
-		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
-				projectsToRunFactory, jobLauncher);
 	}
 
 	@Bean

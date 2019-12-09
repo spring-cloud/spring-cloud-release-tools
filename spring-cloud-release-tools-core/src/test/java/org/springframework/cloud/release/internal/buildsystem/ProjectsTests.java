@@ -224,8 +224,8 @@ public class ProjectsTests {
 		Projects projects = new Projects(projectVersions);
 
 		thenThrownBy(() -> projects.releaseTrain(properties))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Project with name [release-train] is not present");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
+						"don't contain any of the following release train names");
 	}
 
 	private File file(String relativePath) {

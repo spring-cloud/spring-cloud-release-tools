@@ -49,7 +49,8 @@ public class RetryConfiguration {
 	private static Logger log = LoggerFactory.getLogger(RetryConfiguration.class);
 
 	@Bean
-	@ConditionalOnMissingBean(name = "configServerRetryInterceptor")
+	@ConditionalOnMissingBean
+	@ConditionalOnDefaultFlowEnabled(name = "configServerRetryInterceptor")
 	public RetryOperationsInterceptor configServerRetryInterceptor() {
 		log.info("Creating custom retry interceptor");
 		return RetryInterceptorBuilder.stateless().backOffOptions(3000, 1.5, 10000)

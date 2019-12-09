@@ -52,8 +52,8 @@ public class DefaultSpringReleaser implements SpringReleaser {
 	 * Default behaviour - interactive mode.
 	 */
 	@Override
-	public void release() {
-		release(new OptionsBuilder().options());
+	public ExecutionResult release() {
+		return release(new OptionsBuilder().options());
 	}
 
 	// SETUP
@@ -78,7 +78,7 @@ public class DefaultSpringReleaser implements SpringReleaser {
 	// * Interactive
 	// * In this mode you haven’t picked what you want to do yet
 	@Override
-	public void release(Options options) {
+	public ExecutionResult release(Options options) {
 		OptionsAndProperties optionsAndProperties = prepareOptionsAndProperties(options,
 				this.properties);
 		// order matters! Tasks will mutate options and properties
@@ -90,11 +90,7 @@ public class DefaultSpringReleaser implements SpringReleaser {
 				optionsAndProperties);
 		ExecutionResult postReleaseTasksExecutionResult = runPostReleaseTasks(
 				optionsAndProperties, postReleaseTrainTasksToRun);
-		ExecutionResult allTasksExecutionResult = releaseTasksExecutionResult
-				.merge(postReleaseTasksExecutionResult);
-		if (allTasksExecutionResult.isFailureOrUnstable()) {
-			throw allTasksExecutionResult.foundExceptions();
-		}
+		return releaseTasksExecutionResult.merge(postReleaseTasksExecutionResult);
 	}
 
 	private OptionsAndProperties prepareOptionsAndProperties(Options options,

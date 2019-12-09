@@ -17,6 +17,7 @@
 package org.springframework.cloud.release.internal.project;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +38,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class ProjectVersion implements Comparable<ProjectVersion> {
+public class ProjectVersion implements Comparable<ProjectVersion>, Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectVersion.class);
 

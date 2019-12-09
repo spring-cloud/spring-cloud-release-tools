@@ -16,11 +16,72 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import javax.sql.DataSource;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableBatchProcessing
 class BatchConfiguration {
+
+	@Bean
+	@ConditionalOnMissingBean
+	SpringBatchExecutionResultHandler springBatchExecutionResultHandler(
+			JobExplorer jobExplorer) {
+		return new SpringBatchExecutionResultHandler(jobExplorer);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory,
+			JobBuilderFactory jobBuilderFactory,
+			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
+		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
+				projectsToRunFactory, jobLauncher);
+	}
+
+	@Bean
+	Jackson2ExecutionContextStringSerializer myJackson2ExecutionContextStringSerializer() {
+		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+		// Needed to add this to serialize the exceptions
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		objectMapper.enableDefaultTyping();
+		serializer.setObjectMapper(objectMapper);
+		return serializer;
+	}
+
+	// Needed to add this to serialize the exceptions
+	@Bean
+	BatchConfigurer myBatchConfigurer(DataSource dataSource,
+			Jackson2ExecutionContextStringSerializer myJackson2ExecutionContextStringSerializer) {
+		return new DefaultBatchConfigurer(dataSource) {
+			@Override
+			protected JobExplorer createJobExplorer() throws Exception {
+				JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+				jobExplorerFactoryBean.setDataSource(dataSource);
+				jobExplorerFactoryBean
+						.setSerializer(myJackson2ExecutionContextStringSerializer);
+				jobExplorerFactoryBean.afterPropertiesSet();
+				return jobExplorerFactoryBean.getObject();
+			}
+		};
+	}
 
 }

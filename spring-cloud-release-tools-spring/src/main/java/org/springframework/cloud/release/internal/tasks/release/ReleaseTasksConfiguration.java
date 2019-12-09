@@ -18,10 +18,12 @@ package org.springframework.cloud.release.internal.tasks.release;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.release.internal.Releaser;
+import org.springframework.cloud.release.internal.tasks.ConditionalOnDefaultFlowEnabled;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnDefaultFlowEnabled
 class ReleaseTasksConfiguration {
 
 	@Bean

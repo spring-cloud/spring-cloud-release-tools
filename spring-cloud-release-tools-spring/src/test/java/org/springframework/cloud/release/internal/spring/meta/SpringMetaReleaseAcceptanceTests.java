@@ -46,8 +46,8 @@ import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
 import org.springframework.cloud.release.internal.spring.AbstractSpringAcceptanceTests;
+import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.spring.SpringReleaser;
-import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -106,12 +106,13 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTe
 							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
 
-					BDDAssertions
-							.thenThrownBy(() -> releaser.release(
-									new OptionsBuilder().metaRelease(true).options()))
-							.isInstanceOf(MakeBuildUnstableException.class);
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().metaRelease(true).options());
 
+					then(result.isUnstable()).isFalse();
 					// consul, release, documentation
 					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(3);
 					// don't want to verify the docs
@@ -125,6 +126,10 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTe
 							.extracting("name").contains("refs/tags/v5.3.5.RELEASE");
 					thenRunUpdatedTestsWereCalled(postReleaseActions);
 					thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 

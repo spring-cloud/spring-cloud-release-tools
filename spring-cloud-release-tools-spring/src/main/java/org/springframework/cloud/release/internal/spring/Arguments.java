@@ -17,6 +17,7 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +29,7 @@ import org.springframework.cloud.release.internal.project.ProcessedProject;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
-public final class Arguments {
+public final class Arguments implements Serializable {
 
 	/**
 	 * Cloned location of the project.

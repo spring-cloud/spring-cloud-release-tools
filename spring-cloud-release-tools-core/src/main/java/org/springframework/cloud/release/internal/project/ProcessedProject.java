@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.release.internal.project;
 
+import java.io.Serializable;
+
 import org.springframework.cloud.release.internal.ReleaserProperties;
 
 /**
@@ -23,7 +25,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
  *
  * @author Marcin Grzejszczak
  */
-public class ProcessedProject {
+public class ProcessedProject implements Serializable {
 
 	/**
 	 * Updated properties for a given project. When doing a meta-release this will

@@ -16,12 +16,8 @@
 
 package org.springframework.cloud.release.internal.spring;
 
-import org.springframework.cloud.release.internal.options.Options;
+import java.util.function.Consumer;
 
-public interface SpringReleaser {
-
-	ExecutionResult release();
-
-	ExecutionResult release(Options options);
+public interface ExecutionResultHandler extends Consumer<ExecutionResult> {
 
 }

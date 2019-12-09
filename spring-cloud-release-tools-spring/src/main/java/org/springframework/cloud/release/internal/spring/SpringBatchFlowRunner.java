@@ -19,8 +19,8 @@ package org.springframework.cloud.release.internal.spring;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,26 +87,58 @@ class SpringBatchFlowRunner implements FlowRunner {
 							args.properties, releaserTask);
 					if (decision == FlowRunner.Decision.CONTINUE) {
 						ExecutionResult result = runTask(releaserTask, args);
+						contribution.getStepExecution().getExecutionContext()
+								.put("result", result);
+						List<Throwable> errors = (List<Throwable>) contribution
+								.getStepExecution().getExecutionContext().get("errors");
+						RuntimeException exception = result.foundExceptions();
+						errors = addExceptionToErrors(errors, exception);
+						String status = result.isUnstable() ? "UNSTABLE"
+								: result.isFailure() ? "FAILURE" : "SUCCESS";
+						ExecutionResultEntity entity = buildEntity(releaserTask, args,
+								status, errors);
+						contribution.getStepExecution().getExecutionContext()
+								.put("entity", entity);
 						if (result.isUnstable()) {
-							List<Throwable> errors = (List<Throwable>) contribution
-									.getStepExecution().getExecutionContext()
-									.get("errors");
-							if (errors == null) {
-								errors = new LinkedList<>();
-							}
-							errors.add(result.foundExceptions());
 							contribution.getStepExecution().getExecutionContext()
 									.put("errors", errors);
 						}
 						else if (result.isFailure()) {
-							throw result.foundExceptions();
+							contribution.getStepExecution().getExecutionContext()
+									.put("errors", exception);
+							throw exception;
 						}
 					}
 					else {
+						ExecutionResultEntity entity = buildEntity(releaserTask, args,
+								"SKIPPED", Collections.emptyList());
+						contribution.getStepExecution().getExecutionContext()
+								.put("entity", entity);
 						log.info("Skipping step [{}]", releaserTask.name());
 					}
 					return RepeatStatus.FINISHED;
 				}).listener(releaserListener(args, releaserTask)).build();
+	}
+
+	private List<Throwable> addExceptionToErrors(List<Throwable> errors,
+			RuntimeException exception) {
+		if (errors == null) {
+			errors = new LinkedList<>();
+		}
+		if (exception != null) {
+			errors.add(exception);
+		}
+		return errors;
+	}
+
+	private ExecutionResultEntity buildEntity(ReleaserTask releaserTask, Arguments args,
+			String state, List<Throwable> errors) {
+		String projectName = args.project.getName();
+		String shortName = releaserTask.getClass().getSimpleName();
+		String description = releaserTask.description();
+		Class<? extends ReleaserTask> releaseType = releaserTask.getClass();
+		return new ExecutionResultEntity(projectName, shortName, description, releaseType,
+				state, errors);
 	}
 
 	private ExecutionResult runTask(ReleaserTask releaserTask, Arguments args) {
@@ -148,8 +180,9 @@ class SpringBatchFlowRunner implements FlowRunner {
 			ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
 		return projectsToRun.stream().map(projectToRun -> {
 			ProjectToRun startedProject = projectToRun.get();
-			ExecutionResult result = executeReleaseTasks(tasksToRun,
-					startedProject.name(), Arguments.forProject(startedProject));
+			String name = startedProject.name() + "_" + System.currentTimeMillis();
+			ExecutionResult result = executeReleaseTasks(tasksToRun, name,
+					Arguments.forProject(startedProject));
 			if (result.isFailure()) {
 				throw result.foundExceptions();
 			}
@@ -163,12 +196,12 @@ class SpringBatchFlowRunner implements FlowRunner {
 		ProjectsToRun projectsToRun = postReleaseProjects(
 				new OptionsAndProperties(properties, options));
 		Flow flow = postReleaseFlow(tasksToRun, properties, projectsToRun);
+		String name = taskName + "_" + System.currentTimeMillis();
 		if (flow == null) {
 			log.info("No post release tasks to run, will do nothing");
 			return ExecutionResult.success();
 		}
-		Job job = this.jobBuilderFactory.get(taskName + "_" + new Random().nextInt())
-				.start(flow).build().build();
+		Job job = this.jobBuilderFactory.get(name).start(flow).build().build();
 		return runJob(job);
 	}
 
@@ -219,7 +252,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 								+ "] and description ["
 								+ execution.getExitStatus().getExitDescription() + "]"));
 			}
-			List<Throwable> thrownExceptions = exceptionsThrownBySteps(execution);
+			List<Exception> thrownExceptions = exceptionsThrownBySteps(execution);
 			if (thrownExceptions.isEmpty()) {
 				return ExecutionResult.success();
 			}
@@ -231,11 +264,11 @@ class SpringBatchFlowRunner implements FlowRunner {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Throwable> exceptionsThrownBySteps(JobExecution execution) {
+	private List<Exception> exceptionsThrownBySteps(JobExecution execution) {
 		return execution.getStepExecutions().stream()
 				.map(e -> e.getExecutionContext().get("errors") != null
 						? (List) e.getExecutionContext().get("errors") : new LinkedList())
-				.reduce(new LinkedList<Throwable>(), (o, o2) -> {
+				.reduce(new LinkedList<Exception>(), (o, o2) -> {
 					o.addAll(o2);
 					return o;
 				});
@@ -250,7 +283,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 		ReleaserTask task = iterator.next();
 		Flow flow = flow(properties, projectsToRun, task);
 		FlowBuilder<Flow> flowBuilder = new FlowBuilder<Flow>(
-				"parallelPostRelease_" + new Random().nextInt()).start(flow);
+				"parallelPostRelease_" + System.currentTimeMillis()).start(flow);
 		if (!iterator.hasNext()) {
 			return flowBuilder.build();
 		}

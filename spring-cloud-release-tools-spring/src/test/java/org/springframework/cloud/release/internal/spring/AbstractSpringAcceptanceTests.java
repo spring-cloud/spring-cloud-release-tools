@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -35,6 +34,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -42,6 +42,7 @@ import org.mockito.BDDMockito;
 
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.release.internal.ReleaserProperties;
@@ -91,6 +92,15 @@ public abstract class AbstractSpringAcceptanceTests {
 				.getResource("/projects/spring-cloud-build").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
+		clean();
+	}
+
+	@After
+	public void cleanup() throws Exception {
+		clean();
+	}
+
+	private void clean() {
 		new File("/tmp/executed_build").delete();
 		new File("/tmp/executed_deploy").delete();
 		new File("/tmp/executed_docs").delete();
@@ -98,6 +108,7 @@ public abstract class AbstractSpringAcceptanceTests {
 		emailTemplate().delete();
 		releaseNotesTemplate().delete();
 		tweetTemplate().delete();
+		buildStatus().delete();
 	}
 
 	public void thenRunUpdatedTestsWereCalled(PostReleaseActions postReleaseActions) {
@@ -157,6 +168,10 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public File blogTemplate() {
 		return new File("target/blog.md");
+	}
+
+	public File buildStatus() {
+		return new File("build_status");
 	}
 
 	public File tweetTemplate() {
@@ -245,7 +260,6 @@ public abstract class AbstractSpringAcceptanceTests {
 		public ArgsBuilder defaults() throws Exception {
 			// @formatter:off
 			this.args.addAll(Arrays.asList(
-					"spring.datasource.url=jdbc:h2:mem:" + new Random().nextInt(),
 					"releaser.git.documentation-url=" + file("/projects/spring-cloud-static-angel/").toURI().toString(),
 					"releaser.git.test-samples-project-url=" + this.tmp.newFolder().toString(),
 					"releaser.git.release-train-docs-url=" + this.tmp.newFolder().toString(),
@@ -268,6 +282,7 @@ public abstract class AbstractSpringAcceptanceTests {
 					"releaser.git.update-release-train-docs=true",
 					"releaser.git.all-test-sample-urls[spring-cloud-consul]=" + this.tmp.newFolder().toString(),
 					"releaser.sagan.update-sagan=true",
+					"releaser.template.enabled=true",
 					"releaser.versions.all-versions-file-url="
 							+ SpringMetaReleaseAcceptanceTests.class.getResource("/raw/initializr.yml").toURI().toString()
 			));
@@ -448,6 +463,29 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	}
 
+	public static class TestExecutionResultHandler
+			extends SpringBatchExecutionResultHandler {
+
+		public boolean exitedSuccessOrUnstable;
+
+		public boolean exitedWithException;
+
+		public TestExecutionResultHandler(JobExplorer jobExplorer) {
+			super(jobExplorer);
+		}
+
+		@Override
+		void exitSuccessfully() {
+			this.exitedSuccessOrUnstable = true;
+		}
+
+		@Override
+		void exitWithException() {
+			this.exitedWithException = true;
+		}
+
+	}
+
 	public static class DefaultTestConfiguration {
 
 		@Bean
@@ -473,6 +511,11 @@ public abstract class AbstractSpringAcceptanceTests {
 					return chosenOption;
 				}
 			};
+		}
+
+		@Bean
+		TestExecutionResultHandler testExecutionResultHandler(JobExplorer explorer) {
+			return new TestExecutionResultHandler(explorer);
 		}
 
 	}

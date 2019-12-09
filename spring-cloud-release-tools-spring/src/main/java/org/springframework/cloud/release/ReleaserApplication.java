@@ -16,10 +16,6 @@
 
 package org.springframework.cloud.release;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +27,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.Parser;
 import org.springframework.cloud.release.internal.spring.DefaultSpringReleaser;
-import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
-import org.springframework.core.NestedExceptionUtils;
+import org.springframework.cloud.release.internal.spring.ExecutionResult;
+import org.springframework.cloud.release.internal.spring.ExecutionResultHandler;
 
 @SpringBootApplication
 public class ReleaserApplication implements CommandLineRunner {
@@ -41,6 +37,9 @@ public class ReleaserApplication implements CommandLineRunner {
 
 	@Autowired
 	DefaultSpringReleaser releaser;
+
+	@Autowired
+	ExecutionResultHandler executionResultHandler;
 
 	@Autowired
 	Parser parser;
@@ -54,60 +53,8 @@ public class ReleaserApplication implements CommandLineRunner {
 	@Override
 	public void run(String... strings) {
 		Options options = this.parser.parse(strings);
-		try {
-			this.releaser.release(options);
-		}
-		catch (MakeBuildUnstableException ex) {
-			handleUnstableException(ex);
-		}
-		catch (Throwable th) {
-			log.error("Exception occurred for the releaser", th);
-			Throwable mostSpecificCause = NestedExceptionUtils.getMostSpecificCause(th);
-			if (mostSpecificCause instanceof MakeBuildUnstableException) {
-				handleUnstableException((MakeBuildUnstableException) mostSpecificCause);
-			}
-			else {
-				throw th;
-			}
-		}
-		handleStableBuild();
-		System.exit(0);
-	}
-
-	private void handleUnstableException(MakeBuildUnstableException ex) {
-		log.error(
-				"[BUILD UNSTABLE] The following exceptions took place in the post release process",
-				ex);
-		log.error(
-				"[BUILD UNSTABLE] The release happened successfully, but there were post release issues");
-		log.error("[BUILD UNSTABLE] An exception that should make "
-				+ "the build unstable occurred. Will not throw an exception.");
-		File buildStatus = new File("build_status");
-		try {
-			buildStatus.createNewFile();
-			String text = "[BUILD UNSTABLE] The release happened successfully, but there were post release issues";
-			Files.write(buildStatus.toPath(), text.getBytes());
-		}
-		catch (IOException e) {
-			throw new IllegalStateException(
-					"[BUILD UNSTABLE] Couldn't create a file to show that the build is unstable");
-		}
-	}
-
-	private void handleStableBuild() {
-		File buildStatus = new File("build_status");
-		if (buildStatus.exists()) {
-			log.info("Build status file has already been created!");
-			return;
-		}
-		try {
-			buildStatus.createNewFile();
-			String text = "[BUILD STABLE] All the release steps have been successfully executed!";
-			Files.write(buildStatus.toPath(), text.getBytes());
-		}
-		catch (IOException e) {
-			log.info("Failed to store the file but the build was stable");
-		}
+		ExecutionResult executionResult = this.releaser.release(options);
+		this.executionResultHandler.accept(executionResult);
 	}
 
 }

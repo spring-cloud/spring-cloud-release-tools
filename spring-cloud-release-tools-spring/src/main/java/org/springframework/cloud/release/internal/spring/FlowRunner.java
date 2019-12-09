@@ -19,7 +19,6 @@ package org.springframework.cloud.release.internal.spring;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
-import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 
 public interface FlowRunner {
 
@@ -34,12 +33,10 @@ public interface FlowRunner {
 	}
 
 	ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties,
-			ProjectsToRun projectToRuns, TasksToRun tasksToRun)
-			throws MakeBuildUnstableException;
+			ProjectsToRun projectToRuns, TasksToRun tasksToRun);
 
 	ExecutionResult runPostReleaseTasks(Options options, ReleaserProperties properties,
-			String executingTaskName, TasksToRun tasksToRun)
-			throws MakeBuildUnstableException;
+			String executingTaskName, TasksToRun tasksToRun);
 
 	enum Decision {
 

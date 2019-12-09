@@ -81,7 +81,21 @@ public class Projects extends HashSet<ProjectVersion> {
 	}
 
 	public ProjectVersion releaseTrain(ReleaserProperties properties) {
-		return this.forName(properties.getMetaRelease().getReleaseTrainProjectName());
+		String releaseTrainProjectName = properties.getMetaRelease()
+				.getReleaseTrainProjectName();
+		boolean containsReleaseTrainProjectName = this
+				.containsProject(releaseTrainProjectName);
+		if (containsReleaseTrainProjectName) {
+			return this.forName(releaseTrainProjectName);
+		}
+		String matchingDependencyName = properties.getMetaRelease()
+				.getReleaseTrainDependencyNames().stream().filter(this::containsProject)
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("Projects " + this
+						+ " don't contain any of the following release train names ["
+						+ releaseTrainProjectName + "] or "
+						+ properties.getMetaRelease().getReleaseTrainDependencyNames()));
+		return this.forName(matchingDependencyName);
 	}
 
 	@Override

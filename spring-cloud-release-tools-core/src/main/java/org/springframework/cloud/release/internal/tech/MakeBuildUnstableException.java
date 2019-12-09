@@ -16,9 +16,12 @@
 
 package org.springframework.cloud.release.internal.tech;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Marcin Grzejszczak
  */
-public class MakeBuildUnstableException extends RuntimeException {
+public class MakeBuildUnstableException extends RuntimeException implements Serializable {
 
 	/**
 	 * Description of the exception.
@@ -44,9 +47,9 @@ public class MakeBuildUnstableException extends RuntimeException {
 			.getLogger(MakeBuildUnstableException.class);
 
 	/**
-	 * List of exceptions causing this unstability.
+	 * List of exceptions causing this instability.
 	 */
-	public final List<Throwable> exceptions = new ArrayList<>();
+	private final List<Throwable> exceptions = new ArrayList<>();
 
 	public MakeBuildUnstableException(Throwable cause) {
 		super(cause);
@@ -55,8 +58,13 @@ public class MakeBuildUnstableException extends RuntimeException {
 	}
 
 	public MakeBuildUnstableException(String message, List<Throwable> throwables) {
-		this.exceptions.addAll(throwables);
+		this(throwables);
 		log.error("\n\n" + DESCRIPTION + message + " with causes " + throwables);
+	}
+
+	@JsonCreator
+	public MakeBuildUnstableException(@JsonProperty List<Throwable> throwables) {
+		this.exceptions.addAll(throwables);
 	}
 
 	public MakeBuildUnstableException(String message) {
@@ -68,6 +76,10 @@ public class MakeBuildUnstableException extends RuntimeException {
 		super(message, cause);
 		log.error("\n\n" + DESCRIPTION + message, cause);
 		this.exceptions.add(cause);
+	}
+
+	public List<Throwable> getExceptions() {
+		return this.exceptions;
 	}
 
 }

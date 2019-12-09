@@ -16,27 +16,34 @@
 
 package org.springframework.cloud.release.internal.spring;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 
-public class ExecutionResult {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ExecutionResult implements Serializable {
 
-	private List<Throwable> exceptions = new LinkedList<>();
+	private List<Exception> exceptions = new LinkedList<>();
 
 	public ExecutionResult() {
 	}
 
-	public ExecutionResult(Throwable throwable) {
+	public ExecutionResult(Exception throwable) {
 		this.exceptions.add(throwable);
 	}
 
-	public ExecutionResult(List<Throwable> throwables) {
+	public ExecutionResult(List<Exception> throwables) {
 		this.exceptions.addAll(throwables);
 	}
 
 	public RuntimeException foundExceptions() {
+		if (this.exceptions.isEmpty()) {
+			return null;
+		}
 		if (this.exceptions.size() == 1) {
 			Throwable throwable = this.exceptions.get(0);
 			return throwable instanceof RuntimeException ? (RuntimeException) throwable
@@ -72,27 +79,36 @@ public class ExecutionResult {
 		return new ExecutionResult();
 	}
 
-	public static ExecutionResult failure(Throwable throwable) {
+	public static ExecutionResult failure(Exception throwable) {
 		return new ExecutionResult(throwable);
 	}
 
-	public static ExecutionResult unstable(Throwable ex) {
+	public static ExecutionResult unstable(Exception ex) {
 		return new ExecutionResult(ex instanceof MakeBuildUnstableException ? ex
 				: new MakeBuildUnstableException(ex));
 	}
 
-	private static final class MergedThrowable extends RuntimeException {
+	public List<Exception> getExceptions() {
+		return this.exceptions;
+	}
 
-		private MergedThrowable(List<Throwable> throwables) {
+	public void setExceptions(List<Exception> exceptions) {
+		this.exceptions = exceptions;
+	}
+
+	private static final class MergedThrowable extends RuntimeException
+			implements Serializable {
+
+		private MergedThrowable(List<Exception> throwables) {
 			super("Failed due to the following exceptions " + throwables);
 		}
 
 	}
 
-	private static final class MergedUnstableThrowable
-			extends MakeBuildUnstableException {
+	private static final class MergedUnstableThrowable extends MakeBuildUnstableException
+			implements Serializable {
 
-		private MergedUnstableThrowable(List<Throwable> throwables) {
+		private MergedUnstableThrowable(List<Exception> throwables) {
 			super("Unstable due to the following exceptions " + throwables);
 		}
 

@@ -232,7 +232,10 @@ class ReleaseTrainContentsParser {
 	String latestReleaseTrainFromWiki(File rawMd) {
 		try {
 			return Files.readAllLines(rawMd.toPath()).stream()
-					.filter(s -> s.trim().startsWith("#")).map(s -> s.substring(1).trim())
+					// We want to find only headers like # Finchley.RELEASE and not any
+					// custom headers
+					.filter(s -> s.trim().startsWith("#") && s.contains("."))
+					.map(s -> s.substring(1).trim())
 					.filter(s -> new ProjectVersion("foo", s).isValid()).findFirst()
 					.orElse("");
 		}

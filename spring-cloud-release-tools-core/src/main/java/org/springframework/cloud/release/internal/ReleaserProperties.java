@@ -50,6 +50,8 @@ public class ReleaserProperties implements Serializable {
 	 */
 	private boolean postReleaseTasksOnly = false;
 
+	private Flow flow = new Flow();
+
 	private Git git = new Git();
 
 	private Pom pom = new Pom();
@@ -81,6 +83,14 @@ public class ReleaserProperties implements Serializable {
 
 	public void setWorkingDir(String workingDir) {
 		this.workingDir = workingDir;
+	}
+
+	public Flow getFlow() {
+		return this.flow;
+	}
+
+	public void setFlow(Flow flow) {
+		this.flow = flow;
 	}
 
 	public Git getGit() {
@@ -201,7 +211,8 @@ public class ReleaserProperties implements Serializable {
 		 * project version.
 		 */
 		private List<String> releaseTrainDependencyNames = Arrays.asList("spring-cloud",
-				"spring-cloud-dependencies", "spring-cloud-starter");
+				"spring-cloud-dependencies", "spring-cloud-starter",
+				"spring-cloud-starter-build");
 
 		/**
 		 * The URL of the Git organization. We'll append each project's name to it.
@@ -266,6 +277,25 @@ public class ReleaserProperties implements Serializable {
 					+ ", releaseTrainProjectName='" + this.releaseTrainProjectName + '\''
 					+ ", gitOrgUrl='" + this.gitOrgUrl + '\'' + ", projectsToSkip="
 					+ this.projectsToSkip + '}';
+		}
+
+	}
+
+	public static class Flow implements Serializable {
+
+		/**
+		 * Should the default flow of jobs be preserved. If set to {@code false} will not
+		 * register any jobs as beans, and it will be up to you to set the whole
+		 * configuration of jobs.
+		 */
+		private boolean defaultEnabled = true;
+
+		public boolean isDefaultEnabled() {
+			return this.defaultEnabled;
+		}
+
+		public void defaultEnabled(boolean defaultEnabled) {
+			this.defaultEnabled = defaultEnabled;
 		}
 
 	}
@@ -1247,9 +1277,22 @@ public class ReleaserProperties implements Serializable {
 	public static class Template implements Serializable {
 
 		/**
+		 * Should template generation be enabled.
+		 */
+		private boolean enabled;
+
+		/**
 		 * Folder in which blog, email etc. templates are stored.
 		 */
 		private String templateFolder = "cloud";
+
+		public boolean isEnabled() {
+			return this.enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
 
 		public String getTemplateFolder() {
 			return this.templateFolder;

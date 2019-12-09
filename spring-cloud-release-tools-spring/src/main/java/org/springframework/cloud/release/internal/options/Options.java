@@ -16,13 +16,14 @@
 
 package org.springframework.cloud.release.internal.options;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class Options {
+public class Options implements Serializable {
 
 	/**
 	 * Is meta release set.

@@ -18,6 +18,7 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +28,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 
-public class ProjectToRun {
+public class ProjectToRun implements Serializable {
 
 	/**
 	 * Cloned location of this project.
