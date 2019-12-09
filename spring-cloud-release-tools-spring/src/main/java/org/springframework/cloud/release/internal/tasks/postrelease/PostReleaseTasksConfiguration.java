@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnDefaultFlowEnabled
+@ConditionalOnProperty(value = "releaser.skip-post-release-tasks", havingValue = "false",
+		matchIfMissing = true)
 class PostReleaseTasksConfiguration {
 
 	@Bean

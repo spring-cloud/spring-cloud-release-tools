@@ -18,6 +18,9 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.util.LinkedList;
 
+/**
+ * List of projects to run. They will be fetched in a lazy fashion.
+ */
 public class ProjectsToRun extends LinkedList<ProjectToRun.ProjectToRunSupplier> {
 
 	public ProjectsToRun() {

@@ -29,6 +29,9 @@ import org.springframework.cloud.release.internal.project.ProcessedProject;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
+/**
+ * Arguments for a task.
+ */
 public final class Arguments implements Serializable {
 
 	/**

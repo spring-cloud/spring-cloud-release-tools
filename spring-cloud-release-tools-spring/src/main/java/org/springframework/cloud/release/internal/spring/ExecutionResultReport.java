@@ -18,10 +18,13 @@ package org.springframework.cloud.release.internal.spring;
 
 import java.util.List;
 
-import org.springframework.batch.core.Entity;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 
-public class ExecutionResultEntity extends Entity {
+/**
+ * A report from running a task. Can be mapped to a row in a table for a single execution
+ * of a release task.
+ */
+public class ExecutionResultReport {
 
 	private String projectName;
 
@@ -35,10 +38,10 @@ public class ExecutionResultEntity extends Entity {
 
 	private List<Throwable> exceptions;
 
-	ExecutionResultEntity() {
+	ExecutionResultReport() {
 	}
 
-	public ExecutionResultEntity(String projectName, String shortName, String description,
+	public ExecutionResultReport(String projectName, String shortName, String description,
 			Class<? extends ReleaserTask> releaserTaskType, String state,
 			List<Throwable> exceptions) {
 		this.projectName = projectName;

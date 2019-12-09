@@ -50,6 +50,11 @@ public class ReleaserProperties implements Serializable {
 	 */
 	private boolean postReleaseTasksOnly = false;
 
+	/**
+	 * If set to {@code true} will not run post release tasks.
+	 */
+	private boolean skipPostReleaseTasks = false;
+
 	private Flow flow = new Flow();
 
 	private Git git = new Git();

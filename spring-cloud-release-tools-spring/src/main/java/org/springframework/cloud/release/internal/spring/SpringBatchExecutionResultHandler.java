@@ -93,7 +93,7 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 
 	private List<Table> buildTable(List<ExecutionContext> stepContexts) {
 		return stepContexts.stream().map(context -> {
-			ExecutionResultEntity entity = (ExecutionResultEntity) context.get("entity");
+			ExecutionResultReport entity = (ExecutionResultReport) context.get("entity");
 			String projectName = TrainPostReleaseReleaserTask.class
 					.isAssignableFrom(entity.getReleaserTaskType()) ? "postRelease"
 							: entity.getProjectName();
@@ -129,6 +129,7 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 		}
 	}
 
+	// File creation required by Jenkins
 	private void handleUnstableException() {
 		File buildStatus = new File("build_status");
 		try {
@@ -142,6 +143,7 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 		}
 	}
 
+	// File creation required by Jenkins
 	private void handleStableBuild() {
 		File buildStatus = new File("build_status");
 		if (buildStatus.exists()) {
@@ -158,6 +160,7 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 		}
 	}
 
+	// File creation required by Jenkins
 	private void handleFailedBuild() {
 		File buildStatus = new File("build_status");
 		if (buildStatus.exists()) {

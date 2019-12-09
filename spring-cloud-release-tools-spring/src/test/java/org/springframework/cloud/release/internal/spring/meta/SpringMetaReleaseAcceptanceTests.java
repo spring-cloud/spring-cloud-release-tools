@@ -17,7 +17,6 @@
 package org.springframework.cloud.release.internal.spring.meta;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,22 +31,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
+import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
 import org.springframework.cloud.release.internal.git.GitTestUtils;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
-import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
 import org.springframework.cloud.release.internal.options.OptionsBuilder;
 import org.springframework.cloud.release.internal.postrelease.PostReleaseActions;
-import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.sagan.SaganClient;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
-import org.springframework.cloud.release.internal.spring.AbstractSpringAcceptanceTests;
 import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.spring.SpringReleaser;
+import org.springframework.cloud.release.internal.tasks.release.BuildProjectReleaseTask;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -56,11 +53,13 @@ import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class SpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTests {
+public class SpringMetaReleaseAcceptanceTests
+		extends AbstractSpringMetaReleaseAcceptanceTests {
 
 	ApplicationContextRunner runner = new ApplicationContextRunner()
 			.withUserConfiguration(
@@ -78,25 +77,8 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTe
 
 		this.runner.withSystemProperties("debug=true")
 				.withPropertyValues("test.metarelease=true")
-				.withPropertyValues(new ArgsBuilder(project, this.tmp)
-						.releaseTrainUrl("/projects/spring-cloud-release/")
-						.projectsToSkip("spring-boot", "spring-cloud-build",
-								"spring-cloud-commons", "spring-cloud-stream",
-								"spring-cloud-task", "spring-cloud-function",
-								"spring-cloud-aws", "spring-cloud-bus",
-								"spring-cloud-config", "spring-cloud-netflix",
-								"spring-cloud-cloudfoundry", "spring-cloud-gateway",
-								"spring-cloud-security", "spring-cloud-zookeeper",
-								"spring-cloud-sleuth", "spring-cloud-contract",
-								"spring-cloud-vault")
-						.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
-						.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
-						.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
-						.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
-						.releaseTrainBomUrl(file("/projects/spring-cloud-release/")
-								.toURI().toString())
-						.bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10())
-						.build())
+				.withPropertyValues(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
+						.addFixedVersions(edgwareSr10()).build())
 				.run(context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
@@ -112,7 +94,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTe
 					ExecutionResult result = releaser
 							.release(new OptionsBuilder().metaRelease(true).options());
 
-					then(result.isUnstable()).isFalse();
+					then(result.isFailureOrUnstable()).isFalse();
 					// consul, release, documentation
 					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(3);
 					// don't want to verify the docs
@@ -133,97 +115,217 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTe
 				});
 	}
 
-	private Map<String, String> edgwareSr10() {
-		Map<String, String> versions = new LinkedHashMap<>();
-		versions.put("spring-boot", "5.5.16.RELEASE");
-		versions.put("spring-cloud-build", "5.3.11.RELEASE");
-		versions.put("spring-cloud-commons", "5.3.5.RELEASE");
-		versions.put("spring-cloud-stream", "Xitmars.SR4");
-		versions.put("spring-cloud-task", "5.2.3.RELEASE");
-		versions.put("spring-cloud-function", "5.0.1.RELEASE");
-		versions.put("spring-cloud-aws", "5.2.3.RELEASE");
-		versions.put("spring-cloud-bus", "5.3.4.RELEASE");
-		versions.put("spring-cloud-config", "5.4.5.RELEASE");
-		versions.put("spring-cloud-netflix", "5.4.6.RELEASE");
-		versions.put("spring-cloud-cloudfoundry", "5.1.2.RELEASE");
-		versions.put("spring-cloud-gateway", "5.0.2.RELEASE");
-		versions.put("spring-cloud-security", "5.2.3.RELEASE");
-		versions.put("spring-cloud-consul", "5.3.5.RELEASE");
-		versions.put("spring-cloud-zookeeper", "5.2.2.RELEASE");
-		versions.put("spring-cloud-sleuth", "5.3.5.RELEASE");
-		versions.put("spring-cloud-contract", "5.2.6.RELEASE");
-		versions.put("spring-cloud-vault", "5.1.2.RELEASE");
-		versions.put("spring-cloud-release", "Edgware.SR10");
-		return versions;
-	}
+	@Test
+	public void should_perform_a_meta_release_dry_run_of_sc_release_and_consul()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-	private void thenAllStepsWereExecutedForEachProject(
-			NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler) {
-		nonAssertingTestProjectGitHandler.clonedProjects.stream()
-				.filter(f -> !f.getName().contains("angel")
-						&& !f.getName().equals("spring-cloud"))
-				.forEach(project -> {
-					then(Arrays.asList("spring-cloud-starter-build",
-							"spring-cloud-consul"))
-									.contains(pom(project).getArtifactId());
-					then(new File("/tmp/executed_build")).exists();
-					then(new File("/tmp/executed_deploy")).exists();
-					then(new File("/tmp/executed_docs")).exists();
+		this.runner.withSystemProperties("debug=true")
+				.withPropertyValues("test.metarelease=true")
+				.withPropertyValues(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
+						.addFixedVersions(edgwareSr10()).build())
+				.run(context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
+							.getBean(NonAssertingTestProjectGitHandler.class);
+					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
+					TestDocumentationUpdater testDocumentationUpdater = context
+							.getBean(TestDocumentationUpdater.class);
+					PostReleaseActions postReleaseActions = context
+							.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+
+					ExecutionResult result = releaser.release(new OptionsBuilder()
+							.metaRelease(true).dryRun(true).options());
+
+					then(result.isFailureOrUnstable()).isFalse();
+					// consul, release
+					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(2);
+					// only dry run tasks were called
+					thenAllDryRunStepsWereExecutedForEachProject(
+							nonAssertingTestProjectGitHandler);
+					thenSaganWasNotCalled(saganUpdater);
+					thenDocumentationWasNotUpdated(testDocumentationUpdater);
+					BDDAssertions
+							.then(clonedProject(nonAssertingTestProjectGitHandler,
+									"spring-cloud-consul").tagList().call())
+							.extracting("name")
+							.doesNotContain("refs/tags/v5.3.5.RELEASE");
+					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
+					thenUpdateReleaseTrainDocsWasNotCalled(postReleaseActions);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 
-	private void thenSaganWasCalled(SaganUpdater saganUpdater) {
-		BDDMockito.then(saganUpdater).should(BDDMockito.atLeastOnce()).updateSagan(
-				BDDMockito.any(File.class), BDDMockito.anyString(),
-				BDDMockito.any(ProjectVersion.class),
-				BDDMockito.any(ProjectVersion.class), BDDMockito.any(Projects.class));
+	@Test
+	public void should_not_release_any_projects_when_they_are_on_list_of_projects_to_skip()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		File temporaryDestination = this.tmp.newFolder();
+
+		this.runner.withSystemProperties("debug=true")
+				.withPropertyValues("test.metarelease=true", "test.mockBuild=true")
+				.withPropertyValues(metaReleaseArgs(project).bomBranch("Greenwich")
+						.addFixedVersions(consulAndReleaseSnapshots())
+						.updateReleaseTrainWiki(false)
+						.cloneDestinationDirectory(temporaryDestination)
+						.projectsToSkip("spring-cloud-consul").build())
+				.run(context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					BuildProjectReleaseTask build = context
+							.getBean(BuildProjectReleaseTask.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().metaRelease(true).options());
+
+					then(result.isFailureOrUnstable()).isFalse();
+					thenBuildWasNeverCalledFor(build, "spring-cloud-consul");
+					thenBuildWasCalledFor(build, "spring-cloud-release");
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+				});
 	}
 
-	private void thenDocumentationWasUpdated(DocumentationUpdater documentationUpdater) {
-		BDDMockito.then(documentationUpdater).should().updateDocsRepo(
-				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class),
-				BDDMockito.anyString());
+	@Test
+	public void should_perform_a_meta_release_of_consul_only_when_run_from_got_passed()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		File temporaryDestination = this.tmp.newFolder();
+
+		this.runner.withSystemProperties("debug=true")
+				.withPropertyValues("test.metarelease=true", "test.mockBuild=true")
+				.withPropertyValues(metaReleaseArgs(project).bomBranch("Greenwich")
+						.addFixedVersions(releaseConsulBuildSnapshots())
+						.cloneDestinationDirectory(temporaryDestination).build())
+				.run(context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					BuildProjectReleaseTask build = context
+							.getBean(BuildProjectReleaseTask.class);
+					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
+					TestDocumentationUpdater testDocumentationUpdater = context
+							.getBean(TestDocumentationUpdater.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().startFrom("spring-cloud-consul")
+									.metaRelease(true).options());
+
+					// release
+					then(result.isFailureOrUnstable()).isFalse();
+					thenBuildWasNeverCalledFor(build, "spring-cloud-release");
+					thenBuildWasNeverCalledFor(build, "spring-cloud-build");
+					thenBuildWasCalledFor(build, "spring-cloud-consul");
+
+					// post release
+					thenSaganWasCalled(saganUpdater);
+					thenDocumentationWasUpdated(testDocumentationUpdater);
+					thenWikiPageWasUpdated(testDocumentationUpdater);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+				});
 	}
 
-	private void assertThatClonedConsulProjectIsInSnapshots(File origin) {
-		pomVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
-		consulPomParentVersionIsEqualTo(origin, "1.2.0.BUILD-SNAPSHOT");
+	@Test
+	public void should_perform_a_meta_release_of_consul_only_when_task_names_got_passed()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		File temporaryDestination = this.tmp.newFolder();
+
+		this.runner.withSystemProperties("debug=true")
+				.withPropertyValues("test.metarelease=true", "test.mockBuild=true")
+				.withPropertyValues(metaReleaseArgs(project).bomBranch("Greenwich")
+						.addFixedVersions(releaseConsulBuildSnapshots())
+						.cloneDestinationDirectory(temporaryDestination).build())
+				.run(context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					BuildProjectReleaseTask build = context
+							.getBean(BuildProjectReleaseTask.class);
+					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
+					TestDocumentationUpdater testDocumentationUpdater = context
+							.getBean(TestDocumentationUpdater.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+
+					ExecutionResult result = releaser.release(new OptionsBuilder()
+							.taskNames(Collections.singletonList("spring-cloud-consul"))
+							.metaRelease(true).options());
+
+					// release
+					then(result.isFailureOrUnstable()).isFalse();
+					thenBuildWasNeverCalledFor(build, "spring-cloud-release");
+					thenBuildWasNeverCalledFor(build, "spring-cloud-build");
+					thenBuildWasCalledFor(build, "spring-cloud-consul");
+
+					// post release
+					thenSaganWasCalled(saganUpdater);
+					thenDocumentationWasUpdated(testDocumentationUpdater);
+					thenWikiPageWasUpdated(testDocumentationUpdater);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+				});
 	}
 
-	static class NonAssertingTestProjectGitHubHandler extends ProjectGitHubHandler {
+	private void thenWikiPageWasUpdated(DocumentationUpdater documentationUpdater) {
+		BDDMockito.then(documentationUpdater).should()
+				.updateReleaseTrainWiki(BDDMockito.any(Projects.class));
+	}
 
-		boolean closedMilestones = false;
+	private void thenBuildWasCalledFor(BuildProjectReleaseTask build,
+			String projectName) {
+		BDDMockito.then(build).should().apply(argThat(
+				argument -> argument.originalVersion.projectName.equals(projectName)
+						|| argument.project.getAbsolutePath().endsWith(projectName)));
+	}
 
-		boolean issueCreatedInSpringGuides = false;
+	private void thenBuildWasNeverCalledFor(BuildProjectReleaseTask build,
+			String projectName) {
+		BDDMockito.then(build).should(BDDMockito.never()).apply(argThat(
+				argument -> argument.originalVersion.projectName.equals(projectName)
+						|| argument.project.getAbsolutePath().endsWith(projectName)));
+	}
 
-		boolean issueCreatedInStartSpringIo = false;
+	private Map<String, String> consulAndReleaseSnapshots() {
+		Map<String, String> versions = new LinkedHashMap<>();
+		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
+		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
+		return versions;
+	}
 
-		NonAssertingTestProjectGitHubHandler(ReleaserProperties properties) {
-			super(properties, Collections.singletonList(
-					SpringCloudGithubIssuesAccessor.springCloud(properties)));
-		}
-
-		@Override
-		public void closeMilestone(ProjectVersion releaseVersion) {
-			this.closedMilestones = true;
-		}
-
-		@Override
-		public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
-			this.issueCreatedInSpringGuides = true;
-		}
-
-		@Override
-		public void createIssueInStartSpringIo(Projects projects,
-				ProjectVersion version) {
-			this.issueCreatedInStartSpringIo = true;
-		}
-
-		@Override
-		public String milestoneUrl(ProjectVersion releaseVersion) {
-			return "https://foo.bar.com/" + releaseVersion.toString();
-		}
-
+	private Map<String, String> releaseConsulBuildSnapshots() {
+		Map<String, String> versions = new LinkedHashMap<>();
+		versions.put("spring-cloud-release", "Camden.BUILD-SNAPSHOT");
+		versions.put("spring-cloud-build", "1.1.2.BUILD-SNAPSHOT");
+		versions.put("spring-cloud-consul", "1.1.2.BUILD-SNAPSHOT");
+		return versions;
 	}
 
 	@Configuration
@@ -237,6 +339,12 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTe
 			BDDMockito.given(saganClient.getProject(anyString()))
 					.willReturn(newProject());
 			return saganClient;
+		}
+
+		@Bean
+		@ConditionalOnProperty(value = "test.mockBuild", havingValue = "true")
+		BuildProjectReleaseTask mockedBuildProjectReleaseTask(Releaser releaser) {
+			return BDDMockito.spy(new BuildProjectReleaseTask(releaser));
 		}
 
 		@Bean

@@ -24,6 +24,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
 
+/**
+ * Task execution result. Contains a list of exceptions thrown while running the task.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExecutionResult implements Serializable {
 

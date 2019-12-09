@@ -86,9 +86,9 @@ public abstract class AbstractSpringAcceptanceTests {
 	@Before
 	public void setup() throws Exception {
 		this.temporaryFolder = this.tmp.newFolder();
-		this.springCloudConsulProject = new File(AcceptanceTests.class
+		this.springCloudConsulProject = new File(AbstractSpringAcceptanceTests.class
 				.getResource("/projects/spring-cloud-consul").toURI());
-		this.springCloudBuildProject = new File(AcceptanceTests.class
+		this.springCloudBuildProject = new File(AbstractSpringAcceptanceTests.class
 				.getResource("/projects/spring-cloud-build").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
@@ -229,6 +229,11 @@ public abstract class AbstractSpringAcceptanceTests {
 				.generateReleaseTrainDocumentation(BDDMockito.any(Projects.class));
 	}
 
+	public void thenUpdateReleaseTrainDocsWasNotCalled(PostReleaseActions actions) {
+		BDDMockito.then(actions).should(BDDMockito.never())
+				.generateReleaseTrainDocumentation(BDDMockito.any(Projects.class));
+	}
+
 	public static Project newProject() {
 		Project project = new Project();
 		project.projectReleases.addAll(Arrays.asList(release("1.0.0.M8"),
@@ -275,7 +280,6 @@ public abstract class AbstractSpringAcceptanceTests {
 					"releaser.git.update-spring-guides=true",
 					"releaser.git.update-spring-project=true",
 					"releaser.git.update-start-spring-io=true",
-					"releaser.git.update-release-train-wiki=true",
 					"releaser.git.update-all-test-samples=true",
 					"releaser.git.update-documentation-repo=true",
 					"releaser.git.update-github-milestones=true",
@@ -287,7 +291,13 @@ public abstract class AbstractSpringAcceptanceTests {
 							+ SpringMetaReleaseAcceptanceTests.class.getResource("/raw/initializr.yml").toURI().toString()
 			));
 			// @formatter:on
-			return fetchVersionsFromGit(true).projectName("spring-cloud-consul");
+			return fetchVersionsFromGit(true).updateReleaseTrainWiki(true)
+					.projectName("spring-cloud-consul");
+		}
+
+		public ArgsBuilder updateReleaseTrainWiki(boolean enabled) throws Exception {
+			this.args.add("releaser.git.update-release-train-wiki=" + enabled);
+			return this;
 		}
 
 		public ArgsBuilder projectsToSkip(String... toSkip) throws Exception {

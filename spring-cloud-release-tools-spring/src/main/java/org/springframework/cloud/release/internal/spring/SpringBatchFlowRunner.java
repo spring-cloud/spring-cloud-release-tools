@@ -95,7 +95,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 						errors = addExceptionToErrors(errors, exception);
 						String status = result.isUnstable() ? "UNSTABLE"
 								: result.isFailure() ? "FAILURE" : "SUCCESS";
-						ExecutionResultEntity entity = buildEntity(releaserTask, args,
+						ExecutionResultReport entity = buildEntity(releaserTask, args,
 								status, errors);
 						contribution.getStepExecution().getExecutionContext()
 								.put("entity", entity);
@@ -110,7 +110,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 						}
 					}
 					else {
-						ExecutionResultEntity entity = buildEntity(releaserTask, args,
+						ExecutionResultReport entity = buildEntity(releaserTask, args,
 								"SKIPPED", Collections.emptyList());
 						contribution.getStepExecution().getExecutionContext()
 								.put("entity", entity);
@@ -131,13 +131,13 @@ class SpringBatchFlowRunner implements FlowRunner {
 		return errors;
 	}
 
-	private ExecutionResultEntity buildEntity(ReleaserTask releaserTask, Arguments args,
+	private ExecutionResultReport buildEntity(ReleaserTask releaserTask, Arguments args,
 			String state, List<Throwable> errors) {
 		String projectName = args.project.getName();
 		String shortName = releaserTask.getClass().getSimpleName();
 		String description = releaserTask.description();
 		Class<? extends ReleaserTask> releaseType = releaserTask.getClass();
-		return new ExecutionResultEntity(projectName, shortName, description, releaseType,
+		return new ExecutionResultReport(projectName, shortName, description, releaseType,
 				state, errors);
 	}
 
@@ -191,9 +191,9 @@ class SpringBatchFlowRunner implements FlowRunner {
 	}
 
 	@Override
-	public ExecutionResult runPostReleaseTasks(Options options,
+	public ExecutionResult runPostReleaseTrainTasks(Options options,
 			ReleaserProperties properties, String taskName, TasksToRun tasksToRun) {
-		ProjectsToRun projectsToRun = postReleaseProjects(
+		ProjectsToRun projectsToRun = postReleaseTrainProjects(
 				new OptionsAndProperties(properties, options));
 		Flow flow = postReleaseFlow(tasksToRun, properties, projectsToRun);
 		String name = taskName + "_" + System.currentTimeMillis();
@@ -205,8 +205,8 @@ class SpringBatchFlowRunner implements FlowRunner {
 		return runJob(job);
 	}
 
-	private ProjectsToRun postReleaseProjects(OptionsAndProperties options) {
-		return this.projectsToRunFactory.postRelease(options);
+	private ProjectsToRun postReleaseTrainProjects(OptionsAndProperties options) {
+		return this.projectsToRunFactory.postReleaseTrain(options);
 	}
 
 	private ExecutionResult executeReleaseTasks(TasksToRun tasksToRun, String name,

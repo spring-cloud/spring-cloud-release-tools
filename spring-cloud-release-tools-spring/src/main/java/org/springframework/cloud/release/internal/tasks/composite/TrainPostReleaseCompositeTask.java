@@ -85,7 +85,7 @@ public class TrainPostReleaseCompositeTask implements CompositeReleaserTask {
 				trainPostReleaseReleaserTasks.values());
 		values.sort(AnnotationAwareOrderComparator.INSTANCE);
 		log.info("Found the following post release tasks {}", values);
-		return flowRunner().runPostReleaseTasks(args.options, args.properties,
+		return flowRunner().runPostReleaseTrainTasks(args.options, args.properties,
 				this.name(), new TasksToRun(values));
 	}
 

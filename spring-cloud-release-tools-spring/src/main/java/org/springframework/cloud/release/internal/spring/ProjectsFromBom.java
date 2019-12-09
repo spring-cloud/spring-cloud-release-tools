@@ -19,6 +19,9 @@ package org.springframework.cloud.release.internal.spring;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 
+/**
+ * Class representing this and other projects retrieved from the BOM.
+ */
 public class ProjectsFromBom {
 
 	/**

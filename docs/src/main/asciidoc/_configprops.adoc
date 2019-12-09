@@ -68,6 +68,7 @@
 |releaser.sagan.docs-adocs-file | docs/src/main/asciidoc | Folder with asciidoctor files for docs.
 |releaser.sagan.index-section-file-name | sagan-index.adoc | Name of the ascii doc file with core part of this project's Sagan project page. Linked with {@link this#docsAdocsFile}.
 |releaser.sagan.update-sagan | false | If set to {@code false} will not update Sagan.
+|releaser.template.enabled | false | Should template generation be enabled.
 |releaser.template.template-folder | cloud | Folder in which blog, email etc. templates are stored.
 |releaser.versions.all-versions-file-url | https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml | Url to a file containing all the versions. Defaults to YAML from start.spring.io.
 |releaser.versions.bom-name | spring-cloud | Name in the YAML from initilizr for BOM mappings.

@@ -68,8 +68,9 @@ public interface FlowRunner {
 	 * @param tasksToRun - set of post release tasks to run for each project
 	 * @return the result of release execution
 	 */
-	ExecutionResult runPostReleaseTasks(Options options, ReleaserProperties properties,
-			String executingTaskName, TasksToRun tasksToRun);
+	ExecutionResult runPostReleaseTrainTasks(Options options,
+			ReleaserProperties properties, String executingTaskName,
+			TasksToRun tasksToRun);
 
 	/**
 	 * Decision to be taken before and after running a task.

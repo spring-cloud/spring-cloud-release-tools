@@ -25,7 +25,7 @@ import org.springframework.cloud.release.internal.options.OptionsBuilder;
  *
  * @author Marcin Grzejszczak
  */
-public class DefaultSpringReleaser implements SpringReleaser {
+class DefaultSpringReleaser implements SpringReleaser {
 
 	private final ReleaserProperties properties;
 
@@ -37,7 +37,7 @@ public class DefaultSpringReleaser implements SpringReleaser {
 
 	private final FlowRunner flowRunner;
 
-	public DefaultSpringReleaser(ReleaserProperties properties,
+	DefaultSpringReleaser(ReleaserProperties properties,
 			OptionsAndPropertiesFactory optionsAndPropertiesFactory,
 			ProjectsToRunFactory projectsToRunFactory,
 			TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner) {
@@ -56,27 +56,6 @@ public class DefaultSpringReleaser implements SpringReleaser {
 		return release(new OptionsBuilder().options());
 	}
 
-	// SETUP
-	// from options, modify the releaser properties
-
-	// RELEASE
-	// which projects to run
-	// * for meta-release take from the options
-	// * for single will return a list of one project
-	// which tasks to run
-	// * for meta-release will run everything
-	// * for single will take from the options
-	// POST-RELEASE
-	// not applicable for dry-run
-	// * for single project will run the project post-release tasks
-	// * for meta-release will pick projects, set the branch to release train version
-
-	// **** take from the options
-	// * Start from
-	// * Range
-	// * Task names
-	// * Interactive
-	// * In this mode you haven’t picked what you want to do yet
 	@Override
 	public ExecutionResult release(Options options) {
 		OptionsAndProperties optionsAndProperties = prepareOptionsAndProperties(options,
@@ -88,9 +67,9 @@ public class DefaultSpringReleaser implements SpringReleaser {
 				optionsAndProperties, projectsToRun, releaseTasksToRun);
 		TasksToRun postReleaseTrainTasksToRun = postReleaseTrainTasksFromOptions(
 				optionsAndProperties);
-		ExecutionResult postReleaseTasksExecutionResult = runPostReleaseTasks(
+		ExecutionResult postReleaseTrainTasksExecutionResult = runPostReleaseTasks(
 				optionsAndProperties, postReleaseTrainTasksToRun);
-		return releaseTasksExecutionResult.merge(postReleaseTasksExecutionResult);
+		return releaseTasksExecutionResult.merge(postReleaseTrainTasksExecutionResult);
 	}
 
 	private OptionsAndProperties prepareOptionsAndProperties(Options options,
@@ -119,7 +98,7 @@ public class DefaultSpringReleaser implements SpringReleaser {
 
 	private ExecutionResult runPostReleaseTasks(OptionsAndProperties optionsAndProperties,
 			TasksToRun postReleaseTasksToRun) {
-		return this.flowRunner.runPostReleaseTasks(optionsAndProperties.options,
+		return this.flowRunner.runPostReleaseTrainTasks(optionsAndProperties.options,
 				optionsAndProperties.properties, "postRelease", postReleaseTasksToRun);
 	}
 

@@ -28,6 +28,10 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 
+/**
+ * A single project to be released. Contains all the information necessary to release a
+ * project.
+ */
 public class ProjectToRun implements Serializable {
 
 	/**
@@ -92,6 +96,10 @@ public class ProjectToRun implements Serializable {
 		return Objects.hash(originalVersion);
 	}
 
+	/**
+	 * Supplier of a project to run. Since retrieval of a project may require cloning it,
+	 * we will cache the cloned location instead of cloning it each time.
+	 */
 	public static class ProjectToRunSupplier
 			implements Supplier<ProjectToRun>, Closeable {
 

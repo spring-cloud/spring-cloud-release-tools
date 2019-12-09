@@ -81,7 +81,7 @@ class TasksToRunFactory {
 	}
 
 	TasksToRun postRelease(Options options) {
-		if (!options.metaRelease) {
+		if (!options.metaRelease || options.dryRun) {
 			return new TasksToRun();
 		}
 		List<ReleaserTask> tasks = new LinkedList<>(

@@ -19,7 +19,9 @@ package org.springframework.cloud.release.internal.spring;
 import java.util.function.Consumer;
 
 /**
- * Handles the result of the execution of the train or project release.
+ * Handles the result of the execution of the train or project release. Example: You can
+ * print the results in a table, throw exceptions when the build was faulty or just log
+ * them when it was unstable.
  */
 public interface ExecutionResultHandler extends Consumer<ExecutionResult> {
 

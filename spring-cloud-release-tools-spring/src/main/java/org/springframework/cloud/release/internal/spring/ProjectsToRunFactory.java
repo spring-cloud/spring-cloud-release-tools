@@ -75,7 +75,7 @@ class ProjectsToRunFactory implements Closeable {
 		return metaReleaseProjectsToRun(options, properties);
 	}
 
-	ProjectsToRun postRelease(OptionsAndProperties optionsAndProperties) {
+	ProjectsToRun postReleaseTrain(OptionsAndProperties optionsAndProperties) {
 		ProjectsToRun projectsToRun = doPostRelease(optionsAndProperties);
 		this.storedProjects.addAll(projectsToRun);
 		return projectsToRun;
@@ -157,6 +157,10 @@ class ProjectsToRunFactory implements Closeable {
 		List<String> filteredProjects = filterProjectsToSkip(projects, properties);
 		log.info("List of all projects to clone before filtering {}", filteredProjects);
 		return filteredProjects;
+	}
+
+	private List<String> allProjects(ReleaserProperties properties) {
+		return new ArrayList<>(properties.getFixedVersions().keySet());
 	}
 
 	private List<String> filterProjectsToSkip(List<String> projects,
