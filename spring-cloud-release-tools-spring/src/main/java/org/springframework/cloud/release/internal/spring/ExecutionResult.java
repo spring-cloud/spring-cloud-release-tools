@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
+import org.springframework.cloud.release.internal.tech.BuildUnstableException;
 
 /**
  * Task execution result. Contains a list of exceptions thrown while running the task.
@@ -66,12 +66,16 @@ public class ExecutionResult implements Serializable {
 
 	public boolean isUnstable() {
 		return !this.exceptions.isEmpty() && this.exceptions.stream()
-				.allMatch(t -> t instanceof MakeBuildUnstableException);
+				.allMatch(t -> t instanceof BuildUnstableException);
 	}
 
 	public boolean isFailure() {
 		return !this.exceptions.isEmpty() && this.exceptions.stream()
-				.anyMatch(t -> !(t instanceof MakeBuildUnstableException));
+				.anyMatch(t -> !(t instanceof BuildUnstableException));
+	}
+
+	public boolean isSuccess() {
+		return this.exceptions.isEmpty();
 	}
 
 	public boolean isFailureOrUnstable() {
@@ -87,8 +91,8 @@ public class ExecutionResult implements Serializable {
 	}
 
 	public static ExecutionResult unstable(Exception ex) {
-		return new ExecutionResult(ex instanceof MakeBuildUnstableException ? ex
-				: new MakeBuildUnstableException(ex));
+		return new ExecutionResult(ex instanceof BuildUnstableException ? ex
+				: new BuildUnstableException(ex));
 	}
 
 	public List<Exception> getExceptions() {
@@ -108,7 +112,7 @@ public class ExecutionResult implements Serializable {
 
 	}
 
-	private static final class MergedUnstableThrowable extends MakeBuildUnstableException
+	private static final class MergedUnstableThrowable extends BuildUnstableException
 			implements Serializable {
 
 		private MergedUnstableThrowable(List<Exception> throwables) {

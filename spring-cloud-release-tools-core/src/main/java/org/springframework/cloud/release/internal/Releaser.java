@@ -33,7 +33,7 @@ import org.springframework.cloud.release.internal.project.ProjectCommandExecutor
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
 import org.springframework.cloud.release.internal.sagan.SaganUpdater;
-import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
+import org.springframework.cloud.release.internal.tech.BuildUnstableException;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.util.Assert;
 
@@ -194,7 +194,7 @@ public class Releaser implements ReleaserPropertiesAware {
 			log.info("\nSuccessfully closed milestone");
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException("Failed to create an email template");
+			throw new BuildUnstableException("Failed to create an email template");
 		}
 	}
 
@@ -213,13 +213,11 @@ public class Releaser implements ReleaserPropertiesAware {
 				log.info("\nSuccessfully created email template at location [{}]", email);
 			}
 			else {
-				throw new MakeBuildUnstableException(
-						"Failed to create an email template");
+				throw new BuildUnstableException("Failed to create an email template");
 			}
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException("Failed to create an email template",
-					ex);
+			throw new BuildUnstableException("Failed to create an email template", ex);
 		}
 	}
 
@@ -234,11 +232,11 @@ public class Releaser implements ReleaserPropertiesAware {
 				log.info("\nSuccessfully created blog template at location [{}]", blog);
 			}
 			else {
-				throw new MakeBuildUnstableException("Failed to create a blog template");
+				throw new BuildUnstableException("Failed to create a blog template");
 			}
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException("Failed to create a blog template", ex);
+			throw new BuildUnstableException("Failed to create a blog template", ex);
 		}
 	}
 
@@ -253,7 +251,7 @@ public class Releaser implements ReleaserPropertiesAware {
 				projects);
 		Exception deployGuidesException = deployGuides(processedProjects);
 		if (springGuidesException != null || deployGuidesException != null) {
-			throw new MakeBuildUnstableException(
+			throw new BuildUnstableException(
 					"Failed to update Spring Guides. Spring Guides updated successfully ["
 							+ (springGuidesException != null)
 							+ "] deployed guides successfully ["
@@ -269,7 +267,7 @@ public class Releaser implements ReleaserPropertiesAware {
 		}
 		Exception exception = createIssueInStartSpringIo(releaseVersion, projects);
 		if (exception != null) {
-			throw new MakeBuildUnstableException("Failed to update start.spring.io");
+			throw new BuildUnstableException("Failed to update start.spring.io");
 		}
 	}
 
@@ -282,8 +280,7 @@ public class Releaser implements ReleaserPropertiesAware {
 		}
 		catch (Exception ex) {
 			log.error("Failed to update Spring Guides repo", ex);
-			return new MakeBuildUnstableException("Failed to update Spring Guides repo",
-					ex);
+			return new BuildUnstableException("Failed to update Spring Guides repo", ex);
 		}
 	}
 
@@ -297,7 +294,7 @@ public class Releaser implements ReleaserPropertiesAware {
 		}
 		catch (Exception ex) {
 			log.error("Failed to update start.spring.io repo", ex);
-			return new MakeBuildUnstableException("Failed to update start.spring.io repo",
+			return new BuildUnstableException("Failed to update start.spring.io repo",
 					ex);
 		}
 	}
@@ -310,7 +307,7 @@ public class Releaser implements ReleaserPropertiesAware {
 		}
 		catch (Exception ex) {
 			log.error("Failed to deploy new guides", ex);
-			return new MakeBuildUnstableException("Failed to deploy new guides", ex);
+			return new BuildUnstableException("Failed to deploy new guides", ex);
 		}
 	}
 
@@ -325,11 +322,11 @@ public class Releaser implements ReleaserPropertiesAware {
 				log.info("\nSuccessfully created tweet template at location [{}]", tweet);
 			}
 			else {
-				throw new MakeBuildUnstableException("Failed to create a tweet template");
+				throw new BuildUnstableException("Failed to create a tweet template");
 			}
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException("Failed to create a tweet template", ex);
+			throw new BuildUnstableException("Failed to create a tweet template", ex);
 		}
 	}
 
@@ -343,7 +340,7 @@ public class Releaser implements ReleaserPropertiesAware {
 			log.info("\nSuccessfully created release notes at location [{}]", output);
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException("Failed to create release notes", ex);
+			throw new BuildUnstableException("Failed to create release notes", ex);
 		}
 	}
 
@@ -357,7 +354,7 @@ public class Releaser implements ReleaserPropertiesAware {
 			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 		}
 		catch (Exception ex) {
-			throw new MakeBuildUnstableException(ex);
+			throw new BuildUnstableException(ex);
 		}
 	}
 

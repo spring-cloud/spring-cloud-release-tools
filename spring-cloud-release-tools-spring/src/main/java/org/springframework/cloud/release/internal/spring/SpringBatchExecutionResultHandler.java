@@ -200,10 +200,10 @@ class Table {
 		this.taskCaption = taskCaption;
 		this.taskDescription = taskDescription;
 		this.taskState = taskState;
-		this.thrownException = exceptions == null ? ""
-				: exceptions.stream()
-						.map(t -> NestedExceptionUtils.getMostSpecificCause(t).toString())
-						.collect(Collectors.joining("\n"));
+		this.thrownException = exceptions == null ? "" : exceptions.stream()
+				// TODO: Last but most specific
+				.map(t -> NestedExceptionUtils.getMostSpecificCause(t).toString())
+				.collect(Collectors.joining("\n"));
 		this.exceptions = exceptions;
 	}
 

@@ -45,6 +45,7 @@ public class ReleaserApplication implements CommandLineRunner {
 	Parser parser;
 
 	public static void main(String[] args) {
+		// TODO: Per library / train set the defaults in application.yml
 		SpringApplication application = new SpringApplication(ReleaserApplication.class);
 		application.setWebApplicationType(WebApplicationType.NONE);
 		application.run(args);
@@ -52,6 +53,12 @@ public class ReleaserApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... strings) {
+		// TODO:
+		// * Check out Spring Shell - maybe move interactive stuff out of it
+		// * Spring Shell would spit out the options at the end
+		// * Check out the ReleaserPropertiesUpdater
+		// * Check why I can't run a composite job as a batch job (transaction not
+		// committed exception)
 		Options options = this.parser.parse(strings);
 		ExecutionResult executionResult = this.releaser.release(options);
 		this.executionResultHandler.accept(executionResult);

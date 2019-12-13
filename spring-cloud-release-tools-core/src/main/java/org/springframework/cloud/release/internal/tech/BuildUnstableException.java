@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Marcin Grzejszczak
  */
-public class MakeBuildUnstableException extends RuntimeException implements Serializable {
+public class BuildUnstableException extends RuntimeException implements Serializable {
 
 	/**
 	 * Description of the exception.
@@ -44,35 +44,35 @@ public class MakeBuildUnstableException extends RuntimeException implements Seri
 	public static final String EXIT_CODE = "BUILD_UNSTABLE";
 
 	private static final Logger log = LoggerFactory
-			.getLogger(MakeBuildUnstableException.class);
+			.getLogger(BuildUnstableException.class);
 
 	/**
 	 * List of exceptions causing this instability.
 	 */
 	private final List<Throwable> exceptions = new ArrayList<>();
 
-	public MakeBuildUnstableException(Throwable cause) {
+	public BuildUnstableException(Throwable cause) {
 		super(cause);
 		log.error("\n\n" + DESCRIPTION, cause);
 		this.exceptions.add(cause);
 	}
 
-	public MakeBuildUnstableException(String message, List<Throwable> throwables) {
+	public BuildUnstableException(String message, List<Throwable> throwables) {
 		this(throwables);
 		log.error("\n\n" + DESCRIPTION + message + " with causes " + throwables);
 	}
 
 	@JsonCreator
-	public MakeBuildUnstableException(@JsonProperty List<Throwable> throwables) {
+	public BuildUnstableException(@JsonProperty List<Throwable> throwables) {
 		this.exceptions.addAll(throwables);
 	}
 
-	public MakeBuildUnstableException(String message) {
+	public BuildUnstableException(String message) {
 		super(message);
 		log.error("\n\n" + DESCRIPTION + message);
 	}
 
-	public MakeBuildUnstableException(String message, Throwable cause) {
+	public BuildUnstableException(String message, Throwable cause) {
 		super(message, cause);
 		log.error("\n\n" + DESCRIPTION + message, cause);
 		this.exceptions.add(cause);

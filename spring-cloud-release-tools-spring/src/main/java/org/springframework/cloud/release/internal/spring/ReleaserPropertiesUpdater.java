@@ -78,6 +78,10 @@ class ReleaserPropertiesUpdater {
 														ReleaserProperties.class)
 												.get();
 				log.info("config/releaser.yml found. Will update the current properties");
+				// TODO: Update Gradle and Bash
+				// assuming that all elements of the properties will not have defaults, we
+				// can
+				// override all elements that have values
 				copy.getMaven()
 						.setBuildCommand(releaserProperties.getMaven().getBuildCommand());
 				copy.getMaven().setDeployCommand(

@@ -35,18 +35,19 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
-import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.tasks.CompositeReleaserTask;
 import org.springframework.cloud.release.internal.tasks.ReleaseReleaserTask;
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
-import org.springframework.cloud.release.internal.tech.MakeBuildUnstableException;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.cloud.release.internal.tech.BuildUnstableException;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 class SpringBatchFlowRunner implements FlowRunner {
 
@@ -99,14 +100,9 @@ class SpringBatchFlowRunner implements FlowRunner {
 								status, errors);
 						contribution.getStepExecution().getExecutionContext()
 								.put("entity", entity);
-						if (result.isUnstable()) {
+						if (result.isFailureOrUnstable()) {
 							contribution.getStepExecution().getExecutionContext()
 									.put("errors", errors);
-						}
-						else if (result.isFailure()) {
-							contribution.getStepExecution().getExecutionContext()
-									.put("errors", exception);
-							throw exception;
 						}
 					}
 					else {
@@ -151,12 +147,7 @@ class SpringBatchFlowRunner implements FlowRunner {
 
 	private StepExecutionListener releaserListener(Arguments args,
 			ReleaserTask releaserTask) {
-		return new StepExecutionListener() {
-			@Override
-			public void beforeStep(StepExecution stepExecution) {
-
-			}
-
+		return new StepExecutionListenerSupport() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				FlowRunner.Decision decision = afterTask(args.options, args.properties,
@@ -164,13 +155,19 @@ class SpringBatchFlowRunner implements FlowRunner {
 				if (decision == FlowRunner.Decision.ABORT) {
 					return ExitStatus.FAILED;
 				}
-				boolean makeUnstable = stepExecution.getFailureExceptions().stream()
-						.anyMatch(t -> t instanceof MakeBuildUnstableException);
-				if (makeUnstable) {
-					return new ExitStatus(MakeBuildUnstableException.EXIT_CODE,
-							MakeBuildUnstableException.DESCRIPTION);
+				ExecutionResult result = (ExecutionResult) stepExecution
+						.getExecutionContext().get("result");
+				if (result == null || result.isSuccess()) {
+					return stepExecution.getExitStatus();
 				}
-				return stepExecution.getExitStatus();
+				else if (result.isUnstable()) {
+					return new ExitStatus(BuildUnstableException.EXIT_CODE,
+							BuildUnstableException.DESCRIPTION);
+				}
+				else if (result.isFailure()) {
+					return ExitStatus.FAILED;
+				}
+				return ExitStatus.COMPLETED;
 			}
 		};
 	}
@@ -233,8 +230,8 @@ class SpringBatchFlowRunner implements FlowRunner {
 			log.info("No jobs to run, will do nothing");
 			return ExecutionResult.success();
 		}
-		JobBuilder builder = this.jobBuilderFactory.get(name);
-		SimpleJobBuilder startedBuilder = builder.start(createStep(task, args));
+		SimpleJobBuilder startedBuilder = this.jobBuilderFactory.get(name)
+				.start(createStep(task, args));
 		while (iterator.hasNext()) {
 			startedBuilder.next(createStep(iterator.next(), args));
 		}
@@ -287,14 +284,20 @@ class SpringBatchFlowRunner implements FlowRunner {
 		if (!iterator.hasNext()) {
 			return flowBuilder.build();
 		}
-		FlowBuilder.SplitBuilder<Flow> builder = flowBuilder
-				.split(new SimpleAsyncTaskExecutor());
+		// TODO: Add an option to configure the task executor
+		FlowBuilder.SplitBuilder<Flow> builder = flowBuilder.split(taskExecutor());
 		List<Flow> flows = new LinkedList<>();
 		while (iterator.hasNext()) {
 			flows.add(flow(properties, projectsToRun, iterator.next()));
 		}
 		Flow[] objects = flows.toArray(new Flow[0]);
 		return builder.add(objects).build();
+	}
+
+	private TaskExecutor taskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.initialize();
+		return executor;
 	}
 
 	private Flow flow(ReleaserProperties properties, ProjectsToRun projectsToRun,
