@@ -16,51 +16,25 @@
 
 package org.springframework.cloud.release;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.release.internal.options.Options;
 import org.springframework.cloud.release.internal.options.Parser;
-import org.springframework.cloud.release.internal.spring.ExecutionResult;
 import org.springframework.cloud.release.internal.spring.ExecutionResultHandler;
 import org.springframework.cloud.release.internal.spring.SpringReleaser;
 
 @SpringBootApplication
-public class ReleaserApplication implements CommandLineRunner {
+public class ReleaserApplication extends ReleaserCommandLineRunner {
 
-	private static final Logger log = LoggerFactory.getLogger(ReleaserApplication.class);
-
-	@Autowired
-	SpringReleaser releaser;
-
-	@Autowired
-	ExecutionResultHandler executionResultHandler;
-
-	@Autowired
-	Parser parser;
+	public ReleaserApplication(SpringReleaser releaser,
+			ExecutionResultHandler executionResultHandler, Parser parser) {
+		super(releaser, executionResultHandler, parser);
+	}
 
 	public static void main(String[] args) {
-		// TODO: Per library / train set the defaults in application.yml
 		SpringApplication application = new SpringApplication(ReleaserApplication.class);
 		application.setWebApplicationType(WebApplicationType.NONE);
 		application.run(args);
-	}
-
-	@Override
-	public void run(String... strings) {
-		// TODO:
-		// * Check out Spring Shell - maybe move interactive stuff out of it
-		// * Spring Shell would spit out the options at the end
-		// * Check why I can't run a composite job as a batch job (transaction not
-		// committed exception)
-		Options options = this.parser.parse(strings);
-		ExecutionResult executionResult = this.releaser.release(options);
-		this.executionResultHandler.accept(executionResult);
 	}
 
 }

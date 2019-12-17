@@ -143,7 +143,7 @@ public class GitRepoTests {
 			fail("should throw an exception");
 		}
 		catch (IllegalStateException e) {
-			then(e).hasMessageContaining("Ref nonExistingBranch can not be resolved");
+			then(e).hasMessageContaining("Ref nonExistingBranch cannot be resolved");
 		}
 	}
 

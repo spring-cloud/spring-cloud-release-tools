@@ -40,7 +40,7 @@ import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
-import org.eclipse.jgit.api.errors.EmtpyCommitException;
+import org.eclipse.jgit.api.errors.EmptyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -167,7 +167,7 @@ class GitRepo {
 			git.commit().setAllowEmpty(false).setMessage(message).call();
 			printLog(git);
 		}
-		catch (EmtpyCommitException e) {
+		catch (EmptyCommitException e) {
 			log.info("There were no changes detected. Will not commit an empty commit");
 		}
 		catch (Exception e) {

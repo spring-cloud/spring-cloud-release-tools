@@ -30,10 +30,13 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
@@ -41,7 +44,7 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	SpringBatchExecutionResultHandler springBatchExecutionResultHandler(
+	ExecutionResultHandler springBatchExecutionResultHandler(
 			JobExplorer jobExplorer) {
 		return new SpringBatchExecutionResultHandler(jobExplorer);
 	}
@@ -70,7 +73,7 @@ class BatchConfiguration {
 	// Needed to add this to serialize the exceptions
 	@Bean
 	BatchConfigurer myBatchConfigurer(DataSource dataSource,
-			Jackson2ExecutionContextStringSerializer myJackson2ExecutionContextStringSerializer) {
+			Jackson2ExecutionContextStringSerializer myJackson2ExecutionContextStringSerializer, PlatformTransactionManager transactionManager) {
 		return new DefaultBatchConfigurer(dataSource) {
 			@Override
 			protected JobExplorer createJobExplorer() throws Exception {
@@ -80,6 +83,16 @@ class BatchConfiguration {
 						.setSerializer(myJackson2ExecutionContextStringSerializer);
 				jobExplorerFactoryBean.afterPropertiesSet();
 				return jobExplorerFactoryBean.getObject();
+			}
+
+			@Override
+			protected JobRepository createJobRepository() throws Exception {
+				JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+				jobRepositoryFactoryBean.setDataSource(dataSource);
+				jobRepositoryFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
+				jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+				jobRepositoryFactoryBean.afterPropertiesSet();
+				return jobRepositoryFactoryBean.getObject();
 			}
 		};
 	}

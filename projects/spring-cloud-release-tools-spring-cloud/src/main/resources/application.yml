@@ -1,0 +1,123 @@
+spring:
+  main:
+    web-application-type: none
+  datasource:
+    url: jdbc:h2:mem:${random.uuid}
+  jackson:
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: true
+releaser:
+  # working-dir:
+  post-release-tasks-only: false
+  skip-post-release-tasks: false
+  flow:
+    default-enabled: true
+  git:
+    release-train-bom-url: https://github.com/spring-cloud/spring-cloud-release
+    documentation-url: https://github.com/spring-cloud/spring-cloud-static
+    spring-project-url: https://github.com/spring-projects/spring-cloud
+    test-samples-project-url: https://github.com/spring-cloud/spring-cloud-core-tests
+    release-train-docs-url: https://github.com/spring-cloud-samples/scripts
+    release-train-wiki-url: https://github.com/spring-projects/spring-cloud.wiki
+    documentation-branch: gh-pages
+    spring-project-branch: gh-pages
+    test-samples-branch: master
+    release-train-docs-branch: master
+    release-train-wiki-page-prefix: Spring-Cloud
+    # clone-destination-dir:
+    fetch-versions-from-git: true
+    # oauth-token:
+    # username:
+    # password:
+    number-of-checked-milestones: 50
+    update-documentation-repo: true
+    update-github-milestones: true
+    update-spring-guides: true
+    update-start-spring-io: true
+    update-spring-project: true
+    run-updated-samples: true
+    update-release-train-docs: true
+    update-release-train-wiki: true
+    update-all-test-samples: true
+    all-test-sample-urls:
+      spring-cloud-sleuth:
+        - https://github.com/spring-cloud-samples/sleuth-issues
+        - https://github.com/spring-cloud-samples/sleuth-documentation-apps
+      spring-cloud-contract:
+        - https://github.com/spring-cloud-samples/spring-cloud-contract-samples
+        - https://github.com/spring-cloud-samples/the-legacy-app
+        - https://github.com/spring-cloud-samples/sc-contract-car-rental
+  pom:
+    branch: master
+    pom-with-boot-starter-parent: spring-cloud-starter-parent/pom.xml
+    this-train-bom: spring-cloud-dependencies/pom.xml
+    bom-version-pattern: "^(spring-cloud-.*)\\.version$"
+    ignored-pom-regex:
+      - "^.*\\.git/.*$"
+      - "^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$"
+      - "^.*spring-cloud-contract-maven-plugin/target/.*$"
+      - "^.*src/test/bats/.*$"
+      - "^.*samples/standalone/[a-z]+/.*$"
+  maven:
+    build-command: "./mvnw clean install -B -Pdocs {{systemProps}}"
+    deploy-command: "./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}"
+    deploy-guides-command: "./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}"
+    publish-docs-commands:
+      - "mkdir -p target"
+      - "wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh"
+      - "chmod +x target/gh-pages.sh"
+      - "./target/gh-pages.sh -v {{version}} -c"
+    generate-release-train-docs-command: "bash release_train.sh --retrieveversions --version {{version}} --ghpages --auto"
+    system-properties: ""
+    wait-time-in-minutes: 20
+  bash:
+    build-command: 'echo "{{systemProps}}"'
+    deploy-command: 'echo "{{systemProps}}"'
+    deploy-guides-command: 'echo "{{systemProps}}"'
+    publish-docs-commands:
+      - 'echo "{{systemProps}}"'
+    generate-release-train-docs-command: 'echo "{{systemProps}}"'
+    system-properties: ""
+    wait-time-in-minutes: 20
+  gradle:
+    gradle-props-substitution:
+      bootVersion: spring-boot
+      BOOT_VERSION: spring-boot
+      bomVersion: spring-cloud-release
+      BOM_VERSION: spring-cloud-release
+      springCloudBuildVersion: spring-cloud-build
+    ignored-gradle-regex:
+      - "^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$"
+      - "^.*spring-cloud-contract-maven-plugin/target/.*$"
+      - "^.*src/test/bats/.*$"
+      - "^.*samples/standalone/[a-z]+/.*$"
+    build-command: "./gradlew clean build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}"
+    deploy-command: "./gradlew publish --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}"
+    deploy-guides-command: "./gradlew clean build deployGuides --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}"
+    publish-docs-commands:
+      - "echo 'TODO'"
+    generate-release-train-docs-command: "echo 'TODO'"
+    system-properties: ""
+    wait-time-in-minutes: 20
+  sagan:
+    update-sagan: true
+  template:
+    enabled: true
+    template-folder: cloud
+  versions:
+    all-versions-file-url: https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml
+    bom-name: spring-cloud
+  # fixed-versions:
+  meta-release:
+    enabled: false
+    release-train-project-name: spring-cloud-release
+    release-train-dependency-names:
+      - spring-cloud
+      - spring-cloud-dependencies
+      - spring-cloud-starter
+      - spring-cloud-starter-build
+    git-org-url: https://github.com/spring-cloud
+    projects-to-skip:
+      - spring-boot
+      - spring-cloud-stream
+      - spring-cloud-task

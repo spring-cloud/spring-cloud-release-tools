@@ -178,6 +178,14 @@ public class ReleaserProperties implements Serializable {
 		this.postReleaseTasksOnly = postReleaseTasksOnly;
 	}
 
+	public boolean isSkipPostReleaseTasks() {
+		return this.skipPostReleaseTasks;
+	}
+
+	public void setSkipPostReleaseTasks(boolean skipPostReleaseTasks) {
+		this.skipPostReleaseTasks = skipPostReleaseTasks;
+	}
+
 	public Versions getVersions() {
 		return this.versions;
 	}
@@ -1092,7 +1100,7 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Maven{" + "buildCommand='" + this.buildCommand + '\''
+			return "Bash{" + "buildCommand='" + this.buildCommand + '\''
 					+ ", deployCommand='" + this.deployCommand + '\''
 					+ ", publishDocsCommands=" + Arrays.toString(this.publishDocsCommands)
 					+ "generateReleaseTrainDocsCommand='"

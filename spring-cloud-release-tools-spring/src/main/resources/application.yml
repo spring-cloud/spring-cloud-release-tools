@@ -1,8 +1,0 @@
-spring:
-  main:
-    web-application-type: none
-  datasource:
-    url: jdbc:h2:mem:${random.uuid}
-  jackson:
-    deserialization:
-      FAIL_ON_UNKNOWN_PROPERTIES: true

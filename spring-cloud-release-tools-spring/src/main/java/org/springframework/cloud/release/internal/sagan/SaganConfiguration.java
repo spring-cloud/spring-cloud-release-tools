@@ -16,7 +16,10 @@
 
 package org.springframework.cloud.release.internal.sagan;
 
+import java.util.List;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +35,43 @@ class SaganConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", matchIfMissing = true)
 	SaganClient saganClient(ReleaserProperties properties) {
 		RestTemplate restTemplate = restTemplate(properties);
 		return new RestTemplateSaganClient(restTemplate, properties);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "false")
+	SaganClient noOpSaganClient() {
+		return new SaganClient() {
+			@Override
+			public Project getProject(String projectName) {
+				return null;
+			}
+
+			@Override
+			public Release getRelease(String projectName, String releaseVersion) {
+				return null;
+			}
+
+			@Override
+			public Release deleteRelease(String projectName, String releaseVersion) {
+				return null;
+			}
+
+			@Override
+			public Project updateRelease(String projectName,
+					List<ReleaseUpdate> releaseUpdate) {
+				return null;
+			}
+
+			@Override
+			public Project patchProject(Project project) {
+				return null;
+			}
+		};
 	}
 
 	private RestTemplate restTemplate(ReleaserProperties properties) {
