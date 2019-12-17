@@ -781,7 +781,74 @@ public class ReleaserProperties implements Serializable {
 
 	}
 
-	public static class Maven implements Serializable {
+	/**
+	 * Abstraction over command execution using different languages and frameworks.
+	 */
+	public interface Command {
+
+		/**
+		 * @return build command
+		 */
+		String getBuildCommand();
+
+		/**
+		 * @param buildCommand to set
+		 */
+		void setBuildCommand(String buildCommand);
+
+		/**
+		 * @return deploy command
+		 */
+		String getDeployCommand();
+
+		/**
+		 * @param deployCommand to set
+		 */
+		void setDeployCommand(String deployCommand);
+
+		/**
+		 * @return deploy guides command
+		 */
+		String getDeployGuidesCommand();
+
+		/**
+		 * @param deployGuidesCommand to set
+		 */
+		void setDeployGuidesCommand(String deployGuidesCommand);
+
+		/**
+		 * @return docs publishing commands
+		 */
+		String[] getPublishDocsCommands();
+
+		/**
+		 * @param publishDocsCommands to set
+		 */
+		void setPublishDocsCommands(String[] publishDocsCommands);
+
+		/**
+		 * @return generate release train docs command
+		 */
+		String getGenerateReleaseTrainDocsCommand();
+
+		/**
+		 * @param generateReleaseTrainDocsCommand to set
+		 */
+		void setGenerateReleaseTrainDocsCommand(String generateReleaseTrainDocsCommand);
+
+		/**
+		 * @return system properties
+		 */
+		String getSystemProperties();
+
+		/**
+		 * @param systemProperties to set
+		 */
+		void setSystemProperties(String systemProperties);
+
+	}
+
+	public static class Maven implements Serializable, Command {
 
 		/**
 		 * Placeholder for system properties.
@@ -912,7 +979,7 @@ public class ReleaserProperties implements Serializable {
 
 	}
 
-	public static class Bash implements Serializable {
+	public static class Bash implements Serializable, Command {
 
 		/**
 		 * Placeholder for system properties.
@@ -1035,7 +1102,7 @@ public class ReleaserProperties implements Serializable {
 
 	}
 
-	public static class Gradle implements Serializable {
+	public static class Gradle implements Serializable, Command {
 
 		/**
 		 * Placeholder for system properties.

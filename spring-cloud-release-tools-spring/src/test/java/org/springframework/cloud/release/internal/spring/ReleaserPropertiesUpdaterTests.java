@@ -55,6 +55,9 @@ public class ReleaserPropertiesUpdaterTests {
 				this.relaserUpdater);
 
 		BDDAssertions.then(aware.properties).isNotNull();
+		BDDAssertions.then(props.getMaven().getBuildCommand()).isEqualTo("maven_build");
+		BDDAssertions.then(props.getGradle().getBuildCommand()).isEqualTo("gradle_build");
+		BDDAssertions.then(props.getBash().getBuildCommand()).isEqualTo("bash_build");
 		BDDAssertions.then(props.getMaven().getSystemProperties()).isEqualTo("-Dfoo=bar");
 	}
 

@@ -56,7 +56,6 @@ public class ReleaserApplication implements CommandLineRunner {
 		// TODO:
 		// * Check out Spring Shell - maybe move interactive stuff out of it
 		// * Spring Shell would spit out the options at the end
-		// * Check out the ReleaserPropertiesUpdater
 		// * Check why I can't run a composite job as a batch job (transaction not
 		// committed exception)
 		Options options = this.parser.parse(strings);

@@ -17,8 +17,11 @@
 package org.springframework.cloud.release.internal.spring;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -31,6 +34,7 @@ import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserPropertiesAware;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -78,18 +82,7 @@ class ReleaserPropertiesUpdater {
 														ReleaserProperties.class)
 												.get();
 				log.info("config/releaser.yml found. Will update the current properties");
-				// TODO: Update Gradle and Bash
-				// assuming that all elements of the properties will not have defaults, we
-				// can
-				// override all elements that have values
-				copy.getMaven()
-						.setBuildCommand(releaserProperties.getMaven().getBuildCommand());
-				copy.getMaven().setDeployCommand(
-						releaserProperties.getMaven().getDeployCommand());
-				copy.getGradle().setGradlePropsSubstitution(
-						releaserProperties.getGradle().getGradlePropsSubstitution());
-				copy.getGradle().setIgnoredGradleRegex(
-						releaserProperties.getGradle().getIgnoredGradleRegex());
+				overrideProperties(releaserProperties, copy);
 			}
 			catch (Exception e) {
 				throw new IllegalStateException(e);
@@ -103,6 +96,64 @@ class ReleaserPropertiesUpdater {
 				clonedProjectFromOrg.getAbsolutePath());
 		copy.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
 		return copy;
+	}
+
+	private void overrideProperties(ReleaserProperties fromProject,
+			ReleaserProperties copy) {
+		overrideCommandIfPresent(fromProject.getMaven(), copy.getMaven());
+		overrideCommandIfPresent(fromProject.getGradle(), copy.getGradle());
+		overrideMapIfPresent(() -> fromProject.getGradle().getGradlePropsSubstitution(),
+				s -> copy.getGradle().setGradlePropsSubstitution(s));
+		overrideListIfPresent(() -> fromProject.getGradle().getIgnoredGradleRegex(),
+				s -> copy.getGradle().setIgnoredGradleRegex(s));
+		overrideCommandIfPresent(fromProject.getBash(), copy.getBash());
+	}
+
+	private void overrideCommandIfPresent(ReleaserProperties.Command fromProject,
+			ReleaserProperties.Command commandCopy) {
+		overrideStringIfPresent(fromProject::getBuildCommand,
+				commandCopy::setBuildCommand);
+		overrideStringIfPresent(fromProject::getDeployCommand,
+				commandCopy::setDeployCommand);
+		overrideStringIfPresent(fromProject::getGenerateReleaseTrainDocsCommand,
+				commandCopy::setGenerateReleaseTrainDocsCommand);
+		overrideArrayIfPresent(fromProject::getPublishDocsCommands,
+				commandCopy::setPublishDocsCommands);
+		overrideStringIfPresent(fromProject::getDeployGuidesCommand,
+				commandCopy::setDeployGuidesCommand);
+		overrideStringIfPresent(fromProject::getSystemProperties,
+				commandCopy::setSystemProperties);
+	}
+
+	private void overrideStringIfPresent(Supplier<String> predicate,
+			Consumer<String> consumer) {
+		if (StringUtils.hasText(predicate.get())) {
+			consumer.accept(predicate.get());
+		}
+	}
+
+	private void overrideArrayIfPresent(Supplier<String[]> predicate,
+			Consumer<String[]> consumer) {
+		String[] strings = predicate.get();
+		if (strings.length > 0) {
+			consumer.accept(strings);
+		}
+	}
+
+	private void overrideMapIfPresent(Supplier<Map<String, String>> predicate,
+			Consumer<Map<String, String>> consumer) {
+		Map<String, String> strings = predicate.get();
+		if (!strings.isEmpty()) {
+			consumer.accept(strings);
+		}
+	}
+
+	private void overrideListIfPresent(Supplier<List<String>> predicate,
+			Consumer<List<String>> consumer) {
+		List<String> strings = predicate.get();
+		if (!strings.isEmpty()) {
+			consumer.accept(strings);
+		}
 	}
 
 	File releaserConfig(File clonedProjectFromOrg) {
