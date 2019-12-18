@@ -48,9 +48,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(ReleaserProperties.class)
 class ReleaserConfiguration {
 
-	@Autowired
-	ReleaserProperties properties;
-
 	@Bean
 	@ConditionalOnMissingBean
 	OptionsAndPropertiesFactory optionsAndPropertiesFactory() {
@@ -59,7 +56,8 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	VersionsToBumpFactory versionsToBumpFactory(Releaser releaser) {
+	VersionsToBumpFactory versionsToBumpFactory(Releaser releaser,
+			ReleaserProperties properties) {
 		return new VersionsToBumpFactory(releaser, properties);
 	}
 
@@ -80,47 +78,51 @@ class ReleaserConfiguration {
 	@ConditionalOnMissingBean
 	SpringReleaser springReleaser(OptionsAndPropertiesFactory optionsAndPropertiesFactory,
 			ProjectsToRunFactory projectsToRunFactory,
-			TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner) {
+			TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner,
+			ReleaserProperties properties) {
 		return new DefaultSpringReleaser(properties, optionsAndPropertiesFactory,
 				projectsToRunFactory, tasksToRunFactory, flowRunner);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	ProjectCommandExecutor projectBuilder() {
-		return new ProjectCommandExecutor(this.properties);
+	ProjectCommandExecutor projectBuilder(ReleaserProperties properties) {
+		return new ProjectCommandExecutor(properties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	VersionsFetcher versionsFetcher(ProjectPomUpdater updater) {
-		return new VersionsFetcher(this.properties, updater);
+	VersionsFetcher versionsFetcher(ProjectPomUpdater updater,
+			ReleaserProperties properties) {
+		return new VersionsFetcher(properties, updater);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	ProjectGitHandler projectGitHandler() {
-		return new ProjectGitHandler(this.properties);
+	ProjectGitHandler projectGitHandler(ReleaserProperties properties) {
+		return new ProjectGitHandler(properties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	ProjectGitHubHandler projectGitHubHandler(
-			@Autowired(required = false) List<CustomGithubIssues> customGithubIssues) {
-		return new ProjectGitHubHandler(this.properties,
+			@Autowired(required = false) List<CustomGithubIssues> customGithubIssues,
+			ReleaserProperties properties) {
+		return new ProjectGitHubHandler(properties,
 				customGithubIssues != null ? customGithubIssues : new ArrayList<>());
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	TemplateGenerator templateGenerator(ProjectGitHubHandler handler) {
-		return new TemplateGenerator(this.properties, handler);
+	TemplateGenerator templateGenerator(ProjectGitHubHandler handler,
+			ReleaserProperties properties) {
+		return new TemplateGenerator(properties, handler);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	GradleUpdater gradleUpdater() {
-		return new GradleUpdater(this.properties);
+	GradleUpdater gradleUpdater(ReleaserProperties properties) {
+		return new GradleUpdater(properties);
 	}
 
 	@Bean

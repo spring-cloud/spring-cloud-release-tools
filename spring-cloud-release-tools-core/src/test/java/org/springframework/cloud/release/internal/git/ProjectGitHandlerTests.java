@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 
@@ -42,7 +43,7 @@ public class ProjectGitHandlerTests {
 	@Mock
 	GitRepo gitRepo;
 
-	ReleaserProperties properties = new ReleaserProperties();
+	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	ProjectGitHandler updater = new ProjectGitHandler(this.properties) {
 		@Override

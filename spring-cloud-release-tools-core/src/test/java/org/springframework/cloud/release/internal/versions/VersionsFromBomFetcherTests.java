@@ -28,6 +28,7 @@ import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.MavenBomParserAccessor;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
@@ -57,7 +58,7 @@ class VersionsFromBomFetcherTests {
 				"2.5.0.RELEASE");
 		URI initilizrUri = VersionsFromBomFetcherTests.class
 				.getResource("/raw/initializr.yml").toURI();
-		ReleaserProperties properties = new ReleaserProperties();
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 		properties.getGit().setUpdateSpringGuides(true);
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(
@@ -78,7 +79,7 @@ class VersionsFromBomFetcherTests {
 				"1.0.0.RELEASE");
 		URI initilizrUri = VersionsFromBomFetcherTests.class
 				.getResource("/raw/initializr.yml").toURI();
-		ReleaserProperties properties = new ReleaserProperties();
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 		properties.getGit().setUpdateSpringGuides(true);
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
 		properties.getGit().setReleaseTrainBomUrl(

@@ -28,28 +28,31 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 class BuildsystemConfiguration {
 
-	@Autowired
-	ReleaserProperties releaserProperties;
-
-	@Autowired(required = false)
-	List<CustomBomParser> customBomParsers = new ArrayList<>();
-
 	@Bean
 	@ConditionalOnMissingBean
-	BomParser mavenBomParser() {
-		return new MavenBomParser(this.releaserProperties, this.customBomParsers);
+	BomParser mavenBomParser(ReleaserProperties releaserProperties,
+			@Autowired(required = false) List<CustomBomParser> customBomParsers) {
+		return new MavenBomParser(releaserProperties, customBomParsers(customBomParsers));
+	}
+
+	private List<CustomBomParser> customBomParsers(
+			List<CustomBomParser> customBomParsers) {
+		return customBomParsers == null ? new ArrayList<>() : customBomParsers;
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	BomParser gradleBomParser() {
-		return new GradleBomParser(this.releaserProperties, this.customBomParsers);
+	BomParser gradleBomParser(ReleaserProperties releaserProperties,
+			@Autowired(required = false) List<CustomBomParser> customBomParsers) {
+		return new GradleBomParser(releaserProperties,
+				customBomParsers(customBomParsers));
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	ProjectPomUpdater pomUpdater(List<BomParser> bomParsers) {
-		return new ProjectPomUpdater(this.releaserProperties, bomParsers);
+	ProjectPomUpdater pomUpdater(ReleaserProperties releaserProperties,
+			List<BomParser> bomParsers) {
+		return new ProjectPomUpdater(releaserProperties, bomParsers);
 	}
 
 }

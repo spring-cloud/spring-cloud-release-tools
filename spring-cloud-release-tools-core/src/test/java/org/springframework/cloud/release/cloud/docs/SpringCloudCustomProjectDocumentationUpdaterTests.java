@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
@@ -63,7 +64,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 
 	File clonedDocProject;
 
-	ReleaserProperties properties = new ReleaserProperties();
+	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	@Before
 	public void setup() throws IOException, URISyntaxException {
@@ -85,7 +86,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	public void should_not_update_current_version_in_the_docs_if_current_release_is_not_ga_or_sr() {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
 				"Angel.M7");
-		ReleaserProperties properties = new ReleaserProperties();
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 		File updatedDocs = projectDocumentationUpdater(properties)
 				.updateDocsRepo(projects(), releaseTrainVersion, "vAngel.M7");

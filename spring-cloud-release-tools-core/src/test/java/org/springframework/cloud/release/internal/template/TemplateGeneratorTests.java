@@ -24,6 +24,7 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.github.ProjectGitHubHandler;
@@ -37,7 +38,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public class TemplateGeneratorTests {
 
-	ReleaserProperties props = new ReleaserProperties();
+	ReleaserProperties props = SpringCloudReleaserProperties.get();
 
 	ProjectGitHubHandler handler = new ProjectGitHubHandler(this.props, Collections
 			.singletonList(SpringCloudGithubIssuesAccessor.springCloud(this.props))) {

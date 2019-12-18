@@ -32,6 +32,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
@@ -232,7 +233,7 @@ public class GithubIssuesTests {
 	}
 
 	ReleaserProperties withToken() {
-		ReleaserProperties properties = new ReleaserProperties();
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 		properties.getGit().setOauthToken("foo");
 		properties.getPom().setBranch("vEdgware.RELEASE");
 		properties.getGit().setUpdateSpringGuides(true);

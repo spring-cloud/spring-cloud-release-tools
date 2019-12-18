@@ -44,8 +44,7 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ExecutionResultHandler springBatchExecutionResultHandler(
-			JobExplorer jobExplorer) {
+	ExecutionResultHandler springBatchExecutionResultHandler(JobExplorer jobExplorer) {
 		return new SpringBatchExecutionResultHandler(jobExplorer);
 	}
 
@@ -73,7 +72,8 @@ class BatchConfiguration {
 	// Needed to add this to serialize the exceptions
 	@Bean
 	BatchConfigurer myBatchConfigurer(DataSource dataSource,
-			Jackson2ExecutionContextStringSerializer myJackson2ExecutionContextStringSerializer, PlatformTransactionManager transactionManager) {
+			Jackson2ExecutionContextStringSerializer myJackson2ExecutionContextStringSerializer,
+			PlatformTransactionManager transactionManager) {
 		return new DefaultBatchConfigurer(dataSource) {
 			@Override
 			protected JobExplorer createJobExplorer() throws Exception {
@@ -89,7 +89,8 @@ class BatchConfiguration {
 			protected JobRepository createJobRepository() throws Exception {
 				JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
 				jobRepositoryFactoryBean.setDataSource(dataSource);
-				jobRepositoryFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
+				jobRepositoryFactoryBean
+						.setSerializer(myJackson2ExecutionContextStringSerializer);
 				jobRepositoryFactoryBean.setTransactionManager(transactionManager);
 				jobRepositoryFactoryBean.afterPropertiesSet();
 				return jobRepositoryFactoryBean.getObject();

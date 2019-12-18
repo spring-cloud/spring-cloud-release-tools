@@ -47,6 +47,8 @@ public class VersionsFromBom {
 
 	private VersionsFromBom() {
 		this.properties = new ReleaserProperties();
+		this.properties.getPom().setThisTrainBom("unknown-bom");
+		this.properties.getMetaRelease().setReleaseTrainProjectName("unknown-bom");
 	}
 
 	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser) {

@@ -28,9 +28,10 @@ import org.mockito.BDDMockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.release.internal.Releaser;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
@@ -61,10 +62,10 @@ import static org.mockito.ArgumentMatchers.argThat;
 public class SpringMetaReleaseAcceptanceTests
 		extends AbstractSpringMetaReleaseAcceptanceTests {
 
-	ApplicationContextRunner runner = new ApplicationContextRunner()
-			.withUserConfiguration(
-					SpringMetaReleaseAcceptanceTests.MetaReleaseConfig.class,
-					SpringMetaReleaseAcceptanceTests.MetaReleaseScanningConfiguration.class);
+	SpringApplicationBuilder runner = new SpringApplicationBuilder(
+			SpringMetaReleaseAcceptanceTests.MetaReleaseConfig.class,
+			SpringMetaReleaseAcceptanceTests.MetaReleaseScanningConfiguration.class)
+					.web(WebApplicationType.NONE).properties("spring.jmx.enabled=false");
 
 	@Test
 	public void should_perform_a_meta_release_of_sc_release_and_consul()
@@ -75,11 +76,11 @@ public class SpringMetaReleaseAcceptanceTests
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues("test.metarelease=true")
-				.withPropertyValues(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
-						.addFixedVersions(edgwareSr10()).build())
-				.run(context -> {
+		run(this.runner,
+				properties("debug=true").properties("test.metarelease=true")
+						.properties(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
+								.addFixedVersions(edgwareSr10()).build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
 							.getBean(NonAssertingTestProjectGitHandler.class);
@@ -124,11 +125,11 @@ public class SpringMetaReleaseAcceptanceTests
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues("test.metarelease=true")
-				.withPropertyValues(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
-						.addFixedVersions(edgwareSr10()).build())
-				.run(context -> {
+		run(this.runner,
+				properties("debug=true").properties("test.metarelease=true")
+						.properties(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
+								.addFixedVersions(edgwareSr10()).build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
 							.getBean(NonAssertingTestProjectGitHandler.class);
@@ -175,14 +176,15 @@ public class SpringMetaReleaseAcceptanceTests
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		File temporaryDestination = this.tmp.newFolder();
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues("test.metarelease=true", "test.mockBuild=true")
-				.withPropertyValues(metaReleaseArgs(project).bomBranch("Greenwich")
-						.addFixedVersions(consulAndReleaseSnapshots())
-						.updateReleaseTrainWiki(false)
-						.cloneDestinationDirectory(temporaryDestination)
-						.projectsToSkip("spring-cloud-consul").build())
-				.run(context -> {
+		run(this.runner,
+				properties("debug=true")
+						.properties("test.metarelease=true", "test.mockBuild=true")
+						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
+								.addFixedVersions(consulAndReleaseSnapshots())
+								.updateReleaseTrainWiki(false)
+								.cloneDestinationDirectory(temporaryDestination)
+								.projectsToSkip("spring-cloud-consul").build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BuildProjectReleaseTask build = context
 							.getBean(BuildProjectReleaseTask.class);
@@ -212,12 +214,13 @@ public class SpringMetaReleaseAcceptanceTests
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		File temporaryDestination = this.tmp.newFolder();
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues("test.metarelease=true", "test.mockBuild=true")
-				.withPropertyValues(metaReleaseArgs(project).bomBranch("Greenwich")
-						.addFixedVersions(releaseConsulBuildSnapshots())
-						.cloneDestinationDirectory(temporaryDestination).build())
-				.run(context -> {
+		run(this.runner,
+				properties("debug=true")
+						.properties("test.metarelease=true", "test.mockBuild=true")
+						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
+								.addFixedVersions(releaseConsulBuildSnapshots())
+								.cloneDestinationDirectory(temporaryDestination).build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BuildProjectReleaseTask build = context
 							.getBean(BuildProjectReleaseTask.class);
@@ -233,9 +236,9 @@ public class SpringMetaReleaseAcceptanceTests
 
 					// release
 					then(result.isFailureOrUnstable()).isFalse();
-					thenBuildWasNeverCalledFor(build, "spring-cloud-release");
 					thenBuildWasNeverCalledFor(build, "spring-cloud-build");
 					thenBuildWasCalledFor(build, "spring-cloud-consul");
+					thenBuildWasCalledFor(build, "spring-cloud-release");
 
 					// post release
 					thenSaganWasCalled(saganUpdater);
@@ -258,12 +261,13 @@ public class SpringMetaReleaseAcceptanceTests
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		File temporaryDestination = this.tmp.newFolder();
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues("test.metarelease=true", "test.mockBuild=true")
-				.withPropertyValues(metaReleaseArgs(project).bomBranch("Greenwich")
-						.addFixedVersions(releaseConsulBuildSnapshots())
-						.cloneDestinationDirectory(temporaryDestination).build())
-				.run(context -> {
+		run(this.runner,
+				properties("debug=true")
+						.properties("test.metarelease=true", "test.mockBuild=true")
+						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
+								.addFixedVersions(releaseConsulBuildSnapshots())
+								.cloneDestinationDirectory(temporaryDestination).build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BuildProjectReleaseTask build = context
 							.getBean(BuildProjectReleaseTask.class);
@@ -348,7 +352,7 @@ public class SpringMetaReleaseAcceptanceTests
 		}
 
 		@Bean
-		SaganUpdater saganUpdater(SaganClient saganClient,
+		SaganUpdater testSaganUpdater(SaganClient saganClient,
 				ReleaserProperties properties) {
 			return BDDMockito.spy(new SaganUpdater(saganClient, properties));
 		}

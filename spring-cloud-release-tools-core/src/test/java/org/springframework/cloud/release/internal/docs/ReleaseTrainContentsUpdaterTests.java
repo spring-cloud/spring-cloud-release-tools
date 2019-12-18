@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
@@ -48,7 +49,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
 
-	ReleaserProperties properties = new ReleaserProperties();
+	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(this.properties,
 			Collections.singletonList(

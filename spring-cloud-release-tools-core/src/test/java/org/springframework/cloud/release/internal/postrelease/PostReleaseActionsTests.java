@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.PomUpdateAcceptanceTests;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
@@ -65,38 +66,54 @@ public class PostReleaseActionsTests {
 
 	GradleUpdater gradleUpdater = BDDMockito.mock(GradleUpdater.class);
 
-	ReleaserProperties properties = new ReleaserProperties();
+	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	File cloned;
 
 	LinkedMultiValueMap<String, File> clonedTestProjects = new LinkedMultiValueMap<>();
 
-	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties) {
-		@Override
-		public File cloneTestSamplesProject() {
-			PostReleaseActionsTests.this.cloned = super.cloneTestSamplesProject();
-			return PostReleaseActionsTests.this.cloned;
-		}
+	ProjectGitHandler projectGitHandler = projectGitHandler(this.properties);
 
-		@Override
-		public File cloneReleaseTrainDocumentationProject() {
-			PostReleaseActionsTests.this.cloned = super.cloneReleaseTrainDocumentationProject();
-			return PostReleaseActionsTests.this.cloned;
-		}
+	private ProjectGitHandler projectGitHandler(ReleaserProperties properties) {
+		return new ProjectGitHandler(properties) {
+			@Override
+			public File cloneTestSamplesProject() {
+				PostReleaseActionsTests.this.cloned = super.cloneTestSamplesProject();
+				return PostReleaseActionsTests.this.cloned;
+			}
 
-		@Override
-		public File cloneAndGuessBranch(String url, String... versions) {
-			File file = super.cloneAndGuessBranch(url, versions);
-			PostReleaseActionsTests.this.clonedTestProjects.add(url, file);
-			return file;
-		}
-	};
+			@Override
+			public File cloneReleaseTrainDocumentationProject() {
+				PostReleaseActionsTests.this.cloned = super.cloneReleaseTrainDocumentationProject();
+				return PostReleaseActionsTests.this.cloned;
+			}
 
-	ProjectPomUpdater updater = new ProjectPomUpdater(this.properties, new ArrayList<>());
+			@Override
+			public File cloneAndGuessBranch(String url, String... versions) {
+				File file = super.cloneAndGuessBranch(url, versions);
+				PostReleaseActionsTests.this.clonedTestProjects.add(url, file);
+				return file;
+			}
+		};
+	}
 
-	VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
+	ProjectPomUpdater updater = projectPomUpdater(this.properties);
 
-	ProjectCommandExecutor builder = new ProjectCommandExecutor(this.properties);
+	private ProjectPomUpdater projectPomUpdater(ReleaserProperties properties) {
+		return new ProjectPomUpdater(properties, new ArrayList<>());
+	}
+
+	VersionsFetcher versionsFetcher = fetcher(this.properties);
+
+	private VersionsFetcher fetcher(ReleaserProperties properties) {
+		return new VersionsFetcher(properties, updater);
+	}
+
+	ProjectCommandExecutor builder = commandExecutor(this.properties);
+
+	private ProjectCommandExecutor commandExecutor(ReleaserProperties properties) {
+		return new ProjectCommandExecutor(properties);
+	}
 
 	@Before
 	public void setup() throws Exception {
@@ -133,15 +150,16 @@ public class PostReleaseActionsTests {
 
 	@Test
 	public void should_update_project_and_run_tests_and_update_test_is_called() {
-		this.properties.getMetaRelease().setEnabled(true);
-		this.properties.getGit().setRunUpdatedSamples(true);
-		this.properties.getGit().setUpdateAllTestSamples(true);
-		this.properties.getGit().setTestSamplesProjectUrl(
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
+		properties.getMetaRelease().setEnabled(true);
+		properties.getGit().setRunUpdatedSamples(true);
+		properties.getGit().setUpdateAllTestSamples(true);
+		properties.getGit().setTestSamplesProjectUrl(
 				tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
-		this.properties.getMaven().setBuildCommand("touch build.log");
-		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+		properties.getMaven().setBuildCommand("touch build.log");
+		PostReleaseActions actions = new PostReleaseActions(projectGitHandler(properties),
+				projectPomUpdater(properties), this.gradleUpdater,
+				commandExecutor(properties), properties, fetcher(properties));
 
 		actions.runUpdatedTests(currentGa());
 
@@ -233,15 +251,16 @@ public class PostReleaseActionsTests {
 	@Test
 	public void should_update_test_sample_projects_when_test_samples_update_is_called()
 			throws Exception {
-		this.properties.getMetaRelease().setEnabled(true);
-		this.properties.getGit().setUpdateAllTestSamples(true);
-		this.properties.getGit().getAllTestSampleUrls().clear();
-		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
+		properties.getMetaRelease().setEnabled(true);
+		properties.getGit().setUpdateAllTestSamples(true);
+		properties.getGit().getAllTestSampleUrls().clear();
+		properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
 				Collections.singletonList(
 						tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
+				this.updater, this.gradleUpdater, this.builder, properties,
 				versionsFetcher) {
 			@Override
 			Projects getPostReleaseProjects(Projects projects) {
@@ -277,15 +296,15 @@ public class PostReleaseActionsTests {
 	@Test
 	public void should_assume_that_project_version_is_snapshot_when_no_pom_is_present()
 			throws Exception {
-		this.properties.getMetaRelease().setEnabled(true);
-		this.properties.getGit().setUpdateAllTestSamples(true);
-		this.properties.getGit().getAllTestSampleUrls().clear();
-		this.properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth",
-				Collections.singletonList(
-						tmpFile("spring-cloud-static/").getAbsolutePath() + "/"));
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
+		properties.getMetaRelease().setEnabled(true);
+		properties.getGit().setUpdateAllTestSamples(true);
+		properties.getGit().getAllTestSampleUrls().clear();
+		properties.getGit().getAllTestSampleUrls().put("spring-cloud-sleuth", Collections
+				.singletonList(tmpFile("spring-cloud-static/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
+				this.updater, this.gradleUpdater, this.builder, properties,
 				versionsFetcher) {
 			@Override
 			Projects getPostReleaseProjects(Projects projects) {
@@ -296,7 +315,7 @@ public class PostReleaseActionsTests {
 
 		actions.updateAllTestSamples(currentGa());
 
-		Map.Entry<String, List<File>> entry = this.clonedTestProjects.entrySet().stream()
+		this.clonedTestProjects.entrySet().stream()
 				.filter(s -> s.getKey().contains("spring-cloud-static")).findFirst()
 				.orElseThrow(() -> new IllegalStateException("Not found"));
 	}

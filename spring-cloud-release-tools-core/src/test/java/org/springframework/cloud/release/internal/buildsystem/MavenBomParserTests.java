@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitRepoTests;
 import org.springframework.cloud.release.internal.project.Project;
@@ -37,7 +38,7 @@ public class MavenBomParserTests {
 
 	File springCloudReleaseProject;
 
-	ReleaserProperties properties = new ReleaserProperties();
+	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	@Before
 	public void setup() throws URISyntaxException {

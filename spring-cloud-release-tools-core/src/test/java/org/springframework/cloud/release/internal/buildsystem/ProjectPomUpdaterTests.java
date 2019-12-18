@@ -25,6 +25,7 @@ import org.assertj.core.api.BDDAssertions;
 import org.junit.Test;
 import org.mockito.BDDMockito;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.git.ProjectGitHandler;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
@@ -37,7 +38,7 @@ public class ProjectPomUpdaterTests {
 
 	@Test
 	public void should_convert_fixed_versions_to_updated_fixed_versions() {
-		ReleaserProperties properties = new ReleaserProperties();
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 		properties.getFixedVersions().put("spring-cloud-task", "2.0.0.RELEASE");
 		properties.getFixedVersions().put("spring-cloud-openfeign",
 				"2.0.1.BUILD-SNAPSHOT");
@@ -86,7 +87,7 @@ public class ProjectPomUpdaterTests {
 
 	@Test
 	public void should_skip_any_steps_if_there_is_no_pom_xml() {
-		ReleaserProperties properties = new ReleaserProperties();
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 		ProjectGitHandler handler = BDDMockito.mock(ProjectGitHandler.class);
 		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections
 				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties)));

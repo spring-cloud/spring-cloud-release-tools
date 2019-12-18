@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.ProjectVersion;
 import org.springframework.cloud.release.internal.project.Projects;
@@ -90,7 +91,8 @@ public class ProjectsTests {
 		projectVersions.add(original);
 		Projects projects = new Projects(projectVersions);
 
-		Projects forRollback = Projects.forRollback(new ReleaserProperties(), projects);
+		Projects forRollback = Projects.forRollback(SpringCloudReleaserProperties.get(),
+				projects);
 
 		then(forRollback.forName("spring-cloud-build").version)
 				.isEqualTo("1.0.1.BUILD-SNAPSHOT");

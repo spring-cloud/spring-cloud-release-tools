@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.springframework.boot.test.rule.OutputCapture;
-import org.springframework.cloud.release.internal.ReleaserProperties;
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.git.GitRepoTests;
 import org.springframework.cloud.release.internal.project.Project;
 import org.springframework.cloud.release.internal.tech.PomReader;
@@ -49,8 +49,9 @@ public class PomUpdaterTests {
 	public TemporaryFolder tmp = new TemporaryFolder();
 
 	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-			.releaserProperties(new ReleaserProperties()).projects(projects())
-			.parsers(MavenBomParserAccessor.cloudMavenBomParser(new ReleaserProperties())
+			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects())
+			.parsers(MavenBomParserAccessor
+					.cloudMavenBomParser(SpringCloudReleaserProperties.get())
 					.customBomParsers())
 			.retrieveFromBom();
 

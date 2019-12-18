@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.cloud.buildsystem.SpringCloudMavenBomParserAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.Project;
@@ -35,13 +36,13 @@ import static org.assertj.core.api.BDDAssertions.then;
 public class VersionsFromBomTests {
 
 	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-			.releaserProperties(new ReleaserProperties()).projects(projects())
+			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects())
 			.retrieveFromBom();
 
 	@Test
 	public void should_add_boot_to_versions_when_version_is_created() {
 		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-				.releaserProperties(new ReleaserProperties())
+				.releaserProperties(SpringCloudReleaserProperties.get())
 				.parsers(Collections
 						.singletonList(SpringCloudMavenBomParserAccessor.cloud()))
 				.retrieveFromBom();
@@ -247,7 +248,8 @@ public class VersionsFromBomTests {
 	}
 
 	private VersionsFromBom mixedVersions() {
-		return new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
+		return new VersionsFromBomBuilder()
+				.releaserProperties(SpringCloudReleaserProperties.get())
 				.parsers(Collections
 						.singletonList(SpringCloudMavenBomParserAccessor.cloud()))
 				.projects(mixedProjects()).merged();
@@ -259,7 +261,7 @@ public class VersionsFromBomTests {
 	}
 
 	private ReleaserProperties customBom() {
-		ReleaserProperties properties = new ReleaserProperties();
+		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 		properties.getMetaRelease()
 				.setReleaseTrainDependencyNames(Collections.emptyList());
 		properties.getMetaRelease()

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Model;
 import org.eclipse.jgit.api.Git;
@@ -45,6 +46,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.TestPomReader;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
@@ -62,6 +64,7 @@ import org.springframework.cloud.release.internal.spring.meta.SpringMetaReleaseA
 import org.springframework.cloud.release.internal.tasks.ReleaserTask;
 import org.springframework.cloud.release.internal.template.TemplateGenerator;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.FileSystemUtils;
 
@@ -234,6 +237,21 @@ public abstract class AbstractSpringAcceptanceTests {
 				.generateReleaseTrainDocumentation(BDDMockito.any(Projects.class));
 	}
 
+	public Props properties(String... args) {
+		return new Props(args);
+	}
+
+	public void run(SpringApplicationBuilder application, Props properties,
+			CatchingConsumer<ConfigurableApplicationContext> consumer) {
+		try (ConfigurableApplicationContext context = application.build()
+				.run(properties.toCommandLineProps())) {
+			consumer.accept(context);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static Project newProject() {
 		Project project = new Project();
 		project.projectReleases.addAll(Arrays.asList(release("1.0.0.M8"),
@@ -296,38 +314,49 @@ public abstract class AbstractSpringAcceptanceTests {
 		}
 
 		public ArgsBuilder updateReleaseTrainWiki(boolean enabled) throws Exception {
+			removeIfPresent("releaser.git.update-release-train-wiki");
 			this.args.add("releaser.git.update-release-train-wiki=" + enabled);
 			return this;
 		}
 
+		private void removeIfPresent(String string) {
+			this.args.stream().filter(s -> s.startsWith(string)).findAny()
+					.ifPresent(s -> this.args.remove(s));
+		}
+
 		public ArgsBuilder projectsToSkip(String... toSkip) throws Exception {
+			removeIfPresent("releaser.meta-release.projects-to-skip");
 			this.args.add(
 					"releaser.meta-release.projects-to-skip=" + String.join(",", toSkip));
 			return this;
 		}
 
 		public ArgsBuilder gitOrgUrl(String url) throws Exception {
+			removeIfPresent("releaser.meta-release.git-org-url");
 			this.args.add("releaser.meta-release.git-org-url=" + url);
 			return this;
 		}
 
 		public ArgsBuilder mavenBuildCommand(String command) throws Exception {
+			removeIfPresent("releaser.maven.build-command");
 			this.args.add("releaser.maven.build-command=" + command);
 			return this;
 		}
 
 		public ArgsBuilder mavenDeployCommand(String command) throws Exception {
+			removeIfPresent("releaser.maven.deploy-command");
 			this.args.add("releaser.maven.deploy-command=" + command);
 			return this;
 		}
 
 		public ArgsBuilder mavenPublishCommand(String command) throws Exception {
+			removeIfPresent("releaser.maven.publish-docs-commands");
 			this.args.add("releaser.maven.publish-docs-commands=" + command);
 			return this;
 		}
 
-		public ArgsBuilder addFixedVersion(String projectName, String projectVersion)
-				throws Exception {
+		public ArgsBuilder addFixedVersion(String projectName, String projectVersion) {
+			removeIfPresent("releaser.fixed-versions[" + projectName + "]");
 			this.args.add(
 					"releaser.fixed-versions[" + projectName + "]=" + projectVersion);
 			return this;
@@ -335,50 +364,57 @@ public abstract class AbstractSpringAcceptanceTests {
 
 		public ArgsBuilder addFixedVersions(Map<String, String> versions)
 				throws Exception {
-			versions.forEach(
-					(s, s2) -> this.args.add("releaser.fixed-versions[" + s + "]=" + s2));
+			versions.forEach((s, s2) -> addFixedVersion(s, s2));
 			return this;
 		}
 
 		public ArgsBuilder releaseTrainBomUrl(String url) throws Exception {
+			removeIfPresent("releaser.git.release-train-bom-url");
 			this.args.add("releaser.git.release-train-bom-url=" + url);
 			return this;
 		}
 
 		public ArgsBuilder fetchVersionsFromGit(boolean fetch) throws Exception {
+			removeIfPresent("releaser.git.fetch-versions-from-git");
 			this.args.add("releaser.git.fetch-versions-from-git=" + fetch);
 			return this;
 		}
 
 		public ArgsBuilder cloneDestinationDirectory(File cloneDestinationDirectory)
 				throws Exception {
+			removeIfPresent("releaser.git.clone-destination-dir");
 			this.args.add("releaser.git.clone-destination-dir="
 					+ cloneDestinationDirectory.toString());
 			return this;
 		}
 
 		public ArgsBuilder releaseTrainUrl(String relativePath) throws Exception {
+			removeIfPresent("releaser.git.release-train-bom-url");
 			this.args.add("releaser.git.release-train-bom-url="
 					+ file(relativePath).toURI().toString());
 			return this;
 		}
 
 		public ArgsBuilder projectName(String projectName) {
+			removeIfPresent("test.projectName");
 			this.args.add("test.projectName=" + projectName);
 			return this;
 		}
 
 		public ArgsBuilder expectedVersion(String expectedVersion) {
+			removeIfPresent("test.expectedVersion");
 			this.args.add("test.expectedVersion=" + expectedVersion);
 			return this;
 		}
 
 		public ArgsBuilder chosenOption(String chosenOption) {
+			removeIfPresent("test.chosenOption");
 			this.args.add("test.chosenOption=" + chosenOption);
 			return this;
 		}
 
 		public ArgsBuilder bomBranch(String bomBranch) {
+			removeIfPresent("releaser.pom.branch");
 			this.args.add("releaser.pom.branch=" + bomBranch);
 			return this;
 		}
@@ -527,6 +563,32 @@ public abstract class AbstractSpringAcceptanceTests {
 		TestExecutionResultHandler testExecutionResultHandler(JobExplorer explorer) {
 			return new TestExecutionResultHandler(explorer);
 		}
+
+	}
+
+	public class Props {
+
+		private List<String> args = new LinkedList<>();
+
+		public Props(String... args) {
+			properties(args);
+		}
+
+		public Props properties(String... args) {
+			this.args.addAll(Arrays.asList(args));
+			return this;
+		}
+
+		public String[] toCommandLineProps() {
+			return this.args.stream().map(s -> "--" + s).collect(Collectors.toList())
+					.toArray(new String[0]);
+		}
+
+	}
+
+	public interface CatchingConsumer<T> {
+
+		void accept(T t) throws Exception;
 
 	}
 

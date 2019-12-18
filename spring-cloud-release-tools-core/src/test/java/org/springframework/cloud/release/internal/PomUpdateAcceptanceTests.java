@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.MavenBomParserAccessor;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.buildsystem.TestUtils;
@@ -170,7 +171,7 @@ public class PomUpdateAcceptanceTests {
 	}
 
 	private ReleaserProperties releaserProperties() throws URISyntaxException {
-		ReleaserProperties releaserProperties = new ReleaserProperties();
+		ReleaserProperties releaserProperties = SpringCloudReleaserProperties.get();
 		releaserProperties.getGit().setReleaseTrainBomUrl(
 				file("/projects/spring-cloud-release/").toURI().toString());
 		return releaserProperties;

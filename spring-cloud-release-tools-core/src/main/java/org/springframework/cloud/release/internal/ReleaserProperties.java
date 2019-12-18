@@ -19,16 +19,20 @@ package org.springframework.cloud.release.internal;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import javax.validation.constraints.NotBlank;
+
 import org.apache.commons.lang.SerializationUtils;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Since, we are making a deep copy of this object, remember to have all the nested
@@ -37,6 +41,7 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 @ConfigurationProperties("releaser")
+@Validated
 public class ReleaserProperties implements Serializable {
 
 	/**
@@ -217,31 +222,25 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Name of the release train project.
 		 */
-		private String releaseTrainProjectName = "spring-cloud-release";
+		@NotBlank
+		private String releaseTrainProjectName;
 
 		/**
 		 * All the names of dependencies that should be updated with the release train
 		 * project version.
 		 */
-		private List<String> releaseTrainDependencyNames = Arrays.asList("spring-cloud",
-				"spring-cloud-dependencies", "spring-cloud-starter",
-				"spring-cloud-starter-build");
+		private List<String> releaseTrainDependencyNames = new ArrayList<>();
 
 		/**
 		 * The URL of the Git organization. We'll append each project's name to it.
 		 */
-		private String gitOrgUrl = "https://github.com/spring-cloud";
+		@NotBlank
+		private String gitOrgUrl;
 
 		/**
 		 * Names of projects to skip deployment for meta-release.
 		 */
-		private List<String> projectsToSkip = new ArrayList<String>() {
-			{
-				this.add("spring-boot");
-				this.add("spring-cloud-stream");
-				this.add("spring-cloud-task");
-			}
-		};
+		private List<String> projectsToSkip = new ArrayList<String>();
 
 		public boolean isEnabled() {
 			return this.enabled;
@@ -307,7 +306,7 @@ public class ReleaserProperties implements Serializable {
 			return this.defaultEnabled;
 		}
 
-		public void defaultEnabled(boolean defaultEnabled) {
+		public void setDefaultEnabled(boolean defaultEnabled) {
 			this.defaultEnabled = defaultEnabled;
 		}
 
@@ -318,58 +317,59 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * URL to a release train repository.
 		 */
-		private String releaseTrainBomUrl = "https://github.com/spring-cloud/spring-cloud-release";
+		@NotBlank
+		private String releaseTrainBomUrl;
 
 		/**
 		 * URL to the documentation Git repository.
 		 */
-		private String documentationUrl = "https://github.com/spring-cloud/spring-cloud-static";
+		private String documentationUrl;
 
 		/**
 		 * URL to the release train project page repository.
 		 */
-		private String springProjectUrl = "https://github.com/spring-projects/spring-cloud";
+		private String springProjectUrl;
 
 		/**
 		 * URL to test samples.
 		 */
-		private String testSamplesProjectUrl = "https://github.com/spring-cloud/spring-cloud-core-tests";
+		private String testSamplesProjectUrl;
 
 		/**
 		 * URL to the release train documentation.
 		 */
-		private String releaseTrainDocsUrl = "https://github.com/spring-cloud-samples/scripts";
+		private String releaseTrainDocsUrl;
 
 		/**
 		 * URL to the release train wiki.
 		 */
-		private String releaseTrainWikiUrl = "https://github.com/spring-projects/spring-cloud.wiki";
+		private String releaseTrainWikiUrl;
 
 		/**
 		 * Branch to check out for the documentation project.
 		 */
-		private String documentationBranch = "gh-pages";
+		private String documentationBranch;
 
 		/**
 		 * Branch to check out for the release train project.
 		 */
-		private String springProjectBranch = "gh-pages";
+		private String springProjectBranch;
 
 		/**
 		 * Branch to check out for the test samples.
 		 */
-		private String testSamplesBranch = "master";
+		private String testSamplesBranch;
 
 		/**
 		 * Branch to check out for the release train docs.
 		 */
-		private String releaseTrainDocsBranch = "master";
+		private String releaseTrainDocsBranch;
 
 		/**
 		 * Page prefix for the release train wiki. E.g. for
 		 * [Spring-Cloud-Finchley-Release-Notes] it would be [Spring-Cloud].
 		 */
-		private String releaseTrainWikiPagePrefix = "Spring-Cloud";
+		private String releaseTrainWikiPagePrefix;
 
 		/**
 		 * Where should the release train repo get cloned to. If {@code null} defaults to
@@ -456,17 +456,7 @@ public class ReleaserProperties implements Serializable {
 		 * Project to urls mapping. For each project will clone the test project and will
 		 * update its versions.
 		 */
-		private Map<String, List<String>> allTestSampleUrls = new HashMap<String, List<String>>() {
-			{
-				this.put("spring-cloud-sleuth", Arrays.asList(
-						"https://github.com/spring-cloud-samples/sleuth-issues",
-						"https://github.com/spring-cloud-samples/sleuth-documentation-apps"));
-				this.put("spring-cloud-contract", Arrays.asList(
-						"https://github.com/spring-cloud-samples/spring-cloud-contract-samples",
-						"https://github.com/spring-cloud-samples/the-legacy-app",
-						"https://github.com/spring-cloud-samples/sc-contract-car-rental"));
-			}
-		};
+		private Map<String, List<String>> allTestSampleUrls = new HashMap<>();
 
 		public String getReleaseTrainBomUrl() {
 			return this.releaseTrainBomUrl;
@@ -716,27 +706,27 @@ public class ReleaserProperties implements Serializable {
 		 * Subfolder of the pom that contains the {@code spring-boot-starer-parent}
 		 * dependency.
 		 */
-		private String pomWithBootStarterParent = "spring-cloud-starter-parent/pom.xml";
+		private String pomWithBootStarterParent;
 
 		/**
 		 * Subfolder of the pom that contains the versions for the release train.
 		 */
-		private String thisTrainBom = "spring-cloud-dependencies/pom.xml";
+		@NotBlank
+		private String thisTrainBom;
 
 		/**
-		 * The pattern to match a version property in a BOM.
+		 * The pattern to match a version property in a BOM. Remember to catch the
+		 * dependency name in a group. E.g. "^(spring-cloud-.*)\\.version$".
 		 */
-		private String bomVersionPattern = "^(spring-cloud-.*)\\.version$";
+		@NotBlank
+		private String bomVersionPattern;
 
 		/**
 		 * List of regular expressions of ignored poms. Defaults to test projects and
 		 * samples.
 		 */
 		@SuppressWarnings("unchecked")
-		private List<String> ignoredPomRegex = Arrays.asList("^.*\\.git/.*$",
-				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
-				"^.*spring-cloud-contract-maven-plugin/target/.*$",
-				"^.*src/test/bats/.*$", "^.*samples/standalone/[a-z]+/.*$");
+		private List<String> ignoredPomRegex = Collections.singletonList("^.*\\.git/.*$");
 
 		public String getBranch() {
 			return this.branch;
@@ -1142,10 +1132,7 @@ public class ReleaserProperties implements Serializable {
 		 * and samples.
 		 */
 		@SuppressWarnings("unchecked")
-		private List<String> ignoredGradleRegex = Arrays.asList(
-				"^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$",
-				"^.*spring-cloud-contract-maven-plugin/target/.*$",
-				"^.*src/test/bats/.*$", "^.*samples/standalone/[a-z]+/.*$");
+		private List<String> ignoredGradleRegex = new ArrayList<>();
 
 		/**
 		 * Command to be executed to build the project If present "{{version}}" will be
@@ -1168,12 +1155,13 @@ public class ReleaserProperties implements Serializable {
 		 * Command to be executed to publish documentation. If present "{{version}}" will
 		 * be replaced by the provided version.
 		 */
-		private String[] publishDocsCommands = { "echo 'TODO'" };
+		private String[] publishDocsCommands = {
+				"./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}" };
 
 		/**
 		 * Command to be executed to generate release train documentation.
 		 */
-		private String generateReleaseTrainDocsCommand = "echo 'TODO'";
+		private String generateReleaseTrainDocsCommand = "./gradlew generateReleaseTrainDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}";
 
 		/**
 		 * Additional system properties that should be passed to the build / deploy
@@ -1364,7 +1352,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Folder in which blog, email etc. templates are stored.
 		 */
-		private String templateFolder = "cloud";
+		private String templateFolder;
 
 		public boolean isEnabled() {
 			return this.enabled;
@@ -1400,7 +1388,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Name in the YAML from initilizr for BOM mappings.
 		 */
-		private String bomName = "spring-cloud";
+		private String bomName;
 
 		public String getAllVersionsFileUrl() {
 			return this.allVersionsFileUrl;

@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.project.Project;
 import org.springframework.cloud.release.internal.tech.PomReader;
+import org.springframework.util.StringUtils;
 
 /**
  * Parses the poms for a given project and populates versions from a release train.
@@ -53,7 +54,10 @@ class MavenBomParser implements BomParser {
 
 	MavenBomParser(ReleaserProperties properties, List<CustomBomParser> customParsers) {
 		this.thisTrainBomLocation = properties.getPom().getThisTrainBom();
-		this.versionPattern = Pattern.compile(properties.getPom().getBomVersionPattern());
+		this.versionPattern = StringUtils
+				.hasText(properties.getPom().getBomVersionPattern())
+						? Pattern.compile(properties.getPom().getBomVersionPattern())
+						: Pattern.compile(".*");
 		this.properties = properties;
 		this.customParsers = customParsers;
 	}

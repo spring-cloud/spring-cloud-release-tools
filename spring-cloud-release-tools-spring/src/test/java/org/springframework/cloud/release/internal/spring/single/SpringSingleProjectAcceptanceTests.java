@@ -31,9 +31,10 @@ import org.mockito.BDDMockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.release.cloud.github.SpringCloudGithubIssuesAccessor;
 import org.springframework.cloud.release.internal.ReleaserProperties;
 import org.springframework.cloud.release.internal.docs.CustomProjectDocumentationUpdater;
@@ -61,10 +62,10 @@ import static org.mockito.ArgumentMatchers.anyString;
  */
 public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptanceTests {
 
-	ApplicationContextRunner runner = new ApplicationContextRunner()
-			.withUserConfiguration(
-					SpringSingleProjectAcceptanceTests.SingleProjectReleaseConfig.class,
-					SpringSingleProjectAcceptanceTests.SingleProjectScanningConfiguration.class);
+	SpringApplicationBuilder runner = new SpringApplicationBuilder(
+			SpringSingleProjectAcceptanceTests.SingleProjectReleaseConfig.class,
+			SpringSingleProjectAcceptanceTests.SingleProjectScanningConfiguration.class)
+					.web(WebApplicationType.NONE).properties("spring.jmx.enabled=false");
 
 	@Test
 	public void should_fail_to_perform_a_release_of_consul_when_sc_release_contains_snapshots()
@@ -76,12 +77,12 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues(new ArgsBuilder(project, this.tmp)
+		run(this.runner,
+				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release-with-snapshot/")
 						.bomBranch("vCamden.SR5.BROKEN").expectedVersion("1.1.2.RELEASE")
-						.build())
-				.run(context -> {
+						.build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BDDAssertions.thenThrownBy(releaser::release).hasMessageContaining(
 							"there is at least one SNAPSHOT library version in the Spring Cloud Release project");
@@ -97,12 +98,12 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues(new ArgsBuilder(project, this.tmp)
+		run(this.runner,
+				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release/")
 						.bomBranch("vGreenwich.SR2").expectedVersion("2.1.2.RELEASE")
-						.build())
-				.run(context -> {
+						.build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context
 							.getBean(TestProjectGitHubHandler.class);
@@ -154,12 +155,12 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-build"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues(new ArgsBuilder(project, this.tmp)
+		run(this.runner,
+				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release/")
 						.bomBranch("vGreenwich.SR2").projectName("spring-cloud-build")
-						.expectedVersion("2.1.6.RELEASE").build())
-				.run(context -> {
+						.expectedVersion("2.1.6.RELEASE").build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context
 							.getBean(TestProjectGitHubHandler.class);
@@ -212,11 +213,11 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues(new ArgsBuilder(project, this.tmp)
+		run(this.runner,
+				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release/")
-						.bomBranch("vDalston.RC1").expectedVersion("1.2.0.RC1").build())
-				.run(context -> {
+						.bomBranch("vDalston.RC1").expectedVersion("1.2.0.RC1").build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context
 							.getBean(TestProjectGitHubHandler.class);
@@ -268,16 +269,16 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		final File temporaryDestination = this.tmp.newFolder();
 
-		this.runner.withSystemProperties("debug=true")
-				.withPropertyValues(new ArgsBuilder(project, this.tmp)
+		run(this.runner,
+				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release/")
 						.bomBranch("vCamden.SR5").expectedVersion("1.1.2.RELEASE")
 						// just build
 						.chosenOption("6").fetchVersionsFromGit(false)
 						.cloneDestinationDirectory(temporaryDestination)
 						.addFixedVersion("spring-cloud-release", "Finchley.RELEASE")
-						.addFixedVersion("spring-cloud-consul", "2.3.4.RELEASE").build())
-				.run(context -> {
+						.addFixedVersion("spring-cloud-consul", "2.3.4.RELEASE").build()),
+				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 
 					releaser.release(new OptionsBuilder().interactive(true).options());

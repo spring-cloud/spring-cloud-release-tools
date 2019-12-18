@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.cloud.release.SpringCloudReleaserProperties;
 import org.springframework.cloud.release.internal.buildsystem.GradleUpdater;
 import org.springframework.cloud.release.internal.buildsystem.ProjectPomUpdater;
 import org.springframework.cloud.release.internal.docs.DocumentationUpdater;
@@ -92,7 +93,7 @@ public class ReleaserTests {
 	}
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
-		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
+		return new Releaser(SpringCloudReleaserProperties.get(), this.projectPomUpdater,
 				this.projectCommandExecutor, this.projectGitHandler,
 				this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
 				this.saganUpdater, this.documentationUpdater, this.postReleaseActions) {
