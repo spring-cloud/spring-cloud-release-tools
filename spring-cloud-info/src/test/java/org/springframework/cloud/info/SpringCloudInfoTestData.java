@@ -26,11 +26,12 @@ import java.util.Map;
  */
 public final class SpringCloudInfoTestData {
 
-	private SpringCloudInfoTestData() {
-		throw new IllegalStateException("Can't instantiate utility class");
-	}
-
 	public static Map<String, String> releaseVersions = new HashMap<>();
+
+	public static List<String> springCloudVersions = new ArrayList<>();
+
+	public static Map<String, String> milestoneStrings = new HashMap<>();
+
 	static {
 		releaseVersions.put("spring-boot", "2.2.0.BUILD-SNAPSHOT");
 		releaseVersions.put("spring-cloud-aws", "2.2.0.BUILD-SNAPSHOT");
@@ -54,7 +55,6 @@ public final class SpringCloudInfoTestData {
 		releaseVersions.put("spring-cloud-zookeeper", "2.2.0.BUILD-SNAPSHOT");
 	}
 
-	public static List<String> springCloudVersions = new ArrayList<>();
 	static {
 		springCloudVersions.add("vGreenwich.SR1");
 		springCloudVersions.add("vGreenwich.RELEASE");
@@ -88,12 +88,15 @@ public final class SpringCloudInfoTestData {
 		springCloudVersions.add("vDalston.SR4");
 	}
 
-	public static Map<String, String> milestoneStrings = new HashMap<>();
 	static {
 		milestoneStrings.put("Hoxton.M1", "2019-05-23T07:00:00Z");
 		milestoneStrings.put("Hoxton.M2", "2019-06-27T07:00:00Z");
 		milestoneStrings.put("Hoxton.RELEASE", "2019-07-31T07:00:00Z");
 		milestoneStrings.put("Finchley.SR4", null);
+	}
+
+	private SpringCloudInfoTestData() {
+		throw new IllegalStateException("Can't instantiate utility class");
 	}
 
 }

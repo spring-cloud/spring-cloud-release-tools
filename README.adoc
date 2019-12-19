@@ -9,8 +9,8 @@ Edit the files in the src/main/asciidoc/ directory instead.
 :repo: spring-cloud-release-tools
 :branch: master
 
-image::https://circleci.com/gh/{org}/{repo}/tree/{branch}.svg?style=svg["CircleCI", link="https://circleci.com/gh/{org}/{repo}/tree/{branch}"]
-image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codecov", link="https://codecov.io/gh/{org}/{repo}"]
+image::https://circleci.com/gh/{org}/{repo}/tree/{branch}.svg?style=svg["CircleCI",link="https://circleci.com/gh/{org}/{repo}/tree/{branch}"]
+image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codecov",link="https://codecov.io/gh/{org}/{repo}"]
 
 :github-tag: master
 :org: spring-cloud
@@ -24,8 +24,8 @@ image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codec
 
 == Spring Cloud Release Tools
 
-Spring Cloud projects reuse the same pattern of building and deploying the applications. That's
-why this tool makes it easy to automate the release / dependency update process of our applications.
+Spring Cloud projects reuse the same pattern of building and deploying the applications.
+That's why this tool makes it easy to automate the release / dependency update process of our applications.
 
 === What does it do?
 
@@ -35,9 +35,9 @@ For a single project
 
 - Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)
 - Modifies the project versions with values from a BOM (e.g. for Spring Cloud it's Spring Cloud Release)
-  * throws an exception when we bump versions to release and there's a SNAPSHOT version referenced in the POM
+* throws an exception when we bump versions to release and there's a SNAPSHOT version referenced in the POM
 - Performs the build and checks if the `docs` modules have properly created the documentation
-  * throws an exception when in the `docs` module there's an unresolved tag in any HTML file
+* throws an exception when in the `docs` module there's an unresolved tag in any HTML file
 - Commits changed poms (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Creates a tag for the release / milestone (ONLY FOR NON-SNAPSHOT VERSIONS)
 - Runs the deployment of the artifacts
@@ -45,8 +45,7 @@ For a single project
 - Reverts back to snapshots, bumps the version by a patch (`1.0.1.RELEASE` -> `1.0.2.BUILD-SNAPSHOT`) (ONLY FOR RELEASE VERSIONS)
 - Closes the milestone on Github (e.g. `v1.0.1.RELEASE`) (ONLY FOR NON-SNAPSHOT VERSIONS)
 
-IMPORTANT: Starting with version that does Sagan integration, you MUST pass the OAuth token,
-otherwise the application will fail to start
+IMPORTANT: Starting with version that does Sagan integration, you MUST pass the OAuth token, otherwise the application will fail to start
 
 After project release
 
@@ -72,13 +71,12 @@ After project release
 - Will clone provided test samples and will update all versions to the latest ones
 - Will clone the release train wiki and update it with the latest release versions (for Spring Cloud it will be `https://github.com/spring-projects/spring-cloud.wiki.git`)
 
-IMPORTANT: For the meta-releaser to work we assume that the path to the
-custom configuration file for each project is always `config/releaser.yml`.
+IMPORTANT: For the meta-releaser to work we assume that the path to the custom configuration file for each project is always `config/releaser.yml`.
 
 === What should I do first?
 
-Members of the Spring Cloud Team typically use this tool as follows. They first
-clone the releaser locally and build the jar manually
+Members of the Spring Cloud Team typically use this tool as follows.
+They first clone the releaser locally and build the jar manually
 
 [source,bash]
 ----
@@ -87,8 +85,8 @@ $ cd spring-cloud-release-tools
 $ ./mvnw clean install
 ----
 
-IMPORTANT: You must set the value of the OAuth token. You can do it either via
-the command line `--releaser.git.oauth-token=...` or put it as an env variable in `.bashrc`
+IMPORTANT: You must set the value of the OAuth token.
+You can do it either via the command line `--releaser.git.oauth-token=...` or put it as an env variable in `.bashrc`
 or `.zshrc` e.g. `export RELEASER_GIT_OAUTH_TOKEN=...`
 
 === How to run it (interactive mode)
@@ -100,13 +98,13 @@ Go to your project (e.g. Spring Cloud Sleuth)
 $ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
 ----
 
-The application will start running from your working directory. Running this code
-follows the convention that you have the OAuth token environment variable set. It also assumes
-that you might have some custom configuration in `config/releaser.yml` file. This setting is optional - if
-you don't have that file, nothing will happen.
+The application will start running from your working directory.
+Running this code follows the convention that you have the OAuth token environment variable set.
+It also assumes that you might have some custom configuration in `config/releaser.yml` file.
+This setting is optional - if you don't have that file, nothing will happen.
 
 TIP:  It is important that you clone the repository you are going to release using SSH in order for the
 `releaser` to be able to push tags and commit changes automatically.
@@ -136,8 +134,10 @@ You can execute given tasks by providing a comma separated list of tasks - e.g. 
 You can press 'q' to quit
 ----
 
-Just pick a number and continue! Pick either a full release or single steps. You can also pick
-ranges or multiple steps. You can also provide the range only with the starting step
+Just pick a number and continue!
+Pick either a full release or single steps.
+You can also pick ranges or multiple steps.
+You can also provide the range only with the starting step
 - that you will execute all steps starting from the given one.
 
 TIP: Read before picking a number cause it might have changed between tool releases ;)
@@ -152,7 +152,7 @@ flag.
 $ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -h
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -h
 ----
 
 You will see a help screen looking like more or less like this
@@ -213,9 +213,11 @@ Range 'docs' -> 'push'
 java -jar releaser.jar -r o-p
 ----
 
-The Releaser can use two sets of options. The configuration options like `releaser.pom.branch`
-and the task switches. For the tasks you can use either the full names or short switches. For example
- providing range of tasks via switches `o-p` is equivalent to full name `docs-push`.
+The Releaser can use two sets of options.
+The configuration options like `releaser.pom.branch`
+and the task switches.
+For the tasks you can use either the full names or short switches.
+For example providing range of tasks via switches `o-p` is equivalent to full name `docs-push`.
 
 A couple of examples:
 
@@ -225,52 +227,49 @@ A couple of examples:
 $ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release
 ----
 
 .Doing the full release in non interactive mode (automatic release)
 [source,bash]
 ----
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release --interactive=false
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release --interactive=false
 ----
 
 .Updating pom, closing milestone & createTemplates in interactive mode
 [source,bash]
 ----
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -u -m -t
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -u -m -t
 ----
 
 .Running all tasks starting from 'push' (automatic)
 [source,bash]
 ----
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -a push -i=false
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -a push -i=false
 ----
 
 .Running tasks from 'docs' (inclusive) to 'push' (inclusive) (automatic)
 [source,bash]
 ----
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -r d-p -i=false
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -r d-p -i=false
 ----
 
 .Running single task 'closeMilestone' (automatic)
 [source,bash]
 ----
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --closeMilestone -i=false
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --closeMilestone -i=false
 ----
 
 === How to run meta-release (automatic-mode)
 
 All you have to do is run the jar with the releaser and pass the
-`-x=true` option to turn on meta-release and a list of fixed versions
-in the `--"releaser.fixed-versions[project-name]=project-version" format
+`-x=true` option to turn on meta-release and a list of fixed versions in the `--"releaser.fixed-versions[project-name]=project-version" format
 
 ```
-$ java -jar spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
+$ java -jar releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
 ```
 
-IMPORTANT: For the meta release the `startFrom` or `taskNames` take into consideration
-the project names, not task names. E.g. you can start from `spring-cloud-netflix` project,
-or build only tasks with names `spring-cloud-build,spring-cloud-sleuth`.
+IMPORTANT: For the meta release the `startFrom` or `taskNames` take into consideration the project names, not task names. E.g. you can start from `spring-cloud-netflix` project, or build only tasks with names `spring-cloud-build,spring-cloud-sleuth`.
 
 === Project options
 
@@ -355,34 +354,31 @@ Below you can find a table with all the releaser options.
 |===
 
 TIP: You can pass the options either via system properties or via application arguments.
-Example for system properties: `java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar`
-Example for application arguments: `java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6`
+Example for system properties: `java -Dreleaser.pom.branch=Camden.SR6 -jar target/releaser-spring-1.0.0.M1.jar`
+Example for application arguments: `java -jar target/releaser-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6`
 
-IMPORTANT: For the GA release to be successful, it's important that if the `build` / `deploy` command
- run a script (e.g. `scripts/foo.sh`) then inside `foo.sh` if you call a Maven build `./mvnw clean install`
- then *remember to pass all arguments of the script there too*. E.g. `./mvnw clean install ${@}`. That's because
- the releaser will pass any system properties to the `build` / `deploy` command, such as system properties
- with keys and we need them to be passed inside the command executed by the releaser.
+IMPORTANT: For the GA release to be successful, it's important that if the `build` / `deploy` command run a script (e.g. `scripts/foo.sh`) then inside `foo.sh` if you call a Maven build `./mvnw clean install`
+then *remember to pass all arguments of the script there too*.
+E.g. `./mvnw clean install ${@}`.
+That's because the releaser will pass any system properties to the `build` / `deploy` command, such as system properties with keys and we need them to be passed inside the command executed by the releaser.
 
 === Examples
 
 ==== Keeping configuration in the project
 
-If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed
-to build the project and properly merge the docs) then you can put a file named e.g. `releaser.yml` under `config`
+If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed to build the project and properly merge the docs) then you can put a file named e.g. `releaser.yml` under `config`
 folder and run your application like this:
 
 [source,bash]
 ----
-$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
-$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser
+$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/releaser-spring/1.0.0.M1/releaser-spring-1.0.0.M1.jar -O ../releaser-spring-1.0.0.M1.jar
+$ java -jar target/releaser-spring-1.0.0.M1.jar --spring.config.name=releaser
 ----
 
-TIP: Notice that we're downloading the jar to a parent folder, not to `target`. That's because `target` get cleaned
-during the build process
+TIP: Notice that we're downloading the jar to a parent folder, not to `target`.
+That's because `target` get cleaned during the build process
 
-IMPORTANT: For the meta-releaser to work we assume that the path to the
-configuration file is always `config/releaser.yml`.
+IMPORTANT: For the meta-releaser to work we assume that the path to the configuration file is always `config/releaser.yml`.
 
 ==== Specifying A Branch
 
@@ -391,39 +387,47 @@ If you would like to use another branch you can specify it using the `releaser.p
 
 [source,bash]
 ----
-$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6
+$ java -jar releaser-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6
 ----
 
 ==== Using Environment Variables
 
 In some cases it might be easier to specify environment variables instead of passing parameters to
-`releaser`.  For example, you might want to use environment variables if you are going to be
-releasing multiple projects, this keeps you from having to specify the same parameters for
-each release
+`releaser`.
+For example, you might want to use environment variables if you are going to be releasing multiple projects, this keeps you from having to specify the same parameters for each release
 
 [source,bash]
 ----
 $ export RELEASER_POM_BRANCH=Dalston.RELEASE
 $ export RELEASER_GIT_OAUTH_TOKEN=...
-$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
-$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root
+$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/releaser-spring/1.0.0.M1/releaser-spring-1.0.0.M1.jar -O releaser-spring-1.0.0.M1.jar
+$ java -jar target/releaser-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root
 ----
 
 === Releasing through Jenkins
 
-NOTE: Whenever a release process is broken, Jenkins marks it with a red ball and breaks the build. Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow ball and marks the build as unstable.
+NOTE: Whenever a release process is broken, Jenkins marks it with a red ball and breaks the build.
+Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow ball and marks the build as unstable.
 
 ==== Releasing a Single Project
 
-Let us assume that we are to release `spring-cloud-build` project. We need to do the following steps:
+Let us assume that we are to release `spring-cloud-build` project.
+We need to do the following steps:
 
-. Create a branch (for example, `springCloudBuildRelease`) in a project that contains a BOM (for example, https://github.com/spring-cloud/spring-cloud-release/[spring-cloud-release]). The following example shows how to do so:
+. Create a branch (for example, `springCloudBuildRelease`) in a project that contains a BOM (for example, https://github.com/spring-cloud/spring-cloud-release/[spring-cloud-release]).
+The following example shows how to do so:
+
 ```bash
 $ git clone git@github.com:spring-cloud/spring-cloud-release.git
 $ cd spring-cloud-release
 $ git checkout -b springCloudBuildRelease
 ```
-. Update *all* versions as if you were doing a release train. We need to update the project's versions, Boot version, and dependencies versions, too. Let us assume that we will eventually be doing a release train for the `Hoxton.M1` release, Spring Boot to the latest available one, and `spring-cloud-commons` to `1.2.3.BUILD-SNAPSHOT`. The following example shows how to do so:
+
+. Update *all* versions as if you were doing a release train.
+We need to update the project's versions, Boot version, and dependencies versions, too.
+Let us assume that we will eventually be doing a release train for the `Hoxton.M1` release, Spring Boot to the latest available one, and `spring-cloud-commons` to `1.2.3.BUILD-SNAPSHOT`.
+The following example shows how to do so:
+
 ```bash
 // setting the release train value
 $ ./mvnw versions:set -DnewVersion=Hoxton.M1 -DgenerateBackupPoms=false -DprocessAllModules=true
@@ -437,27 +441,32 @@ $ git diff
 // commit and push the branch
 $ git add . && git commit -m "Updating project for Spring Cloud Build release" && git push origin springCloudBuildRelease
 ```
+
 IMPORTANT: If you're doing a e.g. `M1` release, remember to not have any snapshot versions in this branch.
 
 Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], which the following image shows:
 
 image::{github-raw}/docs/src/main/asciidoc/images/releasers.png[Releaser view]
 
-. Pick the proper releaser project (for example, `spring-cloud-build-releaser`). The following image shows the settings for this example:
+. Pick the proper releaser project (for example, `spring-cloud-build-releaser`).
+The following image shows the settings for this example:
 
 image::{github-raw}/docs/src/main/asciidoc/images/scBuildReleaser.png[Spring Cloud Build Releaser - build with parameters]
 
-. Next, click `Build with parameters`. The following image shows the UI for doing so:
+. Next, click `Build with parameters`.
+The following image shows the UI for doing so:
 
 image::{github-raw}/docs/src/main/asciidoc/images/runningScBuildReleaser.png[Updated `RELEASER_POM_BRANCH`]
 
-Pick from which branch you would like the project (for example, `spring-cloud-build` - defaults to `master`) to be built and update the `RELEASER_POM_BRANCH` to point to the checked-out branch of Spring Cloud Release (for example, `springCloudBuildRelease`). You can pick whether you want to perform only post-release tasks or the whole release.
+Pick from which branch you would like the project (for example, `spring-cloud-build` - defaults to `master`) to be built and update the `RELEASER_POM_BRANCH` to point to the checked-out branch of Spring Cloud Release (for example, `springCloudBuildRelease`).
+You can pick whether you want to perform only post-release tasks or the whole release.
 
 . Finally, click `Build`.
 
 You are done!
 
-As a post action, do not forget to remove the branch. The following example shows how to do so:
+As a post action, do not forget to remove the branch.
+The following example shows how to do so:
 
 ```bash
 // to synchronize any deleted branches (don't run this if you want leave any deleted branches that were deleted in the origin)
@@ -468,19 +477,31 @@ $ git push origin --delete springCloudBuildRelease
 
 ==== Releasing a Release Train
 
-We call a release train a `meta-release`. In order to perform one, you need to:
+We call a release train a `meta-release`.
+In order to perform one, you need to:
 
-. In your project (which must contain a BOM, such as `spring-cloud-release`) you have to have a branch, where you store properties with versions of your projects. For example, the branch name can be https://github.com/spring-cloud/spring-cloud-release/tree/jenkins-releaser-config[jenkins-releaser-config]). The folloiwng example shows how to do so:
+. In your project (which must contain a BOM, such as `spring-cloud-release`) you have to have a branch, where you store properties with versions of your projects.
+For example, the branch name can be https://github.com/spring-cloud/spring-cloud-release/tree/jenkins-releaser-config[jenkins-releaser-config]).
+The folloiwng example shows how to do so:
+
 ```bash
 $ git clone git@github.com:spring-cloud/spring-cloud-release.git
 $ cd spring-cloud-release
 $ git checkout jenkins-releaser-config
 ```
-. Create a file that contains all properties for a given release train. The name of the release train should be lowercase, and dots should be converted to underscores. For example, for the `Greenwich.SR2` release train we need to have a file named  `greenwich_sr2.properties`. The following example shows how to do so:
+
+. Create a file that contains all properties for a given release train.
+The name of the release train should be lowercase, and dots should be converted to underscores.
+For example, for the `Greenwich.SR2` release train we need to have a file named  `greenwich_sr2.properties`.
+The following example shows how to do so:
+
 ```bash
 $ touch greenwich_sr2.properties
 ```
-. We need to update the file with all versions for the release train. The properties file contains an *ordered* list of `releaser.fixed-versions[project-name]=project-version` entries, as the following listing shows:
+
+. We need to update the file with all versions for the release train.
+The properties file contains an *ordered* list of `releaser.fixed-versions[project-name]=project-version` entries, as the following listing shows:
+
 ```bash
 $ echo "releaser.fixed-versions[spring-boot]=2.1.5.RELEASE
 releaser.fixed-versions[spring-cloud-build]=2.1.5.RELEASE
@@ -519,7 +540,8 @@ image::{github-raw}/docs/src/main/asciidoc/images/springCloudMetaRelease.png[Spr
 
 image::{github-raw}/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Spring Cloud Meta Releaser view]
 
-You have quite a few options to pick, but the most important one is to set the value of the `RELEASE_VERSION` to the given release train version (for example, `Greenwich.SR2`). Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.
+You have quite a few options to pick, but the most important one is to set the value of the `RELEASE_VERSION` to the given release train version (for example, `Greenwich.SR2`).
+Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.
 
 . Finally, click `Build`.
 
@@ -566,79 +588,65 @@ $ ssh-add ~/.ssh/id_rsa
 
 To build the source you will need to install JDK {jdkversion}.
 
-Spring Cloud uses Maven for most build-related activities, and you
-should be able to get off the ground quite quickly by cloning the
-project you are interested in and typing
+Spring Cloud uses Maven for most build-related activities, and you should be able to get off the ground quite quickly by cloning the project you are interested in and typing
 
 ----
 $ ./mvnw install
 ----
 
-NOTE: You can also install Maven (>=3.3.3) yourself and run the `mvn` command
-in place of `./mvnw` in the examples below. If you do that you also
-might need to add `-P spring` if your local Maven settings do not
-contain repository declarations for spring pre-release artifacts.
+NOTE: You can also install Maven (>=3.3.3) yourself and run the `mvn` command in place of `./mvnw` in the examples below.
+If you do that you also might need to add `-P spring` if your local Maven settings do not contain repository declarations for spring pre-release artifacts.
 
-NOTE: Be aware that you might need to increase the amount of memory
-available to Maven by setting a `MAVEN_OPTS` environment variable with
-a value like `-Xmx512m -XX:MaxPermSize=128m`. We try to cover this in
-the `.mvn` configuration, so if you find you have to do it to make a
-build succeed, please raise a ticket to get the settings added to
-source control.
+NOTE: Be aware that you might need to increase the amount of memory available to Maven by setting a `MAVEN_OPTS` environment variable with a value like `-Xmx512m -XX:MaxPermSize=128m`.
+We try to cover this in the `.mvn` configuration, so if you find you have to do it to make a build succeed, please raise a ticket to get the settings added to source control.
 
-For hints on how to build the project look in `.travis.yml` if there
-is one. There should be a "script" and maybe "install" command. Also
-look at the "services" section to see if any services need to be
-running locally (e.g. mongo or rabbit).  Ignore the git-related bits
-that you might find in "before_install" since they're related to setting git
-credentials and you already have those.
+For hints on how to build the project look in `.travis.yml` if there is one.
+There should be a "script" and maybe "install" command.
+Also look at the "services" section to see if any services need to be running locally (e.g. mongo or rabbit).
+Ignore the git-related bits that you might find in "before_install" since they're related to setting git credentials and you already have those.
 
 The projects that require middleware generally include a
 `docker-compose.yml`, so consider using
-https://docs.docker.com/compose/[Docker Compose] to run the middeware servers
-in Docker containers. See the README in the
+https://docs.docker.com/compose/[Docker Compose] to run the middeware servers in Docker containers.
+See the README in the
 https://github.com/spring-cloud-samples/scripts[scripts demo
-repository] for specific instructions about the common cases of mongo,
-rabbit and redis.
+repository] for specific instructions about the common cases of mongo, rabbit and redis.
 
 NOTE: If all else fails, build with the command from `.travis.yml` (usually
 `./mvnw install`).
 
 === Documentation
 
-The spring-cloud-build module has a "docs" profile, and if you switch
-that on it will try to build asciidoc sources from
-`src/main/asciidoc`. As part of that process it will look for a
-`README.adoc` and process it by loading all the includes, but not
-parsing or rendering it, just copying it to `${main.basedir}`
-(defaults to `${basedir}`, i.e. the root of the project). If there are
-any changes in the README it will then show up after a Maven build as
-a modified file in the correct place. Just commit it and push the change.
+The spring-cloud-build module has a "docs" profile, and if you switch that on it will try to build asciidoc sources from
+`src/main/asciidoc`.
+As part of that process it will look for a
+`README.adoc` and process it by loading all the includes, but not parsing or rendering it, just copying it to `${main.basedir}`
+(defaults to `${basedir}`, i.e. the root of the project).
+If there are any changes in the README it will then show up after a Maven build as a modified file in the correct place.
+Just commit it and push the change.
 
 === Working with the code
+
 If you don't have an IDE preference we would recommend that you use
 https://www.springsource.com/developer/sts[Spring Tools Suite] or
-https://eclipse.org[Eclipse] when working with the code. We use the
-https://eclipse.org/m2e/[m2eclipse] eclipse plugin for maven support. Other IDEs and tools
-should also work without issue as long as they use Maven 3.3.3 or better.
+https://eclipse.org[Eclipse] when working with the code.
+We use the
+https://eclipse.org/m2e/[m2eclipse] eclipse plugin for maven support.
+Other IDEs and tools should also work without issue as long as they use Maven 3.3.3 or better.
 
 ==== Importing into eclipse with m2eclipse
-We recommend the https://eclipse.org/m2e/[m2eclipse] eclipse plugin when working with
-eclipse. If you don't already have m2eclipse installed it is available from the "eclipse
-marketplace".
 
-NOTE: Older versions of m2e do not support Maven 3.3, so once the
-projects are imported into Eclipse you will also need to tell
-m2eclipse to use the right profile for the projects.  If you
-see many different errors related to the POMs in the projects, check
-that you have an up to date installation.  If you can't upgrade m2e,
-add the "spring" profile to your `settings.xml`. Alternatively you can
-copy the repository settings from the "spring" profile of the parent
-pom into your `settings.xml`.
+We recommend the https://eclipse.org/m2e/[m2eclipse] eclipse plugin when working with eclipse.
+If you don't already have m2eclipse installed it is available from the "eclipse marketplace".
+
+NOTE: Older versions of m2e do not support Maven 3.3, so once the projects are imported into Eclipse you will also need to tell m2eclipse to use the right profile for the projects.
+If you see many different errors related to the POMs in the projects, check that you have an up to date installation.
+If you can't upgrade m2e, add the "spring" profile to your `settings.xml`.
+Alternatively you can copy the repository settings from the "spring" profile of the parent pom into your `settings.xml`.
 
 ==== Importing into eclipse without m2eclipse
-If you prefer not to use m2eclipse you can generate eclipse project metadata using the
-following command:
+
+If you prefer not to use m2eclipse you can generate eclipse project metadata using the following command:
 
 [indent=0]
 ----
@@ -649,63 +657,60 @@ The generated eclipse projects can be imported by selecting `import existing pro
 from the `file` menu.
 
 
-IMPORTANT: There are 2 different versions of language level used in Spring Cloud Sleuth. Java 1.7 is used for main sources and
-Java 1.8 is used for tests. When importing your project to an IDE please activate the `ide` Maven profile to turn on
-Java 1.8 for both main and test sources. Of course remember that you MUST NOT use Java 1.8 features in the main sources. If you do
-so your app will break during the Maven build.
+IMPORTANT: There are 2 different versions of language level used in Spring Cloud Sleuth.
+Java 1.7 is used for main sources and Java 1.8 is used for tests.
+When importing your project to an IDE please activate the `ide` Maven profile to turn on Java 1.8 for both main and test sources.
+Of course remember that you MUST NOT use Java 1.8 features in the main sources.
+If you do so your app will break during the Maven build.
 
 == Contributing
 
 :spring-cloud-build-branch: master
 
-Spring Cloud is released under the non-restrictive Apache 2.0 license,
-and follows a very standard Github development process, using Github
-tracker for issues and merging pull requests into master. If you want
-to contribute even something trivial please do not hesitate, but
-follow the guidelines below.
+Spring Cloud is released under the non-restrictive Apache 2.0 license, and follows a very standard Github development process, using Github tracker for issues and merging pull requests into master.
+If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
 
 === Sign the Contributor License Agreement
+
 Before we accept a non-trivial patch or pull request we will need you to sign the
 https://cla.pivotal.io/sign/spring[Contributor License Agreement].
-Signing the contributor's agreement does not grant anyone commit rights to the main
-repository, but it does mean that we can accept your contributions, and you will get an
-author credit if we do.  Active contributors might be asked to join the core team, and
-given the ability to merge pull requests.
+Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.
+Active contributors might be asked to join the core team, and given the ability to merge pull requests.
 
 === Code of Conduct
+
 This project adheres to the Contributor Covenant https://github.com/spring-cloud/spring-cloud-build/blob/master/docs/src/main/asciidoc/code-of-conduct.adoc[code of
-conduct]. By participating, you  are expected to uphold this code. Please report
-unacceptable behavior to spring-code-of-conduct@pivotal.io.
+conduct].
+By participating, you are expected to uphold this code.
+Please report unacceptable behavior to spring-code-of-conduct@pivotal.io.
 
 === Code Conventions and Housekeeping
-None of these is essential for a pull request, but they will all help.  They can also be
-added after the original pull request but before a merge.
 
-* Use the Spring Framework code format conventions. If you use Eclipse
-  you can import formatter settings using the
+None of these is essential for a pull request, but they will all help.
+They can also be added after the original pull request but before a merge.
+
+* Use the Spring Framework code format conventions.
+If you use Eclipse you can import formatter settings using the
   `eclipse-code-formatter.xml` file from the
   https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-dependencies-parent/eclipse-code-formatter.xml[Spring
-  Cloud Build] project. If using IntelliJ, you can use the
+  Cloud Build] project.
+If using IntelliJ, you can use the
   https://plugins.jetbrains.com/plugin/6546[Eclipse Code Formatter
   Plugin] to import the same file.
 * Make sure all new `.java` files to have a simple Javadoc class comment with at least an
-  `@author` tag identifying you, and preferably at least a paragraph on what the class is
-  for.
-* Add the ASF license header comment to all new `.java` files (copy from existing files
-  in the project)
-* Add yourself as an `@author` to the .java files that you modify substantially (more
-  than cosmetic changes).
+  `@author` tag identifying you, and preferably at least a paragraph on what the class is for.
+* Add the ASF license header comment to all new `.java` files (copy from existing files in the project)
+* Add yourself as an `@author` to the .java files that you modify substantially (more than cosmetic changes).
 * Add some Javadocs and, if you change the namespace, some XSD doc elements.
 * A few unit tests would help a lot as well -- someone has to do it.
-* If no-one else is using your branch, please rebase it against the current master (or
-  other target branch in the main project).
-* When writing a commit message please follow https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html[these conventions],
-  if you are fixing an existing issue please add `Fixes gh-XXXX` at the end of the commit
-  message (where XXXX is the issue number).
+* If no-one else is using your branch, please rebase it against the current master (or other target branch in the main project).
+* When writing a commit message please follow https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html[these conventions], if you are fixing an existing issue please add `Fixes gh-XXXX` at the end of the commit message (where XXXX is the issue number).
 
 === Checkstyle
 
-Spring Cloud Build comes with a set of checkstyle rules. You can find them in the `spring-cloud-build-tools` module. The most notable files under the module are:
+Spring Cloud Build comes with a set of checkstyle rules.
+You can find them in the `spring-cloud-build-tools` module.
+The most notable files under the module are:
 
 .spring-cloud-build-tools/
 ----
@@ -723,7 +728,8 @@ Spring Cloud Build comes with a set of checkstyle rules. You can find them in th
 
 ==== Checkstyle configuration
 
-Checkstyle rules are *disabled by default*. To add checkstyle to your project just define the following properties and plugins.
+Checkstyle rules are *disabled by default*.
+To add checkstyle to your project just define the following properties and plugins.
 
 .pom.xml
 ----
@@ -763,7 +769,8 @@ Checkstyle rules are *disabled by default*. To add checkstyle to your project ju
 <4> Add the Spring Java Format plugin that will reformat your code to pass most of the Checkstyle formatting rules
 <5> Add checkstyle plugin to your build and reporting phases
 
-If you need to suppress some rules (e.g. line length needs to be longer), then it's enough for you to define a file under `${project.root}/src/checkstyle/checkstyle-suppressions.xml` with your suppressions. Example:
+If you need to suppress some rules (e.g. line length needs to be longer), then it's enough for you to define a file under `${project.root}/src/checkstyle/checkstyle-suppressions.xml` with your suppressions.
+Example:
 
 .projectRoot/src/checkstyle/checkstyle-suppresions.xml
 ----
@@ -777,7 +784,9 @@ If you need to suppress some rules (e.g. line length needs to be longer), then i
 </suppressions>
 ----
 
-It's advisable to copy the `${spring-cloud-build.rootFolder}/.editorconfig` and `${spring-cloud-build.rootFolder}/.springformat` to your project. That way, some default formatting rules will be applied. You can do so by running this script:
+It's advisable to copy the `${spring-cloud-build.rootFolder}/.editorconfig` and `${spring-cloud-build.rootFolder}/.springformat` to your project.
+That way, some default formatting rules will be applied.
+You can do so by running this script:
 
 ```bash
 $ curl https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/.editorconfig -o .editorconfig
@@ -811,27 +820,37 @@ The following files can be found in the https://github.com/spring-cloud/spring-c
 <5> Project style conventions for Intellij that apply most of Checkstyle rules
 
 .Code style
-
 image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/{spring-cloud-build-branch}/docs/src/main/asciidoc/images/intellij-code-style.png[Code style]
 
-Go to `File` -> `Settings` -> `Editor` -> `Code style`. There click on the icon next to the `Scheme` section. There, click on the `Import Scheme` value and pick the `Intellij IDEA code style XML` option. Import the `spring-cloud-build-tools/src/main/resources/intellij/Intellij_Spring_Boot_Java_Conventions.xml` file.
+Go to `File` -> `Settings` -> `Editor` -> `Code style`.
+There click on the icon next to the `Scheme` section.
+There, click on the `Import Scheme` value and pick the `Intellij IDEA code style XML` option.
+Import the `spring-cloud-build-tools/src/main/resources/intellij/Intellij_Spring_Boot_Java_Conventions.xml` file.
 
 .Inspection profiles
-
 image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/{spring-cloud-build-branch}/docs/src/main/asciidoc/images/intellij-inspections.png[Code style]
 
-Go to `File` -> `Settings` -> `Editor` -> `Inspections`. There click on the icon next to the `Profile` section. There, click on the `Import Profile` and import the `spring-cloud-build-tools/src/main/resources/intellij/Intellij_Project_Defaults.xml` file.
+Go to `File` -> `Settings` -> `Editor` -> `Inspections`.
+There click on the icon next to the `Profile` section.
+There, click on the `Import Profile` and import the `spring-cloud-build-tools/src/main/resources/intellij/Intellij_Project_Defaults.xml` file.
 
 .Checkstyle
-
-To have Intellij work with Checkstyle, you have to install the `Checkstyle` plugin. It's advisable to also install the `Assertions2Assertj` to automatically convert the JUnit assertions
+To have Intellij work with Checkstyle, you have to install the `Checkstyle` plugin.
+It's advisable to also install the `Assertions2Assertj` to automatically convert the JUnit assertions
 
 image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/{spring-cloud-build-branch}/docs/src/main/asciidoc/images/intellij-checkstyle.png[Checkstyle]
 
-Go to `File` -> `Settings` -> `Other settings` -> `Checkstyle`. There click on the `+` icon in the `Configuration file` section. There, you'll have to define where the checkstyle rules should be picked from. In the image above, we've picked the rules from the cloned Spring Cloud Build repository. However, you can point to the Spring Cloud Build's GitHub repository (e.g. for the `checkstyle.xml` : `https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/main/resources/checkstyle.xml`). We need to provide the following variables:
+Go to `File` -> `Settings` -> `Other settings` -> `Checkstyle`.
+There click on the `+` icon in the `Configuration file` section.
+There, you'll have to define where the checkstyle rules should be picked from.
+In the image above, we've picked the rules from the cloned Spring Cloud Build repository.
+However, you can point to the Spring Cloud Build's GitHub repository (e.g. for the `checkstyle.xml` : `https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/main/resources/checkstyle.xml`). We need to provide the following variables:
 
 - `checkstyle.header.file` - please point it to the Spring Cloud Build's, `spring-cloud-build-tools/src/main/resources/checkstyle-header.txt` file either in your cloned repo or via the `https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/main/resources/checkstyle-header.txt` URL.
-- `checkstyle.suppressions.file` - default suppressions. Please point it to the Spring Cloud Build's, `spring-cloud-build-tools/src/checkstyle/checkstyle-suppressions.xml` file either in your cloned repo or via the `https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/checkstyle/checkstyle-suppressions.xml` URL.
-- `checkstyle.additional.suppressions.file` - this variable corresponds to suppressions in your local project. E.g. you're working on `spring-cloud-contract`. Then point to the `project-root/src/checkstyle/checkstyle-suppressions.xml` folder. Example for `spring-cloud-contract` would be: `/home/username/spring-cloud-contract/src/checkstyle/checkstyle-suppressions.xml`.
+- `checkstyle.suppressions.file` - default suppressions.
+Please point it to the Spring Cloud Build's, `spring-cloud-build-tools/src/checkstyle/checkstyle-suppressions.xml` file either in your cloned repo or via the `https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-build-tools/src/checkstyle/checkstyle-suppressions.xml` URL.
+- `checkstyle.additional.suppressions.file` - this variable corresponds to suppressions in your local project. E.g. you're working on `spring-cloud-contract`.
+Then point to the `project-root/src/checkstyle/checkstyle-suppressions.xml` folder.
+Example for `spring-cloud-contract` would be: `/home/username/spring-cloud-contract/src/checkstyle/checkstyle-suppressions.xml`.
 
 IMPORTANT: Remember to set the `Scan Scope` to `All sources` since we apply checkstyle rules for production and test sources.
