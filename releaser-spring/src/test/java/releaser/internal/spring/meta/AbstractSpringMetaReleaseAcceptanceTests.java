@@ -74,6 +74,25 @@ abstract class AbstractSpringMetaReleaseAcceptanceTests
 						file("/projects/spring-cloud-release/").toURI().toString());
 	}
 
+	ArgsBuilder metaReleaseArgsForParallel(File project) throws Exception {
+		return new ArgsBuilder(project, this.tmp)
+				.releaseTrainUrl("/projects/spring-cloud-release/")
+				.projectsToSkip("spring-boot", "spring-cloud-commons",
+						"spring-cloud-stream", "spring-cloud-task",
+						"spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus",
+						"spring-cloud-config", "spring-cloud-netflix",
+						"spring-cloud-cloudfoundry", "spring-cloud-gateway",
+						"spring-cloud-security", "spring-cloud-zookeeper",
+						"spring-cloud-sleuth", "spring-cloud-contract",
+						"spring-cloud-vault")
+				.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
+				.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
+				.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
+				.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
+				.releaseTrainBomUrl(
+						file("/projects/spring-cloud-release/").toURI().toString());
+	}
+
 	Map<String, String> edgwareSr10() {
 		Map<String, String> versions = new LinkedHashMap<>();
 		versions.put("spring-boot", "5.5.16.RELEASE");

@@ -19,10 +19,12 @@ package releaser.internal.spring;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.jakewharton.fliptables.FlipTableConverters;
@@ -84,22 +86,27 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 				.flatMap(instance -> this.jobExplorer.getJobExecutions(instance).stream())
 				.sorted(Comparator.comparing(JobExecution::getCreateTime))
 				.collect(Collectors.toList());
-		List<ExecutionContext> stepContexts = sortedJobExecutions.stream()
+		List<StepExecution> stepContexts = sortedJobExecutions.stream()
 				.flatMap(j -> j.getStepExecutions().stream())
-				.map(StepExecution::getExecutionContext)
 				.collect(Collectors.toCollection(LinkedList::new));
 		printTable(buildTable(stepContexts));
 	}
 
-	private List<Table> buildTable(List<ExecutionContext> stepContexts) {
-		return stepContexts.stream().map(context -> {
+	private List<Table> buildTable(List<StepExecution> stepContexts) {
+		return stepContexts.stream().map(step -> {
+			String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+					.format(step.getStartTime());
+			ExecutionContext context = step.getExecutionContext();
 			ExecutionResultReport entity = (ExecutionResultReport) context.get("entity");
+			if (entity == null) {
+				return null;
+			}
 			String projectName = TrainPostReleaseReleaserTask.class
 					.isAssignableFrom(entity.getReleaserTaskType()) ? "postRelease"
 							: entity.getProjectName();
-			return new Table(projectName, entity.getShortName(), entity.getDescription(),
-					entity.getState(), entity.getExceptions());
-		}).collect(Collectors.toCollection(LinkedList::new));
+			return new Table(date, projectName, entity.getShortName(),
+					entity.getDescription(), entity.getState(), entity.getExceptions());
+		}).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	private void printTable(List<Table> table) {
@@ -182,6 +189,8 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 
 class Table {
 
+	final String creationTime;
+
 	final String projectName;
 
 	final String taskCaption;
@@ -194,8 +203,9 @@ class Table {
 
 	List<Throwable> exceptions;
 
-	Table(String projectName, String taskCaption, String taskDescription,
-			String taskState, List<Throwable> exceptions) {
+	Table(String creationTime, String projectName, String taskCaption,
+			String taskDescription, String taskState, List<Throwable> exceptions) {
+		this.creationTime = creationTime;
 		this.projectName = projectName;
 		this.taskCaption = taskCaption;
 		this.taskDescription = taskDescription;
@@ -205,6 +215,10 @@ class Table {
 				.map(t -> NestedExceptionUtils.getMostSpecificCause(t).toString())
 				.collect(Collectors.joining("\n"));
 		this.exceptions = exceptions;
+	}
+
+	public String getCreationTime() {
+		return this.creationTime;
 	}
 
 	public String getProjectName() {

@@ -22,6 +22,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -29,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
+import releaser.internal.tasks.CompositeReleaserTask;
 import releaser.internal.tasks.ReleaseReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
@@ -75,6 +79,8 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
 	private static final List<TaskExecutor> EXECUTORS = new ArrayList<>();
 
+	private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+
 	SpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory,
 			JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
@@ -92,10 +98,12 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 		return decide(options, releaserTask);
 	}
 
-	private Step createStep(ReleaserTask releaserTask, Arguments args) {
+	private Step createStep(ReleaserTask releaserTask,
+			NamedArgumentsSupplier argsSupplier) {
 		return this.stepBuilderFactory
-				.get(args.project.getName() + "_" + releaserTask.name())
+				.get(argsSupplier.projectName + "_" + releaserTask.name())
 				.tasklet((contribution, chunkContext) -> {
+					Arguments args = argsSupplier.get();
 					FlowRunner.Decision decision = beforeTask(args.options,
 							args.properties, releaserTask);
 					if (decision == FlowRunner.Decision.CONTINUE) {
@@ -125,7 +133,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 						log.info("Skipping step [{}]", releaserTask.name());
 					}
 					return RepeatStatus.FINISHED;
-				}).listener(releaserListener(args, releaserTask)).build();
+				}).listener(releaserListener(argsSupplier, releaserTask)).build();
 	}
 
 	private List<Throwable> addExceptionToErrors(List<Throwable> errors,
@@ -157,11 +165,12 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 		return executionResult;
 	}
 
-	private StepExecutionListener releaserListener(Arguments args,
+	private StepExecutionListener releaserListener(NamedArgumentsSupplier argsSupplier,
 			ReleaserTask releaserTask) {
 		return new StepExecutionListenerSupport() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
+				Arguments args = argsSupplier.get();
 				FlowRunner.Decision decision = afterTask(args.options, args.properties,
 						releaserTask);
 				if (decision == FlowRunner.Decision.ABORT) {
@@ -187,58 +196,91 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	@Override
 	public ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties,
 			ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
-		List<ReleaseGroup> releaseGroups = new ProjectsToReleaseGroups(properties)
-				.toReleaseGroup(projectsToRun);
+		ProjectsToReleaseGroups groups = new ProjectsToReleaseGroups(properties);
+		List<ReleaseGroup> releaseGroups = groups.toReleaseGroup(projectsToRun);
 		TaskExecutor taskExecutor = taskExecutor();
-		LinkedList<Flow> flows = releaseGroups.stream()
+		List<StuffToRun> flows = releaseGroups.stream()
 				.map(group -> buildFlowForGroup(tasksToRun, taskExecutor, group))
 				.collect(Collectors.toCollection(LinkedList::new));
-		Iterator<Flow> flowsIterator = flows.iterator();
+		Iterator<StuffToRun> flowsIterator = flows.iterator();
 		if (!flowsIterator.hasNext()) {
 			// nothing to run
 			return ExecutionResult.success();
 		}
+		if (flows.stream().allMatch(StuffToRun::hasCompositeTask) && groups.hasGroups()) {
+			return runComposites(flows);
+		}
 		return runJob(buildJobForFlows(flowsIterator));
 	}
 
-	private Job buildJobForFlows(Iterator<Flow> flowsIterator) {
+	private ExecutionResult runComposites(List<StuffToRun> flows) {
+		List<ExecutionResult> results = new LinkedList<>();
+		for (StuffToRun stuffToRun : flows) {
+			CompositeReleaserTask releaserTask = stuffToRun.task;
+			results.add(stuffToRun.releaseGroup.projectsToRun.stream()
+					.map(s -> this.executorService.submit(() -> {
+						log.info("Running a composite task [{}] in parallel",
+								releaserTask.name());
+						return releaserTask.apply(Arguments.forProject(s.get()));
+					})).map(f -> {
+						try {
+							return f.get();
+						}
+						catch (Exception e) {
+							throw new IllegalStateException(e);
+						}
+					}).reduce(new ExecutionResult(), ExecutionResult::merge));
+		}
+		return results.stream().reduce(new ExecutionResult(), ExecutionResult::merge);
+	}
+
+	private Job buildJobForFlows(Iterator<StuffToRun> flowsIterator) {
 		JobBuilder release = this.jobBuilderFactory
 				.get("release_" + System.currentTimeMillis());
-		JobFlowBuilder start = release.start(flowsIterator.next());
+		Flow first = flowsIterator.next().flow;
+		JobFlowBuilder start = release.start(first);
 		FlowBuilder<FlowJobBuilder> next = null;
 		while (flowsIterator.hasNext()) {
-			next = start.next(flowsIterator.next());
+			next = start.next(flowsIterator.next().flow);
 		}
 		FlowJobBuilder builder = next != null ? next.build() : start.build();
 		return builder.build();
 	}
 
-	private Flow buildFlowForGroup(TasksToRun tasksToRun, TaskExecutor taskExecutor,
+	private StuffToRun buildFlowForGroup(TasksToRun tasksToRun, TaskExecutor taskExecutor,
 			ReleaseGroup group) {
 		FlowBuilder<Flow> flowBuilder = new FlowBuilder<>(
 				group.flowName() + (group.shouldRunInParallel() ? "_Parallel" : "") + "_"
 						+ System.currentTimeMillis());
 		Iterator<ProjectToRun.ProjectToRunSupplier> iterator = group.iterator();
 		if (!iterator.hasNext() || tasksToRun.isEmpty()) {
-			return flowBuilder.build();
+			return new StuffToRun(group, flowBuilder.build());
 		}
 		// only one project to run - run in sequence
-		ProjectToRun.ProjectToRunSupplier project = iterator.next();
-		flowBuilder.start(toFlowOfTasks(tasksToRun, Arguments.forProject(project.get()),
+		final ProjectToRun.ProjectToRunSupplier project = iterator.next();
+		if (tasksToRun.size() == 1
+				&& tasksToRun.get(0) instanceof CompositeReleaserTask) {
+			return new StuffToRun(group, (CompositeReleaserTask) tasksToRun.get(0));
+		}
+		flowBuilder.start(toFlowOfTasks(tasksToRun,
+				new NamedArgumentsSupplier(project.projectName(),
+						() -> Arguments.forProject(project.get())),
 				flowBuilder(project.projectName())));
 		if (!iterator.hasNext()) {
-			return flowBuilder.build();
+			return new StuffToRun(group, flowBuilder.build());
 		}
 		// more projects, run them in parallel
 		FlowBuilder.SplitBuilder<Flow> split = flowBuilder.split(taskExecutor);
 		List<Flow> flows = new LinkedList<>();
 		while (iterator.hasNext()) {
-			project = iterator.next();
+			final ProjectToRun.ProjectToRunSupplier nextProject = iterator.next();
 			String projectName = project.projectName();
-			flows.add(toFlowOfTasks(tasksToRun, Arguments.forProject(project.get()),
+			flows.add(toFlowOfTasks(tasksToRun,
+					new NamedArgumentsSupplier(project.projectName(),
+							() -> Arguments.forProject(nextProject.get())),
 					flowBuilder(projectName)));
 		}
-		return split.add(flows.toArray(new Flow[0])).end();
+		return new StuffToRun(group, split.add(flows.toArray(new Flow[0])).end());
 	}
 
 	private FlowBuilder<Flow> flowBuilder(String projectName) {
@@ -264,7 +306,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 		return this.projectsToRunFactory.postReleaseTrain(options);
 	}
 
-	private Flow toFlowOfTasks(TasksToRun tasksToRun, Arguments args,
+	private Flow toFlowOfTasks(TasksToRun tasksToRun, NamedArgumentsSupplier args,
 			FlowBuilder<Flow> flowBuilder) {
 		Iterator<? extends ReleaserTask> iterator = tasksToRun.iterator();
 		ReleaserTask task = iterator.next();
@@ -337,8 +379,9 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
 	private Flow flow(ReleaserProperties properties, ProjectsToRun projectsToRun,
 			ReleaserTask task) {
-		return new FlowBuilder<Flow>(task.name() + "Flow").start(
-				createStep(task, Arguments.forPostRelease(properties, projectsToRun)))
+		return new FlowBuilder<Flow>(task.name() + "Flow")
+				.start(createStep(task, new NamedArgumentsSupplier("postRelease",
+						() -> Arguments.forPostRelease(properties, projectsToRun))))
 				.build();
 	}
 
@@ -367,6 +410,25 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 				log.debug("Exception occurred while trying to destroy the bean", ex);
 			}
 		});
+		this.executorService.shutdown();
+	}
+
+}
+
+class NamedArgumentsSupplier implements Supplier<Arguments> {
+
+	final String projectName;
+
+	final Supplier<Arguments> argumentsSupplier;
+
+	NamedArgumentsSupplier(String projectName, Supplier<Arguments> argumentsSupplier) {
+		this.projectName = projectName;
+		this.argumentsSupplier = argumentsSupplier;
+	}
+
+	@Override
+	public Arguments get() {
+		return this.argumentsSupplier.get();
 	}
 
 }
@@ -392,6 +454,32 @@ class ConsoleInputStepSkipper {
 
 }
 
+class StuffToRun {
+
+	final ReleaseGroup releaseGroup;
+
+	final Flow flow;
+
+	final CompositeReleaserTask task;
+
+	StuffToRun(ReleaseGroup releaseGroup, Flow flow) {
+		this.releaseGroup = releaseGroup;
+		this.flow = flow;
+		this.task = null;
+	}
+
+	StuffToRun(ReleaseGroup releaseGroup, CompositeReleaserTask task) {
+		this.releaseGroup = releaseGroup;
+		this.task = task;
+		this.flow = null;
+	}
+
+	boolean hasCompositeTask() {
+		return this.task != null;
+	}
+
+}
+
 class ProjectsToReleaseGroups {
 
 	private final ReleaserProperties releaserProperties;
@@ -405,6 +493,10 @@ class ProjectsToReleaseGroups {
 				this.releaserProperties.getMetaRelease().getReleaseGroups());
 		return releaseGroup(releaseGroups, null, new LinkedList<>(),
 				projectsToRun.iterator());
+	}
+
+	boolean hasGroups() {
+		return !this.releaserProperties.getMetaRelease().getReleaseGroups().isEmpty();
 	}
 
 	private List<ReleaseGroup> releaseGroup(ReleaseGroups releaseGroups,
@@ -445,21 +537,21 @@ class ProjectsToReleaseGroups {
 
 class ReleaseGroup {
 
-	final List<ProjectToRun.ProjectToRunSupplier> projectsToRuns = new LinkedList<>();
+	final List<ProjectToRun.ProjectToRunSupplier> projectsToRun = new LinkedList<>();
 
 	final String[] group;
 
 	ReleaseGroup(ProjectToRun.ProjectToRunSupplier supplier, String[] group) {
-		this.projectsToRuns.add(supplier);
+		this.projectsToRun.add(supplier);
 		this.group = group;
 	}
 
 	Iterator<ProjectToRun.ProjectToRunSupplier> iterator() {
-		return projectsToRuns.iterator();
+		return projectsToRun.iterator();
 	}
 
 	void add(ProjectToRun.ProjectToRunSupplier projectToRun) {
-		this.projectsToRuns.add(projectToRun);
+		this.projectsToRun.add(projectToRun);
 	}
 
 	boolean sameGroup(String[] group) {
@@ -467,11 +559,11 @@ class ReleaseGroup {
 	}
 
 	boolean shouldRunInParallel() {
-		return this.projectsToRuns.size() > 1;
+		return this.projectsToRun.size() > 1;
 	}
 
 	String flowName() {
-		return this.projectsToRuns.get(0).projectName() + "_Flow";
+		return this.projectsToRun.get(0).projectName() + "_Flow";
 	}
 
 }

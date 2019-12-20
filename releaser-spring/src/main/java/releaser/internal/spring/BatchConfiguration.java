@@ -61,7 +61,8 @@ class BatchConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	FlowRunnerTaskExecutorSupplier defaultFlowRunnerTaskExecutorSupplier() {
-		return new FlowRunnerTaskExecutorSupplier() {};
+		return new FlowRunnerTaskExecutorSupplier() {
+		};
 	}
 
 	@Bean

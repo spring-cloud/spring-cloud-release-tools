@@ -20,8 +20,6 @@ import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.options.OptionsBuilder;
 
-import org.springframework.transaction.annotation.Transactional;
-
 /**
  * Releaser that gets input from console.
  *
