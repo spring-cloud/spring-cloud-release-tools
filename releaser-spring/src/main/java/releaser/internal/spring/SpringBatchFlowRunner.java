@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
@@ -207,41 +208,59 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			// nothing to run
 			return ExecutionResult.success();
 		}
-		if (flows.stream().allMatch(StuffToRun::hasCompositeTask) && groups.hasGroups()) {
-			return runComposites(flows);
+		if (flows.stream().allMatch(StuffToRun::hasCompositeTask)) {
+			return runComposites(flows, groups);
 		}
 		return runJob(buildJobForFlows(flowsIterator));
 	}
 
-	private ExecutionResult runComposites(List<StuffToRun> flows) {
+	private ExecutionResult runComposites(List<StuffToRun> flows,
+			ProjectsToReleaseGroups groups) {
 		List<ExecutionResult> results = new LinkedList<>();
 		for (StuffToRun stuffToRun : flows) {
 			CompositeReleaserTask releaserTask = stuffToRun.task;
-			results.add(stuffToRun.releaseGroup.projectsToRun.stream()
-					.map(s -> this.executorService.submit(() -> {
-						log.info("Running a composite task [{}] in parallel",
-								releaserTask.name());
-						return releaserTask.apply(Arguments.forProject(s.get()));
-					})).map(f -> {
-						try {
-							return f.get();
-						}
-						catch (Exception e) {
-							throw new IllegalStateException(e);
-						}
-					}).reduce(new ExecutionResult(), ExecutionResult::merge));
+			Stream<ExecutionResult> resultStream = groups.hasGroups()
+					? runInParallel(stuffToRun, releaserTask)
+					: runInSequence(stuffToRun, releaserTask);
+			results.add(
+					resultStream.reduce(new ExecutionResult(), ExecutionResult::merge));
 		}
 		return results.stream().reduce(new ExecutionResult(), ExecutionResult::merge);
+	}
+
+	private Stream<ExecutionResult> runInParallel(StuffToRun stuffToRun,
+			CompositeReleaserTask releaserTask) {
+		return stuffToRun.releaseGroup.projectsToRun.stream()
+				.map(s -> this.executorService.submit(() -> {
+					log.info("Running a composite task [{}] in parallel",
+							releaserTask.name());
+					return releaserTask.apply(Arguments.forProject(s.get()));
+				})).map(f -> {
+					try {
+						return f.get();
+					}
+					catch (Exception e) {
+						throw new IllegalStateException(e);
+					}
+				});
+	}
+
+	private Stream<ExecutionResult> runInSequence(StuffToRun stuffToRun,
+			CompositeReleaserTask releaserTask) {
+		return stuffToRun.releaseGroup.projectsToRun.stream()
+				.map(s -> releaserTask.apply(Arguments.forProject(s.get())));
 	}
 
 	private Job buildJobForFlows(Iterator<StuffToRun> flowsIterator) {
 		JobBuilder release = this.jobBuilderFactory
 				.get("release_" + System.currentTimeMillis());
-		Flow first = flowsIterator.next().flow;
+		StuffToRun stuffToRun = flowsIterator.next();
+		Flow first = stuffToRun.flow;
 		JobFlowBuilder start = release.start(first);
 		FlowBuilder<FlowJobBuilder> next = null;
 		while (flowsIterator.hasNext()) {
-			next = start.next(flowsIterator.next().flow);
+			StuffToRun toRun = flowsIterator.next();
+			next = start.next(toRun.flow);
 		}
 		FlowJobBuilder builder = next != null ? next.build() : start.build();
 		return builder.build();
