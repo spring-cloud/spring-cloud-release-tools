@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -309,6 +310,17 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private List<String> projectsToSkip = new ArrayList<String>();
 
+		/**
+		 * If provided, allows to provide groups of projects that can be ran in parallel.
+		 * E.g.
+		 * {@code --releaser.meta-release.release-groups[0]=projectA,projectB,projectC}
+		 * {@code --releaser.meta-release.release-groups[1]=projectD,projectE}
+		 * {@code --releaser.meta-release.release-groups[2]=projectF,projectG} The order
+		 * is still provided by the list of versions passed to the releaser. Basing on
+		 * that order, and this value we are able to build a flow with projects.
+		 */
+		private List<String> releaseGroups = new LinkedList<>();
+
 		public boolean isEnabled() {
 			return this.enabled;
 		}
@@ -350,12 +362,21 @@ public class ReleaserProperties implements Serializable {
 			this.projectsToSkip = projectsToSkip;
 		}
 
+		public List<String> getReleaseGroups() {
+			return this.releaseGroups;
+		}
+
+		public void setReleaseGroups(List<String> releaseGroups) {
+			this.releaseGroups = releaseGroups;
+		}
+
 		@Override
 		public String toString() {
-			return "MetaRelease{" + "enabled=" + this.enabled
-					+ ", releaseTrainProjectName='" + this.releaseTrainProjectName + '\''
-					+ ", gitOrgUrl='" + this.gitOrgUrl + '\'' + ", projectsToSkip="
-					+ this.projectsToSkip + '}';
+			return "MetaRelease{" + "enabled=" + enabled + ", releaseTrainProjectName='"
+					+ releaseTrainProjectName + '\'' + ", releaseTrainDependencyNames="
+					+ releaseTrainDependencyNames + ", gitOrgUrl='" + gitOrgUrl + '\''
+					+ ", projectsToSkip=" + projectsToSkip + ", releaseGroups='"
+					+ releaseGroups + '\'' + '}';
 		}
 
 	}

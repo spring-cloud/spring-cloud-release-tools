@@ -115,6 +115,56 @@ public class SpringMetaReleaseAcceptanceTests
 	}
 
 	@Test
+	public void should_perform_a_meta_release_of_sc_release_and_consul_in_parallel()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+
+		run(this.runner, properties("debug=true").properties("test.metarelease=true")
+				.properties(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
+						.addFixedVersions(edgwareSr10())
+						.metaReleaseGroups("example1,example2",
+								"spring-cloud-consul,spring-cloud-release")
+						.build()),
+				context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
+							.getBean(NonAssertingTestProjectGitHandler.class);
+					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
+					TestDocumentationUpdater testDocumentationUpdater = context
+							.getBean(TestDocumentationUpdater.class);
+					PostReleaseActions postReleaseActions = context
+							.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().metaRelease(true).options());
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
+					then(result.isFailureOrUnstable()).isFalse();
+					// consul, release, documentation
+					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(3);
+					// don't want to verify the docs
+					thenAllStepsWereExecutedForEachProject(
+							nonAssertingTestProjectGitHandler);
+					thenSaganWasCalled(saganUpdater);
+					thenDocumentationWasUpdated(testDocumentationUpdater);
+					then(clonedProject(nonAssertingTestProjectGitHandler,
+							"spring-cloud-consul").tagList().call()).extracting("name")
+									.contains("refs/tags/v5.3.5.RELEASE");
+					thenRunUpdatedTestsWereCalled(postReleaseActions);
+					thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
+				});
+	}
+
+	@Test
 	public void should_perform_a_meta_release_dry_run_of_sc_release_and_consul()
 			throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");

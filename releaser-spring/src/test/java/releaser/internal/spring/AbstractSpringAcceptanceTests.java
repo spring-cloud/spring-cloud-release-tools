@@ -385,9 +385,10 @@ public abstract class AbstractSpringAcceptanceTests {
 		SpringBatchFlowRunner mySpringBatchFlowRunner(
 				StepBuilderFactory stepBuilderFactory,
 				JobBuilderFactory jobBuilderFactory,
-				ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
+				ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
+				FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier) {
 			return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
-					projectsToRunFactory, jobLauncher) {
+					projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier) {
 				@Override
 				Decision decide(Options options, ReleaserTask task) {
 					return Decision.CONTINUE;
@@ -499,6 +500,15 @@ public abstract class AbstractSpringAcceptanceTests {
 		public ArgsBuilder mavenPublishCommand(String command) throws Exception {
 			removeIfPresent("releaser.maven.publish-docs-commands");
 			this.args.add("releaser.maven.publish-docs-commands=" + command);
+			return this;
+		}
+
+		public ArgsBuilder metaReleaseGroups(String... groups) throws Exception {
+			for (int i = 0; i < groups.length; i++) {
+				removeIfPresent("releaser.meta-release.release-groups[" + i + "]");
+				this.args.add(
+						"releaser.meta-release.release-groups[" + i + "]=" + groups[i]);
+			}
 			return this;
 		}
 

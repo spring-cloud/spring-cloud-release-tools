@@ -36,11 +36,21 @@ import org.springframework.batch.core.repository.support.JobRepositoryFactoryBea
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
 class BatchConfiguration {
+
+	@Bean
+	TaskExecutor batchTaskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(4);
+		executor.initialize();
+		return executor;
+	}
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -50,11 +60,18 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	FlowRunnerTaskExecutorSupplier defaultFlowRunnerTaskExecutorSupplier() {
+		return new FlowRunnerTaskExecutorSupplier() {};
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory,
 			JobBuilderFactory jobBuilderFactory,
-			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
+			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
+			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier) {
 		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
-				projectsToRunFactory, jobLauncher);
+				projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier);
 	}
 
 	@Bean

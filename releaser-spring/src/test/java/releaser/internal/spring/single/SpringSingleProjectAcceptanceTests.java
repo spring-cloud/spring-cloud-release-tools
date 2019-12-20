@@ -17,8 +17,6 @@
 package releaser.internal.spring.single;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Iterator;
@@ -40,6 +38,7 @@ import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganClient;
 import releaser.internal.spring.AbstractSpringAcceptanceTests;
+import releaser.internal.spring.ExecutionResult;
 import releaser.internal.spring.SpringReleaser;
 import releaser.internal.template.TemplateGenerator;
 
@@ -112,8 +111,11 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
 
-					releaser.release(new OptionsBuilder().interactive(true).options());
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().interactive(true).options());
 
 					Iterable<RevCommit> commits = listOfCommits(project);
 					Iterator<RevCommit> iterator = commits.iterator();
@@ -143,6 +145,10 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 									"spring-cloud-consul/current").toPath())
 							.toString()).isEqualTo("2.1.2.RELEASE");
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 
@@ -169,8 +175,11 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
 
-					releaser.release(new OptionsBuilder().interactive(true).options());
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().interactive(true).options());
 
 					Iterable<RevCommit> commits = listOfCommits(project);
 					Iterator<RevCommit> iterator = commits.iterator();
@@ -202,6 +211,10 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 									"spring-cloud-build/current").toPath())
 							.toString()).isEqualTo("2.1.6.RELEASE");
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 
@@ -226,8 +239,11 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
 
-					releaser.release(new OptionsBuilder().interactive(true).options());
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().interactive(true).options());
 
 					Iterable<RevCommit> commits = listOfCommits(project);
 					tagIsPresentInOrigin(origin, "v1.2.0.RC1");
@@ -256,6 +272,10 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 					then(new File(testDocumentationUpdater.getDocumentationRepo(),
 							"current/index.html")).doesNotExist();
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 
@@ -296,13 +316,6 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringAcceptance
 		pomVersionIsEqualTo(origin, "1.3.7.BUILD-SNAPSHOT");
 		pomParentVersionIsEqualTo(origin, "spring-cloud-build-dependencies",
 				"1.5.9.RELEASE");
-	}
-
-	private String[] springCloudConsulArgs(File project, String bomBranch)
-			throws URISyntaxException, IOException {
-		// @formatter:off
-		return new String[] {
-				};
 	}
 	// @formatter:on
 

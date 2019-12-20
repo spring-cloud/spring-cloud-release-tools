@@ -16,16 +16,19 @@
 
 package releaser.internal.spring;
 
+import java.io.Closeable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
-import releaser.internal.tasks.CompositeReleaserTask;
 import releaser.internal.tasks.ReleaseReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
@@ -41,15 +44,17 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
-import org.springframework.batch.core.job.builder.SimpleJobBuilder;
+import org.springframework.batch.core.job.builder.FlowJobBuilder;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.builder.JobFlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-class SpringBatchFlowRunner implements FlowRunner {
+class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(SpringBatchFlowRunner.class);
@@ -66,13 +71,19 @@ class SpringBatchFlowRunner implements FlowRunner {
 
 	private final JobLauncher jobLauncher;
 
+	private final FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier;
+
+	private static final List<TaskExecutor> EXECUTORS = new ArrayList<>();
+
 	SpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory,
 			JobBuilderFactory jobBuilderFactory,
-			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher) {
+			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
+			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier) {
 		this.stepBuilderFactory = stepBuilderFactory;
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
 		this.jobLauncher = jobLauncher;
+		this.flowRunnerTaskExecutorSupplier = flowRunnerTaskExecutorSupplier;
 	}
 
 	@Override
@@ -82,7 +93,8 @@ class SpringBatchFlowRunner implements FlowRunner {
 	}
 
 	private Step createStep(ReleaserTask releaserTask, Arguments args) {
-		return this.stepBuilderFactory.get(releaserTask.name())
+		return this.stepBuilderFactory
+				.get(args.project.getName() + "_" + releaserTask.name())
 				.tasklet((contribution, chunkContext) -> {
 					FlowRunner.Decision decision = beforeTask(args.options,
 							args.properties, releaserTask);
@@ -175,16 +187,62 @@ class SpringBatchFlowRunner implements FlowRunner {
 	@Override
 	public ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties,
 			ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
-		return projectsToRun.stream().map(projectToRun -> {
-			ProjectToRun startedProject = projectToRun.get();
-			String name = startedProject.name() + "_" + System.currentTimeMillis();
-			ExecutionResult result = executeReleaseTasks(tasksToRun, name,
-					Arguments.forProject(startedProject));
-			if (result.isFailure()) {
-				throw result.foundExceptions();
-			}
-			return result;
-		}).reduce(new ExecutionResult(), ExecutionResult::merge);
+		List<ReleaseGroup> releaseGroups = new ProjectsToReleaseGroups(properties)
+				.toReleaseGroup(projectsToRun);
+		TaskExecutor taskExecutor = taskExecutor();
+		LinkedList<Flow> flows = releaseGroups.stream()
+				.map(group -> buildFlowForGroup(tasksToRun, taskExecutor, group))
+				.collect(Collectors.toCollection(LinkedList::new));
+		Iterator<Flow> flowsIterator = flows.iterator();
+		if (!flowsIterator.hasNext()) {
+			// nothing to run
+			return ExecutionResult.success();
+		}
+		return runJob(buildJobForFlows(flowsIterator));
+	}
+
+	private Job buildJobForFlows(Iterator<Flow> flowsIterator) {
+		JobBuilder release = this.jobBuilderFactory
+				.get("release_" + System.currentTimeMillis());
+		JobFlowBuilder start = release.start(flowsIterator.next());
+		FlowBuilder<FlowJobBuilder> next = null;
+		while (flowsIterator.hasNext()) {
+			next = start.next(flowsIterator.next());
+		}
+		FlowJobBuilder builder = next != null ? next.build() : start.build();
+		return builder.build();
+	}
+
+	private Flow buildFlowForGroup(TasksToRun tasksToRun, TaskExecutor taskExecutor,
+			ReleaseGroup group) {
+		FlowBuilder<Flow> flowBuilder = new FlowBuilder<>(
+				group.flowName() + (group.shouldRunInParallel() ? "_Parallel" : "") + "_"
+						+ System.currentTimeMillis());
+		Iterator<ProjectToRun.ProjectToRunSupplier> iterator = group.iterator();
+		if (!iterator.hasNext() || tasksToRun.isEmpty()) {
+			return flowBuilder.build();
+		}
+		// only one project to run - run in sequence
+		ProjectToRun.ProjectToRunSupplier project = iterator.next();
+		flowBuilder.start(toFlowOfTasks(tasksToRun, Arguments.forProject(project.get()),
+				flowBuilder(project.projectName())));
+		if (!iterator.hasNext()) {
+			return flowBuilder.build();
+		}
+		// more projects, run them in parallel
+		FlowBuilder.SplitBuilder<Flow> split = flowBuilder.split(taskExecutor);
+		List<Flow> flows = new LinkedList<>();
+		while (iterator.hasNext()) {
+			project = iterator.next();
+			String projectName = project.projectName();
+			flows.add(toFlowOfTasks(tasksToRun, Arguments.forProject(project.get()),
+					flowBuilder(projectName)));
+		}
+		return split.add(flows.toArray(new Flow[0])).end();
+	}
+
+	private FlowBuilder<Flow> flowBuilder(String projectName) {
+		return new FlowBuilder<>(projectName + "_Flow_" + System.currentTimeMillis());
 	}
 
 	@Override
@@ -206,37 +264,15 @@ class SpringBatchFlowRunner implements FlowRunner {
 		return this.projectsToRunFactory.postReleaseTrain(options);
 	}
 
-	private ExecutionResult executeReleaseTasks(TasksToRun tasksToRun, String name,
-			Arguments args) {
+	private Flow toFlowOfTasks(TasksToRun tasksToRun, Arguments args,
+			FlowBuilder<Flow> flowBuilder) {
 		Iterator<? extends ReleaserTask> iterator = tasksToRun.iterator();
-		if (!iterator.hasNext()) {
-			return ExecutionResult.success();
-		}
 		ReleaserTask task = iterator.next();
-		// If composite, just run it instead of using Batch (otherwise a job will call
-		// another job)
-		if (task instanceof CompositeReleaserTask) {
-			log.info(
-					"Task [{}] is composite, will run it manually instead of calling it via Batch",
-					task);
-			return task.apply(args);
-		}
-		return runBatchJob(name, args, iterator, task);
-	}
-
-	private ExecutionResult runBatchJob(String name, Arguments args,
-			Iterator<? extends ReleaserTask> iterator, ReleaserTask task) {
-		if (!iterator.hasNext()) {
-			log.info("No jobs to run, will do nothing");
-			return ExecutionResult.success();
-		}
-		SimpleJobBuilder startedBuilder = this.jobBuilderFactory.get(name)
-				.start(createStep(task, args));
+		flowBuilder.start(createStep(task, args));
 		while (iterator.hasNext()) {
-			startedBuilder.next(createStep(iterator.next(), args));
+			flowBuilder.next(createStep(iterator.next(), args));
 		}
-		Job job = startedBuilder.preventRestart().build();
-		return runJob(job);
+		return flowBuilder.build();
 	}
 
 	private ExecutionResult runJob(Job job) {
@@ -284,7 +320,6 @@ class SpringBatchFlowRunner implements FlowRunner {
 		if (!iterator.hasNext()) {
 			return flowBuilder.build();
 		}
-		// TODO: Add an option to configure the task executor
 		FlowBuilder.SplitBuilder<Flow> builder = flowBuilder.split(taskExecutor());
 		List<Flow> flows = new LinkedList<>();
 		while (iterator.hasNext()) {
@@ -295,9 +330,9 @@ class SpringBatchFlowRunner implements FlowRunner {
 	}
 
 	private TaskExecutor taskExecutor() {
-		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.initialize();
-		return executor;
+		TaskExecutor taskExecutor = this.flowRunnerTaskExecutorSupplier.get();
+		EXECUTORS.add(taskExecutor);
+		return taskExecutor;
 	}
 
 	private Flow flow(ReleaserProperties properties, ProjectsToRun projectsToRun,
@@ -322,6 +357,18 @@ class SpringBatchFlowRunner implements FlowRunner {
 				interactive ? MSG : "");
 	}
 
+	@Override
+	public void close() {
+		EXECUTORS.stream().filter(t -> t instanceof DisposableBean).forEach(e -> {
+			try {
+				((DisposableBean) e).destroy();
+			}
+			catch (Exception ex) {
+				log.debug("Exception occurred while trying to destroy the bean", ex);
+			}
+		});
+	}
+
 }
 
 class ConsoleInputStepSkipper {
@@ -341,6 +388,109 @@ class ConsoleInputStepSkipper {
 
 	String chosenOption() {
 		return System.console().readLine();
+	}
+
+}
+
+class ProjectsToReleaseGroups {
+
+	private final ReleaserProperties releaserProperties;
+
+	ProjectsToReleaseGroups(ReleaserProperties releaserProperties) {
+		this.releaserProperties = releaserProperties;
+	}
+
+	List<ReleaseGroup> toReleaseGroup(ProjectsToRun projectsToRun) {
+		ReleaseGroups releaseGroups = new ReleaseGroups(
+				this.releaserProperties.getMetaRelease().getReleaseGroups());
+		return releaseGroup(releaseGroups, null, new LinkedList<>(),
+				projectsToRun.iterator());
+	}
+
+	private List<ReleaseGroup> releaseGroup(ReleaseGroups releaseGroups,
+			ReleaseGroup currentGroup, List<ReleaseGroup> merged,
+			Iterator<ProjectToRun.ProjectToRunSupplier> iterator) {
+		if (iterator.hasNext()) {
+			// sleuth
+			ProjectToRun.ProjectToRunSupplier supplier = iterator.next();
+			// sleuth,contract,gateway
+			String[] group = releaseGroups.group(supplier.projectName());
+			if (currentGroup != null && !currentGroup.sameGroup(group)) {
+				// we've been adding things to the current group, but we need to stop now
+				merged.add(currentGroup);
+				currentGroup = null;
+			}
+			if (group.length == 0) {
+				// if no group matching, return a single entry
+				ReleaseGroup current = new ReleaseGroup(supplier, group);
+				merged.add(current);
+				return releaseGroup(releaseGroups, null, merged, iterator);
+			}
+			// if still in group add to the current one
+			if (currentGroup != null) {
+				currentGroup.add(supplier);
+			}
+			else {
+				currentGroup = new ReleaseGroup(supplier, group);
+			}
+			return releaseGroup(releaseGroups, currentGroup, merged, iterator);
+		}
+		if (currentGroup != null) {
+			merged.add(currentGroup);
+		}
+		return merged;
+	}
+
+}
+
+class ReleaseGroup {
+
+	final List<ProjectToRun.ProjectToRunSupplier> projectsToRuns = new LinkedList<>();
+
+	final String[] group;
+
+	ReleaseGroup(ProjectToRun.ProjectToRunSupplier supplier, String[] group) {
+		this.projectsToRuns.add(supplier);
+		this.group = group;
+	}
+
+	Iterator<ProjectToRun.ProjectToRunSupplier> iterator() {
+		return projectsToRuns.iterator();
+	}
+
+	void add(ProjectToRun.ProjectToRunSupplier projectToRun) {
+		this.projectsToRuns.add(projectToRun);
+	}
+
+	boolean sameGroup(String[] group) {
+		return Arrays.equals(group, this.group);
+	}
+
+	boolean shouldRunInParallel() {
+		return this.projectsToRuns.size() > 1;
+	}
+
+	String flowName() {
+		return this.projectsToRuns.get(0).projectName() + "_Flow";
+	}
+
+}
+
+class ReleaseGroups {
+
+	private final List<String> releaseGroups;
+
+	ReleaseGroups(List<String> releaseGroups) {
+		this.releaseGroups = releaseGroups;
+	}
+
+	String[] group(String name) {
+		String foundGroup = this.releaseGroups.stream().filter(s -> s.contains(name))
+				.findFirst().orElse(null);
+		if (foundGroup == null) {
+			return new String[0];
+		}
+		return foundGroup.split(",");
 	}
 
 }

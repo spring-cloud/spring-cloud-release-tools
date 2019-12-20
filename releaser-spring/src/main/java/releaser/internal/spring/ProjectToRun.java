@@ -125,6 +125,10 @@ public class ProjectToRun implements Serializable {
 			return projectToRun;
 		}
 
+		public String projectName() {
+			return this.projectName;
+		}
+
 		@Override
 		public boolean equals(Object o) {
 			if (this == o) {
