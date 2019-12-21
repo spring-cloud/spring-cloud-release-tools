@@ -9,7 +9,7 @@
 
 	<parent>
 		<groupId>org.springframework.cloud.internal</groupId>
-		<artifactId>spring-cloud-release-tools-projects</artifactId>
+		<artifactId>releaser-projects</artifactId>
 		<version>1.0.0.BUILD-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
