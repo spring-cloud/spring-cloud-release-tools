@@ -16,7 +16,9 @@
 
 package releaser.internal.spring;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -30,7 +32,7 @@ import releaser.internal.project.Projects;
 
 import org.springframework.util.StringUtils;
 
-class VersionsToBumpFactory {
+class VersionsToBumpFactory implements Closeable {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(VersionsToBumpFactory.class);
@@ -47,26 +49,16 @@ class VersionsToBumpFactory {
 	}
 
 	ProjectsFromBom withProject(File project) {
-		ProjectsFromBom projectsFromBom = CACHE.get(project);
-		if (projectsFromBom != null) {
-			log.info("Found cached version of projects and version [{}]",
-					projectsFromBom);
-			return projectsFromBom;
-		}
-		log.info("Fetch from git [{}], meta release [{}], project [{}]",
-				this.properties.getGit().isFetchVersionsFromGit(),
-				this.properties.getMetaRelease().isEnabled(), project);
-		if (this.properties.getGit().isFetchVersionsFromGit()
-				&& !this.properties.getMetaRelease().isEnabled()) {
-			return fetchVersionsFromGitForSingleProject(project);
-		}
-		return fetchVersionsFromFixedProjects(project);
-	}
-
-	ProjectsFromBom postRelease() {
-		Projects fixedVersions = this.releaser.fixedVersions();
-		printSettingVersionFromFixedVersions(fixedVersions);
-		return new ProjectsFromBom(fixedVersions);
+		return CACHE.computeIfAbsent(project, file -> {
+			log.info("Fetch from git [{}], meta release [{}], project [{}]",
+					this.properties.getGit().isFetchVersionsFromGit(),
+					this.properties.getMetaRelease().isEnabled(), project);
+			if (this.properties.getGit().isFetchVersionsFromGit()
+					&& !this.properties.getMetaRelease().isEnabled()) {
+				return fetchVersionsFromGitForSingleProject(project);
+			}
+			return fetchVersionsFromFixedProjects(project);
+		});
 	}
 
 	private ProjectsFromBom fetchVersionsFromFixedProjects(File project) {
@@ -91,10 +83,7 @@ class VersionsToBumpFactory {
 
 	private ProjectsFromBom cachedProjectsFromBom(File project,
 			ProjectVersion versionFromBom, Projects projectsToUpdate) {
-		ProjectsFromBom projectsFromBom = new ProjectsFromBom(projectsToUpdate,
-				versionFromBom);
-		CACHE.put(project, projectsFromBom);
-		return projectsFromBom;
+		return new ProjectsFromBom(projectsToUpdate, versionFromBom);
 	}
 
 	ProjectVersion assertNoSnapshotsForANonSnapshotProject(File project,
@@ -126,6 +115,11 @@ class VersionsToBumpFactory {
 						+ " of projects\n\n{}",
 				projectsToUpdate.stream().map(p -> p.projectName + " => " + p.version)
 						.collect(Collectors.joining("\n")));
+	}
+
+	@Override
+	public void close() throws IOException {
+		CACHE.clear();
 	}
 
 }

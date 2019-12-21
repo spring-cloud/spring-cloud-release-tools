@@ -116,13 +116,7 @@ public class ProjectToRun implements Serializable {
 
 		@Override
 		public ProjectToRun get() {
-			ProjectToRun projectToRun = CACHE.get(this.projectName);
-			if (projectToRun != null) {
-				return projectToRun;
-			}
-			projectToRun = this.project.get();
-			CACHE.put(this.projectName, projectToRun);
-			return projectToRun;
+			return CACHE.computeIfAbsent(this.projectName, s -> this.project.get());
 		}
 
 		public String projectName() {

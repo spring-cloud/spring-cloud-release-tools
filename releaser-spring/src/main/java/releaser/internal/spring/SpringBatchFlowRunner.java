@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -440,6 +441,8 @@ class NamedArgumentsSupplier implements Supplier<Arguments> {
 
 	final Supplier<Arguments> argumentsSupplier;
 
+	final AtomicReference<Arguments> arguments = new AtomicReference<>();
+
 	NamedArgumentsSupplier(String projectName, Supplier<Arguments> argumentsSupplier) {
 		this.projectName = projectName;
 		this.argumentsSupplier = argumentsSupplier;
@@ -447,7 +450,12 @@ class NamedArgumentsSupplier implements Supplier<Arguments> {
 
 	@Override
 	public Arguments get() {
-		return this.argumentsSupplier.get();
+		if (this.arguments.get() != null) {
+			return arguments.get();
+		}
+		Arguments arguments = this.argumentsSupplier.get();
+		this.arguments.set(arguments);
+		return arguments;
 	}
 
 }

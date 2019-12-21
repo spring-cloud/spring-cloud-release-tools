@@ -200,25 +200,36 @@ public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 			URIish urIish = new URIish(url);
 			// retrieve from cache
 			// reset any changes and fetch the latest data
-			File clonedProject = CACHE.get(urIish);
-			if (clonedProject != null && clonedProject.exists()) {
+			File destinationDir = destinationDir();
+			File clonedProject = CACHE.computeIfAbsent(urIish,
+					urIish1 -> gitRepo(destinationDir).cloneProject(urIish));
+			if (clonedProject.exists()) {
 				log.info(
-						"Project has already been cloned. Will reset the current branch and fetch the latest changes.");
-				gitRepo(clonedProject).reset();
-				gitRepo(clonedProject).fetch();
+						"Project has already been cloned. Will try to reset the current branch and fetch the latest changes.");
+				try {
+					gitRepo(clonedProject).reset();
+					gitRepo(clonedProject).fetch();
+				}
+				catch (Exception ex) {
+					log.warn("Couldn't reset / fetch the repository, will continue", ex);
+				}
 				return clonedProject;
 			}
-			File destinationDir = this.properties.getGit()
-					.getCloneDestinationDir() != null
-							? new File(this.properties.getGit().getCloneDestinationDir())
-							: TemporaryFileStorage.createTempDir("releaser");
-			File clonedLocation = gitRepo(destinationDir).cloneProject(urIish);
-			CACHE.put(urIish, clonedLocation);
-			return clonedLocation;
+			return clonedProject;
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	private File destinationDir() {
+		return this.properties.getGit().getCloneDestinationDir() != null
+				? new File(this.properties.getGit().getCloneDestinationDir())
+				: TemporaryFileStorage.createTempDir("releaser");
+	}
+
+	private File humanishDestination(URIish projectUrl, File destinationFolder) {
+		return new File(destinationFolder, projectUrl.getHumanishName());
 	}
 
 	public void checkout(File project, String branch) {
