@@ -75,6 +75,60 @@ You can create your own project's module and
 * if you want to completely rewrite the flow of the release, just set `releaser.flow.default-enabled` to `false` and create the whole flow from scratch
 * if you want to modify the current flow, you can add new tasks by just creating a bean of a given type that extends the `ReleaserTask` and set its order accordingly.
 
+Example of creating a new `ReleaseReleaserTask` called `BuildCustomStuffTask`:
+
+```java
+package releaser.my_project;
+
+//...
+
+import releaser.internal.Releaser;
+import releaser.internal.spring.Arguments;
+import releaser.internal.spring.ExecutionResult;
+import releaser.internal.tasks.ReleaseReleaserTask;
+
+@Component
+public class BuildCustomStuffTask implements ReleaseReleaserTask {
+
+	/**
+	 * Order of this task. The higher value, the lower order.
+	 */
+	public static final int ORDER = 45;
+
+	@Override
+	public String name() {
+		return "build_custom_stuff";
+	}
+
+	@Override
+	public String shortName() {
+		return "bcf";
+	}
+
+	@Override
+	public String header() {
+		return "BUILDING CUSTOM STUFF";
+	}
+
+	@Override
+	public String description() {
+		return "Builds custom stuff";
+	}
+
+	@Override
+	public ExecutionResult runTask(Arguments args) {
+		// do some custom stuff basing on the arguments
+		return ExecutionResult.success();
+	}
+
+	@Override
+	public int getOrder() {
+		return BuildCustomStuffTask.ORDER;
+	}
+
+}
+```
+
 Each release or post release task can implement one of the following interfaces
 
 * `ReleaserTask` - marker interface for all release tasks
