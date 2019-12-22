@@ -35,6 +35,8 @@ import releaser.internal.tasks.CompositeReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
 import releaser.internal.tasks.SingleProjectReleaserTask;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.StringUtils;
 
 /**
@@ -48,10 +50,14 @@ class OptionsParser implements Parser {
 
 	private final List<SingleProjectReleaserTask> singleProjectReleaserTasks;
 
+	private final ConfigurableApplicationContext context;
+
 	OptionsParser(List<ReleaserTask> allTasks,
-			List<SingleProjectReleaserTask> singleProjectReleaserTasks) {
+			List<SingleProjectReleaserTask> singleProjectReleaserTasks,
+			ConfigurableApplicationContext context) {
 		this.allTasks = allTasks;
 		this.singleProjectReleaserTasks = singleProjectReleaserTasks;
+		this.context = context;
 	}
 
 	@Override
@@ -103,6 +109,7 @@ class OptionsParser implements Parser {
 			OptionSet options = parser.parse(args);
 			if (options.has("h")) {
 				printHelpMessage(parser);
+				SpringApplication.exit(this.context, () -> 0);
 				System.exit(0);
 			}
 			Boolean metaRelease = options.valueOf(metaReleaseOpt);

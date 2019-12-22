@@ -36,6 +36,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.util.StringUtils;
 
@@ -46,8 +48,12 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 
 	private final JobExplorer jobExplorer;
 
-	SpringBatchExecutionResultHandler(JobExplorer jobExplorer) {
+	private final ConfigurableApplicationContext context;
+
+	SpringBatchExecutionResultHandler(JobExplorer jobExplorer,
+			ConfigurableApplicationContext context) {
 		this.jobExplorer = jobExplorer;
+		this.context = context;
 	}
 
 	@Override
@@ -71,10 +77,12 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 	}
 
 	void exitSuccessfully() {
+		SpringApplication.exit(this.context, () -> 0);
 		System.exit(0);
 	}
 
 	void exitWithException() {
+		SpringApplication.exit(this.context, () -> 1);
 		System.exit(1);
 	}
 

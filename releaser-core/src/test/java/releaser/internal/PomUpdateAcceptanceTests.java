@@ -147,7 +147,7 @@ public class PomUpdateAcceptanceTests {
 		BDDAssertions
 				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
 						project, projects, projects.forFile(project), true))
-				.hasMessageContaining("<version>1.4.2.BUILD-SNAPSHOT</version>");
+				.hasMessageContaining("BUILD-SNAPSHOT</version>");
 	}
 
 	@Test

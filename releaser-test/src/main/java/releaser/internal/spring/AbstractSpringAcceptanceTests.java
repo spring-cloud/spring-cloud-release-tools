@@ -348,8 +348,9 @@ public abstract class AbstractSpringAcceptanceTests {
 
 		public boolean exitedWithException;
 
-		public TestExecutionResultHandler(JobExplorer jobExplorer) {
-			super(jobExplorer);
+		public TestExecutionResultHandler(JobExplorer jobExplorer,
+				ConfigurableApplicationContext context) {
+			super(jobExplorer, context);
 		}
 
 		@Override
@@ -371,9 +372,11 @@ public abstract class AbstractSpringAcceptanceTests {
 				StepBuilderFactory stepBuilderFactory,
 				JobBuilderFactory jobBuilderFactory,
 				ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
-				FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier) {
+				FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
+				ConfigurableApplicationContext context) {
 			return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
-					projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier) {
+					projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier,
+					context) {
 				@Override
 				Decision decide(Options options, ReleaserTask task) {
 					return Decision.CONTINUE;
@@ -393,8 +396,9 @@ public abstract class AbstractSpringAcceptanceTests {
 		}
 
 		@Bean
-		TestExecutionResultHandler testExecutionResultHandler(JobExplorer explorer) {
-			return new TestExecutionResultHandler(explorer);
+		TestExecutionResultHandler testExecutionResultHandler(JobExplorer explorer,
+				ConfigurableApplicationContext context) {
+			return new TestExecutionResultHandler(explorer, context);
 		}
 
 	}

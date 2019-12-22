@@ -58,6 +58,8 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
 
 class SpringBatchFlowRunner implements FlowRunner, Closeable {
@@ -67,7 +69,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
 	private static final String MSG = "\nPress 'q' to quit, 's' to skip, any key to continue\n\n";
 
-	private final ConsoleInputStepSkipper stepSkipper = new ConsoleInputStepSkipper();
+	private final ConsoleInputStepSkipper stepSkipper;
 
 	private final StepBuilderFactory stepBuilderFactory;
 
@@ -86,12 +88,14 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	SpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory,
 			JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
-			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier) {
+			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
+			ConfigurableApplicationContext context) {
 		this.stepBuilderFactory = stepBuilderFactory;
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
 		this.jobLauncher = jobLauncher;
 		this.flowRunnerTaskExecutorSupplier = flowRunnerTaskExecutorSupplier;
+		this.stepSkipper = new ConsoleInputStepSkipper(context);
 	}
 
 	@Override
@@ -462,12 +466,19 @@ class NamedArgumentsSupplier implements Supplier<Arguments> {
 
 class ConsoleInputStepSkipper {
 
+	private final ConfigurableApplicationContext context;
+
+	ConsoleInputStepSkipper(ConfigurableApplicationContext context) {
+		this.context = context;
+	}
+
 	public boolean skipStep() {
 		String input = chosenOption();
 		switch (input.toLowerCase()) {
 		case "s":
 			return true;
 		case "q":
+			SpringApplication.exit(this.context, () -> 0);
 			System.exit(0);
 			return true;
 		default:

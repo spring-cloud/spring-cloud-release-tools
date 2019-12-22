@@ -33,6 +33,7 @@ import releaser.internal.tasks.composite.MetaReleaseCompositeTask;
 import releaser.internal.tasks.composite.MetaReleaseDryRunCompositeTask;
 import releaser.internal.tasks.composite.ReleaseCompositeTask;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.StringUtils;
@@ -175,6 +176,7 @@ class TasksToRunFactory {
 	TasksToRun taskFromOption(List<ReleaserTask> tasks) {
 		String input = chosenOption();
 		if ("q".equals(input.toLowerCase())) {
+			SpringApplication.exit(this.context, () -> 0);
 			System.exit(0);
 			return null;
 		}

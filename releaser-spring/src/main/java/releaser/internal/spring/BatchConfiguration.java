@@ -34,6 +34,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -54,8 +55,9 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ExecutionResultHandler springBatchExecutionResultHandler(JobExplorer jobExplorer) {
-		return new SpringBatchExecutionResultHandler(jobExplorer);
+	ExecutionResultHandler springBatchExecutionResultHandler(JobExplorer jobExplorer,
+			ConfigurableApplicationContext context) {
+		return new SpringBatchExecutionResultHandler(jobExplorer, context);
 	}
 
 	@Bean
@@ -70,9 +72,11 @@ class BatchConfiguration {
 	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory,
 			JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
-			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier) {
+			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
+			ConfigurableApplicationContext context) {
 		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
-				projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier);
+				projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier,
+				context);
 	}
 
 	@Bean
