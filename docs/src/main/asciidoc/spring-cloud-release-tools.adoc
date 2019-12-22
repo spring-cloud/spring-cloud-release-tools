@@ -61,6 +61,14 @@ All the tasks are opt in, so if you do opt in for everything you'll get:
 
 IMPORTANT: For the meta-releaser to work we assume that the path to the custom configuration file for each project is always `config/releaser.yml`.
 
+NOTE: If you want to run some projects in parallel you have to set the `releaser.meta-release.release-groups` property to state which projects should be released in parallel. Example:
+
+```properties
+releaser.meta-release.release-groups[0]=projectA,projectB,projectC
+```
+
+If in the list of projects you have `projectA,projectB,projectC,projectD,projectE`, then `projectA,projectB,projectC` will be released in parallel and then `projectD` and `projectE` sequentially.
+
 === How can I extend it?
 
 The project consists of the following main modules
