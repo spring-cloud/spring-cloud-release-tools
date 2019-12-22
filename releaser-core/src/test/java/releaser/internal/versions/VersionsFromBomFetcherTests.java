@@ -22,14 +22,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import releaser.SpringCloudReleaserProperties;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.buildsystem.MavenBomParserAccessor;
 import releaser.internal.buildsystem.ProjectPomUpdater;
 import releaser.internal.buildsystem.TestUtils;
 import releaser.internal.project.ProjectVersion;
@@ -49,48 +46,6 @@ class VersionsFromBomFetcherTests {
 		projects.mkdirs();
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(localFile("/projects"), projects);
-	}
-
-	@Test
-	void should_return_true_when_current_version_is_the_latest_ga()
-			throws URISyntaxException {
-		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
-				"2.5.0.RELEASE");
-		URI initilizrUri = VersionsFromBomFetcherTests.class
-				.getResource("/raw/initializr.yml").toURI();
-		ReleaserProperties properties = SpringCloudReleaserProperties.get();
-		properties.getGit().setUpdateSpringGuides(true);
-		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
-		properties.getGit().setReleaseTrainBomUrl(
-				file("/projects/spring-cloud-release/").toURI().toString() + "/");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections
-				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties)));
-		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
-
-		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
-
-		BDDAssertions.then(latestGa).isTrue();
-	}
-
-	@Test
-	void should_return_false_when_current_version_is_not_the_latest_ga()
-			throws URISyntaxException {
-		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
-				"1.0.0.RELEASE");
-		URI initilizrUri = VersionsFromBomFetcherTests.class
-				.getResource("/raw/initializr.yml").toURI();
-		ReleaserProperties properties = SpringCloudReleaserProperties.get();
-		properties.getGit().setUpdateSpringGuides(true);
-		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
-		properties.getGit().setReleaseTrainBomUrl(
-				file("/projects/spring-cloud-release/").toURI().toString() + "/");
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections
-				.singletonList(MavenBomParserAccessor.cloudMavenBomParser(properties)));
-		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
-
-		boolean latestGa = versionsFetcher.isLatestGa(projectVersion);
-
-		BDDAssertions.then(latestGa).isTrue();
 	}
 
 	@Test

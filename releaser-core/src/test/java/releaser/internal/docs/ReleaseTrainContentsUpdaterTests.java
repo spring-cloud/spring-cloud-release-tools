@@ -29,7 +29,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import releaser.SpringCloudReleaserProperties;
-import releaser.cloud.github.SpringCloudGithubIssuesAccessor;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
 import releaser.internal.git.GitTestUtils;
@@ -52,8 +51,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(this.properties,
-			Collections.singletonList(
-					SpringCloudGithubIssuesAccessor.springCloud(this.properties))) {
+			Collections.emptyList()) {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
 			return "http://www.foo.com/";

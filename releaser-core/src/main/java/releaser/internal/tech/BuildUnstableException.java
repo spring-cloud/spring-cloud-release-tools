@@ -62,6 +62,10 @@ public class BuildUnstableException extends RuntimeException implements Serializ
 		log.error("\n\n" + DESCRIPTION + message + " with causes " + throwables);
 	}
 
+	// for Jackson
+	public BuildUnstableException() {
+	}
+
 	@JsonCreator
 	public BuildUnstableException(@JsonProperty List<Throwable> throwables) {
 		this.exceptions.addAll(throwables);

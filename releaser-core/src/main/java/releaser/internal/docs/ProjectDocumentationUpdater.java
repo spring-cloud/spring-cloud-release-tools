@@ -56,9 +56,8 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
 		log.debug("Cloning the doc project to [{}]", documentationProject);
-		CustomProjectDocumentationUpdater updater = this.updaters.stream().filter(
-				u -> u.isApplicable(documentationProject, currentProject, bomBranch))
-				.findFirst().orElse(CustomProjectDocumentationUpdater.NO_OP);
+		CustomProjectDocumentationUpdater updater = this.updaters.isEmpty()
+				? CustomProjectDocumentationUpdater.NO_OP : this.updaters.get(0);
 		return updater.updateDocsRepoForReleaseTrain(documentationProject, currentProject,
 				projects, bomBranch);
 	}
@@ -70,9 +69,8 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
 		log.debug("Cloning the doc project to [{}]", documentationProject);
-		CustomProjectDocumentationUpdater updater = this.updaters.stream()
-				.filter(u -> u.isApplicable(documentationProject, currentProject, null))
-				.findFirst().orElse(CustomProjectDocumentationUpdater.NO_OP);
+		CustomProjectDocumentationUpdater updater = this.updaters.isEmpty()
+				? CustomProjectDocumentationUpdater.NO_OP : this.updaters.get(0);
 		return updater.updateDocsRepoForSingleProject(documentationProject,
 				currentProject, projects);
 	}

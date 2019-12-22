@@ -27,8 +27,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.maven.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.Project;
 import releaser.internal.tech.PomReader;
@@ -41,8 +39,6 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 class MavenBomParser implements BomParser {
-
-	private static final Logger log = LoggerFactory.getLogger(MavenBomParser.class);
 
 	private final String thisTrainBomLocation;
 

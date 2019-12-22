@@ -18,7 +18,6 @@ package releaser.internal.github;
 
 import java.util.List;
 
-import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
@@ -27,30 +26,23 @@ import releaser.internal.project.Projects;
  */
 class GithubIssues {
 
-	private final ReleaserProperties releaserProperties;
-
 	private final List<CustomGithubIssues> customGithubIssues;
 
-	GithubIssues(ReleaserProperties releaserProperties,
-			List<CustomGithubIssues> customGithubIssues) {
-		this.releaserProperties = releaserProperties;
+	GithubIssues(List<CustomGithubIssues> customGithubIssues) {
 		this.customGithubIssues = customGithubIssues;
 	}
 
-	private CustomGithubIssues customGithubIssues(Projects projects,
-			ProjectVersion version) {
-		return this.customGithubIssues
-				.stream().filter(githubIssues -> githubIssues
-						.isApplicable(this.releaserProperties, projects, version))
-				.findFirst().orElse(CustomGithubIssues.NO_OP);
+	private CustomGithubIssues customGithubIssues() {
+		return this.customGithubIssues.isEmpty() ? CustomGithubIssues.NO_OP
+				: this.customGithubIssues.get(0);
 	}
 
 	void fileIssueInSpringGuides(Projects projects, ProjectVersion version) {
-		customGithubIssues(projects, version).fileIssueInSpringGuides(projects, version);
+		customGithubIssues().fileIssueInSpringGuides(projects, version);
 	}
 
 	void fileIssueInStartSpringIo(Projects projects, ProjectVersion version) {
-		customGithubIssues(projects, version).fileIssueInStartSpringIo(projects, version);
+		customGithubIssues().fileIssueInStartSpringIo(projects, version);
 	}
 
 }

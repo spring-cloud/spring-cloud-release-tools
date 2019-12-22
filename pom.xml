@@ -20,6 +20,7 @@
 	<modules>
 		<module>releaser-core</module>
 		<module>releaser-spring</module>
+		<module>releaser-test</module>
 		<module>spring-cloud-info</module>
 		<module>projects</module>
 		<module>docs</module>

@@ -45,7 +45,7 @@ public class ProjectGitHubHandler implements ReleaserPropertiesAware {
 			List<CustomGithubIssues> customGithubIssues) {
 		this.properties = properties;
 		this.githubMilestones = new GithubMilestones(properties);
-		this.githubIssues = new GithubIssues(properties, customGithubIssues);
+		this.githubIssues = new GithubIssues(customGithubIssues);
 		registerShutdownHook();
 	}
 

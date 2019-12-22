@@ -18,13 +18,11 @@ package releaser.internal.buildsystem;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import org.junit.Test;
 import releaser.SpringCloudReleaserProperties;
-import releaser.cloud.buildsystem.SpringCloudMavenBomParserAccessor;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.Project;
 
@@ -38,22 +36,6 @@ public class VersionsFromBomTests {
 	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
 			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects())
 			.retrieveFromBom();
-
-	@Test
-	public void should_add_boot_to_versions_when_version_is_created() {
-		CustomBomParser bomParser = SpringCloudMavenBomParserAccessor.cloud();
-		List<CustomBomParser> bomParsers = Collections.singletonList(bomParser);
-		VersionsFromBom customVersionsFromBom = new VersionsFromBomBuilder()
-				.releaserProperties(SpringCloudReleaserProperties.get())
-				.parsers(bomParsers).projects(springCloudBuildProjects())
-				.retrieveFromBom();
-		customVersionsFromBom.setVersion("spring-boot", "1.2.3.RELEASE");
-
-		then(customVersionsFromBom.projects).contains(
-				new Project("spring-boot", "1.2.3.RELEASE"),
-				new Project("spring-boot-starter-parent", "1.2.3.RELEASE"),
-				new Project("spring-boot-dependencies", "1.2.3.RELEASE"));
-	}
 
 	@Test
 	public void should_return_true_when_project_is_on_the_list() {
@@ -93,59 +75,6 @@ public class VersionsFromBomTests {
 	@Test
 	public void should_return_false_if_properties_does_not_contain_project_key() {
 		then(this.versionsFromBom.shouldSetProperty(missingProps())).isFalse();
-	}
-
-	@Test
-	public void should_update_projects_for_boot() {
-		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-boot",
-				"3.0.0");
-
-		then(versionsFromBom.versionForProject("spring-boot")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-starter-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-dependencies"))
-				.isEqualTo("3.0.0");
-
-		versionsFromBom = mixedVersions().setVersion("spring-boot-starter-parent",
-				"3.0.0");
-
-		then(versionsFromBom.versionForProject("spring-boot")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-starter-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-dependencies"))
-				.isEqualTo("3.0.0");
-
-		versionsFromBom = mixedVersions().setVersion("spring-boot-dependencies", "3.0.0");
-
-		then(versionsFromBom.versionForProject("spring-boot")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-starter-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-dependencies"))
-				.isEqualTo("3.0.0");
-	}
-
-	@Test
-	public void should_update_projects_for_build() {
-		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-cloud-build",
-				"3.0.0");
-
-		then(versionsFromBom.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
-
-		versionsFromBom = mixedVersions().setVersion("spring-cloud-build", "3.0.0");
-
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.RELEASE");
-
-		versionsFromBom = mixedVersions().setVersion("spring-cloud-dependencies-parent",
-				"3.0.0");
-
-		then(versionsFromBom.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.RELEASE");
 	}
 
 	@Test
@@ -251,9 +180,7 @@ public class VersionsFromBomTests {
 	private VersionsFromBom mixedVersions() {
 		return new VersionsFromBomBuilder()
 				.releaserProperties(SpringCloudReleaserProperties.get())
-				.parsers(Collections
-						.singletonList(SpringCloudMavenBomParserAccessor.cloud()))
-				.projects(mixedProjects()).merged();
+				.parsers(Collections.emptyList()).projects(mixedProjects()).merged();
 	}
 
 	private VersionsFromBom mixedVersions(ReleaserProperties properties) {

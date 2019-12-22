@@ -16,7 +16,6 @@
 
 package releaser.internal.github;
 
-import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
@@ -28,12 +27,6 @@ public interface CustomGithubIssues {
 	CustomGithubIssues NO_OP = new CustomGithubIssues() {
 
 		@Override
-		public boolean isApplicable(ReleaserProperties properties, Projects projects,
-				ProjectVersion version) {
-			return true;
-		}
-
-		@Override
 		public void fileIssueInSpringGuides(Projects projects, ProjectVersion version) {
 
 		}
@@ -43,9 +36,6 @@ public interface CustomGithubIssues {
 
 		}
 	};
-
-	boolean isApplicable(ReleaserProperties properties, Projects projects,
-			ProjectVersion version);
 
 	void fileIssueInSpringGuides(Projects projects, ProjectVersion version);
 

@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
 import org.junit.Before;
@@ -50,10 +51,7 @@ public class PomUpdaterTests {
 
 	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
 			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects())
-			.parsers(MavenBomParserAccessor
-					.cloudMavenBomParser(SpringCloudReleaserProperties.get())
-					.customBomParsers())
-			.retrieveFromBom();
+			.parsers(Collections.emptyList()).retrieveFromBom();
 
 	PomUpdater pomUpdater = new PomUpdater();
 
@@ -246,7 +244,7 @@ public class PomUpdaterTests {
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("0.0.3.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
-				.isEqualTo("0.0.1");
+				.isEqualTo("1.5.8.RELEASE");
 		BDDAssertions.then(overriddenPomModel.getProperties())
 				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
 	}
@@ -293,7 +291,7 @@ public class PomUpdaterTests {
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
-				.isEqualTo("0.0.1");
+				.isEqualTo("1.5.8.RELEASE");
 		// the rest is the same
 		BDDAssertions.then(overriddenPomModel.getProperties())
 				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
@@ -318,7 +316,7 @@ public class PomUpdaterTests {
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
-				.isEqualTo("0.0.1");
+				.isEqualTo("1.5.8.RELEASE");
 		// the rest is the same
 		BDDAssertions.then(overriddenPomModel.getProperties())
 				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
@@ -343,7 +341,7 @@ public class PomUpdaterTests {
 		BDDAssertions.then(overriddenPomModel.getVersion())
 				.isEqualTo("1.2.2.BUILD-SNAPSHOT");
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
-				.isEqualTo("0.0.1");
+				.isEqualTo("1.5.8.RELEASE");
 		// the rest is the same
 		BDDAssertions.then(overriddenPomModel.getProperties())
 				.containsEntry("spring-cloud-sleuth.version", "0.0.3.BUILD-SNAPSHOT");
@@ -366,7 +364,7 @@ public class PomUpdaterTests {
 		BDDAssertions.then(asString(storedPom)).isNotEqualTo(asString(originalPom));
 		Model overriddenPomModel = PomReader.readPom(storedPom);
 		BDDAssertions.then(overriddenPomModel.getParent().getVersion())
-				.isEqualTo("0.0.1");
+				.isEqualTo("0.0.2.BUILD-SNAPSHOT");
 
 	}
 

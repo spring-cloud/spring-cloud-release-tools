@@ -497,6 +497,15 @@ class GitRepo {
 			}
 		}
 
+		Git init(File file) {
+			try {
+				return Git.init().setDirectory(file).call();
+			}
+			catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
 	}
 
 }

@@ -18,6 +18,7 @@ package releaser.internal.versions;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -50,7 +51,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class VersionsFetcher implements ReleaserPropertiesAware {
+public class VersionsFetcher implements ReleaserPropertiesAware, Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(VersionsFetcher.class);
 
@@ -144,6 +145,11 @@ public class VersionsFetcher implements ReleaserPropertiesAware {
 		this.properties = properties;
 	}
 
+	@Override
+	public void close() {
+		this.toPropertiesConverter.close();
+	}
+
 }
 
 class RawGithubRetriever {
@@ -168,7 +174,7 @@ class RawGithubRetriever {
 
 }
 
-class ToPropertiesConverter {
+class ToPropertiesConverter implements Closeable {
 
 	private static final Map<String, InitializrProperties> CACHE = new ConcurrentHashMap<>();
 
@@ -196,6 +202,11 @@ class ToPropertiesConverter {
 													InitializrProperties.class)
 											.get();
 		});
+	}
+
+	@Override
+	public void close() {
+		CACHE.clear();
 	}
 
 }

@@ -1,0 +1,6 @@
+releaser.maven.buildCommand: maven_build
+releaser.bash.buildCommand: bash_build
+releaser.gradle.buildCommand: gradle_build
+releaser.gradle.gradlePropsSubstitution:
+  verifierVersion: spring-cloud-contract
+  bootVersion: spring-boot

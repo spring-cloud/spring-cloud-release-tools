@@ -30,11 +30,6 @@ public interface CustomProjectDocumentationUpdater {
 	 * NO OP implementation of the updater.
 	 */
 	CustomProjectDocumentationUpdater NO_OP = new CustomProjectDocumentationUpdater() {
-		@Override
-		public boolean isApplicable(File clonedDocumentationProject,
-				ProjectVersion currentProject, String bomBranch) {
-			return true;
-		}
 
 		@Override
 		public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
@@ -48,18 +43,6 @@ public interface CustomProjectDocumentationUpdater {
 			return clonedDocumentationProject;
 		}
 	};
-
-	/**
-	 * Different projects can have different documentation updaters. This method will tell
-	 * whether the current updater should be applied or not. Updates the documentation
-	 * repository.
-	 * @param clonedDocumentationProject path to the cloned documentation project
-	 * @param currentProject project to update the docs repo for
-	 * @param bomBranch the bom project branch - can be null
-	 * @return {@code true} if the parser should be applied.
-	 */
-	boolean isApplicable(File clonedDocumentationProject, ProjectVersion currentProject,
-			String bomBranch);
 
 	/**
 	 * Updates the documentation repository for a release train.

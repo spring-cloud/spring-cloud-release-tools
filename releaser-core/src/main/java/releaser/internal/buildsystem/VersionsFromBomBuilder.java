@@ -64,8 +64,7 @@ public class VersionsFromBomBuilder {
 	}
 
 	public VersionsFromBom merged() {
-		File thisProjectRoot = thisProjectRoot();
-		CustomBomParser bomParser = parser(thisProjectRoot);
+		CustomBomParser bomParser = parser();
 		if (!this.projects.isEmpty()) {
 			return new VersionsFromBom(this.releaserProperties, bomParser, this.projects);
 		}
@@ -75,9 +74,9 @@ public class VersionsFromBomBuilder {
 
 	public VersionsFromBom retrieveFromBom() {
 		File thisProjectRoot = thisProjectRoot();
-		CustomBomParser bomParser = parser(thisProjectRoot);
+		CustomBomParser bomParser = parser();
 		VersionsFromBom versionsFromBom = versionsFromBom(bomParser);
-		VersionsFromBom customParsing = customParsing(thisProjectRoot, this.projects);
+		VersionsFromBom customParsing = customParsing(thisProjectRoot);
 		return new VersionsFromBom(this.releaserProperties, bomParser, versionsFromBom,
 				customParsing);
 	}
@@ -87,11 +86,8 @@ public class VersionsFromBomBuilder {
 				: new File(this.releaserProperties.getWorkingDir());
 	}
 
-	private CustomBomParser parser(File thisProjectRoot) {
-		return this.parsers
-				.stream().filter(p -> p.isApplicable(thisProjectRoot,
-						this.releaserProperties, this.projects))
-				.findFirst().orElse(CustomBomParser.NO_OP);
+	private CustomBomParser parser() {
+		return this.parsers.isEmpty() ? CustomBomParser.NO_OP : this.parsers.get(0);
 	}
 
 	private VersionsFromBom versionsFromBom(CustomBomParser bomParser) {
@@ -105,10 +101,8 @@ public class VersionsFromBomBuilder {
 		return new VersionsFromBom(this.releaserProperties, bomParser);
 	}
 
-	private VersionsFromBom customParsing(File thisProjectRoot, Set<Project> projects) {
+	private VersionsFromBom customParsing(File thisProjectRoot) {
 		return this.parsers.stream()
-				.filter(p -> p.isApplicable(thisProjectRoot, this.releaserProperties,
-						projects))
 				.map(p -> p.parseBom(thisProjectRoot, this.releaserProperties))
 				.reduce((versionsFromBom,
 						versionsFromBom2) -> new VersionsFromBomBuilder()

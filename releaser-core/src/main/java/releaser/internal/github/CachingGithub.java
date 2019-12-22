@@ -147,7 +147,7 @@ class CachingGithub implements Github, Closeable {
 
 class CachingRepos implements Repos, Closeable {
 
-	private static final Map<Object, Repo> CACHE = new ConcurrentHashMap<>();
+	private static final Map<Object, CachingRepo> CACHE = new ConcurrentHashMap<>();
 
 	private final Repos delegate;
 
@@ -193,12 +193,13 @@ class CachingRepos implements Repos, Closeable {
 
 	@Override
 	public void close() throws IOException {
+		CACHE.forEach((o, repo) -> repo.close());
 		CACHE.clear();
 	}
 
 }
 
-class CachingRepo implements Repo {
+class CachingRepo implements Repo, Closeable {
 
 	private static final Map<RepoKey, Object> CACHE = new ConcurrentHashMap<>();
 
@@ -352,6 +353,11 @@ class CachingRepo implements Repo {
 	@Override
 	public int compareTo(Repo o) {
 		return this.delegate.compareTo(o);
+	}
+
+	@Override
+	public void close() {
+		CACHE.clear();
 	}
 
 }

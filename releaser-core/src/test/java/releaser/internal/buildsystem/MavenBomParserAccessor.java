@@ -18,14 +18,12 @@ package releaser.internal.buildsystem;
 
 import java.util.Collections;
 
-import releaser.cloud.buildsystem.SpringCloudMavenBomParserAccessor;
 import releaser.internal.ReleaserProperties;
 
 public class MavenBomParserAccessor {
 
-	public static BomParser cloudMavenBomParser(ReleaserProperties properties) {
-		return new MavenBomParser(properties,
-				Collections.singletonList(SpringCloudMavenBomParserAccessor.cloud()));
+	public static BomParser maven(ReleaserProperties properties) {
+		return new MavenBomParser(properties, Collections.emptyList());
 	}
 
 }

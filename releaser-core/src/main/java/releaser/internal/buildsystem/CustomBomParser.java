@@ -23,38 +23,13 @@ import java.util.Set;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.Project;
 
-import org.springframework.lang.Nullable;
-
 /**
  * Allows to pass in some additional gradle files parser.
  */
 public interface CustomBomParser {
 
-	CustomBomParser NO_OP = new CustomBomParser() {
-		@Override
-		public boolean isApplicable(File thisProjectRoot, ReleaserProperties properties,
-				Set<Project> projects) {
-			return true;
-		}
-
-		@Override
-		public VersionsFromBom parseBom(File thisProjectRoot,
-				ReleaserProperties properties) {
-			return VersionsFromBom.EMPTY_VERSION;
-		}
-
-	};
-
-	/**
-	 * Different projects can have different parsers. This method will tell whether the
-	 * current parser should be applied or not.
-	 * @param thisProjectRoot - location of the cloned project
-	 * @param properties - releaser properties
-	 * @param projects - parsed projects from the BOM
-	 * @return {@code true} if the parser should be applied.
-	 */
-	boolean isApplicable(File thisProjectRoot, ReleaserProperties properties,
-			@Nullable Set<Project> projects);
+	CustomBomParser NO_OP = (thisProjectRoot,
+			properties) -> VersionsFromBom.EMPTY_VERSION;
 
 	/**
 	 * When parsing a part of the BOM pom, one can add custom logic to perform project
