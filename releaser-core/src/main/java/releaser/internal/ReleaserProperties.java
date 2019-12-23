@@ -321,6 +321,20 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private List<String> releaseGroups = new LinkedList<>();
 
+		/**
+		 * Timeout in minutes during which we're waiting for a single composite task per a
+		 * project to be executed. That means that e.g. a release process for a single
+		 * project should take at most 60 minutes.
+		 */
+		private int releaseGroupTimeoutInMinutes = 60;
+
+		/**
+		 * Number of threads per release group. E.g. for thread count of 4 if there are 6
+		 * projects in a release group, 4 of them will be executed in parallel and 2 will
+		 * wait for their turn.
+		 */
+		private int releaseGroupThreadCount = 4;
+
 		public boolean isEnabled() {
 			return this.enabled;
 		}
@@ -370,13 +384,31 @@ public class ReleaserProperties implements Serializable {
 			this.releaseGroups = releaseGroups;
 		}
 
+		public int getReleaseGroupTimeoutInMinutes() {
+			return this.releaseGroupTimeoutInMinutes;
+		}
+
+		public void setReleaseGroupTimeoutInMinutes(int releaseGroupTimeoutInMinutes) {
+			this.releaseGroupTimeoutInMinutes = releaseGroupTimeoutInMinutes;
+		}
+
+		public int getReleaseGroupThreadCount() {
+			return this.releaseGroupThreadCount;
+		}
+
+		public void setReleaseGroupThreadCount(int releaseGroupThreadCount) {
+			this.releaseGroupThreadCount = releaseGroupThreadCount;
+		}
+
 		@Override
 		public String toString() {
 			return "MetaRelease{" + "enabled=" + enabled + ", releaseTrainProjectName='"
 					+ releaseTrainProjectName + '\'' + ", releaseTrainDependencyNames="
 					+ releaseTrainDependencyNames + ", gitOrgUrl='" + gitOrgUrl + '\''
-					+ ", projectsToSkip=" + projectsToSkip + ", releaseGroups='"
-					+ releaseGroups + '\'' + '}';
+					+ ", projectsToSkip=" + projectsToSkip + ", releaseGroups="
+					+ releaseGroups + ", releaseGroupTimeoutInMinutes="
+					+ releaseGroupTimeoutInMinutes + ", releaseGroupThreadCount="
+					+ releaseGroupThreadCount + '}';
 		}
 
 	}

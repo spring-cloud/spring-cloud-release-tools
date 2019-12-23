@@ -373,10 +373,11 @@ public abstract class AbstractSpringAcceptanceTests {
 				JobBuilderFactory jobBuilderFactory,
 				ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 				FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
-				ConfigurableApplicationContext context) {
+				ConfigurableApplicationContext context,
+				ReleaserProperties releaserProperties) {
 			return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
 					projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier,
-					context) {
+					context, releaserProperties) {
 				@Override
 				Decision decide(Options options, ReleaserTask task) {
 					return Decision.CONTINUE;

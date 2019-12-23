@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package releaser.internal.tasks.release;
+package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
 import releaser.internal.spring.ExecutionResult;
-import releaser.internal.tasks.ReleaseReleaserTask;
+import releaser.internal.tasks.ProjectPostReleaseReleaserTask;
 
-public class CloseMilestonesReleaseTask implements ReleaseReleaserTask {
+public class CloseMilestonesProjectPostReleaseTask
+		implements ProjectPostReleaseReleaserTask {
 
 	/**
 	 * Order of this task. The higher value, the lower order.
@@ -30,7 +31,7 @@ public class CloseMilestonesReleaseTask implements ReleaseReleaserTask {
 
 	private final Releaser releaser;
 
-	public CloseMilestonesReleaseTask(Releaser releaser) {
+	public CloseMilestonesProjectPostReleaseTask(Releaser releaser) {
 		this.releaser = releaser;
 	}
 
@@ -62,7 +63,7 @@ public class CloseMilestonesReleaseTask implements ReleaseReleaserTask {
 
 	@Override
 	public int getOrder() {
-		return CloseMilestonesReleaseTask.ORDER;
+		return CloseMilestonesProjectPostReleaseTask.ORDER;
 	}
 
 }

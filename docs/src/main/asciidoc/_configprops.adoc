@@ -56,6 +56,8 @@
 |releaser.meta-release.enabled | false | Are we releasing the whole suite of apps or only one?
 |releaser.meta-release.git-org-url |  | The URL of the Git organization. We'll append each project's name to it.
 |releaser.meta-release.projects-to-skip |  | Names of projects to skip deployment for meta-release.
+|releaser.meta-release.release-group-thread-count | 4 | Number of threads per release group. E.g. for thread count of 4 if there are 6 projects in a release group, 4 of them will be executed in parallel and 2 will wait for their turn.
+|releaser.meta-release.release-group-timeout-in-minutes | 60 | Timeout in minutes during which we're waiting for a single composite task per a project to be executed. That means that e.g. a release process for a single project should take at most 60 minutes.
 |releaser.meta-release.release-groups |  | If provided, allows to provide groups of projects that can be ran in parallel. E.g. {@code --releaser.meta-release.release-groups[0]=projectA,projectB,projectC} {@code --releaser.meta-release.release-groups[1]=projectD,projectE} {@code --releaser.meta-release.release-groups[2]=projectF,projectG} The order is still provided by the list of versions passed to the releaser. Basing on that order, and this value we are able to build a flow with projects.
 |releaser.meta-release.release-train-dependency-names |  | All the names of dependencies that should be updated with the release train project version.
 |releaser.meta-release.release-train-project-name |  | Name of the release train project.

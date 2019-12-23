@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +92,9 @@ public class ReleaseCompositeTask implements CompositeReleaserTask {
 		allReleaseTasks.addAll(projectPostReleaseTasks.values());
 		List<ReleaserTask> values = new LinkedList<>(allReleaseTasks);
 		values.sort(AnnotationAwareOrderComparator.INSTANCE);
-		log.info("Found the following release and project post release tasks {}", values);
+		log.info("Found the following release and project post release tasks {}",
+				values.stream().map(r -> r.getClass().getSimpleName()).collect(Collectors
+						.toCollection((Supplier<LinkedList<String>>) LinkedList::new)));
 		return flowRunner().runReleaseTasks(args.options, args.properties,
 				new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(
 						args.originalVersion.projectName, () -> args.projectToRun)),

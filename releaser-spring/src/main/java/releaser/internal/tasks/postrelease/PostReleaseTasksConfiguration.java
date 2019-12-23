@@ -32,6 +32,13 @@ class PostReleaseTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	@ConditionalOnProperty("releaser.git.update-github-milestones")
+	CloseMilestonesProjectPostReleaseTask closeMilestonesReleaseTask(Releaser releaser) {
+		return new CloseMilestonesProjectPostReleaseTask(releaser);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.template.enabled")
 	CreateTemplatesTrainPostReleaseTask createTemplatesTrainPostReleaseTask(
 			Releaser releaser) {

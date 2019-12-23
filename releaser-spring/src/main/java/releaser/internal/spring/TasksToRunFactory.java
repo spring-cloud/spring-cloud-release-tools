@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -52,6 +53,9 @@ class TasksToRunFactory {
 		TasksToRun tasks = releaseTasks(optionsAndProperties);
 		tasks.forEach(t -> t.setup(optionsAndProperties.options,
 				optionsAndProperties.properties));
+		log.info("Will run the following tasks {}",
+				tasks.stream().map(t -> t.getClass().getSimpleName()).collect(Collectors
+						.toCollection((Supplier<LinkedList<String>>) LinkedList::new)));
 		return tasks;
 	}
 

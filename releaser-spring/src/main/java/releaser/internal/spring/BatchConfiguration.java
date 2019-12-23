@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import releaser.internal.ReleaserProperties;
 
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
@@ -73,10 +74,11 @@ class BatchConfiguration {
 			JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
-			ConfigurableApplicationContext context) {
+			ConfigurableApplicationContext context,
+			ReleaserProperties releaserProperties) {
 		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
 				projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier,
-				context);
+				context, releaserProperties);
 	}
 
 	@Bean

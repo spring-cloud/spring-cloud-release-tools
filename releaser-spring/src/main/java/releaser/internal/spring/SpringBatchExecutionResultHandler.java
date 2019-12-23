@@ -151,6 +151,12 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 			buildStatus.createNewFile();
 			String text = "[BUILD UNSTABLE] The release happened successfully, but there were post release issues";
 			Files.write(buildStatus.toPath(), text.getBytes());
+			log.info(
+					"\n\n\n  ___ _   _ ___ _    ___    _   _ _  _ ___ _____ _   ___ _    ___ \n"
+							+ " | _ ) | | |_ _| |  |   \\  | | | | \\| / __|_   _/_\\ | _ ) |  | __|\n"
+							+ " | _ \\ |_| || || |__| |) | | |_| | .` \\__ \\ | |/ _ \\| _ \\ |__| _| \n"
+							+ " |___/\\___/|___|____|___/   \\___/|_|\\_|___/ |_/_/ \\_\\___/____|___|\n"
+							+ "                                                                  ");
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(
@@ -169,6 +175,12 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 			buildStatus.createNewFile();
 			String text = "[BUILD STABLE] All the release steps have been successfully executed!";
 			Files.write(buildStatus.toPath(), text.getBytes());
+			log.info(
+					"\n\n\n  ___ _   _ ___ _    ___    ___ _   _  ___ ___ ___ ___ ___ ___ _   _ _    \n"
+							+ " | _ ) | | |_ _| |  |   \\  / __| | | |/ __/ __| __/ __/ __| __| | | | |   \n"
+							+ " | _ \\ |_| || || |__| |) | \\__ \\ |_| | (_| (__| _|\\__ \\__ \\ _|| |_| | |__ \n"
+							+ " |___/\\___/|___|____|___/  |___/\\___/ \\___\\___|___|___/___/_|  \\___/|____|\n"
+							+ "                                                                          ");
 		}
 		catch (IOException e) {
 			log.info("Failed to store the file but the build was stable");
@@ -186,6 +198,11 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 			buildStatus.createNewFile();
 			String text = "[BUILD FAILED] There were exceptions while doing the release!";
 			Files.write(buildStatus.toPath(), text.getBytes());
+			log.info("\n\n\n  ___ _   _ ___ _    ___    ___ _   ___ _    ___ ___  \n"
+					+ " | _ ) | | |_ _| |  |   \\  | __/_\\ |_ _| |  | __|   \\ \n"
+					+ " | _ \\ |_| || || |__| |) | | _/ _ \\ | || |__| _|| |) |\n"
+					+ " |___/\\___/|___|____|___/  |_/_/ \\_\\___|____|___|___/ \n"
+					+ "                                                      ");
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(

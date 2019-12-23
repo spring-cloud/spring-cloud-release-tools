@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.options.Options;
 import releaser.internal.options.OptionsBuilder;
 import releaser.internal.options.Parser;
-import releaser.internal.tasks.CompositeReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
 import releaser.internal.tasks.SingleProjectReleaserTask;
 
@@ -82,10 +81,10 @@ class OptionsParser implements Parser {
 					Arrays.asList("dr", "dry-run"),
 					"Do you want to do the release / meta release with build and install projects locally only?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(false);
-			LinkedList<ReleaserTask> nonCompositeTasks = this.allTasks.stream().filter(
-					releaserTask -> !(releaserTask instanceof CompositeReleaserTask))
+			LinkedList<ReleaserTask> singleProjectReleaseTasks = this.allTasks.stream()
+					.filter(releaserTask -> releaserTask instanceof SingleProjectReleaserTask)
 					.collect(Collectors.toCollection(LinkedList::new));
-			nonCompositeTasks.forEach(task -> parser
+			singleProjectReleaseTasks.forEach(task -> parser
 					.acceptsAll(Arrays.asList(task.shortName(), task.name()),
 							task.description())
 					.withOptionalArg());
@@ -123,9 +122,9 @@ class OptionsParser implements Parser {
 			providedTaskNames = providedTaskNames.stream().map(this::removeQuotingChars)
 					.collect(Collectors.toList());
 			log.info("Passed tasks {} from command line", providedTaskNames);
-			List<String> allTaskNames = nonCompositeTasks.stream().map(ReleaserTask::name)
-					.collect(Collectors.toList());
-			List<String> tasksFromOptions = nonCompositeTasks.stream().filter(
+			List<String> allTaskNames = singleProjectReleaseTasks.stream()
+					.map(ReleaserTask::name).collect(Collectors.toList());
+			List<String> tasksFromOptions = singleProjectReleaseTasks.stream().filter(
 					task -> options.has(task.name()) || options.has(task.shortName()))
 					.map(ReleaserTask::name).collect(Collectors.toList());
 			if (providedTaskNames.isEmpty()) {
@@ -194,7 +193,7 @@ class OptionsParser implements Parser {
 	}
 
 	private String intro() {
-		return "\nHere you can find the list of tasks in order\n\n["
+		return "\nHere you can find the list of tasks in order for a single project\n\n["
 				+ this.singleProjectReleaserTasks.stream().map(ReleaserTask::name)
 						.collect(Collectors.joining(","))
 				+ "]\n\n";

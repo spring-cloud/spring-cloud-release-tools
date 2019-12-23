@@ -41,12 +41,6 @@ class ReleaseTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	CloseMilestonesReleaseTask closeMilestonesReleaseTask(Releaser releaser) {
-		return new CloseMilestonesReleaseTask(releaser);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
 	CommitReleaseTask commitReleaseTask(Releaser releaser) {
 		return new CommitReleaseTask(releaser);
 	}

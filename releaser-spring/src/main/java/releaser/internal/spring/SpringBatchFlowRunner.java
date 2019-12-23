@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.tasks.CompositeReleaserTask;
+import releaser.internal.tasks.PostReleaseReleaserTask;
 import releaser.internal.tasks.ReleaseReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
@@ -83,19 +85,25 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
 	private static final List<TaskExecutor> EXECUTORS = new ArrayList<>();
 
-	private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+	private final ExecutorService executorService;
+
+	private final ReleaserProperties releaserProperties;
 
 	SpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory,
 			JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
-			ConfigurableApplicationContext context) {
+			ConfigurableApplicationContext context,
+			ReleaserProperties releaserProperties) {
 		this.stepBuilderFactory = stepBuilderFactory;
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
 		this.jobLauncher = jobLauncher;
 		this.flowRunnerTaskExecutorSupplier = flowRunnerTaskExecutorSupplier;
 		this.stepSkipper = new ConsoleInputStepSkipper(context);
+		this.releaserProperties = releaserProperties;
+		this.executorService = Executors.newFixedThreadPool(
+				this.releaserProperties.getMetaRelease().getReleaseGroupThreadCount());
 	}
 
 	@Override
@@ -204,6 +212,9 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
 		ProjectsToReleaseGroups groups = new ProjectsToReleaseGroups(properties);
 		List<ReleaseGroup> releaseGroups = groups.toReleaseGroup(projectsToRun);
+		if (groups.hasGroups()) {
+			log.info("Found the following release groups {}", releaseGroups);
+		}
 		TaskExecutor taskExecutor = taskExecutor();
 		List<StuffToRun> flows = releaseGroups.stream()
 				.map(group -> buildFlowForGroup(tasksToRun, taskExecutor, group))
@@ -242,7 +253,10 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 					return releaserTask.apply(Arguments.forProject(s.get()));
 				})).map(f -> {
 					try {
-						return f.get();
+						return f.get(
+								this.releaserProperties.getMetaRelease()
+										.getReleaseGroupTimeoutInMinutes() * 60,
+								TimeUnit.SECONDS);
 					}
 					catch (Exception e) {
 						throw new IllegalStateException(e);
@@ -319,7 +333,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 		Flow flow = postReleaseFlow(tasksToRun, properties, projectsToRun);
 		String name = taskName + "_" + System.currentTimeMillis();
 		if (flow == null) {
-			log.info("No post release tasks to run, will do nothing");
+			log.info("No release train post release tasks to run, will do nothing");
 			return ExecutionResult.success();
 		}
 		Job job = this.jobBuilderFactory.get(name).start(flow).build().build();
@@ -420,8 +434,10 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	}
 
 	private void printLog(boolean interactive, ReleaserTask task) {
-		log.info("\n\n\n=== {} ===\n\n{} {}\n\n", task.header(), task.description(),
-				interactive ? MSG : "");
+		String taskType = task instanceof PostReleaseReleaserTask ? "Post Release Task"
+				: "Release Task";
+		log.info("\n\n\n=== {} [{}] ===\n\n{} {}\n\n", task.header(), taskType,
+				task.description(), interactive ? MSG : "");
 	}
 
 	@Override
@@ -602,6 +618,17 @@ class ReleaseGroup {
 
 	String flowName() {
 		return this.projectsToRun.get(0).projectName() + "_Flow";
+	}
+
+	private String projectName() {
+		return this.projectsToRun.isEmpty() ? "EMPTY"
+				: this.projectsToRun.get(0).projectName();
+	}
+
+	@Override
+	public String toString() {
+		return "ReleaseGroup{" + "group="
+				+ (group.length > 0 ? Arrays.toString(group) : projectName()) + '}';
 	}
 
 }
