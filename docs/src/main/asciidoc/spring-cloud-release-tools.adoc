@@ -209,7 +209,7 @@ Go to your project (e.g. Spring Cloud Sleuth)
 $ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/projects/spring-cloud/target/releaser-spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
+$ java -jar ~/repo/spring-cloud-release-tools/projects/spring-cloud/target/spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
 ----
 
 The application will start running from your working directory.
@@ -377,7 +377,7 @@ All you have to do is run the jar with the releaser and pass the
 `-x=true` option to turn on meta-release and a list of fixed versions in the `--"releaser.fixed-versions[project-name]=project-version" format
 
 ```
-$ java -jar projects/spring-cloud/target/releaser-spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
+$ java -jar projects/spring-cloud/target/spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
 ```
 
 IMPORTANT: For the meta release the `startFrom` or `taskNames` take into consideration the project names, not task names. E.g. you can start from `spring-cloud-netflix` project, or build only tasks with names `spring-cloud-build,spring-cloud-sleuth`.
