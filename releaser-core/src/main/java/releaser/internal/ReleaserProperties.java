@@ -323,10 +323,10 @@ public class ReleaserProperties implements Serializable {
 
 		/**
 		 * Timeout in minutes during which we're waiting for a single composite task per a
-		 * project to be executed. That means that e.g. a release process for a single
-		 * project should take at most 60 minutes.
+		 * project to be executed. That means that if set to e.g. 180 then a release
+		 * process for a single project should take at most 180 minutes.
 		 */
-		private int releaseGroupTimeoutInMinutes = 60;
+		private int releaseGroupTimeoutInMinutes = 180;
 
 		/**
 		 * Number of threads per release group. E.g. for thread count of 4 if there are 6

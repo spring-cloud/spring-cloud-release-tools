@@ -1,13 +1,3 @@
-:github-tag: master
-:org: spring-cloud
-:repo: spring-cloud-release-tools
-:github-repo: {org}/{repo}
-:github-raw: https://raw.github.com/{github-repo}/{github-tag}
-:github-code: https://github.com/{github-repo}/tree/{github-tag}
-:toc: left
-:toclevels: 8
-:nofooter:
-
 == Spring Cloud Release Tools
 
 Spring Cloud projects reuse the same pattern of building and deploying the applications.
@@ -183,6 +173,12 @@ public class ReleaserApplication extends ReleaserCommandLineRunner {
 
 }
 ```
+
+You can also extend the way the projects and tasks are parsed, flows are executed and the result is analyzed together with the printed report. To do that you should implement the following interfaces as beans:
+
+* `SpringReleaser` - performs the release, given the provided options
+* `FlowRunner` - knows how to execute a release and post release flow
+* `ExecutionResultHandler` - handles the result of the release
 
 === What should I do first?
 

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -104,6 +105,8 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 		return stepContexts.stream().map(step -> {
 			String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 					.format(step.getStartTime());
+			long millis = ChronoUnit.MILLIS.between(step.getStartTime().toInstant(),
+					step.getEndTime().toInstant());
 			ExecutionContext context = step.getExecutionContext();
 			ExecutionResultReport entity = (ExecutionResultReport) context.get("entity");
 			if (entity == null) {
@@ -112,9 +115,21 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 			String projectName = TrainPostReleaseReleaserTask.class
 					.isAssignableFrom(entity.getReleaserTaskType()) ? "postRelease"
 							: entity.getProjectName();
-			return new Table(date, projectName, entity.getShortName(),
+			return new Table(date, time(millis), projectName, entity.getShortName(),
 					entity.getDescription(), entity.getState(), entity.getExceptions());
 		}).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedList::new));
+	}
+
+	private String time(long millis) {
+		long minutes = (millis / 1000) / 60;
+		long seconds = (millis / 1000) % 60;
+		if (minutes == 0 && seconds == 0) {
+			return millis + " ms";
+		}
+		else if (minutes == 0) {
+			return seconds + " s";
+		}
+		return minutes + " min " + seconds + " s";
 	}
 
 	private void printTable(List<Table> table) {
@@ -216,6 +231,8 @@ class Table {
 
 	final String creationTime;
 
+	final String executionTime;
+
 	final String projectName;
 
 	final String taskCaption;
@@ -228,9 +245,11 @@ class Table {
 
 	List<Throwable> exceptions;
 
-	Table(String creationTime, String projectName, String taskCaption,
-			String taskDescription, String taskState, List<Throwable> exceptions) {
+	Table(String creationTime, String executionTime, String projectName,
+			String taskCaption, String taskDescription, String taskState,
+			List<Throwable> exceptions) {
 		this.creationTime = creationTime;
+		this.executionTime = executionTime;
 		this.projectName = projectName;
 		this.taskCaption = taskCaption;
 		this.taskDescription = taskDescription;
@@ -240,6 +259,10 @@ class Table {
 				.map(t -> NestedExceptionUtils.getMostSpecificCause(t).toString())
 				.collect(Collectors.joining("\n"));
 		this.exceptions = exceptions;
+	}
+
+	public String getExecutionTime() {
+		return this.executionTime;
 	}
 
 	public String getCreationTime() {

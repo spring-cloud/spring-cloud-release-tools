@@ -12,16 +12,6 @@ Edit the files in the src/main/asciidoc/ directory instead.
 image::https://circleci.com/gh/{org}/{repo}/tree/{branch}.svg?style=svg["CircleCI",link="https://circleci.com/gh/{org}/{repo}/tree/{branch}"]
 image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codecov",link="https://codecov.io/gh/{org}/{repo}"]
 
-:github-tag: master
-:org: spring-cloud
-:repo: spring-cloud-release-tools
-:github-repo: {org}/{repo}
-:github-raw: https://raw.github.com/{github-repo}/{github-tag}
-:github-code: https://github.com/{github-repo}/tree/{github-tag}
-:toc: left
-:toclevels: 8
-:nofooter:
-
 == Spring Cloud Release Tools
 
 Spring Cloud projects reuse the same pattern of building and deploying the applications.
@@ -198,6 +188,12 @@ public class ReleaserApplication extends ReleaserCommandLineRunner {
 }
 ```
 
+You can also extend the way the projects and tasks are parsed, flows are executed and the result is analyzed together with the printed report. To do that you should implement the following interfaces as beans:
+
+* `SpringReleaser` - performs the release, given the provided options
+* `FlowRunner` - knows how to execute a release and post release flow
+* `ExecutionResultHandler` - handles the result of the release
+
 === What should I do first?
 
 Members of the Spring Cloud Team typically use this tool as follows.
@@ -223,7 +219,7 @@ Go to your project (e.g. Spring Cloud Sleuth)
 $ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/projects/spring-cloud/target/releaser-spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
+$ java -jar ~/repo/spring-cloud-release-tools/projects/spring-cloud/target/spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser
 ----
 
 The application will start running from your working directory.
@@ -391,7 +387,7 @@ All you have to do is run the jar with the releaser and pass the
 `-x=true` option to turn on meta-release and a list of fixed versions in the `--"releaser.fixed-versions[project-name]=project-version" format
 
 ```
-$ java -jar projects/spring-cloud/target/releaser-spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
+$ java -jar projects/spring-cloud/target/spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"
 ```
 
 IMPORTANT: For the meta release the `startFrom` or `taskNames` take into consideration the project names, not task names. E.g. you can start from `spring-cloud-netflix` project, or build only tasks with names `spring-cloud-build,spring-cloud-sleuth`.
@@ -458,6 +454,8 @@ Below you can find a table with all the releaser options.
 |releaser.meta-release.enabled | false | Are we releasing the whole suite of apps or only one?
 |releaser.meta-release.git-org-url |  | The URL of the Git organization. We'll append each project's name to it.
 |releaser.meta-release.projects-to-skip |  | Names of projects to skip deployment for meta-release.
+|releaser.meta-release.release-group-thread-count | 4 | Number of threads per release group. E.g. for thread count of 4 if there are 6 projects in a release group, 4 of them will be executed in parallel and 2 will wait for their turn.
+|releaser.meta-release.release-group-timeout-in-minutes | 180 | Timeout in minutes during which we're waiting for a single composite task per a project to be executed. That means that if set to e.g. 180 then a release process for a single project should take at most 180 minutes.
 |releaser.meta-release.release-groups |  | If provided, allows to provide groups of projects that can be ran in parallel. E.g. {@code --releaser.meta-release.release-groups[0]=projectA,projectB,projectC} {@code --releaser.meta-release.release-groups[1]=projectD,projectE} {@code --releaser.meta-release.release-groups[2]=projectF,projectG} The order is still provided by the list of versions passed to the releaser. Basing on that order, and this value we are able to build a flow with projects.
 |releaser.meta-release.release-train-dependency-names |  | All the names of dependencies that should be updated with the release train project version.
 |releaser.meta-release.release-train-project-name |  | Name of the release train project.

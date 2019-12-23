@@ -26,7 +26,7 @@ public class UpdatingPomsReleaseTask implements DryRunReleaseReleaserTask {
 	/**
 	 * Order of this task. The higher value, the lower order.
 	 */
-	public static final int ORDER = 10;
+	public static final int ORDER = 0;
 
 	private final Releaser releaser;
 

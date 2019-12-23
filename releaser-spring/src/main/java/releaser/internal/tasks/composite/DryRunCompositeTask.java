@@ -19,6 +19,7 @@ package releaser.internal.tasks.composite;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,10 @@ public class DryRunCompositeTask implements CompositeReleaserTask {
 				.getBeansOfType(DryRunReleaseReleaserTask.class);
 		List<DryRunReleaseReleaserTask> values = new LinkedList<>(dryRunTasks.values());
 		values.sort(AnnotationAwareOrderComparator.INSTANCE);
-		log.info("Found the following dry run tasks {}", values);
+		log.info("For project [{}], found the following dry run tasks {}",
+				args.project.getName(),
+				values.stream().map(r -> r.getClass().getSimpleName())
+						.collect(Collectors.toCollection(LinkedList::new)));
 		return flowRunner().runReleaseTasks(args.options, args.properties,
 				new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(
 						args.originalVersion.projectName, () -> args.projectToRun)),
