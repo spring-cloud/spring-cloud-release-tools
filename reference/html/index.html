@@ -97,35 +97,16 @@ $(addBlockSwitches);
 <ul class="sectlevel1">
 <li><a href="#_spring_cloud_release_tools">Spring Cloud Release Tools</a>
 <ul class="sectlevel2">
-<li><a href="#_what_does_it_do">What does it do?</a>
-<ul class="sectlevel3">
-<li><a href="#_single_project">Single project</a></li>
-<li><a href="#_meta_release">Meta-release</a></li>
-</ul>
-</li>
+<li><a href="#_what_does_it_do">What does it do?</a></li>
+<li><a href="#_how_can_i_extend_it">How can I extend it?</a></li>
 <li><a href="#_what_should_i_do_first">What should I do first?</a></li>
 <li><a href="#_how_to_run_it_interactive_mode">How to run it (interactive mode)</a></li>
 <li><a href="#_how_to_run_it_automatic_mode">How to run it (automatic mode)</a></li>
 <li><a href="#_how_to_run_meta_release_automatic_mode">How to run meta-release (automatic-mode)</a></li>
 <li><a href="#_project_options">Project options</a></li>
-<li><a href="#_examples">Examples</a>
-<ul class="sectlevel3">
-<li><a href="#_keeping_configuration_in_the_project">Keeping configuration in the project</a></li>
-<li><a href="#_specifying_a_branch">Specifying A Branch</a></li>
-<li><a href="#_using_environment_variables">Using Environment Variables</a></li>
-</ul>
-</li>
-<li><a href="#_releasing_through_jenkins">Releasing through Jenkins</a>
-<ul class="sectlevel3">
-<li><a href="#_releasing_a_single_project">Releasing a Single Project</a></li>
-<li><a href="#_releasing_a_release_train">Releasing a Release Train</a></li>
-</ul>
-</li>
-<li><a href="#_faq">FAQ</a>
-<ul class="sectlevel3">
-<li><a href="#_jschexception_auth_fail">JSchException: Auth fail</a></li>
-</ul>
-</li>
+<li><a href="#_examples">Examples</a></li>
+<li><a href="#_releasing_through_jenkins">Releasing through Jenkins</a></li>
+<li><a href="#_faq">FAQ</a></li>
 </ul>
 </li>
 </ul>
@@ -136,20 +117,20 @@ $(addBlockSwitches);
 <h2 id="_spring_cloud_release_tools"><a class="link" href="#_spring_cloud_release_tools">Spring Cloud Release Tools</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Spring Cloud projects reuse the same pattern of building and deploying the applications. That&#8217;s
-why this tool makes it easy to automate the release / dependency update process of our applications.</p>
+<p>Spring Cloud projects reuse the same pattern of building and deploying the applications.
+That&#8217;s why this tool makes it easy to automate the release / dependency update process of our applications.</p>
 </div>
 <div class="sect2">
 <h3 id="_what_does_it_do"><a class="link" href="#_what_does_it_do">What does it do?</a></h3>
 <div class="sect3">
 <h4 id="_single_project"><a class="link" href="#_single_project">Single project</a></h4>
 <div class="paragraph">
-<p>For a single project</p>
+<p>For a single project, by default if you opt in to all tasks</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Clones the Spring Cloud Release project and picks all versions (Boot + Cloud projects)</p>
+<p>Clones the BOM project and picks all versions</p>
 </li>
 <li>
 <p>Modifies the project versions with values from a BOM (e.g. for Spring Cloud it&#8217;s Spring Cloud Release)</p>
@@ -181,7 +162,7 @@ why this tool makes it easy to automate the release / dependency update process 
 <p>Runs the deployment of the artifacts</p>
 </li>
 <li>
-<p>Publishes the docs (to <code>spring-cloud-static</code> for non-snapshots, to <code>gh-pages</code> for snapshots)</p>
+<p>Publishes the docs (for Spring Cloud to <code>spring-cloud-static</code> for non-snapshots, to <code>gh-pages</code> for snapshots)</p>
 </li>
 <li>
 <p>Reverts back to snapshots, bumps the version by a patch (<code>1.0.1.RELEASE</code> &#8594; <code>1.0.2.BUILD-SNAPSHOT</code>) (ONLY FOR RELEASE VERSIONS)</p>
@@ -198,8 +179,7 @@ why this tool makes it easy to automate the release / dependency update process 
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-Starting with version that does Sagan integration, you MUST pass the OAuth token,
-otherwise the application will fail to start
+Starting with version that does Sagan integration, you MUST pass the OAuth token, otherwise the application will fail to start
 </td>
 </tr>
 </table>
@@ -231,7 +211,7 @@ otherwise the application will fail to start
 <p>For <code>GA</code>/ <code>SR</code> release will create an issue in start.spring.io under <a href="https://github.com/spring-io/start.spring.io/issues/" class="bare">https://github.com/spring-io/start.spring.io/issues/</a></p>
 </li>
 <li>
-<p>For <code>GA</code>/ <code>SR</code> release will update the links under <a href="https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current" class="bare">https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current</a></p>
+<p>For <code>GA</code>/ <code>SR</code> release will update the documentation links (for Spring Cloud <a href="https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current" class="bare">https://github.com/spring-cloud/spring-cloud-static/tree/gh-pages/current</a>)</p>
 </li>
 <li>
 <p>Will update the release train project page (for Spring Cloud it will be <code><a href="https://github.com/spring-projects/spring-cloud" class="bare">https://github.com/spring-projects/spring-cloud</a></code>)</p>
@@ -241,6 +221,9 @@ otherwise the application will fail to start
 </div>
 <div class="sect3">
 <h4 id="_meta_release"><a class="link" href="#_meta_release">Meta-release</a></h4>
+<div class="paragraph">
+<p>All the tasks are opt in, so if you do opt in for everything you&#8217;ll get:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -283,19 +266,228 @@ otherwise the application will fail to start
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-For the meta-releaser to work we assume that the path to the
-custom configuration file for each project is always <code>config/releaser.yml</code>.
+For the meta-releaser to work we assume that the path to the custom configuration file for each project is always <code>config/releaser.yml</code>.
 </td>
 </tr>
 </table>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you want to run some projects in parallel you have to set the <code>releaser.meta-release.release-groups</code> property to state which projects should be released in parallel. Example:
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">releaser.meta-release.release-groups[0]=projectA,projectB,projectC</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If in the list of projects you have <code>projectA,projectB,projectC,projectD,projectE</code>, then <code>projectA,projectB,projectC</code> will be released in parallel and then <code>projectD</code> and <code>projectE</code> sequentially.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_how_can_i_extend_it"><a class="link" href="#_how_can_i_extend_it">How can I extend it?</a></h3>
+<div class="paragraph">
+<p>The project consists of the following main modules</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>releaser-core</code> - with the core logic for doing releases</p>
+</li>
+<li>
+<p><code>relaser-spring</code> - with the Spring setup of tasks and a flow execution</p>
+</li>
+<li>
+<p><code>projects</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>where each project has their configuration properties and additional tasks</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can create your own project&#8217;s module and</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>if you want to completely rewrite the flow of the release, just set <code>releaser.flow.default-enabled</code> to <code>false</code> and create the whole flow from scratch</p>
+</li>
+<li>
+<p>if you want to modify the current flow, you can add new tasks by just creating a bean of a given type that extends the <code>ReleaserTask</code> and set its order accordingly.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Example of creating a new <code>ReleaseReleaserTask</code> called <code>BuildCustomStuffTask</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package releaser.my_project;
+
+//...
+
+import releaser.internal.Releaser;
+import releaser.internal.spring.Arguments;
+import releaser.internal.spring.ExecutionResult;
+import releaser.internal.tasks.ReleaseReleaserTask;
+
+@Component
+public class BuildCustomStuffTask implements ReleaseReleaserTask {
+
+	/**
+	 * Order of this task. The higher value, the lower order.
+	 */
+	public static final int ORDER = 45;
+
+	@Override
+	public String name() {
+		return "build_custom_stuff";
+	}
+
+	@Override
+	public String shortName() {
+		return "bcf";
+	}
+
+	@Override
+	public String header() {
+		return "BUILDING CUSTOM STUFF";
+	}
+
+	@Override
+	public String description() {
+		return "Builds custom stuff";
+	}
+
+	@Override
+	public ExecutionResult runTask(Arguments args) {
+		// do some custom stuff basing on the arguments
+		return ExecutionResult.success();
+	}
+
+	@Override
+	public int getOrder() {
+		return BuildCustomStuffTask.ORDER;
+	}
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each release or post release task can implement one of the following interfaces</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ReleaserTask</code> - marker interface for all release tasks</p>
+</li>
+<li>
+<p><code>ReleaseReleaserTask</code> - if a task is part of the main release process. That means that if it breaks, the whole release process should stop at once.</p>
+</li>
+<li>
+<p><code>PostReleaseReleaserTask</code> - marker interface for a post release task. If a post release task fails - the build continues but will be unstable.</p>
+</li>
+<li>
+<p><code>SingleProjectReleaserTask</code> - a release task for a single project.</p>
+</li>
+<li>
+<p><code>ProjectPostReleaseReleaserTask</code> - a post release task for a single project.</p>
+</li>
+<li>
+<p><code>DryRunReleaseReleaserTask</code> - a release task that should be executed during dry run mode.</p>
+</li>
+<li>
+<p><code>TrainPostReleaseReleaserTask</code> - a post release task that should be executed after the whole release train.</p>
+</li>
+<li>
+<p><code>CompositeReleaserTask</code> - a task that delegates work to other tasks.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, your project can provide the following beans:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>CustomBomParser</code> - if you need to perform some additional BOM parsing. E.g. Spring Cloud adds <code>spring-boot</code> and <code>spring-cloud-build</code> versions when parsing the BOM project.</p>
+</li>
+<li>
+<p><code>CustomProjectDocumentationUpdater</code> - if you need to perform some custom logic when updating the project&#8217;s documentation.</p>
+</li>
+<li>
+<p><code>CustomGithubIssues</code> - if you need to perform additional logic when dealing with Github issues.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To run the project you should create your main class preferably under the <code>releaser</code> package and extend the <code>ReleaserCommandLineRunner</code> class.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package releaser;
+
+import releaser.internal.options.Parser;
+import releaser.internal.spring.ExecutionResultHandler;
+import releaser.internal.spring.SpringReleaser;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ReleaserApplication extends ReleaserCommandLineRunner {
+
+	public ReleaserApplication(SpringReleaser releaser,
+			ExecutionResultHandler executionResultHandler, Parser parser) {
+		super(releaser, executionResultHandler, parser);
+	}
+
+	public static void main(String[] args) {
+		SpringApplication application = new SpringApplication(ReleaserApplication.class);
+		application.setWebApplicationType(WebApplicationType.NONE);
+		application.run(args);
+	}
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also extend the way the projects and tasks are parsed, flows are executed and the result is analyzed together with the printed report. To do that you should implement the following interfaces as beans:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>SpringReleaser</code> - performs the release, given the provided options</p>
+</li>
+<li>
+<p><code>FlowRunner</code> - knows how to execute a release and post release flow</p>
+</li>
+<li>
+<p><code>ExecutionResultHandler</code> - handles the result of the release</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_what_should_i_do_first"><a class="link" href="#_what_should_i_do_first">What should I do first?</a></h3>
 <div class="paragraph">
-<p>Members of the Spring Cloud Team typically use this tool as follows. They first
-clone the releaser locally and build the jar manually</p>
+<p>Members of the Spring Cloud Team typically use this tool as follows.
+They first clone the releaser locally and build the jar manually</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -311,8 +503,8 @@ $ ./mvnw clean install</code></pre>
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-You must set the value of the OAuth token. You can do it either via
-the command line <code>--releaser.git.oauth-token=&#8230;&#8203;</code> or put it as an env variable in <code>.bashrc</code>
+You must set the value of the OAuth token.
+You can do it either via the command line <code>--releaser.git.oauth-token=&#8230;&#8203;</code> or put it as an env variable in <code>.bashrc</code>
 or <code>.zshrc</code> e.g. <code>export RELEASER_GIT_OAUTH_TOKEN=&#8230;&#8203;</code>
 </td>
 </tr>
@@ -329,14 +521,14 @@ or <code>.zshrc</code> e.g. <code>export RELEASER_GIT_OAUTH_TOKEN=&#8230;&#8203;
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser</code></pre>
+$ java -jar ~/repo/spring-cloud-release-tools/projects/spring-cloud/target/spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The application will start running from your working directory. Running this code
-follows the convention that you have the OAuth token environment variable set. It also assumes
-that you might have some custom configuration in <code>config/releaser.yml</code> file. This setting is optional - if
-you don&#8217;t have that file, nothing will happen.</p>
+<p>The application will start running from your working directory.
+Running this code follows the convention that you have the OAuth token environment variable set.
+It also assumes that you might have some custom configuration in <code>config/releaser.yml</code> file.
+This setting is optional - if you don&#8217;t have that file, nothing will happen.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -378,8 +570,10 @@ You can press 'q' to quit</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Just pick a number and continue! Pick either a full release or single steps. You can also pick
-ranges or multiple steps. You can also provide the range only with the starting step
+<p>Just pick a number and continue!
+Pick either a full release or single steps.
+You can also pick ranges or multiple steps.
+You can also provide the range only with the starting step
 - that you will execute all steps starting from the given one.</p>
 </div>
 <div class="admonitionblock tip">
@@ -406,7 +600,7 @@ flag.</p>
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -h</code></pre>
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -h</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -469,9 +663,11 @@ java -jar releaser.jar -r o-p</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The Releaser can use two sets of options. The configuration options like <code>releaser.pom.branch</code>
-and the task switches. For the tasks you can use either the full names or short switches. For example
- providing range of tasks via switches <code>o-p</code> is equivalent to full name <code>docs-push</code>.</p>
+<p>The Releaser can use two sets of options.
+The configuration options like <code>releaser.pom.branch</code>
+and the task switches.
+For the tasks you can use either the full names or short switches.
+For example providing range of tasks via switches <code>o-p</code> is equivalent to full name <code>docs-push</code>.</p>
 </div>
 <div class="paragraph">
 <p>A couple of examples:</p>
@@ -482,37 +678,37 @@ and the task switches. For the tasks you can use either the full names or short 
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ git clone git@github.com:spring-cloud/spring-cloud-sleuth.git
 $ cd spring-cloud-sleuth
 $ # example of running the releaser agains Dalston.SR1 tag with 1.0.0.BUILD-SNAPSHOT version of the releaser
-$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release</code></pre>
+$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Doing the full release in non interactive mode (automatic release)</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release --interactive=false</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --full-release --interactive=false</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Updating pom, closing milestone &amp; createTemplates in interactive mode</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -u -m -t</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -u -m -t</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Running all tasks starting from 'push' (automatic)</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -a push -i=false</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -a push -i=false</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Running tasks from 'docs' (inclusive) to 'push' (inclusive) (automatic)</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -r d-p -i=false</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser -r d-p -i=false</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Running single task 'closeMilestone' (automatic)</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --closeMilestone -i=false</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar ~/repo/spring-cloud-release-tools/releaser-spring/target/releaser-spring-1.0.0.BUILD-SNAPSHOT.jar --releaser.pom.branch=vDalston.SR1 --spring.config.name=releaser --closeMilestone -i=false</code></pre>
 </div>
 </div>
 </div>
@@ -520,12 +716,11 @@ $ java -jar ~/repo/spring-cloud-release-tools/spring-cloud-release-tools-spring/
 <h3 id="_how_to_run_meta_release_automatic_mode"><a class="link" href="#_how_to_run_meta_release_automatic_mode">How to run meta-release (automatic-mode)</a></h3>
 <div class="paragraph">
 <p>All you have to do is run the jar with the releaser and pass the
-<code>-x=true</code> option to turn on meta-release and a list of fixed versions
-in the `--"releaser.fixed-versions[project-name]=project-version" format</p>
+<code>-x=true</code> option to turn on meta-release and a list of fixed versions in the `--"releaser.fixed-versions[project-name]=project-version" format</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>$ java -jar spring-cloud-release-tools-spring/target/spring-cloud-release-tools-spring-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"</code></pre>
+<pre class="highlightjs highlight"><code>$ java -jar projects/spring-cloud/target/spring-cloud-1.0.0.BUILD-SNAPSHOT.jar --spring.config.name=releaser -x=true --"releaser.fixed-versions[spring-cloud-sleuth]=2.0.1.BUILD-SNAPSHOT"</code></pre>
 </div>
 </div>
 <div class="admonitionblock important">
@@ -535,9 +730,7 @@ in the `--"releaser.fixed-versions[project-name]=project-version" format</p>
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-For the meta release the <code>startFrom</code> or <code>taskNames</code> take into consideration
-the project names, not task names. E.g. you can start from <code>spring-cloud-netflix</code> project,
-or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</code>.
+For the meta release the <code>startFrom</code> or <code>taskNames</code> take into consideration the project names, not task names. E.g. you can start from <code>spring-cloud-netflix</code> project, or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</code>.
 </td>
 </tr>
 </table>
@@ -603,6 +796,11 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 <td class="tableblock halign-left valign-top"><p class="tableblock">Project name to its version - overrides all versions retrieved from a release train repository like Spring Cloud Release.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.flow.default-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Should the default flow of jobs be preserved. If set to {@code false} will not register any jobs as beans, and it will be up to you to set the whole configuration of jobs.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.all-test-sample-urls</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Project to urls mapping. For each project will clone the test project and will update its versions.</p></td>
@@ -614,12 +812,12 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.documentation-branch</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gh-pages</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the documentation project.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.documentation-url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud/spring-cloud-static" class="bare">https://github.com/spring-cloud/spring-cloud-static</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to the documentation Git repository.</p></td>
 </tr>
 <tr>
@@ -644,27 +842,27 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-bom-url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud/spring-cloud-release" class="bare">https://github.com/spring-cloud/spring-cloud-release</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to a release train repository.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-docs-branch</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">master</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the release train docs.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-docs-url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud-samples/scripts" class="bare">https://github.com/spring-cloud-samples/scripts</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to the release train documentation.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-wiki-page-prefix</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Spring-Cloud</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Page prefix for the release train wiki. E.g. for [Spring-Cloud-Finchley-Release-Notes] it would be [Spring-Cloud].</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.release-train-wiki-url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-projects/spring-cloud.wiki" class="bare">https://github.com/spring-projects/spring-cloud.wiki</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to the release train wiki.</p></td>
 </tr>
 <tr>
@@ -674,22 +872,22 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.spring-project-branch</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gh-pages</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the release train project.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.spring-project-url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-projects/spring-cloud" class="bare">https://github.com/spring-projects/spring-cloud</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to the release train project page repository.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.test-samples-branch</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">master</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch to check out for the test samples.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.git.test-samples-project-url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud/spring-cloud-core-tests" class="bare">https://github.com/spring-cloud/spring-cloud-core-tests</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to test samples.</p></td>
 </tr>
 <tr>
@@ -754,7 +952,7 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.generate-release-train-docs-command</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">echo 'TODO'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">./gradlew generateReleaseTrainDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to generate release train documentation.</p></td>
 </tr>
 <tr>
@@ -769,7 +967,7 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.gradle.publish-docs-commands</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">[echo 'TODO']</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.</p></td>
 </tr>
 <tr>
@@ -824,7 +1022,7 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.git-org-url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/spring-cloud" class="bare">https://github.com/spring-cloud</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The URL of the Git organization. We&#8217;ll append each project&#8217;s name to it.</p></td>
 </tr>
 <tr>
@@ -833,19 +1031,34 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 <td class="tableblock halign-left valign-top"><p class="tableblock">Names of projects to skip deployment for meta-release.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.release-group-thread-count</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of threads per release group. E.g. for thread count of 4 if there are 6 projects in a release group, 4 of them will be executed in parallel and 2 will wait for their turn.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.release-group-timeout-in-minutes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">180</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timeout in minutes during which we&#8217;re waiting for a single composite task per a project to be executed. That means that if set to e.g. 180 then a release process for a single project should take at most 180 minutes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.release-groups</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If provided, allows to provide groups of projects that can be ran in parallel. E.g. {@code --releaser.meta-release.release-groups[0]=projectA,projectB,projectC} {@code --releaser.meta-release.release-groups[1]=projectD,projectE} {@code --releaser.meta-release.release-groups[2]=projectF,projectG} The order is still provided by the list of versions passed to the releaser. Basing on that order, and this value we are able to build a flow with projects.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.release-train-dependency-names</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">All the names of dependencies that should be updated with the release train project version.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.meta-release.release-train-project-name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud-release</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Name of the release train project.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.bom-version-pattern</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">^(spring-cloud-.*)\.version$</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The pattern to match a version property in a BOM.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The pattern to match a version property in a BOM. Remember to catch the dependency name in a group. E.g. "^(spring-cloud-.*)\\.version$".</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.branch</p></td>
@@ -854,17 +1067,17 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.ignored-pom-regex</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">^.<strong>\.git/.</strong>$</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of regular expressions of ignored poms. Defaults to test projects and samples.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.pom-with-boot-starter-parent</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud-starter-parent/pom.xml</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Subfolder of the pom that contains the {@code spring-boot-starer-parent} dependency.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.pom.this-train-bom</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud-dependencies/pom.xml</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Subfolder of the pom that contains the versions for the release train.</p></td>
 </tr>
 <tr>
@@ -898,8 +1111,18 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code false} will not update Sagan.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.skip-post-release-tasks</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to {@code true} will not run post release tasks.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">releaser.template.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Should template generation be enabled.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.template.template-folder</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">cloud</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Folder in which blog, email etc. templates are stored.</p></td>
 </tr>
 <tr>
@@ -909,7 +1132,7 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">releaser.versions.bom-name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring-cloud</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Name in the YAML from initilizr for BOM mappings.</p></td>
 </tr>
 <tr>
@@ -927,8 +1150,8 @@ or build only tasks with names <code>spring-cloud-build,spring-cloud-sleuth</cod
 </td>
 <td class="content">
 You can pass the options either via system properties or via application arguments.
-Example for system properties: <code>java -Dreleaser.pom.branch=Camden.SR6 -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar</code>
-Example for application arguments: <code>java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code>
+Example for system properties: <code>java -Dreleaser.pom.branch=Camden.SR6 -jar target/releaser-spring-1.0.0.M1.jar</code>
+Example for application arguments: <code>java -jar target/releaser-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code>
 </td>
 </tr>
 </table>
@@ -940,11 +1163,10 @@ Example for application arguments: <code>java -jar target/spring-cloud-release-t
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-For the GA release to be successful, it&#8217;s important that if the <code>build</code> / <code>deploy</code> command
- run a script (e.g. <code>scripts/foo.sh</code>) then inside <code>foo.sh</code> if you call a Maven build <code>./mvnw clean install</code>
- then <strong>remember to pass all arguments of the script there too</strong>. E.g. <code>./mvnw clean install ${@}</code>. That&#8217;s because
- the releaser will pass any system properties to the <code>build</code> / <code>deploy</code> command, such as system properties
- with keys and we need them to be passed inside the command executed by the releaser.
+For the GA release to be successful, it&#8217;s important that if the <code>build</code> / <code>deploy</code> command run a script (e.g. <code>scripts/foo.sh</code>) then inside <code>foo.sh</code> if you call a Maven build <code>./mvnw clean install</code>
+then <strong>remember to pass all arguments of the script there too</strong>.
+E.g. <code>./mvnw clean install ${@}</code>.
+That&#8217;s because the releaser will pass any system properties to the <code>build</code> / <code>deploy</code> command, such as system properties with keys and we need them to be passed inside the command executed by the releaser.
 </td>
 </tr>
 </table>
@@ -955,14 +1177,13 @@ For the GA release to be successful, it&#8217;s important that if the <code>buil
 <div class="sect3">
 <h4 id="_keeping_configuration_in_the_project"><a class="link" href="#_keeping_configuration_in_the_project">Keeping configuration in the project</a></h4>
 <div class="paragraph">
-<p>If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed
-to build the project and properly merge the docs) then you can put a file named e.g. <code>releaser.yml</code> under <code>config</code>
+<p>If your project has some custom configuration (e.g. Spring Cloud Contract needs a script to be executed to build the project and properly merge the docs) then you can put a file named e.g. <code>releaser.yml</code> under <code>config</code>
 folder and run your application like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O ../spring-cloud-release-tools-spring-1.0.0.M1.jar
-$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.config.name=releaser</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/releaser-spring/1.0.0.M1/releaser-spring-1.0.0.M1.jar -O ../releaser-spring-1.0.0.M1.jar
+$ java -jar target/releaser-spring-1.0.0.M1.jar --spring.config.name=releaser</code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -972,8 +1193,8 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --spring.confi
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Notice that we&#8217;re downloading the jar to a parent folder, not to <code>target</code>. That&#8217;s because <code>target</code> get cleaned
-during the build process
+Notice that we&#8217;re downloading the jar to a parent folder, not to <code>target</code>.
+That&#8217;s because <code>target</code> get cleaned during the build process
 </td>
 </tr>
 </table>
@@ -985,8 +1206,7 @@ during the build process
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-For the meta-releaser to work we assume that the path to the
-configuration file is always <code>config/releaser.yml</code>.
+For the meta-releaser to work we assume that the path to the configuration file is always <code>config/releaser.yml</code>.
 </td>
 </tr>
 </table>
@@ -1000,7 +1220,7 @@ If you would like to use another branch you can specify it using the <code>relea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar releaser-spring-1.0.0.M1.jar --releaser.pom.branch=Camden.SR6</code></pre>
 </div>
 </div>
 </div>
@@ -1008,16 +1228,15 @@ If you would like to use another branch you can specify it using the <code>relea
 <h4 id="_using_environment_variables"><a class="link" href="#_using_environment_variables">Using Environment Variables</a></h4>
 <div class="paragraph">
 <p>In some cases it might be easier to specify environment variables instead of passing parameters to
-<code>releaser</code>.  For example, you might want to use environment variables if you are going to be
-releasing multiple projects, this keeps you from having to specify the same parameters for
-each release</p>
+<code>releaser</code>.
+For example, you might want to use environment variables if you are going to be releasing multiple projects, this keeps you from having to specify the same parameters for each release</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ export RELEASER_POM_BRANCH=Dalston.RELEASE
 $ export RELEASER_GIT_OAUTH_TOKEN=...
-$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/spring-cloud-release-tools-spring/1.0.0.M1/spring-cloud-release-tools-spring-1.0.0.M1.jar -O spring-cloud-release-tools-spring-1.0.0.M1.jar
-$ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root</code></pre>
+$ wget https://repo.spring.io/libs-milestone/org/springframework/cloud/internal/releaser-spring/1.0.0.M1/releaser-spring-1.0.0.M1.jar -O releaser-spring-1.0.0.M1.jar
+$ java -jar target/releaser-spring-1.0.0.M1.jar --releaser.working-dir=/path/to/project/root</code></pre>
 </div>
 </div>
 </div>
@@ -1031,7 +1250,8 @@ $ java -jar target/spring-cloud-release-tools-spring-1.0.0.M1.jar --releaser.wor
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Whenever a release process is broken, Jenkins marks it with a red ball and breaks the build. Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow ball and marks the build as unstable.
+Whenever a release process is broken, Jenkins marks it with a red ball and breaks the build.
+Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow ball and marks the build as unstable.
 </td>
 </tr>
 </table>
@@ -1039,12 +1259,14 @@ Whenever a release process is broken, Jenkins marks it with a red ball and break
 <div class="sect3">
 <h4 id="_releasing_a_single_project"><a class="link" href="#_releasing_a_single_project">Releasing a Single Project</a></h4>
 <div class="paragraph">
-<p>Let us assume that we are to release <code>spring-cloud-build</code> project. We need to do the following steps:</p>
+<p>Let us assume that we are to release <code>spring-cloud-build</code> project.
+We need to do the following steps:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Create a branch (for example, <code>springCloudBuildRelease</code>) in a project that contains a BOM (for example, <a href="https://github.com/spring-cloud/spring-cloud-release/">spring-cloud-release</a>). The following example shows how to do so:</p>
+<p>Create a branch (for example, <code>springCloudBuildRelease</code>) in a project that contains a BOM (for example, <a href="https://github.com/spring-cloud/spring-cloud-release/">spring-cloud-release</a>).
+The following example shows how to do so:</p>
 </li>
 </ol>
 </div>
@@ -1058,7 +1280,10 @@ $ git checkout -b springCloudBuildRelease</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Update <strong>all</strong> versions as if you were doing a release train. We need to update the project&#8217;s versions, Boot version, and dependencies versions, too. Let us assume that we will eventually be doing a release train for the <code>Hoxton.M1</code> release, Spring Boot to the latest available one, and <code>spring-cloud-commons</code> to <code>1.2.3.BUILD-SNAPSHOT</code>. The following example shows how to do so:</p>
+<p>Update <strong>all</strong> versions as if you were doing a release train.
+We need to update the project&#8217;s versions, Boot version, and dependencies versions, too.
+Let us assume that we will eventually be doing a release train for the <code>Hoxton.M1</code> release, Spring Boot to the latest available one, and <code>spring-cloud-commons</code> to <code>1.2.3.BUILD-SNAPSHOT</code>.
+The following example shows how to do so:</p>
 </li>
 </ol>
 </div>
@@ -1094,35 +1319,38 @@ If you&#8217;re doing a e.g. <code>M1</code> release, remember to not have any s
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasers.png" alt="Releaser view">
+<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/releasers.png" alt="Releaser view">
 </div>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Pick the proper releaser project (for example, <code>spring-cloud-build-releaser</code>). The following image shows the settings for this example:</p>
+<p>Pick the proper releaser project (for example, <code>spring-cloud-build-releaser</code>).
+The following image shows the settings for this example:</p>
 </li>
 </ol>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/scBuildReleaser.png" alt="Spring Cloud Build Releaser - build with parameters">
+<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/scBuildReleaser.png" alt="Spring Cloud Build Releaser - build with parameters">
 </div>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Next, click <code>Build with parameters</code>. The following image shows the UI for doing so:</p>
+<p>Next, click <code>Build with parameters</code>.
+The following image shows the UI for doing so:</p>
 </li>
 </ol>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningScBuildReleaser.png" alt="Updated `RELEASER_POM_BRANCH`">
+<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/runningScBuildReleaser.png" alt="Updated `RELEASER_POM_BRANCH`">
 </div>
 </div>
 <div class="paragraph">
-<p>Pick from which branch you would like the project (for example, <code>spring-cloud-build</code> - defaults to <code>master</code>) to be built and update the <code>RELEASER_POM_BRANCH</code> to point to the checked-out branch of Spring Cloud Release (for example, <code>springCloudBuildRelease</code>). You can pick whether you want to perform only post-release tasks or the whole release.</p>
+<p>Pick from which branch you would like the project (for example, <code>spring-cloud-build</code> - defaults to <code>master</code>) to be built and update the <code>RELEASER_POM_BRANCH</code> to point to the checked-out branch of Spring Cloud Release (for example, <code>springCloudBuildRelease</code>).
+You can pick whether you want to perform only post-release tasks or the whole release.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -1135,7 +1363,8 @@ If you&#8217;re doing a e.g. <code>M1</code> release, remember to not have any s
 <p>You are done!</p>
 </div>
 <div class="paragraph">
-<p>As a post action, do not forget to remove the branch. The following example shows how to do so:</p>
+<p>As a post action, do not forget to remove the branch.
+The following example shows how to do so:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1149,12 +1378,15 @@ $ git push origin --delete springCloudBuildRelease</code></pre>
 <div class="sect3">
 <h4 id="_releasing_a_release_train"><a class="link" href="#_releasing_a_release_train">Releasing a Release Train</a></h4>
 <div class="paragraph">
-<p>We call a release train a <code>meta-release</code>. In order to perform one, you need to:</p>
+<p>We call a release train a <code>meta-release</code>.
+In order to perform one, you need to:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>In your project (which must contain a BOM, such as <code>spring-cloud-release</code>) you have to have a branch, where you store properties with versions of your projects. For example, the branch name can be <a href="https://github.com/spring-cloud/spring-cloud-release/tree/jenkins-releaser-config">jenkins-releaser-config</a>). The folloiwng example shows how to do so:</p>
+<p>In your project (which must contain a BOM, such as <code>spring-cloud-release</code>) you have to have a branch, where you store properties with versions of your projects.
+For example, the branch name can be <a href="https://github.com/spring-cloud/spring-cloud-release/tree/jenkins-releaser-config">jenkins-releaser-config</a>).
+The folloiwng example shows how to do so:</p>
 </li>
 </ol>
 </div>
@@ -1168,7 +1400,10 @@ $ git checkout jenkins-releaser-config</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Create a file that contains all properties for a given release train. The name of the release train should be lowercase, and dots should be converted to underscores. For example, for the <code>Greenwich.SR2</code> release train we need to have a file named  <code>greenwich_sr2.properties</code>. The following example shows how to do so:</p>
+<p>Create a file that contains all properties for a given release train.
+The name of the release train should be lowercase, and dots should be converted to underscores.
+For example, for the <code>Greenwich.SR2</code> release train we need to have a file named  <code>greenwich_sr2.properties</code>.
+The following example shows how to do so:</p>
 </li>
 </ol>
 </div>
@@ -1180,7 +1415,8 @@ $ git checkout jenkins-releaser-config</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>We need to update the file with all versions for the release train. The properties file contains an <strong>ordered</strong> list of <code>releaser.fixed-versions[project-name]=project-version</code> entries, as the following listing shows:</p>
+<p>We need to update the file with all versions for the release train.
+The properties file contains an <strong>ordered</strong> list of <code>releaser.fixed-versions[project-name]=project-version</code> entries, as the following listing shows:</p>
 </li>
 </ol>
 </div>
@@ -1216,7 +1452,7 @@ $ git add greenwich_sr2.properties &amp;&amp; git commit -m "Added Greenwich.SR2
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasersForMetaRelease.png" alt="Releaser view">
+<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/releasersForMetaRelease.png" alt="Releaser view">
 </div>
 </div>
 <div class="olist arabic">
@@ -1228,7 +1464,7 @@ $ git add greenwich_sr2.properties &amp;&amp; git commit -m "Added Greenwich.SR2
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/springCloudMetaRelease.png" alt="Spring Cloud Meta Releaser - build with parameters">
+<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/springCloudMetaRelease.png" alt="Spring Cloud Meta Releaser - build with parameters">
 </div>
 </div>
 <div class="olist arabic">
@@ -1240,11 +1476,12 @@ $ git add greenwich_sr2.properties &amp;&amp; git commit -m "Added Greenwich.SR2
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.github.com/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png" alt="Spring Cloud Meta Releaser view">
+<img src="https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/${github-tag}/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png" alt="Spring Cloud Meta Releaser view">
 </div>
 </div>
 <div class="paragraph">
-<p>You have quite a few options to pick, but the most important one is to set the value of the <code>RELEASE_VERSION</code> to the given release train version (for example, <code>Greenwich.SR2</code>). Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.</p>
+<p>You have quite a few options to pick, but the most important one is to set the value of the <code>RELEASE_VERSION</code> to the given release train version (for example, <code>Greenwich.SR2</code>).
+Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
