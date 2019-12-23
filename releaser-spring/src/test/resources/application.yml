@@ -1,0 +1,79 @@
+spring:
+  main:
+    web-application-type: none
+  datasource:
+    url: jdbc:h2:mem:${random.uuid}
+  jackson:
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: true
+releaser:
+  git:
+    release-train-bom-url: https://github.com/spring-cloud/spring-cloud-release
+    documentation-url: https://github.com/spring-cloud/spring-cloud-static
+    spring-project-url: https://github.com/spring-projects/spring-cloud
+    test-samples-project-url: https://github.com/spring-cloud/spring-cloud-core-tests
+    release-train-docs-url: https://github.com/spring-cloud-samples/scripts
+    release-train-wiki-url: https://github.com/spring-projects/spring-cloud.wiki
+    documentation-branch: gh-pages
+    spring-project-branch: gh-pages
+    test-samples-branch: master
+    release-train-docs-branch: master
+    release-train-wiki-page-prefix: Spring-Cloud
+    fetch-versions-from-git: true
+    oauth-token:
+    # username:
+    # password:
+    update-documentation-repo: true
+    update-github-milestones: true
+    update-spring-guides: true
+    update-start-spring-io: true
+    update-spring-project: true
+    run-updated-samples: true
+    update-release-train-docs: true
+    update-release-train-wiki: true
+    update-all-test-samples: true
+    all-test-sample-urls:
+      spring-cloud-sleuth:
+        - https://github.com/spring-cloud-samples/sleuth-issues
+        - https://github.com/spring-cloud-samples/sleuth-documentation-apps
+      spring-cloud-contract:
+        - https://github.com/spring-cloud-samples/spring-cloud-contract-samples
+        - https://github.com/spring-cloud-samples/the-legacy-app
+        - https://github.com/spring-cloud-samples/sc-contract-car-rental
+  pom:
+    branch: master
+    pom-with-boot-starter-parent: spring-cloud-starter-parent/pom.xml
+    this-train-bom: spring-cloud-dependencies/pom.xml
+    bom-version-pattern: "^(spring-cloud-.*)\\.version$"
+    ignored-pom-regex:
+      - "^.*\\.git/.*$"
+      - "^.*spring-cloud-contract-maven-plugin/src/test/projects/.*$"
+      - "^.*spring-cloud-contract-maven-plugin/target/.*$"
+      - "^.*src/test/bats/.*$"
+      - "^.*samples/standalone/[a-z]+/.*$"
+  sagan:
+    update-sagan: true
+    base-url: https://spring.io
+    docs-adocs-file: docs/src/main/asciidoc
+    index-section-file-name: sagan-index.adoc
+    boot-section-file-name: sagan-boot.adoc
+  template:
+    enabled: true
+    template-folder: cloud
+  versions:
+    all-versions-file-url: https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml
+    bom-name: spring-cloud
+  # fixed-versions:
+  meta-release:
+    enabled: false
+    release-train-project-name: spring-cloud-release
+    release-train-dependency-names:
+      - spring-cloud
+      - spring-cloud-dependencies
+      - spring-cloud-starter
+      - spring-cloud-starter-build
+    git-org-url: https://github.com/spring-cloud
+    projects-to-skip:
+      - spring-boot
+      - spring-cloud-stream
+      - spring-cloud-task

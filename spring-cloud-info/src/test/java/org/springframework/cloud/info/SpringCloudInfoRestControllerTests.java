@@ -56,14 +56,14 @@ public class SpringCloudInfoRestControllerTests {
 	@Rule
 	public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
 
+	@MockBean
+	SpringCloudInfoService springCloudInfoService;
+
 	@Autowired
 	private MockMvc mockMvc;
 
 	@Autowired
 	private WebApplicationContext context;
-
-	@MockBean
-	SpringCloudInfoService springCloudInfoService;
 
 	@Before
 	public void setUp() {

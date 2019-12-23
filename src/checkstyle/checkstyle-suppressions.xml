@@ -24,9 +24,9 @@
 	<suppress files=".*PomUpdateAcceptanceTests.*" checks="LineLengthCheck"/>
 	<suppress files=".*ProjectDocumentationUpdaterTests.*" checks="LineLengthCheck"/>
 	<suppress files=".*ReleaserApplicationEventTests.*" checks="LineLengthCheck"/>
-	<suppress files=".*org.springframework.cloud.release.internal.sagan.Project.*" checks="JavadocVariableCheck"/>
-	<suppress files=".*org.springframework.cloud.release.internal.sagan.Release.*" checks="JavadocVariableCheck"/>
-	<suppress files=".*org.springframework.cloud.release.internal.sagan.ReleaseUpdate.*" checks="JavadocVariableCheck"/>
-	<suppress files=".*org.springframework.cloud.release.internal.sagan.Repository.*" checks="JavadocVariableCheck"/>
+	<suppress files=".*Project.*" checks="JavadocVariableCheck"/>
+	<suppress files=".*Release.*" checks="JavadocVariableCheck"/>
+	<suppress files=".*ReleaseUpdate.*" checks="JavadocVariableCheck"/>
+	<suppress files=".*Repository.*" checks="JavadocVariableCheck"/>
 	<suppress files=".*src.test.java.*" checks="JavadocVariableCheck"/>
 </suppressions>

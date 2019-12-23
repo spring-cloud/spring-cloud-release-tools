@@ -1,0 +1,17 @@
+spring:
+  main:
+    web-application-type: none
+  datasource:
+    url: jdbc:h2:mem:${random.uuid}
+  jackson:
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: true
+releaser:
+  git:
+    release-train-bom-url: https://github.com/reactor/reactor
+    fetch-versions-from-git: true
+  meta-release:
+    release-train-project-name: reactor
+    release-train-dependency-names:
+      - reactor
+    git-org-url: https://github.com/reactor

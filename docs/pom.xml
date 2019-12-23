@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.cloud.internal</groupId>
-		<artifactId>spring-cloud-release-tools-parent</artifactId>
+		<artifactId>releaser-parent</artifactId>
 		<version>1.0.0.BUILD-SNAPSHOT</version>
 	</parent>
-	<artifactId>spring-cloud-release-tools-docs</artifactId>
+	<artifactId>releaser-docs</artifactId>
 	<packaging>pom</packaging>
 	<properties>
 		<docs.main>spring-cloud-release-tools</docs.main>
@@ -23,12 +23,12 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>spring-cloud-release-tools-core</artifactId>
+			<artifactId>releaser-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>spring-cloud-release-tools-spring</artifactId>
+			<artifactId>releaser-spring</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

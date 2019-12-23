@@ -35,7 +35,6 @@ import javax.json.JsonReader;
 
 import com.jcabi.github.Coordinates;
 import com.jcabi.github.Github;
-import com.jcabi.github.Milestone;
 import com.jcabi.http.response.JsonResponse;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
