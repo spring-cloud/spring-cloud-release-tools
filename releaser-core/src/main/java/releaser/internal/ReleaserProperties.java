@@ -302,7 +302,6 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * The URL of the Git organization. We'll append each project's name to it.
 		 */
-		@NotBlank
 		private String gitOrgUrl;
 
 		/**
