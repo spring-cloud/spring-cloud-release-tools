@@ -172,11 +172,27 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	}
 
 	private ExecutionResult runTask(ReleaserTask releaserTask, Arguments args) {
-		ExecutionResult executionResult = releaserTask.apply(args);
+		ExecutionResult executionResult = executionResult(releaserTask, args);
 		if (executionResult.isFailure() && releaserTask instanceof ReleaseReleaserTask) {
 			throw executionResult.foundExceptions();
 		}
 		return executionResult;
+	}
+
+	private ExecutionResult executionResult(ReleaserTask releaserTask, Arguments args) {
+		try {
+			return releaserTask.apply(args);
+		}
+		catch (BuildUnstableException bue) {
+			log.error("Unstable exception occurred while trying to execute the task [{}]",
+					releaserTask.getClass().getSimpleName(), bue);
+			return ExecutionResult.unstable(bue);
+		}
+		catch (Exception ex) {
+			log.error("Exception occurred while trying to execute the task [{}]",
+					releaserTask.getClass().getSimpleName(), ex);
+			return ExecutionResult.failure(ex);
+		}
 	}
 
 	private StepExecutionListener releaserListener(NamedArgumentsSupplier argsSupplier,
