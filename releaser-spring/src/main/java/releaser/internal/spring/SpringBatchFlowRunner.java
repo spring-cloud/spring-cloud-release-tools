@@ -172,11 +172,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	}
 
 	private ExecutionResult runTask(ReleaserTask releaserTask, Arguments args) {
-		ExecutionResult executionResult = executionResult(releaserTask, args);
-		if (executionResult.isFailure() && releaserTask instanceof ReleaseReleaserTask) {
-			throw executionResult.foundExceptions();
-		}
-		return executionResult;
+		return executionResult(releaserTask, args);
 	}
 
 	private ExecutionResult executionResult(ReleaserTask releaserTask, Arguments args) {
@@ -191,7 +187,10 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 		catch (Exception ex) {
 			log.error("Exception occurred while trying to execute the task [{}]",
 					releaserTask.getClass().getSimpleName(), ex);
-			return ExecutionResult.failure(ex);
+			if (releaserTask instanceof ReleaseReleaserTask) {
+				return ExecutionResult.failure(ex);
+			}
+			return ExecutionResult.unstable(ex);
 		}
 	}
 
