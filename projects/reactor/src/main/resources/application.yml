@@ -15,3 +15,8 @@ releaser:
     release-train-dependency-names:
       - reactor
     git-org-url: https://github.com/reactor
+cf:
+  organization: FrameworksAndRuntimes
+  space: Reactor
+  reactorAppName: projectreactor
+  apiHost: api.run.pivotal.io
