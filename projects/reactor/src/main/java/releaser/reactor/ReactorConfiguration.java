@@ -16,6 +16,9 @@
 
 package releaser.reactor;
 
+import com.jcabi.github.Github;
+import com.jcabi.github.RtGithub;
+import com.jcabi.http.wire.RetryWire;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
@@ -29,6 +32,9 @@ import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.uaa.UaaClient;
 import releaser.internal.Releaser;
+import releaser.internal.ReleaserProperties;
+import releaser.internal.git.ProjectGitHandler;
+import releaser.internal.github.ProjectGitHubHandler;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -48,6 +54,18 @@ class ReactorConfiguration {
 	RestartSiteProjectPostReleaseTask restartSiteProjectPostReleaseTask(Releaser releaser,
 			CfClient cfClient, @Value("${cf.reactorAppName}") String reactorAppName) {
 		return new RestartSiteProjectPostReleaseTask(releaser, cfClient, reactorAppName);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	Github githubClient(ReleaserProperties properties) {
+		return new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry().through(RetryWire.class));
+	}
+
+	@Bean
+	GenerateReleaseNotesTask releaseNotesTask(Github github,
+			ProjectGitHandler gitHandler) {
+		return new GenerateReleaseNotesTask(github, gitHandler);
 	}
 
 }
