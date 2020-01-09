@@ -19,8 +19,10 @@ package releaser.internal.git;
 import java.io.Closeable;
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.transport.URIish;
 import org.slf4j.Logger;
@@ -189,6 +191,20 @@ public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 		log.info("Branch [{}] exists. Will check it out", branchToCheckout);
 		checkout(clonedProject, branchToCheckout);
 		return clonedProject;
+	}
+
+	/**
+	 * Find the commits between two versions. The second version is actually turned into
+	 * the head of the relevant branch.
+	 * @param clonedProject location of the cloned project
+	 * @param fromRef the ref to start from (tag, branch or sha1)
+	 * @param toRef the ref to go to (tag, branch or sha1)
+	 * @return the list of revisions between these two references
+	 */
+	public List<SimpleCommit> commitsBetween(File clonedProject, String fromRef,
+			String toRef) {
+		return gitRepo(clonedProject).log(fromRef, toRef).stream().map(SimpleCommit::new)
+				.collect(Collectors.toList());
 	}
 
 	private String suffixNonHttpRepo(String orgUrl) {
