@@ -143,4 +143,5 @@ public final class Arguments implements Serializable {
 	public ProjectVersion releaseTrain() {
 		return this.projects.releaseTrain(this.properties);
 	}
+
 }
