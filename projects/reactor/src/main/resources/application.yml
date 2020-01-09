@@ -21,3 +21,13 @@ cf:
   space: Reactor
   reactorAppName: projectreactor
   apiHost: api.run.pivotal.io
+
+# Boot values to be passed via env/command line:
+# cf.username
+# cf.password
+
+# Gradle project properties to be passed to deploy task somehow
+# artifactory_publish_contextUrl
+# artifactory_publish_repoKey
+# artifactory_publish_username
+# artifactory_publish_password
