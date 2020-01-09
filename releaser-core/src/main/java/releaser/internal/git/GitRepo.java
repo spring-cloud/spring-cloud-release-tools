@@ -192,6 +192,7 @@ class GitRepo {
 	}
 
 	private String nameOfBranch(String branch) {
+		//TODO careful: this doesn't take into account branches that follow a pattern like `experiments/foo`
 		return branch.substring(branch.lastIndexOf("/") + 1);
 	}
 
