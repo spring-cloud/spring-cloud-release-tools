@@ -8,6 +8,7 @@ spring:
       FAIL_ON_UNKNOWN_PROPERTIES: true
 releaser:
   git:
+    org-name: spring-cloud
     release-train-bom-url: https://github.com/spring-cloud/spring-cloud-stream-starters
     documentation-url: https://github.com/spring-cloud/spring-cloud-static
     number-of-checked-milestones: 50

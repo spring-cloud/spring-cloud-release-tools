@@ -184,7 +184,7 @@ class GithubMilestones {
 	}
 
 	String org() {
-		return "spring-cloud";
+		return this.properties.getGit().getOrgName();
 	}
 
 	private Map<String, String> openMilestones() {

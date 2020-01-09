@@ -448,6 +448,12 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * URL to the release train project page repository.
 		 */
+		@NotBlank
+		private String orgName;
+
+		/**
+		 * URL to the release train project page repository.
+		 */
 		private String springProjectUrl;
 
 		/**
@@ -792,6 +798,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setUpdateGithubMilestones(boolean updateGithubMilestones) {
 			this.updateGithubMilestones = updateGithubMilestones;
+		}
+
+		public String getOrgName() {
+			return this.orgName;
+		}
+
+		public void setOrgName(String orgName) {
+			this.orgName = orgName;
 		}
 
 		@Override
