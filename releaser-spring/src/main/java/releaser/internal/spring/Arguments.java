@@ -140,4 +140,7 @@ public final class Arguments implements Serializable {
 				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
+	public ProjectVersion releaseTrain() {
+		return this.projects.releaseTrain(this.properties);
+	}
 }
