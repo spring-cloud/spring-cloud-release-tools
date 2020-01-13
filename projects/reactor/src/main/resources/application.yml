@@ -11,6 +11,9 @@ releaser:
     org-name: spring-cloud
     release-train-bom-url: https://github.com/reactor/reactor
     fetch-versions-from-git: true
+  gradle:
+    build-command: "./gradlew clean bumpVersionsInReadme build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}"
+
   meta-release:
     release-train-project-name: reactor
     release-train-dependency-names:
