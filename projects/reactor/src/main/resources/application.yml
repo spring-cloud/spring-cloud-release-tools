@@ -10,7 +10,7 @@ spring:
     active: production
 releaser:
   git:
-    org-name: spring-cloud
+    org-name: reactor
     release-train-bom-url: https://github.com/reactor/reactor
     fetch-versions-from-git: true
   gradle:
