@@ -17,6 +17,7 @@
 package releaser.internal.github;
 
 import com.jcabi.github.Github;
+import com.jcabi.github.RtGithub;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -32,7 +33,7 @@ class GithubConfiguration {
 			@Override
 			public Object postProcessAfterInitialization(Object bean, String beanName)
 					throws BeansException {
-				if (bean instanceof Github) {
+				if (bean instanceof RtGithub) {
 					return new CachingGithub((Github) bean);
 				}
 				return bean;
