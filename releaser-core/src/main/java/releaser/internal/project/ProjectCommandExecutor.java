@@ -88,7 +88,7 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		try {
 			String projectRoot = this.properties.getWorkingDir();
 			String[] commands = command.split(" ");
-			return runCommand(projectRoot, commands);
+			return runCommand(projectRoot, commands).trim();
 		}
 		catch (IllegalStateException e) {
 			throw e;
@@ -319,8 +319,7 @@ class ProcessExecutor implements ReleaserPropertiesAware {
 			commandsToRun = commandToExecute(lastArg);
 		}
 		log.info("Will run the command [{}]", Arrays.toString(commandsToRun));
-		return new ProcessBuilder(commandsToRun).directory(new File(workingDir))
-				.inheritIO();
+		return new ProcessBuilder(commandsToRun).directory(new File(workingDir));
 	}
 
 	String[] commandToExecute(String lastArg) {
