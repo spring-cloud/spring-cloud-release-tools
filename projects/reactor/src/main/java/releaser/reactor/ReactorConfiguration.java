@@ -24,10 +24,12 @@ import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.git.ProjectGitHandler;
 
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.util.StringUtils;
 
 @Configuration
 @Profile("production")
@@ -46,6 +48,13 @@ class ReactorConfiguration {
 
 	@Bean
 	Github githubClient(ReleaserProperties properties) {
+		if (!StringUtils.hasText(properties.getGit().getOauthToken())) {
+			throw new BeanInitializationException(
+					"You must set the value of the OAuth token. You can do it "
+							+ "either via the command line [--releaser.git.oauth-token=...] "
+							+ "or put it as an env variable in [~/.bashrc] or "
+							+ "[~/.zshrc] e.g. [export RELEASER_GIT_OAUTH_TOKEN=...]");
+		}
 		return new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry()
 				.through(RetryWire.class));
 	}
