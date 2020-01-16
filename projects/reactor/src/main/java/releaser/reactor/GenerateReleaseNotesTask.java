@@ -52,8 +52,8 @@ import releaser.internal.tech.ExecutionResult;
 /**
  * @author Simon Baslé
  */
-public class GenerateReleaseNotesTask implements ProjectPostReleaseReleaserTask,
-		DryRunReleaseReleaserTask {
+public class GenerateReleaseNotesTask
+		implements ProjectPostReleaseReleaserTask, DryRunReleaseReleaserTask {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(GenerateReleaseNotesTask.class);
