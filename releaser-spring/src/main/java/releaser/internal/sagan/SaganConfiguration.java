@@ -36,7 +36,7 @@ class SaganConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", matchIfMissing = true)
+	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "true")
 	SaganClient saganClient(ReleaserProperties properties) {
 		RestTemplate restTemplate = restTemplate(properties);
 		return new RestTemplateSaganClient(restTemplate, properties);
@@ -44,7 +44,8 @@ class SaganConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "false")
+	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "false",
+			matchIfMissing = true)
 	SaganClient noOpSaganClient() {
 		return new SaganClient() {
 			@Override
