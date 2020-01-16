@@ -16,12 +16,14 @@
 
 package releaser.reactor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.jcabi.github.mock.MkGithub;
 import org.junit.jupiter.api.Test;
+import releaser.internal.git.SimpleCommit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -108,6 +110,54 @@ class GenerateReleaseNotesTaskTest {
 		assertThat(task.extractType(Collections.emptySet(), message))
 				.isEqualTo(GenerateReleaseNotesTask.Type.UNCLASSIFIED);
 	}
+
+	@Test
+	void noTitleCleanupFromMergeCommit() throws IOException {
+		SimpleCommit mergeCommit = new SimpleCommit("sha1", "fullsha1",
+				"merge #123 into 3.3 (#123)", "merge #123 into 3.3", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", true);
+
+		assertThat(task.cleanupShortMessage(mergeCommit))
+				.isEqualTo("merge #123 into 3.3 (#123)");
+	}
+
+	@Test
+	void titleCleanupFixPrefix() throws IOException {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"fix #123 Text from title", "fix #123 Some more text", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Text from title");
+	}
+
+	@Test
+	void titleCleanupSeePrefix() throws IOException {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"see #123 Text from title", "see #123 Some more text", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Text from title");
+	}
+
+	@Test
+	void titleCleanupPrStyleSuffix() throws IOException {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"Commit without issue (#123)", "fullMessage", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Commit without issue");
+	}
+
+	@Test
+	void titleCleanupBothPrefixAndSuffix() throws IOException {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"prefix #123 Commit title (#123)", "fullMessage", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Commit title");
+	}
+
+	// TODO test login extraction by mocking the task's commitToGithubMention method
 
 	// TODO find a way to mock commits and thus test extractContributors
 

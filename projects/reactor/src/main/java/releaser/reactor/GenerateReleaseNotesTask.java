@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.json.JsonObject;
 
 import com.jcabi.github.Coordinates;
 import com.jcabi.github.Github;
@@ -280,20 +283,79 @@ public class GenerateReleaseNotesTask
 		return Type.UNCLASSIFIED;
 	}
 
+	protected String commitToGithubMention(RepoCommits commitsClient,
+			SimpleCommit revCommit) {
+		RepoCommit dumbCommit = commitsClient.get(revCommit.fullSha1);
+		RepoCommit.Smart smartCommit = new RepoCommit.Smart(dumbCommit);
+		try {
+			JsonObject commitJson = smartCommit.json();
+			return "@" + commitJson.getJsonObject("author").getString("login");
+		}
+		catch (IOException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Extract at-mentions of contributors, given a list of commits (will fetch
+	 * contributor login from github). The list is deduplicated and sorted in
+	 * case-insensitive alphabetical order.
+	 */
 	List<String> extractContributorMentions(Repo repo, List<SimpleCommit> revCommits) {
 		RepoCommits commitsClient = repo.commits();
-		return revCommits.stream().map(revCommit -> commitsClient.get(revCommit.fullSha1))
-				.map(RepoCommit.Smart::new).map(commit -> {
-					try {
-						return commit.json();
-					}
-					catch (IOException e) {
-						return null;
-					}
-				}).filter(Objects::nonNull)
-				.map(commitJson -> "@"
-						+ commitJson.getJsonObject("author").getString("login"))
-				.sorted().distinct().collect(Collectors.toList());
+		return revCommits.stream().map(c -> commitToGithubMention(commitsClient, c))
+				.filter(Objects::nonNull).distinct().sorted(String.CASE_INSENSITIVE_ORDER)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Clean up the short message of a {@link SimpleCommit}, ie detect message prefix like
+	 * "fix #123 Something something (#124)". The prefix up to the issue link is removed,
+	 * and so is the PR reference at the end.
+	 */
+	protected String cleanupShortMessage(SimpleCommit commit) {
+		String cleanShortMessage = commit.title;
+		if (!commit.isMergeCommit) {
+			final Matcher shortMessageMatcher = SHORT_MESSAGE.matcher(cleanShortMessage);
+			if (shortMessageMatcher.matches()) {
+				cleanShortMessage = shortMessageMatcher.group(1).trim();
+			}
+		}
+		return cleanShortMessage;
+	}
+
+	/**
+	 * Extract issue numbers from links like #123 in the whole commit message, in order.
+	 */
+	protected Set<Integer> extractIssueNumbers(SimpleCommit commit) {
+		Set<Integer> issueNumbers = new LinkedHashSet<>();
+		Matcher bodyIssueMatcher = ISSUE_REF.matcher(commit.fullMessage);
+		while (bodyIssueMatcher.find()) {
+			issueNumbers.add(Integer.valueOf(bodyIssueMatcher.group(1)));
+		}
+		return issueNumbers;
+	}
+
+	/**
+	 * From the set of issue numbers (see {@link #extractIssueNumbers(SimpleCommit)}),
+	 * extract github client Issue objects and fetch labels and titles from these issues.
+	 * The labels and titles are injected in a {@link Set} of labels and {@link Map} of
+	 * hashtag issue links to issue titles.
+	 */
+	protected void fetchIssueLabelsAndTitles(Issues issueClient,
+			Set<Integer> issueNumbers, Set<String> labelsTarget,
+			Map<String, String> referencedIssuesTarget) {
+		issueNumbers.forEach(i -> {
+			Issue.Smart issue = new Issue.Smart(issueClient.get(i));
+			issue.labels().iterate().forEach(l -> labelsTarget.add(l.name()));
+
+			try {
+				referencedIssuesTarget.put("#" + issue.number(), issue.title());
+			}
+			catch (IOException e) {
+				log.warn("Could not fetch issue title for #" + issue.number(), e);
+			}
+		});
 	}
 
 	/**
@@ -301,38 +363,18 @@ public class GenerateReleaseNotesTask
 	 */
 	protected ChangelogEntry parseChangeLogEntry(Issues issueClient,
 			SimpleCommit commit) {
-		String cleanShortMessage = commit.title;
-		Set<String> labels = new HashSet<>();
-		List<Issue.Smart> issues = new ArrayList<>();
+		String cleanShortMessage = cleanupShortMessage(commit);
+		Set<Integer> issueNumbers = extractIssueNumbers(commit);
 
-		final Matcher shortMessageMatcher = SHORT_MESSAGE.matcher(cleanShortMessage);
-		if (shortMessageMatcher.matches()) {
-			cleanShortMessage = shortMessageMatcher.group(1).trim();
-		}
+		Set<String> labelsTarget = new HashSet<>();
+		Map<String, String> referencedIssuesTarget = new LinkedHashMap<>();
+		fetchIssueLabelsAndTitles(issueClient, issueNumbers, labelsTarget,
+				referencedIssuesTarget);
 
-		Matcher bodyIssueMatcher = ISSUE_REF.matcher(commit.fullMessage);
-		while (bodyIssueMatcher.find()) {
-			int issueNumber = Integer.parseInt(bodyIssueMatcher.group(1));
-
-			Issue.Smart issue = new Issue.Smart(issueClient.get(issueNumber));
-			issue.labels().iterate().forEach(l -> labels.add(l.name()));
-			issues.add(issue);
-		}
-
-		Type type = extractType(labels, commit.title);
-
-		Map<String, String> referencedIssues = new LinkedHashMap<>();
-		issues.forEach(i -> {
-			try {
-				referencedIssues.put("#" + i.number(), i.title());
-			}
-			catch (IOException e) {
-				log.warn("Could not fetch issue title for #" + i.number(), e);
-			}
-		});
+		Type type = extractType(labelsTarget, commit.title);
 
 		return new ChangelogEntry(type, commit.abbreviatedSha1, cleanShortMessage,
-				referencedIssues);
+				referencedIssuesTarget);
 	}
 
 	/*
