@@ -185,17 +185,45 @@ class GitRepo {
 	 */
 	List<RevCommit> log(String from, String to) {
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
-			final ObjectId fromRevision = findTagOrBranchHeadRevision(git, from)
-					.map(Ref::getObjectId).orElse(ObjectId.fromString(from));
-			final ObjectId toRevision = findTagOrBranchHeadRevision(git, to)
-					.map(Ref::getObjectId).orElse(ObjectId.fromString(to));
+			final Optional<Ref> fromRevisionOptional = findTagOrBranchHeadRevision(git,
+					from);
+			final Optional<Ref> toRevisionOptional = findTagOrBranchHeadRevision(git, to);
+
+			ObjectId fromRevision;
+			if (fromRevisionOptional.isPresent()) {
+				Ref ref = fromRevisionOptional.get();
+				if (ref.isPeeled()) {
+					fromRevision = ref.getPeeledObjectId();
+				}
+				else {
+					fromRevision = ref.getObjectId();
+				}
+			}
+			else {
+				fromRevision = ObjectId.fromString(from);
+			}
+
+			ObjectId toRevision;
+			if (toRevisionOptional.isPresent()) {
+				Ref ref = toRevisionOptional.get();
+				if (ref.isPeeled()) {
+					toRevision = ref.getPeeledObjectId();
+				}
+				else {
+					toRevision = ref.getObjectId();
+				}
+			}
+			else {
+				toRevision = ObjectId.fromString(to);
+			}
 
 			LinkedList<RevCommit> commits = new LinkedList<>();
 			git.log().addRange(fromRevision, toRevision).call().forEach(commits::add);
 			return commits;
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(e);
+			throw new IllegalStateException(
+					"Unable to fetch git log for " + from + ".." + to, e);
 		}
 	}
 
@@ -205,13 +233,15 @@ class GitRepo {
 	private Optional<Ref> findTagOrBranchHeadRevision(Git git, String tagOrBranch)
 			throws GitAPIException {
 		final Optional<Ref> tag = git.tagList().call().stream()
-				.filter(ref -> ref.getName().equals(tagOrBranch)).findFirst();
+				.filter(ref -> ref.getName().equals("refs/tags/" + tagOrBranch))
+				.findFirst();
 		if (tag.isPresent()) {
 			return tag;
 		}
 
 		return git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call()
-				.stream().filter(ref -> ref.getName().equals(tagOrBranch)).findFirst();
+				.stream().filter(ref -> ref.getName().equals("refs/heads/" + tagOrBranch))
+				.findFirst();
 	}
 
 	boolean hasBranch(String branch) {
