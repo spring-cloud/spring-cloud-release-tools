@@ -65,13 +65,19 @@ public class SimpleCommit {
 	 */
 	public final String committerEmail;
 
+	/**
+	 * Is the commit a merge commit, ie. it has two parents.
+	 */
+	public final boolean isMergeCommit;
+
 	SimpleCommit(RevCommit revCommit) {
 		this(revCommit.abbreviate(8).name(), revCommit.name(),
 				revCommit.getShortMessage(), revCommit.getFullMessage(),
 				revCommit.getAuthorIdent().getName(),
 				revCommit.getAuthorIdent().getEmailAddress(),
 				revCommit.getCommitterIdent().getName(),
-				revCommit.getCommitterIdent().getEmailAddress());
+				revCommit.getCommitterIdent().getEmailAddress(),
+				revCommit.getParentCount() > 1);
 	}
 
 	/**
@@ -84,10 +90,11 @@ public class SimpleCommit {
 	 * @param authorEmail the email of the commit's author
 	 * @param committerName the name of the commit's committer
 	 * @param committerEmail the email of the commit's committer
+	 * @param isMergeCommit is the commit a merge commit (with 2 parents)
 	 */
 	public SimpleCommit(String abbreviatedSha1, String fullSha1, String title,
 			String fullMessage, String authorName, String authorEmail,
-			String committerName, String committerEmail) {
+			String committerName, String committerEmail, boolean isMergeCommit) {
 		this.abbreviatedSha1 = abbreviatedSha1;
 		this.fullSha1 = fullSha1;
 		this.title = title;
@@ -96,6 +103,7 @@ public class SimpleCommit {
 		this.authorEmail = authorEmail;
 		this.committerName = committerName;
 		this.committerEmail = committerEmail;
+		this.isMergeCommit = isMergeCommit;
 	}
 
 }
