@@ -110,10 +110,32 @@ public class GenerateReleaseNotesTask
 		Issues issuesClient = repo.issues();
 		EnumMap<Type, List<ChangelogEntry>> entries = new EnumMap<>(Type.class);
 
+		String fromVersionTag = "v" + args.projectToRun.originalVersion.version;
+		String toVersionTag = "v" + args.versionFromBom.version;
+
+		if (Boolean.TRUE == args.options.interactive) {
+			String defaultRange = fromVersionTag + ".." + toVersionTag;
+			log.info("Force the log range if needed [{}]: ", defaultRange);
+			String modifiedRange = System.console().readLine();
+			if (!modifiedRange.trim().isEmpty()) {
+				String[] range = modifiedRange.split("\\.\\.");
+				if (range.length != 2) {
+					log.warn("Improper range format: {}, will use: {}", modifiedRange,
+							defaultRange);
+				}
+				else {
+					fromVersionTag = range[0];
+					toVersionTag = range[1];
+				}
+			}
+		}
+		else {
+			log.info("Will fetch the log for range {}..{}", fromVersionTag, toVersionTag);
+		}
+
 		// gather commits. we use tags in the format `vVERSION`
 		final List<SimpleCommit> revCommits = gitHandler.commitsBetween(args.project,
-				"v" + args.projectToRun.originalVersion.version,
-				"v" + args.versionFromBom.version);
+				fromVersionTag, toVersionTag);
 
 		// parse and link to issues if possible, determining type
 		for (SimpleCommit revCommit : revCommits) {
