@@ -212,7 +212,7 @@ public class GenerateReleaseNotesTask
 				Collections.emptyList())) {
 			notes.append("\n - ").append(noteworthy.description);
 			for (String issueTitle : noteworthy.associatedIssueLinksAndTitles.values()) {
-				notes.append("\n\t").append(issueTitle);
+				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
 			}
 		}
 
@@ -221,7 +221,7 @@ public class GenerateReleaseNotesTask
 				Collections.emptyList())) {
 			notes.append("\n - ").append(feature.description);
 			for (String issueTitle : feature.associatedIssueLinksAndTitles.values()) {
-				notes.append("\n\t").append(issueTitle);
+				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
 			}
 		}
 
@@ -230,7 +230,7 @@ public class GenerateReleaseNotesTask
 				Collections.emptyList())) {
 			notes.append("\n - ").append(bug.description);
 			for (String issueTitle : bug.associatedIssueLinksAndTitles.values()) {
-				notes.append("\n\t").append(issueTitle);
+				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
 			}
 		}
 
@@ -239,7 +239,7 @@ public class GenerateReleaseNotesTask
 				Collections.emptyList())) {
 			notes.append("\n - ").append(misc.description);
 			for (String issueTitle : misc.associatedIssueLinksAndTitles.values()) {
-				notes.append("\n\t").append(issueTitle);
+				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
 			}
 		}
 
@@ -249,7 +249,7 @@ public class GenerateReleaseNotesTask
 			notes.append("\n - ").append(unclassified.description);
 			for (String issueTitle : unclassified.associatedIssueLinksAndTitles
 					.values()) {
-				notes.append("\n\t").append(issueTitle);
+				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
 			}
 		}
 
@@ -329,19 +329,26 @@ public class GenerateReleaseNotesTask
 	}
 
 	/**
+	 * Clean up a short message, removing issue links in suffix and pr prefix forms.
+	 */
+	protected String cleanupShortMessage(String shortMessage) {
+		final Matcher shortMessageMatcher = SHORT_MESSAGE.matcher(shortMessage);
+		if (shortMessageMatcher.matches()) {
+			return shortMessageMatcher.group(1).trim();
+		}
+		return shortMessage;
+	}
+
+	/**
 	 * Clean up the short message of a {@link SimpleCommit}, ie detect message prefix like
 	 * "fix #123 Something something (#124)". The prefix up to the issue link is removed,
 	 * and so is the PR reference at the end.
 	 */
 	protected String cleanupShortMessage(SimpleCommit commit) {
-		String cleanShortMessage = commit.title;
 		if (!commit.isMergeCommit) {
-			final Matcher shortMessageMatcher = SHORT_MESSAGE.matcher(cleanShortMessage);
-			if (shortMessageMatcher.matches()) {
-				cleanShortMessage = shortMessageMatcher.group(1).trim();
-			}
+			return cleanupShortMessage(commit.title);
 		}
-		return cleanShortMessage;
+		return commit.title;
 	}
 
 	/**
@@ -370,14 +377,13 @@ public class GenerateReleaseNotesTask
 			Set<Integer> issueNumbers, Set<String> labelsTarget,
 			Map<String, String> referencedIssuesTarget) {
 		issueNumbers.forEach(i -> {
-			Issue.Smart issue = new Issue.Smart(issueClient.get(i));
-			issue.labels().iterate().forEach(l -> labelsTarget.add(l.name()));
-
 			try {
+				Issue.Smart issue = new Issue.Smart(issueClient.get(i));
+				issue.labels().iterate().forEach(l -> labelsTarget.add(l.name()));
 				referencedIssuesTarget.put("#" + issue.number(), issue.title());
 			}
-			catch (IOException e) {
-				log.warn("Could not fetch issue title for #" + issue.number(), e);
+			catch (Exception e) {
+				log.warn("Could not fetch issue information for #" + i, e);
 			}
 		});
 	}
@@ -481,7 +487,7 @@ public class GenerateReleaseNotesTask
 				description = cleanShortMessage + " (" + commitSha1 + ")";
 			}
 			else {
-				this.description = cleanShortMessage + "("
+				this.description = cleanShortMessage + " ("
 						+ String.join(", ", this.associatedIssueLinksAndTitles.keySet())
 						+ ")";
 			}
