@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -144,7 +145,9 @@ public class GenerateReleaseNotesTask
 		for (SimpleCommit revCommit : revCommits) {
 			ChangelogEntry entry = parseChangeLogEntry(issuesClient, revCommit);
 
-			entries.computeIfAbsent(entry.type, t -> new ArrayList<>()).add(entry);
+			for (Type type : entry.types) {
+				entries.computeIfAbsent(type, t -> new ArrayList<>()).add(entry);
+			}
 		}
 
 		// generate the notes
@@ -202,11 +205,16 @@ public class GenerateReleaseNotesTask
 		StringBuilder notes = new StringBuilder().append(args.projectToRun.name())
 				.append(" `").append(args.versionFromBom.version)
 				.append("` is part of **`").append(args.releaseTrain().version)
-				.append("` Release Train**.")
-				.append("\n\n## :warning: Update considerations and deprecations")
-				.append("\n - short update consideration / breaking change")
-				.append("\n   - additional notes")
-				.append("\n - note about deprecation (#{ISSUE_NUMBER})");
+				.append("` Release Train**.");
+
+		notes.append("\n\n## :warning: Update considerations and deprecations");
+		for (ChangelogEntry noteworthy : entries.getOrDefault(Type.NOTEWORTHY,
+				Collections.emptyList())) {
+			notes.append("\n - ").append(noteworthy.description);
+			for (String issueTitle : noteworthy.associatedIssueLinksAndTitles.values()) {
+				notes.append("\n\t").append(issueTitle);
+			}
+		}
 
 		notes.append("\n\n## :sparkles: New features and improvements");
 		for (ChangelogEntry feature : entries.getOrDefault(Type.FEATURE,
@@ -261,26 +269,38 @@ public class GenerateReleaseNotesTask
 	 * @return a {@link Type} categorizing the commit, or {@link Type#UNCLASSIFIED} if not
 	 * clear
 	 */
-	protected Type extractType(Set<String> labels, String shortMessage) {
-		if (labels.contains("type/bug")) {
-			return Type.BUG;
-		}
-		if (labels.contains("type/enhancement")) {
-			return Type.FEATURE;
-		}
-		if (labels.contains("type/documentation")) {
-			return Type.DOC_MISC;
-		}
-		if (labels.contains("type/chores")) {
-			return Type.DOC_MISC;
+	protected EnumSet<Type> extractTypes(Set<String> labels, String shortMessage) {
+		List<Type> types = new ArrayList<>();
+		for (String label : labels) {
+			switch (label) {
+			case "type/bug":
+				types.add(Type.BUG);
+				break;
+			case "type/enhancement":
+				types.add(Type.FEATURE);
+				break;
+			case "type/documentation":
+			case "type/dependency-upgrade":
+			case "type/chores":
+				types.add(Type.DOC_MISC);
+				break;
+			default:
+				if (label.startsWith("warn/")) {
+					types.add(Type.NOTEWORTHY);
+				}
+				break;
+			}
 		}
 
 		if (shortMessage.startsWith("[build]") || shortMessage.startsWith("[polish]")
 				|| shortMessage.startsWith("[doc]")) {
-			return Type.DOC_MISC;
+			types.add(Type.DOC_MISC);
 		}
 
-		return Type.UNCLASSIFIED;
+		if (types.isEmpty()) {
+			return EnumSet.of(Type.UNCLASSIFIED);
+		}
+		return EnumSet.copyOf(types);
 	}
 
 	protected String commitToGithubMention(RepoCommits commitsClient,
@@ -371,9 +391,9 @@ public class GenerateReleaseNotesTask
 		fetchIssueLabelsAndTitles(issueClient, issueNumbers, labelsTarget,
 				referencedIssuesTarget);
 
-		Type type = extractType(labelsTarget, commit.title);
+		EnumSet<Type> types = extractTypes(labelsTarget, commit.title);
 
-		return new ChangelogEntry(type, commit.abbreviatedSha1, cleanShortMessage,
+		return new ChangelogEntry(types, commit.abbreviatedSha1, cleanShortMessage,
 				referencedIssuesTarget);
 	}
 
@@ -396,12 +416,13 @@ public class GenerateReleaseNotesTask
 
 	/**
 	 * An enum of the 3 types of changes recognized by the changelog template, plus one
-	 * for the commits that couldn't be classified (eg. no relevant prefix and no
-	 * associated issue).
+	 * type for noteworthy items (eg. breaking changes) and one additional type for the
+	 * commits that couldn't be classified (eg. no relevant prefix and no associated
+	 * issue).
 	 */
 	protected enum Type {
 
-		BUG, FEATURE, DOC_MISC, UNCLASSIFIED;
+		NOTEWORTHY, BUG, FEATURE, DOC_MISC, UNCLASSIFIED;
 
 	}
 
@@ -411,9 +432,10 @@ public class GenerateReleaseNotesTask
 	protected static final class ChangelogEntry {
 
 		/**
-		 * The type of the change, or {@link Type#UNCLASSIFIED} if unknown.
+		 * The set of types of the change, or singleton {@link Type#UNCLASSIFIED} if
+		 * unknown.
 		 */
-		public final Type type;
+		public final EnumSet<Type> types;
 
 		/**
 		 * The human-friendly description to put in the release note for that commit.
@@ -430,12 +452,12 @@ public class GenerateReleaseNotesTask
 		 * An ordered map of github-compatible issue links (including the pound sign) and
 		 * their titles, to be added to the draft as possible alternative descriptions.
 		 * The links are automatically added to the end of the {@link #description} by the
-		 * {@link #ChangelogEntry(Type, String, String, Map) constructor}.
+		 * {@link #ChangelogEntry(EnumSet, String, String, Map)} constructor}.
 		 */
 		public final Map<String, String> associatedIssueLinksAndTitles;
 
 		/**
-		 * @param type the {@link Type} of the commit
+		 * @param types the set of {@link Type} of the commit
 		 * @param commitSha1 the commit's human-friendly sha1 (can and should be the
 		 * abbreviated form)
 		 * @param cleanShortMessage the commit's cleaned up title, as should be displayed
@@ -445,9 +467,9 @@ public class GenerateReleaseNotesTask
 		 * be mentioned at the end of the entry, and the issue titles will be added to the
 		 * {@link #description} on their own lines as potential alternative descriptions
 		 */
-		ChangelogEntry(Type type, String commitSha1, String cleanShortMessage,
+		ChangelogEntry(EnumSet<Type> types, String commitSha1, String cleanShortMessage,
 				Map<String, String> associatedIssueLinksAndTitles) {
-			this.type = type;
+			this.types = types;
 			this.commitSha1 = commitSha1;
 			this.associatedIssueLinksAndTitles = associatedIssueLinksAndTitles;
 

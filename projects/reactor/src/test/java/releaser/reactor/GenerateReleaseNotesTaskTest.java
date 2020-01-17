@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static releaser.reactor.GenerateReleaseNotesTask.Type;
 
 /**
  * @author Simon Baslé
@@ -46,69 +47,67 @@ class GenerateReleaseNotesTaskTest {
 
 	@Test
 	void extractTypeFromLabel() {
-		assertThat(task.extractType(Collections.singleton("type/bug"), "")).as("type/bug")
-				.isEqualTo(GenerateReleaseNotesTask.Type.BUG);
+		assertThat(task.extractTypes(Collections.singleton("type/bug"), ""))
+				.as("type/bug").containsOnly(Type.BUG);
 
-		assertThat(task.extractType(Collections.singleton("type/enhancement"), ""))
-				.as("type/enhancement").isEqualTo(GenerateReleaseNotesTask.Type.FEATURE);
+		assertThat(task.extractTypes(Collections.singleton("type/enhancement"), ""))
+				.as("type/enhancement").containsOnly(Type.FEATURE);
 
-		assertThat(task.extractType(Collections.singleton("type/documentation"), ""))
-				.as("type/documentation")
-				.isEqualTo(GenerateReleaseNotesTask.Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.singleton("type/documentation"), ""))
+				.as("type/documentation").containsOnly(Type.DOC_MISC);
 
-		assertThat(task.extractType(Collections.singleton("type/chores"), ""))
-				.as("type/chores").isEqualTo(GenerateReleaseNotesTask.Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.singleton("type/chores"), ""))
+				.as("type/chores").containsOnly(Type.DOC_MISC);
 
-		assertThat(task.extractType(Collections.singleton("type/whatever"), ""))
-				.as("type/whatever")
-				.isEqualTo(GenerateReleaseNotesTask.Type.UNCLASSIFIED);
+		assertThat(task.extractTypes(Collections.singleton("warn/something"), ""))
+				.as("warn/*").containsOnly(Type.NOTEWORTHY);
+
+		assertThat(task.extractTypes(Collections.singleton("type/whatever"), ""))
+				.as("type/whatever").containsOnly(Type.UNCLASSIFIED);
 	}
 
 	@Test
-	void extractTypeFromMultipleLabelsPrecedence() {
+	void extractTypeFromMultipleLabels() {
 		Set<String> labels = new LinkedHashSet<>();
 		labels.add("type/bug");
 		labels.add("type/enhancement");
 		labels.add("type/documentation");
+		labels.add("whatever");
 
-		assertThat(task.extractType(labels, "")).as("BUG has priority")
-				.isEqualTo(GenerateReleaseNotesTask.Type.BUG);
-
-		labels.remove("type/bug");
-		assertThat(task.extractType(labels, "")).as("FEATURE has priority")
-				.isEqualTo(GenerateReleaseNotesTask.Type.FEATURE);
+		assertThat(task.extractTypes(labels, "")).as("multiple labels")
+				.containsOnly(Type.BUG, Type.FEATURE, Type.DOC_MISC);
 	}
 
 	@Test
 	void extractMiscTypeFromBuildMessagePrefix() {
 		String message = "[build] Foo";
 
-		assertThat(task.extractType(Collections.emptySet(), message))
-				.isEqualTo(GenerateReleaseNotesTask.Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.emptySet(), message))
+				.containsOnly(Type.DOC_MISC);
 	}
 
 	@Test
 	void extractMiscTypeFromPolishMessagePrefix() {
 		String message = "[polish] Foo";
 
-		assertThat(task.extractType(Collections.emptySet(), message))
-				.isEqualTo(GenerateReleaseNotesTask.Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.emptySet(), message))
+				.containsOnly(Type.DOC_MISC);
 	}
 
 	@Test
 	void extractMiscTypeFromDocMessagePrefix() {
 		String message = "[doc] Foo";
 
-		assertThat(task.extractType(Collections.emptySet(), message))
-				.isEqualTo(GenerateReleaseNotesTask.Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.emptySet(), message))
+				.containsOnly(Type.DOC_MISC);
 	}
 
 	@Test
 	void extractUnclassifiedTypeFromRandomMessagePrefix() {
 		String message = "fix #123 There was a [bug], needed to [polish] the [doc]";
 
-		assertThat(task.extractType(Collections.emptySet(), message))
-				.isEqualTo(GenerateReleaseNotesTask.Type.UNCLASSIFIED);
+		assertThat(task.extractTypes(Collections.emptySet(), message))
+				.containsOnly(Type.UNCLASSIFIED);
 	}
 
 	@Test
