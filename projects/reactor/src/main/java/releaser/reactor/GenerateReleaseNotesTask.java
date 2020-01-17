@@ -349,6 +349,10 @@ public class GenerateReleaseNotesTask
 	 */
 	protected Set<Integer> extractIssueNumbers(SimpleCommit commit) {
 		Set<Integer> issueNumbers = new LinkedHashSet<>();
+		Matcher titleIssueMatcher = ISSUE_REF.matcher(commit.title);
+		while (titleIssueMatcher.find()) {
+			issueNumbers.add(Integer.valueOf(titleIssueMatcher.group(1)));
+		}
 		Matcher bodyIssueMatcher = ISSUE_REF.matcher(commit.fullMessage);
 		while (bodyIssueMatcher.find()) {
 			issueNumbers.add(Integer.valueOf(bodyIssueMatcher.group(1)));

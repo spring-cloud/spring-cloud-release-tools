@@ -16,7 +16,6 @@
 
 package releaser.reactor;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -111,7 +110,7 @@ class GenerateReleaseNotesTaskTest {
 	}
 
 	@Test
-	void noTitleCleanupFromMergeCommit() throws IOException {
+	void noTitleCleanupFromMergeCommit() {
 		SimpleCommit mergeCommit = new SimpleCommit("sha1", "fullsha1",
 				"merge #123 into 3.3 (#123)", "merge #123 into 3.3", "Simon Baslé",
 				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", true);
@@ -121,7 +120,7 @@ class GenerateReleaseNotesTaskTest {
 	}
 
 	@Test
-	void titleCleanupFixPrefix() throws IOException {
+	void titleCleanupFixPrefix() {
 		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
 				"fix #123 Text from title", "fix #123 Some more text", "Simon Baslé",
 				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
@@ -130,7 +129,7 @@ class GenerateReleaseNotesTaskTest {
 	}
 
 	@Test
-	void titleCleanupSeePrefix() throws IOException {
+	void titleCleanupSeePrefix() {
 		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
 				"see #123 Text from title", "see #123 Some more text", "Simon Baslé",
 				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
@@ -139,7 +138,7 @@ class GenerateReleaseNotesTaskTest {
 	}
 
 	@Test
-	void titleCleanupPrStyleSuffix() throws IOException {
+	void titleCleanupPrStyleSuffix() {
 		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
 				"Commit without issue (#123)", "fullMessage", "Simon Baslé",
 				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
@@ -148,12 +147,57 @@ class GenerateReleaseNotesTaskTest {
 	}
 
 	@Test
-	void titleCleanupBothPrefixAndSuffix() throws IOException {
+	void titleCleanupPrStyleSuffixNoSpace() {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"Commit without issue(#123)", "fullMessage", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Commit without issue");
+	}
+
+	@Test
+	void titleCleanupBothPrefixAndSuffix() {
 		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
 				"prefix #123 Commit title (#123)", "fullMessage", "Simon Baslé",
 				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Commit title");
+	}
+
+	@Test
+	void issueNumberTitlePrefix() {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"prefix #123 Commit title", "fullMessage", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.extractIssueNumbers(commit)).containsOnly(123);
+	}
+
+	@Test
+	void issueNumberTitlePrStyleSuffix() {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "Commit title (#123)",
+				"fullMessage", "Simon Baslé", "sbasle@pivotal.io", "Simon Baslé",
+				"sbasle@pivotal.io", false);
+
+		assertThat(task.extractIssueNumbers(commit)).containsOnly(123);
+	}
+
+	@Test
+	void issueNumberTitlePrefixAndSuffix() {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"prefix #123 Commit title (#456)", "fullMessage", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.extractIssueNumbers(commit)).containsOnly(123, 456);
+	}
+
+	@Test
+	void issueNumberTitleNotSeparatedBySpace() {
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
+				"prefix#123Commit title(#456)", "fullMessage", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+
+		assertThat(task.extractIssueNumbers(commit)).containsOnly(123, 456);
 	}
 
 	// TODO test login extraction by mocking the task's commitToGithubMention method
