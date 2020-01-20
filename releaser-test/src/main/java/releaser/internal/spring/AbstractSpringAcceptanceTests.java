@@ -216,9 +216,13 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public void checkoutReleaseTrainBranch(String fileToRepo, String branch)
 			throws GitAPIException, URISyntaxException {
-		Git git = GitTestUtils.openGitProject(file(fileToRepo));
+		File file = file(fileToRepo);
+		Git git = GitTestUtils.openGitProject(file);
 		git.reset().setMode(ResetCommand.ResetType.HARD).call();
-		git.checkout().setName(branch).call();
+		if (new File(file, ".travis.yml").exists()) {
+			new File(file, ".travis.yml").delete();
+		}
+		git.checkout().setForce(true).setName(branch).call();
 	}
 
 	public Git clonedProject(NonAssertingTestProjectGitHandler handler, String name) {
