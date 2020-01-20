@@ -119,7 +119,7 @@ public class GenerateReleaseNotesTask
 
 		if (Boolean.TRUE == args.options.interactive) {
 			String defaultRange = fromVersionTag + ".." + toVersionTag;
-			log.info("Force the log range if needed [{}]: ", defaultRange);
+			log.info("\nForce the log range if needed [{}]: ", defaultRange);
 			String modifiedRange = System.console().readLine();
 			if (!modifiedRange.trim().isEmpty()) {
 				String[] range = modifiedRange.split("\\.\\.");
@@ -157,10 +157,7 @@ public class GenerateReleaseNotesTask
 		if (args.options.dryRun != null && args.options.dryRun) {
 			// print out
 			log.info("[Dry-Run] Generated release notes:");
-			String[] lines = notes.split("\n");
-			for (String line : lines) {
-				log.info("\t > " + line);
-			}
+			log.info("\n\n" + notes + "\n\n");
 			return ExecutionResult.success();
 		}
 		else {
@@ -255,7 +252,7 @@ public class GenerateReleaseNotesTask
 
 		// contributors
 		notes.append(
-				"\n\n:+1: Thanks to the following contributors that also participated to this release");
+				"\n\n## :+1: Thanks to the following contributors that also participated to this release\n");
 		notes.append(String.join(", ", contributorGithubMentions));
 
 		return notes.toString();
