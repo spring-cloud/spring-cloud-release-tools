@@ -93,14 +93,14 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
-			ConfigurableApplicationContext context,
-			ReleaserProperties releaserProperties) {
+			ConfigurableApplicationContext context, ReleaserProperties releaserProperties,
+			BuildReportHandler reportHandler) {
 		this.stepBuilderFactory = stepBuilderFactory;
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
 		this.jobLauncher = jobLauncher;
 		this.flowRunnerTaskExecutorSupplier = flowRunnerTaskExecutorSupplier;
-		this.stepSkipper = new ConsoleInputStepSkipper(context);
+		this.stepSkipper = new ConsoleInputStepSkipper(context, reportHandler);
 		this.releaserProperties = releaserProperties;
 		this.executorService = Executors.newFixedThreadPool(
 				this.releaserProperties.getMetaRelease().getReleaseGroupThreadCount());
@@ -534,8 +534,12 @@ class ConsoleInputStepSkipper {
 
 	private final ConfigurableApplicationContext context;
 
-	ConsoleInputStepSkipper(ConfigurableApplicationContext context) {
+	private final BuildReportHandler reportHandler;
+
+	ConsoleInputStepSkipper(ConfigurableApplicationContext context,
+			BuildReportHandler reportHandler) {
 		this.context = context;
+		this.reportHandler = reportHandler;
 	}
 
 	public boolean skipStep() {
@@ -544,6 +548,7 @@ class ConsoleInputStepSkipper {
 		case "s":
 			return true;
 		case "q":
+			reportHandler.reportBuildSummary();
 			System.exit(SpringApplication.exit(this.context, () -> 0));
 			return true;
 		default:

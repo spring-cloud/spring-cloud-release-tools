@@ -56,8 +56,8 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ExecutionResultHandler springBatchExecutionResultHandler(JobExplorer jobExplorer,
-			ConfigurableApplicationContext context) {
+	SpringBatchExecutionResultHandler springBatchExecutionResultHandler(
+			JobExplorer jobExplorer, ConfigurableApplicationContext context) {
 		return new SpringBatchExecutionResultHandler(jobExplorer, context);
 	}
 
@@ -74,11 +74,11 @@ class BatchConfiguration {
 			JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
-			ConfigurableApplicationContext context,
-			ReleaserProperties releaserProperties) {
+			ConfigurableApplicationContext context, ReleaserProperties releaserProperties,
+			BuildReportHandler reportHandler) {
 		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
 				projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier,
-				context, releaserProperties);
+				context, releaserProperties, reportHandler);
 	}
 
 	@Bean
