@@ -179,6 +179,26 @@ class GitRepo {
 	}
 
 	/**
+	 * Attempt to retrieve a tag id from a name, prepending the name with /refs/tags/.
+	 */
+	Optional<ObjectId> findTagIdByName(String tagName, boolean unpeel) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
+			return git.tagList().call().stream()
+					.filter(ref -> ref.getName().equals("refs/tags/" + tagName))
+					.findFirst().map(ref -> {
+						if (ref.isPeeled() && unpeel) {
+							return ref.getPeeledObjectId();
+						}
+						return ref.getObjectId();
+					});
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(
+					"Unable to fetch git tag id for refs/tags/" + tagName, e);
+		}
+	}
+
+	/**
 	 * Logs {@link RevCommit} between two tags / branches / hashes.
 	 * @param from oldest revision
 	 * @param to newest revision

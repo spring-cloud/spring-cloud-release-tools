@@ -21,9 +21,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.transport.URIish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,6 +207,17 @@ public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 			String toRef) {
 		return gitRepo(clonedProject).log(fromRef, toRef).stream().map(SimpleCommit::new)
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Attempt to find the SHA1 of a named tag (without the refs/tags/ prefix).
+	 * @param clonedProject location of the cloned project
+	 * @param tagName the name of the tag to find
+	 * @return an {@link Optional} that is valued with the sha1, if found
+	 */
+	public Optional<String> findTagSha1(File clonedProject, String tagName) {
+		return gitRepo(clonedProject).findTagIdByName(tagName, false)
+				.map(AnyObjectId::getName);
 	}
 
 	private String suffixNonHttpRepo(String orgUrl) {
