@@ -113,6 +113,39 @@ public class GenerateReleaseNotesTask
 		Repo repo = github.repos().get(new Coordinates.Simple(
 				args.properties.getGit().getOrgName(), args.projectToRun.name()));
 
+		String releaseTag = "v" + args.versionFromBom.version;
+		if (args.options.dryRun != Boolean.TRUE) {
+			Optional<String> maybeTagSha1 = gitHandler.findTagSha1(args.project,
+					releaseTag);
+			if (maybeTagSha1.isPresent()) {
+				String tagSha1 = maybeTagSha1.get();
+				try {
+					repo.git().references().get("tags/" + tagSha1).json(); // has to call
+					// json()
+					// to trigger fetch, and has to be with SHA1
+					boolean releaseExists = StreamSupport
+							.stream(repo.releases().iterate().spliterator(), true)
+							.map(Release.Smart::new)
+							.anyMatch(r -> tagEquals(r, releaseTag));
+					if (releaseExists) {
+						return ExecutionResult.failure(new IllegalStateException(
+								"Release already exists for tag " + releaseTag));
+					}
+				}
+				catch (IOException e) {
+					return ExecutionResult.failure(new IllegalStateException(
+							"Shouldn't create a release if tag " + releaseTag + " (sha1="
+									+ tagSha1 + ") not visible in Github",
+							e));
+				}
+			}
+			else {
+				return ExecutionResult.failure(new IllegalStateException(
+						"Attempting to draft release note but tag not found in repository: "
+								+ releaseTag));
+			}
+		}
+
 		Issues issuesClient = repo.issues();
 		EnumMap<Type, List<ChangelogEntry>> entries = new EnumMap<>(Type.class);
 
@@ -164,52 +197,23 @@ public class GenerateReleaseNotesTask
 		}
 		else {
 			// WARNING: double check the tag actually exists, otherwise this will create a
-			// tag :(
-			String tag = "v" + args.versionFromBom.version; // we force using the version
-															// from BOM
-			Optional<String> maybeTagSha1 = gitHandler.findTagSha1(args.project, tag);
-			if (maybeTagSha1.isPresent()) {
-				String tagSha1 = maybeTagSha1.get();
-				try {
-					repo.git().references().get("tags/" + tagSha1).json(); // has to call
-																			// json()
-					// to trigger fetch, and has to be with SHA1
-					boolean releaseExists = StreamSupport
-							.stream(repo.releases().iterate().spliterator(), true)
-							.map(Release.Smart::new).anyMatch(r -> tagEquals(r, tag));
-					if (releaseExists) {
-						return ExecutionResult.failure(new IllegalStateException(
-								"Release already exists for tag " + tag));
-					}
+			// tag :( The verification is done early in the task to avoid fetching
+			// commits/issues
+			// create a draft release for the tag
+			try {
+				Release.Smart release = new Release.Smart(
+						repo.releases().create(releaseTag));
+				release.draft(true);
+				release.tag(releaseTag);
+				release.name(releaseTag);
+				release.body(notes);
+				if (args.versionFromBom.isMilestone() || args.versionFromBom.isRc()) {
+					release.prerelease(true);
 				}
-				catch (IOException e) {
-					return ExecutionResult.failure(new IllegalStateException(
-							"Shouldn't create a release if tag " + tag + " (sha1="
-									+ tagSha1 + ") not visible in Github",
-							e));
-				}
-
-				// create a draft release for the tag
-				try {
-					Release.Smart release = new Release.Smart(
-							repo.releases().create(tag));
-					release.draft(true);
-					release.tag(tag);
-					release.name(tag);
-					release.body(notes);
-					if (args.versionFromBom.isMilestone() || args.versionFromBom.isRc()) {
-						release.prerelease(true);
-					}
-					return ExecutionResult.success();
-				}
-				catch (IOException e) {
-					return ExecutionResult.failure(e);
-				}
+				return ExecutionResult.success();
 			}
-			else {
-				return ExecutionResult.failure(new IllegalStateException(
-						"Attempting to draft release note but tag not found in repository: "
-								+ toVersionTag));
+			catch (IOException e) {
+				return ExecutionResult.failure(e);
 			}
 		}
 	}
