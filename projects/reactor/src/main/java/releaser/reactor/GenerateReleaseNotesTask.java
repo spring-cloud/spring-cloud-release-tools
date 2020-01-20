@@ -27,10 +27,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.json.JsonObject;
 
@@ -163,32 +165,61 @@ public class GenerateReleaseNotesTask
 		else {
 			// WARNING: double check the tag actually exists, otherwise this will create a
 			// tag :(
-			String tag = "v" + args.versionFromBom.version;
-			try {
-				repo.git().references().get("tags/" + tag).json(); // has to call json()
-																	// to trigger fetch
-																	// -_-
-			}
-			catch (IOException e) {
-				return ExecutionResult.failure(new IllegalStateException(
-						"Shouldn't create a release if tag " + tag + " not present", e));
-			}
-
-			// create a draft release for the tag
-			try {
-				Release.Smart release = new Release.Smart(repo.releases().create(tag));
-				release.draft(true);
-				release.tag(tag);
-				release.name(tag);
-				release.body(notes);
-				if (args.versionFromBom.isMilestone() || args.versionFromBom.isRc()) {
-					release.prerelease(true);
+			String tag = "v" + args.versionFromBom.version; // we force using the version
+															// from BOM
+			Optional<String> maybeTagSha1 = gitHandler.findTagSha1(args.project, tag);
+			if (maybeTagSha1.isPresent()) {
+				String tagSha1 = maybeTagSha1.get();
+				try {
+					repo.git().references().get("tags/" + tagSha1).json(); // has to call
+																			// json()
+					// to trigger fetch, and has to be with SHA1
+					boolean releaseExists = StreamSupport
+							.stream(repo.releases().iterate().spliterator(), true)
+							.map(Release.Smart::new).anyMatch(r -> tagEquals(r, tag));
+					if (releaseExists) {
+						return ExecutionResult.failure(new IllegalStateException(
+								"Release already exists for tag " + tag));
+					}
 				}
-				return ExecutionResult.success();
+				catch (IOException e) {
+					return ExecutionResult.failure(new IllegalStateException(
+							"Shouldn't create a release if tag " + tag + " (sha1="
+									+ tagSha1 + ") not visible in Github",
+							e));
+				}
+
+				// create a draft release for the tag
+				try {
+					Release.Smart release = new Release.Smart(
+							repo.releases().create(tag));
+					release.draft(true);
+					release.tag(tag);
+					release.name(tag);
+					release.body(notes);
+					if (args.versionFromBom.isMilestone() || args.versionFromBom.isRc()) {
+						release.prerelease(true);
+					}
+					return ExecutionResult.success();
+				}
+				catch (IOException e) {
+					return ExecutionResult.failure(e);
+				}
 			}
-			catch (IOException e) {
-				return ExecutionResult.failure(e);
+			else {
+				return ExecutionResult.failure(new IllegalStateException(
+						"Attempting to draft release note but tag not found in repository: "
+								+ toVersionTag));
 			}
+		}
+	}
+
+	private boolean tagEquals(Release.Smart release, final String tag) {
+		try {
+			return release.tag().equals(tag);
+		}
+		catch (IOException e) {
+			return false;
 		}
 	}
 
