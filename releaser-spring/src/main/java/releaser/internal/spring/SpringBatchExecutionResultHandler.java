@@ -79,13 +79,11 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 	}
 
 	void exitSuccessfully() {
-		SpringApplication.exit(this.context, () -> 0);
-		System.exit(0);
+		System.exit(SpringApplication.exit(this.context, () -> 0));
 	}
 
 	void exitWithException() {
-		SpringApplication.exit(this.context, () -> 1);
-		System.exit(1);
+		System.exit(SpringApplication.exit(this.context, () -> 1));
 	}
 
 	private void buildSummaryTable() {

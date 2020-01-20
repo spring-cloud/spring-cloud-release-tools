@@ -544,8 +544,7 @@ class ConsoleInputStepSkipper {
 		case "s":
 			return true;
 		case "q":
-			SpringApplication.exit(this.context, () -> 0);
-			System.exit(0);
+			System.exit(SpringApplication.exit(this.context, () -> 0));
 			return true;
 		default:
 			return false;
