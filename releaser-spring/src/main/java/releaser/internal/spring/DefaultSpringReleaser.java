@@ -66,6 +66,9 @@ class DefaultSpringReleaser implements SpringReleaser {
 		ProjectsToRun projectsToRun = releaseProjects(optionsAndProperties);
 		ExecutionResult releaseTasksExecutionResult = runReleaseTasks(
 				optionsAndProperties, projectsToRun, releaseTasksToRun);
+		if (releaseTasksExecutionResult.isFailure()) {
+			return releaseTasksExecutionResult;
+		}
 		TasksToRun postReleaseTrainTasksToRun = postReleaseTrainTasksFromOptions(
 				optionsAndProperties);
 		ExecutionResult postReleaseTrainTasksExecutionResult = runPostReleaseTasks(

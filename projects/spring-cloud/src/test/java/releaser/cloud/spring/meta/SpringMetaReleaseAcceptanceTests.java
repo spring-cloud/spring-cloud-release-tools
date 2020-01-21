@@ -38,6 +38,7 @@ import releaser.internal.sagan.SaganUpdater;
 import releaser.internal.spring.Arguments;
 import releaser.internal.spring.SpringReleaser;
 import releaser.internal.tasks.ReleaseReleaserTask;
+import releaser.internal.tasks.TrainPostReleaseReleaserTask;
 import releaser.internal.tasks.composite.MetaReleaseCompositeTask;
 import releaser.internal.tasks.composite.ReleaseCompositeTask;
 import releaser.internal.tasks.release.BuildProjectReleaseTask;
@@ -368,6 +369,7 @@ public class SpringMetaReleaseAcceptanceTests
 							.getBean(TestExecutionResultHandler.class);
 					FirstTask firstTask = context.getBean(FirstTask.class);
 					SecondTask secondTask = context.getBean(SecondTask.class);
+					PostReleaseTask postReleaseTask = context.getBean(PostReleaseTask.class);
 
 					ExecutionResult result = releaser
 							.release(new OptionsBuilder().metaRelease(true).options());
@@ -385,6 +387,8 @@ public class SpringMetaReleaseAcceptanceTests
 							.runTask(BDDMockito.argThat(arg -> arg.project.getName()
 									.equals("spring-cloud-release")));
 					BDDMockito.then(secondTask).should(BDDMockito.never())
+							.runTask(BDDMockito.any(Arguments.class));
+					BDDMockito.then(postReleaseTask).should(BDDMockito.never())
 							.runTask(BDDMockito.any(Arguments.class));
 				});
 	}
@@ -522,6 +526,11 @@ public class SpringMetaReleaseAcceptanceTests
 		}
 
 		@Bean
+		PostReleaseTask firstPostReleaseTask() {
+			return BDDMockito.spy(new PostReleaseTask());
+		}
+
+		@Bean
 		MetaReleaseCompositeTask metaReleaseCompositeTask(ApplicationContext context) {
 			return new MetaReleaseCompositeTask(context);
 		}
@@ -601,6 +610,41 @@ class SecondTask implements ReleaseReleaserTask {
 	@Override
 	public int getOrder() {
 		return 1;
+	}
+
+}
+
+class PostReleaseTask implements TrainPostReleaseReleaserTask {
+
+	@Override
+	public String name() {
+		return "third";
+	}
+
+	@Override
+	public String shortName() {
+		return "3";
+	}
+
+	@Override
+	public String header() {
+		return "THIRD";
+	}
+
+	@Override
+	public String description() {
+		return name();
+	}
+
+	@Override
+	public ExecutionResult runTask(Arguments args)
+			throws BuildUnstableException, RuntimeException {
+		return ExecutionResult.success();
+	}
+
+	@Override
+	public int getOrder() {
+		return 3;
 	}
 
 }
