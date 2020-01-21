@@ -17,6 +17,9 @@
 package releaser.reactor;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -32,7 +35,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.json.JsonObject;
 
@@ -120,17 +122,8 @@ public class GenerateReleaseNotesTask
 			if (maybeTagSha1.isPresent()) {
 				String tagSha1 = maybeTagSha1.get();
 				try {
-					repo.git().references().get("tags/" + tagSha1).json(); // has to call
-					// json()
-					// to trigger fetch, and has to be with SHA1
-					boolean releaseExists = StreamSupport
-							.stream(repo.releases().iterate().spliterator(), true)
-							.map(Release.Smart::new)
-							.anyMatch(r -> tagEquals(r, releaseTag));
-					if (releaseExists) {
-						return ExecutionResult.failure(new IllegalStateException(
-								"Release already exists for tag " + releaseTag));
-					}
+					// call json() to trigger fetch of gh tag by SHA1
+					repo.git().references().get("tags/" + tagSha1).json();
 				}
 				catch (IOException e) {
 					return ExecutionResult.failure(new IllegalStateException(
@@ -168,9 +161,7 @@ public class GenerateReleaseNotesTask
 				}
 			}
 		}
-		else {
-			log.info("Will fetch the log for range {}..{}", fromVersionTag, toVersionTag);
-		}
+		log.info("Fetching the log for range {}..{}", fromVersionTag, toVersionTag);
 
 		// gather commits. we use tags in the format `vVERSION`
 		final List<SimpleCommit> revCommits = gitHandler.commitsBetween(args.project,
@@ -199,31 +190,80 @@ public class GenerateReleaseNotesTask
 			// WARNING: double check the tag actually exists, otherwise this will create a
 			// tag :( The verification is done early in the task to avoid fetching
 			// commits/issues
-			// create a draft release for the tag
-			try {
-				Release.Smart release = new Release.Smart(
-						repo.releases().create(releaseTag));
-				release.draft(true);
-				release.tag(releaseTag);
-				release.name(releaseTag);
-				release.body(notes);
-				if (args.versionFromBom.isMilestone() || args.versionFromBom.isRc()) {
-					release.prerelease(true);
-				}
-				return ExecutionResult.success();
-			}
-			catch (IOException e) {
-				return ExecutionResult.failure(e);
-			}
-		}
-	}
 
-	private boolean tagEquals(Release.Smart release, final String tag) {
-		try {
-			return release.tag().equals(tag);
-		}
-		catch (IOException e) {
-			return false;
+			Release.Smart draftRelease = null;
+			JsonObject draftReleaseJson = null;
+			try {
+				// attempt to find gh release with this tag. stop at 2 month old releases
+				Instant oldestReleaseToConsider = ZonedDateTime.now().minusMonths(2)
+						.toInstant();
+				for (Release release : repo.releases().iterate()) {
+					JsonObject releaseJson = release.json();
+					// seems the created release has a wrong tag "untagged-xxxxx", we also
+					// look at name
+					if (releaseJson.getString("tag_name").equals(releaseTag)
+							|| releaseJson.getString("name").equals(releaseTag)) {
+						if (!releaseJson.getBoolean("draft")) {
+							return ExecutionResult.failure(new IllegalStateException(
+									"Release already exists for tag " + releaseTag));
+						}
+						else {
+							draftRelease = new Release.Smart(release);
+							draftReleaseJson = releaseJson;
+							break;
+						}
+					}
+					// we didn't find a matching release. don't go too far back in time!
+					String publishedAtJson = releaseJson.getString("published_at");
+					Instant publishedAt = oldestReleaseToConsider.minusSeconds(1);
+					if (publishedAtJson != null) {
+						publishedAt = ZonedDateTime.parse(publishedAtJson).toInstant();
+					}
+					if (publishedAt.isBefore(oldestReleaseToConsider)) {
+						log.info("OK, didn't find a release matching tag " + releaseTag
+								+ " within the last 2 month, stopping there");
+						break;
+					}
+				}
+			}
+			catch (Throwable e) {
+				return ExecutionResult.failure(new IllegalStateException(
+						"Unable to try to match github releases with tag " + releaseTag,
+						e));
+			}
+
+			if (draftReleaseJson == null) {
+				// create a draft release for the tag
+				try {
+					Release.Smart release = new Release.Smart(
+							repo.releases().create(releaseTag));
+					release.draft(true);
+					release.tag(releaseTag);
+					release.name(releaseTag);
+					release.body(notes);
+					if (args.versionFromBom.isMilestone() || args.versionFromBom.isRc()) {
+						release.prerelease(true);
+					}
+					return ExecutionResult.success();
+				}
+				catch (IOException e) {
+					return ExecutionResult.failure(e);
+				}
+			}
+			else {
+				// update the existing draft
+				try {
+					// edit the release
+					String oldAndNewNotes = draftReleaseJson.getString("body")
+							+ "\n\n----\nNew draft added "
+							+ LocalDateTime.now().toString() + "\n----\n" + notes;
+					draftRelease.body(oldAndNewNotes);
+					return ExecutionResult.success();
+				}
+				catch (IOException e) {
+					return ExecutionResult.failure(e);
+				}
+			}
 		}
 	}
 
@@ -410,9 +450,14 @@ public class GenerateReleaseNotesTask
 			Map<String, String> referencedIssuesTarget) {
 		issueNumbers.forEach(i -> {
 			try {
-				Issue.Smart issue = new Issue.Smart(issueClient.get(i));
-				issue.labels().iterate().forEach(l -> labelsTarget.add(l.name()));
-				referencedIssuesTarget.put("#" + issue.number(), issue.title());
+				// avoid "Smart" issue here as it makes further requests to the server :(
+				// we have everything handy in the JSON
+				Issue issue = issueClient.get(i);
+				JsonObject issueJson = issue.json();
+				issueJson.getJsonArray("labels").forEach(label -> labelsTarget
+						.add(((JsonObject) label).getString("name")));
+				referencedIssuesTarget.put("#" + issueJson.getInt("number"),
+						issueJson.getString("title"));
 			}
 			catch (Exception e) {
 				log.warn("Could not fetch issue information for #" + i, e);
