@@ -18,9 +18,9 @@ package releaser;
 
 import releaser.internal.options.Options;
 import releaser.internal.options.Parser;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.spring.ExecutionResultHandler;
 import releaser.internal.spring.SpringReleaser;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.boot.CommandLineRunner;
 

@@ -35,9 +35,14 @@ import releaser.internal.postrelease.PostReleaseActions;
 import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganClient;
 import releaser.internal.sagan.SaganUpdater;
-import releaser.internal.spring.ExecutionResult;
+import releaser.internal.spring.Arguments;
 import releaser.internal.spring.SpringReleaser;
+import releaser.internal.tasks.ReleaseReleaserTask;
+import releaser.internal.tasks.composite.MetaReleaseCompositeTask;
+import releaser.internal.tasks.composite.ReleaseCompositeTask;
 import releaser.internal.tasks.release.BuildProjectReleaseTask;
+import releaser.internal.tech.BuildUnstableException;
+import releaser.internal.tech.ExecutionResult;
 import releaser.internal.template.TemplateGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -61,11 +67,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 public class SpringMetaReleaseAcceptanceTests
 		extends AbstractSpringCloudMetaAcceptanceTests {
 
-	SpringApplicationBuilder runner = new SpringApplicationBuilder(
-			SpringMetaReleaseAcceptanceTests.MetaReleaseConfig.class,
-			SpringMetaReleaseAcceptanceTests.MetaReleaseScanningConfiguration.class)
-					.web(WebApplicationType.NONE).properties("spring.jmx.enabled=false");
-
 	@Test
 	public void should_perform_a_meta_release_of_sc_release_and_consul()
 			throws Exception {
@@ -75,7 +76,7 @@ public class SpringMetaReleaseAcceptanceTests
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(this.runner,
+		run(defaultRunner(),
 				properties("debug=true").properties("test.metarelease=true")
 						.properties(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
 								.addFixedVersions(edgwareSr10()).build()),
@@ -94,6 +95,10 @@ public class SpringMetaReleaseAcceptanceTests
 					ExecutionResult result = releaser
 							.release(new OptionsBuilder().metaRelease(true).options());
 
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
 					then(result.isFailureOrUnstable()).isFalse();
 					// consul, release, documentation
 					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(3);
@@ -107,10 +112,6 @@ public class SpringMetaReleaseAcceptanceTests
 									.contains("refs/tags/v5.3.5.RELEASE");
 					thenRunUpdatedTestsWereCalled(postReleaseActions);
 					thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
-
-					// print results
-					testExecutionResultHandler.accept(result);
-					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 
@@ -123,7 +124,7 @@ public class SpringMetaReleaseAcceptanceTests
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(this.runner, properties("debug=true").properties("test.metarelease=true")
+		run(defaultRunner(), properties("debug=true").properties("test.metarelease=true")
 				.properties(metaReleaseArgsForParallel(project)
 						.bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10())
 						.metaReleaseGroups("example1,example2",
@@ -174,7 +175,7 @@ public class SpringMetaReleaseAcceptanceTests
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(this.runner,
+		run(defaultRunner(),
 				properties("debug=true").properties("test.metarelease=true")
 						.properties(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
 								.addFixedVersions(edgwareSr10()).build()),
@@ -193,6 +194,10 @@ public class SpringMetaReleaseAcceptanceTests
 					ExecutionResult result = releaser.release(new OptionsBuilder()
 							.metaRelease(true).dryRun(true).options());
 
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
 					then(result.isFailureOrUnstable()).isFalse();
 					// consul, release
 					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(2);
@@ -206,10 +211,6 @@ public class SpringMetaReleaseAcceptanceTests
 									.doesNotContain("refs/tags/v5.3.5.RELEASE");
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
 					thenUpdateReleaseTrainDocsWasNotCalled(postReleaseActions);
-
-					// print results
-					testExecutionResultHandler.accept(result);
-					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 
@@ -223,7 +224,7 @@ public class SpringMetaReleaseAcceptanceTests
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		File temporaryDestination = this.tmp.newFolder();
 
-		run(this.runner,
+		run(defaultRunner(),
 				properties("debug=true")
 						.properties("test.metarelease=true", "test.mockBuild=true")
 						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
@@ -241,13 +242,13 @@ public class SpringMetaReleaseAcceptanceTests
 					ExecutionResult result = releaser
 							.release(new OptionsBuilder().metaRelease(true).options());
 
-					then(result.isFailureOrUnstable()).isFalse();
-					thenBuildWasNeverCalledFor(build, "spring-cloud-consul");
-					thenBuildWasCalledFor(build, "spring-cloud-release");
-
 					// print results
 					testExecutionResultHandler.accept(result);
 					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
+					then(result.isFailureOrUnstable()).isFalse();
+					thenBuildWasNeverCalledFor(build, "spring-cloud-consul");
+					thenBuildWasCalledFor(build, "spring-cloud-release");
 				});
 	}
 
@@ -261,7 +262,7 @@ public class SpringMetaReleaseAcceptanceTests
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		File temporaryDestination = this.tmp.newFolder();
 
-		run(this.runner,
+		run(defaultRunner(),
 				properties("debug=true")
 						.properties("test.metarelease=true", "test.mockBuild=true")
 						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
@@ -281,6 +282,10 @@ public class SpringMetaReleaseAcceptanceTests
 							.release(new OptionsBuilder().startFrom("spring-cloud-consul")
 									.metaRelease(true).options());
 
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
 					// release
 					then(result.isFailureOrUnstable()).isFalse();
 					thenBuildWasNeverCalledFor(build, "spring-cloud-build");
@@ -291,10 +296,6 @@ public class SpringMetaReleaseAcceptanceTests
 					thenSaganWasCalled(saganUpdater);
 					thenDocumentationWasUpdated(testDocumentationUpdater);
 					thenWikiPageWasUpdated(testDocumentationUpdater);
-
-					// print results
-					testExecutionResultHandler.accept(result);
-					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 				});
 	}
 
@@ -308,7 +309,7 @@ public class SpringMetaReleaseAcceptanceTests
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		File temporaryDestination = this.tmp.newFolder();
 
-		run(this.runner,
+		run(defaultRunner(),
 				properties("debug=true")
 						.properties("test.metarelease=true", "test.mockBuild=true")
 						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
@@ -328,6 +329,10 @@ public class SpringMetaReleaseAcceptanceTests
 							.taskNames(Collections.singletonList("spring-cloud-consul"))
 							.metaRelease(true).options());
 
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
 					// release
 					then(result.isFailureOrUnstable()).isFalse();
 					thenBuildWasNeverCalledFor(build, "spring-cloud-release");
@@ -338,11 +343,64 @@ public class SpringMetaReleaseAcceptanceTests
 					thenSaganWasCalled(saganUpdater);
 					thenDocumentationWasUpdated(testDocumentationUpdater);
 					thenWikiPageWasUpdated(testDocumentationUpdater);
+				});
+	}
+
+	@Test
+	public void should_not_execute_any_subsequent_task_when_first_one_fails()
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
+		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+
+		run(failingBuildRunner(), properties("debug=true")
+				.properties("test.metarelease=true", "test.metarelease.failing=true",
+						"releaser.flow.default-enabled=false")
+				.properties(metaReleaseArgs(project).bomBranch("vGreenwich.SR2")
+						.addFixedVersions(edgwareSr10()).build()),
+				context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
+							.getBean(NonAssertingTestProjectGitHandler.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+					FirstTask firstTask = context.getBean(FirstTask.class);
+					SecondTask secondTask = context.getBean(SecondTask.class);
+
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().metaRelease(true).options());
 
 					// print results
 					testExecutionResultHandler.accept(result);
-					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+					then(testExecutionResultHandler.exitedWithException).isTrue();
+
+					then(result.isFailureOrUnstable()).isTrue();
+					// consul
+					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(1);
+					BDDMockito.then(firstTask).should().runTask(BDDMockito.argThat(
+							arg -> arg.project.getName().equals("spring-cloud-consul")));
+					BDDMockito.then(firstTask).should(BDDMockito.never())
+							.runTask(BDDMockito.argThat(arg -> arg.project.getName()
+									.equals("spring-cloud-release")));
+					BDDMockito.then(secondTask).should(BDDMockito.never())
+							.runTask(BDDMockito.any(Arguments.class));
 				});
+	}
+
+	private SpringApplicationBuilder defaultRunner() {
+		return new SpringApplicationBuilder(MetaReleaseConfig.class,
+				MetaReleaseScanningConfiguration.class).web(WebApplicationType.NONE)
+						.properties("spring.jmx.enabled=false");
+	}
+
+	private SpringApplicationBuilder failingBuildRunner() {
+		return new SpringApplicationBuilder(
+				SpringMetaReleaseAcceptanceTests.MetaReleaseConfig.class,
+				SpringMetaReleaseAcceptanceTests.MetaReleaseFailingTasksScanningConfiguration.class)
+						.web(WebApplicationType.NONE)
+						.properties("spring.jmx.enabled=false");
 	}
 
 	private void thenWikiPageWasUpdated(DocumentationUpdater documentationUpdater) {
@@ -406,7 +464,11 @@ public class SpringMetaReleaseAcceptanceTests
 
 		@Bean
 		PostReleaseActions myPostReleaseActions() {
-			return BDDMockito.mock(PostReleaseActions.class);
+			return BDDMockito
+					.mock(PostReleaseActions.class,
+							invocation -> invocation.getMethod().getReturnType()
+									.equals(ExecutionResult.class)
+											? ExecutionResult.success() : null);
 		}
 
 		@Bean
@@ -442,6 +504,103 @@ public class SpringMetaReleaseAcceptanceTests
 	@ComponentScan({ "releaser.internal", "releaser.cloud" })
 	static class MetaReleaseScanningConfiguration {
 
+	}
+
+	@Configuration
+	@ConditionalOnProperty(value = "test.metarelease.failing", havingValue = "true")
+	@ComponentScan({ "releaser.internal", "releaser.cloud" })
+	static class MetaReleaseFailingTasksScanningConfiguration {
+
+		@Bean
+		FirstTask firstTask() {
+			return BDDMockito.spy(new FirstTask());
+		}
+
+		@Bean
+		SecondTask secondTask() {
+			return BDDMockito.spy(new SecondTask());
+		}
+
+		@Bean
+		MetaReleaseCompositeTask metaReleaseCompositeTask(ApplicationContext context) {
+			return new MetaReleaseCompositeTask(context);
+		}
+
+		@Bean
+		ReleaseCompositeTask releaseCompositeTask(ApplicationContext context) {
+			return new ReleaseCompositeTask(context);
+		}
+
+	}
+
+}
+
+class FirstTask implements ReleaseReleaserTask {
+
+	@Override
+	public String name() {
+		return "first";
+	}
+
+	@Override
+	public String shortName() {
+		return "1";
+	}
+
+	@Override
+	public String header() {
+		return "FIRST";
+	}
+
+	@Override
+	public String description() {
+		return name();
+	}
+
+	@Override
+	public ExecutionResult runTask(Arguments args)
+			throws BuildUnstableException, RuntimeException {
+		return ExecutionResult.failure(new IllegalStateException("Failure"));
+	}
+
+	@Override
+	public int getOrder() {
+		return 0;
+	}
+
+}
+
+class SecondTask implements ReleaseReleaserTask {
+
+	@Override
+	public String name() {
+		return "second";
+	}
+
+	@Override
+	public String shortName() {
+		return "2";
+	}
+
+	@Override
+	public String header() {
+		return "SECOND";
+	}
+
+	@Override
+	public String description() {
+		return name();
+	}
+
+	@Override
+	public ExecutionResult runTask(Arguments args)
+			throws BuildUnstableException, RuntimeException {
+		return ExecutionResult.success();
+	}
+
+	@Override
+	public int getOrder() {
+		return 1;
 	}
 
 }

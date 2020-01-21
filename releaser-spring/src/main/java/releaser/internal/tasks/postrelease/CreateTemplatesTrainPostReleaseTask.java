@@ -18,8 +18,8 @@ package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class CreateTemplatesTrainPostReleaseTask implements TrainPostReleaseReleaserTask {
 
@@ -56,11 +56,11 @@ public class CreateTemplatesTrainPostReleaseTask implements TrainPostReleaseRele
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.createEmail(args.versionFromBom, args.projects);
-		this.releaser.createBlog(args.versionFromBom, args.projects);
-		this.releaser.createTweet(args.versionFromBom, args.projects);
-		this.releaser.createReleaseNotes(args.versionFromBom, args.projects);
-		return ExecutionResult.success();
+		return this.releaser.createEmail(args.versionFromBom, args.projects)
+				.merge(this.releaser.createBlog(args.versionFromBom, args.projects))
+				.merge(this.releaser.createTweet(args.versionFromBom, args.projects))
+				.merge(this.releaser.createReleaseNotes(args.versionFromBom,
+						args.projects));
 	}
 
 	@Override

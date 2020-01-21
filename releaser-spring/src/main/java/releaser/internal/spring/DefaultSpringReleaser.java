@@ -19,6 +19,7 @@ package releaser.internal.spring;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.options.OptionsBuilder;
+import releaser.internal.tech.ExecutionResult;
 
 /**
  * Releaser that gets input from console.

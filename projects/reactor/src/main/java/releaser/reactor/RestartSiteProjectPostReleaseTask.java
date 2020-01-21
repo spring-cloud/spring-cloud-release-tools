@@ -20,9 +20,9 @@ import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.DryRunReleaseReleaserTask;
 import releaser.internal.tasks.release.PublishDocsReleaseTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class RestartSiteProjectPostReleaseTask extends PublishDocsReleaseTask
 		implements DryRunReleaseReleaserTask {

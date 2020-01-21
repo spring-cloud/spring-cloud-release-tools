@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.spring.FlowRunner;
 import releaser.internal.spring.TasksToRun;
 import releaser.internal.tasks.CompositeReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;

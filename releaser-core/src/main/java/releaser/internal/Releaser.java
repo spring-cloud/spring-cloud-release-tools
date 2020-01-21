@@ -33,6 +33,7 @@ import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganUpdater;
 import releaser.internal.tech.BuildUnstableException;
+import releaser.internal.tech.ExecutionResult;
 import releaser.internal.template.TemplateGenerator;
 
 import org.springframework.util.Assert;
@@ -100,12 +101,12 @@ public class Releaser implements ReleaserPropertiesAware {
 		return this.projectPomUpdater.fixedVersions();
 	}
 
-	public void updateProjectFromBom(File project, Projects versions,
+	public ExecutionResult updateProjectFromBom(File project, Projects versions,
 			ProjectVersion versionFromBom) {
-		updateProjectFromBom(project, versions, versionFromBom, ASSERT_SNAPSHOTS);
+		return updateProjectFromBom(project, versions, versionFromBom, ASSERT_SNAPSHOTS);
 	}
 
-	private void updateProjectFromBom(File project, Projects versions,
+	private ExecutionResult updateProjectFromBom(File project, Projects versions,
 			ProjectVersion versionFromBom, boolean assertSnapshots) {
 		log.info("Will update the project with versions [{}]", versions);
 		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
@@ -114,35 +115,42 @@ public class Releaser implements ReleaserPropertiesAware {
 				versionFromBom, assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion.version);
+		return ExecutionResult.success();
 	}
 
-	public void buildProject(ProjectVersion originalVersion,
+	public ExecutionResult buildProject(ProjectVersion originalVersion,
 			ProjectVersion versionFromBom) {
 		this.projectCommandExecutor.build(originalVersion, versionFromBom);
 		log.info("\nProject was successfully built");
+		return ExecutionResult.success();
 	}
 
-	public void commitAndPushTags(File project, ProjectVersion changedVersion) {
+	public ExecutionResult commitAndPushTags(File project,
+			ProjectVersion changedVersion) {
 		this.projectGitHandler.commitAndTagIfApplicable(project, changedVersion);
 		log.info("\nCommit was made and tag was pushed successfully");
+		return ExecutionResult.success();
 	}
 
-	public void deploy(ProjectVersion originalVersion, ProjectVersion versionFromBom) {
+	public ExecutionResult deploy(ProjectVersion originalVersion,
+			ProjectVersion versionFromBom) {
 		this.projectCommandExecutor.deploy(originalVersion, versionFromBom);
 		log.info("\nThe artifact was deployed successfully");
+		return ExecutionResult.success();
 	}
 
-	public void publishDocs(ProjectVersion originalVersion,
+	public ExecutionResult publishDocs(ProjectVersion originalVersion,
 			ProjectVersion changedVersion) {
 		this.projectCommandExecutor.publishDocs(originalVersion, changedVersion);
 		log.info("\nThe docs were published successfully");
+		return ExecutionResult.success();
 	}
 
-	public void rollbackReleaseVersion(File project, Projects projects,
+	public ExecutionResult rollbackReleaseVersion(File project, Projects projects,
 			ProjectVersion scReleaseVersion) {
 		if (scReleaseVersion.isSnapshot()) {
 			log.info("\nWon't rollback a snapshot version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		this.projectGitHandler.revertChangesIfApplicable(project, scReleaseVersion);
 		ProjectVersion originalVersion = originalVersion(project);
@@ -155,9 +163,10 @@ public class Releaser implements ReleaserPropertiesAware {
 			log.info(
 					"\nSuccessfully reverted the commit and came back to snapshot versions");
 		}
+		return ExecutionResult.success();
 	}
 
-	private void updateBumpedVersions(File project, Projects projects,
+	private ExecutionResult updateBumpedVersions(File project, Projects projects,
 			ProjectVersion originalVersion) {
 		Projects newProjects = Projects.forRollback(releaserProperties, projects);
 		ProjectVersion bumpedProject = bumpProject(originalVersion, newProjects);
@@ -166,6 +175,7 @@ public class Releaser implements ReleaserPropertiesAware {
 				SKIP_SNAPSHOT_ASSERTION);
 		this.projectGitHandler.commitAfterBumpingVersions(project, bumpedProject);
 		log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
+		return ExecutionResult.success();
 	}
 
 	private ProjectVersion bumpProject(ProjectVersion originalVersion,
@@ -179,96 +189,108 @@ public class Releaser implements ReleaserPropertiesAware {
 		return new ProjectVersion(project);
 	}
 
-	public void pushCurrentBranch(File project) {
+	public ExecutionResult pushCurrentBranch(File project) {
 		this.projectGitHandler.pushCurrentBranch(project);
 		log.info("\nSuccessfully pushed current branch");
+		return ExecutionResult.success();
 	}
 
-	public void closeMilestone(ProjectVersion releaseVersion) {
+	public ExecutionResult closeMilestone(ProjectVersion releaseVersion) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't close a milestone for a SNAPSHOT version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		try {
 			this.projectGitHubHandler.closeMilestone(releaseVersion);
 			log.info("\nSuccessfully closed milestone");
+			return ExecutionResult.success();
 		}
 		catch (Exception ex) {
-			throw new BuildUnstableException("Failed to create an email template");
+			return ExecutionResult.unstable(ex);
 		}
 	}
 
-	public void createEmail(ProjectVersion releaseVersion, Projects projects) {
+	public ExecutionResult createEmail(ProjectVersion releaseVersion, Projects projects) {
 		Assert.notNull(releaseVersion,
 				"You must provide a release version for your project");
 		Assert.notNull(releaseVersion.version,
 				"You must provide a release version for your project");
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create email template for a SNAPSHOT version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		try {
 			File email = this.templateGenerator.email(projects);
 			if (email != null) {
 				log.info("\nSuccessfully created email template at location [{}]", email);
+				return ExecutionResult.success();
 			}
 			else {
-				throw new BuildUnstableException("Failed to create an email template");
+				return ExecutionResult.unstable(
+						new BuildUnstableException("Failed to create an email template"));
 			}
 		}
 		catch (Exception ex) {
-			throw new BuildUnstableException("Failed to create an email template", ex);
+			return ExecutionResult.unstable(
+					new BuildUnstableException("Failed to create an email template", ex));
 		}
 	}
 
-	public void createBlog(ProjectVersion releaseVersion, Projects projects) {
+	public ExecutionResult createBlog(ProjectVersion releaseVersion, Projects projects) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create blog template for a SNAPSHOT version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		try {
 			File blog = this.templateGenerator.blog(projects);
 			if (blog != null) {
 				log.info("\nSuccessfully created blog template at location [{}]", blog);
+				return ExecutionResult.success();
 			}
 			else {
-				throw new BuildUnstableException("Failed to create a blog template");
+				return ExecutionResult.unstable(
+						new BuildUnstableException("Failed to create a blog template"));
 			}
 		}
 		catch (Exception ex) {
-			throw new BuildUnstableException("Failed to create a blog template", ex);
+			return ExecutionResult.unstable(
+					new BuildUnstableException("Failed to create a blog template", ex));
 		}
 	}
 
-	public void updateSpringGuides(ProjectVersion releaseVersion, Projects projects,
-			List<ProcessedProject> processedProjects) {
+	public ExecutionResult updateSpringGuides(ProjectVersion releaseVersion,
+			Projects projects, List<ProcessedProject> processedProjects) {
 		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
 			log.info(
 					"\nWon't update Spring Guides for a non Release / Service Release version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		Exception springGuidesException = createIssueInSpringGuides(releaseVersion,
 				projects);
 		Exception deployGuidesException = deployGuides(processedProjects);
 		if (springGuidesException != null || deployGuidesException != null) {
-			throw new BuildUnstableException(
+			return ExecutionResult.unstable(new BuildUnstableException(
 					"Failed to update Spring Guides. Spring Guides updated successfully ["
 							+ (springGuidesException != null)
 							+ "] deployed guides successfully ["
-							+ (deployGuidesException != null) + "]");
+							+ (deployGuidesException != null) + "]"));
 		}
+		return ExecutionResult.success();
 	}
 
-	public void updateStartSpringIo(ProjectVersion releaseVersion, Projects projects) {
+	public ExecutionResult updateStartSpringIo(ProjectVersion releaseVersion,
+			Projects projects) {
 		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
 			log.info(
 					"\nWon't update start.spring.io for a non Release / Service Release version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		Exception exception = createIssueInStartSpringIo(releaseVersion, projects);
 		if (exception != null) {
-			throw new BuildUnstableException("Failed to update start.spring.io");
+			return ExecutionResult.unstable(
+					new BuildUnstableException("Failed to update start.spring.io"));
 		}
+		return ExecutionResult.success();
 	}
 
 	private Exception createIssueInSpringGuides(ProjectVersion releaseVersion,
@@ -311,93 +333,110 @@ public class Releaser implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void createTweet(ProjectVersion releaseVersion, Projects projects) {
+	public ExecutionResult createTweet(ProjectVersion releaseVersion, Projects projects) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create tweet template for a SNAPSHOT version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		try {
 			File tweet = this.templateGenerator.tweet(projects);
 			if (tweet != null) {
 				log.info("\nSuccessfully created tweet template at location [{}]", tweet);
+				return ExecutionResult.success();
 			}
 			else {
-				throw new BuildUnstableException("Failed to create a tweet template");
+				return ExecutionResult.unstable(
+						new BuildUnstableException("Failed to create a tweet template"));
 			}
 		}
 		catch (Exception ex) {
-			throw new BuildUnstableException("Failed to create a tweet template", ex);
+			return ExecutionResult.unstable(
+					new BuildUnstableException("Failed to create a tweet template", ex));
 		}
 	}
 
-	public void createReleaseNotes(ProjectVersion releaseVersion, Projects projects) {
+	public ExecutionResult createReleaseNotes(ProjectVersion releaseVersion,
+			Projects projects) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create release notes for a SNAPSHOT version");
-			return;
+			return ExecutionResult.skipped();
 		}
 		try {
 			File output = this.templateGenerator.releaseNotes(projects);
 			log.info("\nSuccessfully created release notes at location [{}]", output);
+			return ExecutionResult.success();
 		}
 		catch (Exception ex) {
-			throw new BuildUnstableException("Failed to create release notes", ex);
+			return ExecutionResult.unstable(
+					new BuildUnstableException("Failed to create release notes", ex));
 		}
 	}
 
-	public void updateSagan(File project, ProjectVersion releaseVersion,
+	public ExecutionResult updateSagan(File project, ProjectVersion releaseVersion,
 			Projects projects) {
 		String currentBranch = this.projectGitHandler.currentBranch(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		try {
-			this.saganUpdater.updateSagan(project, currentBranch, originalVersion,
+			return this.saganUpdater.updateSagan(project, currentBranch, originalVersion,
 					releaseVersion, projects);
-			log.info("\nSuccessfully updated Sagan for branch [{}]", currentBranch);
 		}
 		catch (Exception ex) {
-			throw new BuildUnstableException(ex);
+			return ExecutionResult.unstable(new BuildUnstableException(ex));
 		}
 	}
 
-	public void updateDocumentationRepositoryForTrain(ReleaserProperties properties,
-			Projects projects, ProjectVersion releaseVersion) {
+	public ExecutionResult updateDocumentationRepositoryForTrain(
+			ReleaserProperties properties, Projects projects,
+			ProjectVersion releaseVersion) {
 		String releaseBranch = properties.getPom().getBranch();
-		this.documentationUpdater.updateDocsRepo(projects, releaseVersion, releaseBranch);
-		log.info("\nSuccessfully updated documentation repository for train branch [{}]",
+		File file = this.documentationUpdater.updateDocsRepo(projects, releaseVersion,
 				releaseBranch);
+		if (file != null) {
+			log.info(
+					"\nSuccessfully updated documentation repository for train branch [{}]",
+					releaseBranch);
+			return ExecutionResult.success();
+		}
+		return ExecutionResult.skipped();
 	}
 
-	public void updateDocumentationRepositoryForSingleProject(Projects projects,
-			ProjectVersion releaseVersion) {
+	public ExecutionResult updateDocumentationRepositoryForSingleProject(
+			Projects projects, ProjectVersion releaseVersion) {
 		if (releaseVersion.projectName.equals(
 				this.releaserProperties.getMetaRelease().getReleaseTrainProjectName())) {
 			log.info("Will not update documentation for project that is a BOM project");
-			return;
+			return ExecutionResult.skipped();
 		}
-		this.documentationUpdater.updateDocsRepoForSingleProject(projects,
+		File file = this.documentationUpdater.updateDocsRepoForSingleProject(projects,
 				releaseVersion);
-		log.info(
-				"\nSuccessfully updated documentation repository for a project with name [{}]",
-				releaseVersion.projectName);
+		if (file != null) {
+			log.info(
+					"\nSuccessfully updated documentation repository for a project with name [{}]",
+					releaseVersion.projectName);
+			return ExecutionResult.success();
+		}
+		return ExecutionResult.skipped();
 	}
 
-	public void runUpdatedSamples(Projects projects) {
-		this.postReleaseActions.runUpdatedTests(projects);
-		log.info("\nSuccessfully updated and ran samples");
+	public ExecutionResult runUpdatedSamples(Projects projects) {
+		return this.postReleaseActions.runUpdatedTests(projects);
 	}
 
-	public void generateReleaseTrainDocumentation(Projects projects) {
-		this.postReleaseActions.generateReleaseTrainDocumentation(projects);
-		log.info("\nSuccessfully updated and generated release train documentation");
+	public ExecutionResult generateReleaseTrainDocumentation(Projects projects) {
+		return this.postReleaseActions.generateReleaseTrainDocumentation(projects);
 	}
 
-	public void updateAllSamples(Projects projects) {
-		this.postReleaseActions.updateAllTestSamples(projects);
-		log.info("\nSuccessfully updated all samples");
+	public ExecutionResult updateAllSamples(Projects projects) {
+		return this.postReleaseActions.updateAllTestSamples(projects);
 	}
 
-	public void updateReleaseTrainWiki(Projects projects) {
-		this.documentationUpdater.updateReleaseTrainWiki(projects);
-		log.info("\nSuccessfully updated project wiki");
+	public ExecutionResult updateReleaseTrainWiki(Projects projects) {
+		File file = this.documentationUpdater.updateReleaseTrainWiki(projects);
+		if (file != null) {
+			log.info("\nSuccessfully updated project wiki");
+			return ExecutionResult.success();
+		}
+		return ExecutionResult.skipped();
 	}
 
 	@Override

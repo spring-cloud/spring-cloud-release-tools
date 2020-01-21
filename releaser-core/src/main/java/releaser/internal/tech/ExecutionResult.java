@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package releaser.internal.spring;
+package releaser.internal.tech;
 
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import releaser.internal.tech.BuildUnstableException;
 
 /**
  * Task execution result. Contains a list of exceptions thrown while running the task.
@@ -31,15 +30,26 @@ public class ExecutionResult implements Serializable {
 
 	private List<Exception> exceptions = new LinkedList<>();
 
+	/**
+	 * Consider an enum in the future.
+	 */
+	private boolean skipped;
+
 	public ExecutionResult() {
 	}
 
 	public ExecutionResult(Exception throwable) {
 		this.exceptions.add(throwable);
+		this.skipped = false;
 	}
 
 	public ExecutionResult(List<Exception> throwables) {
 		this.exceptions.addAll(throwables);
+		this.skipped = false;
+	}
+
+	public ExecutionResult(boolean skipped) {
+		this.skipped = skipped;
 	}
 
 	public static ExecutionResult success() {
@@ -50,9 +60,17 @@ public class ExecutionResult implements Serializable {
 		return new ExecutionResult(throwable);
 	}
 
+	public static ExecutionResult failure(List<Exception> throwables) {
+		return new ExecutionResult(throwables);
+	}
+
 	public static ExecutionResult unstable(Exception ex) {
 		return new ExecutionResult(ex instanceof BuildUnstableException ? ex
 				: new BuildUnstableException(ex));
+	}
+
+	public static ExecutionResult skipped() {
+		return new ExecutionResult(true);
 	}
 
 	public RuntimeException foundExceptions() {
@@ -81,6 +99,11 @@ public class ExecutionResult implements Serializable {
 				.allMatch(t -> t instanceof BuildUnstableException);
 	}
 
+	public String toStringResult() {
+		return isUnstable() ? "UNSTABLE"
+				: isFailure() ? "FAILURE" : isSkipped() ? "SKIPPED" : "SUCCESS";
+	}
+
 	public boolean isFailure() {
 		return !this.exceptions.isEmpty() && this.exceptions.stream()
 				.anyMatch(t -> !(t instanceof BuildUnstableException));
@@ -100,6 +123,14 @@ public class ExecutionResult implements Serializable {
 
 	public void setExceptions(List<Exception> exceptions) {
 		this.exceptions = exceptions;
+	}
+
+	public boolean isSkipped() {
+		return this.skipped;
+	}
+
+	public void setSkipped(boolean skipped) {
+		this.skipped = skipped;
 	}
 
 	private static final class MergedThrowable extends RuntimeException

@@ -32,6 +32,7 @@ import com.jakewharton.fliptables.FlipTableConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -145,12 +146,10 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 							"***** Project / Task : <%s/%s> ***** \nTask Description <%s>\nException Stacktrace \n\n%s",
 							table1.projectName, table1.taskCaption,
 							table1.taskDescription,
-							table1.exceptions + "\n"
-									+ table1.exceptions.stream()
-											.map(Throwable::getStackTrace)
-											.flatMap(e -> Arrays.stream(e))
-											.map(StackTraceElement::toString)
-											.collect(Collectors.joining("\n"))))
+							table1.exceptions + "\n" + table1.exceptions.stream()
+									.map(Throwable::getStackTrace).flatMap(Arrays::stream)
+									.map(StackTraceElement::toString)
+									.collect(Collectors.joining("\n"))))
 							.collect(Collectors.joining("\n\n"));
 			log.warn(string + brokenBuilds);
 		}

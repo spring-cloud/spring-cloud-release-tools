@@ -38,6 +38,7 @@ import releaser.internal.project.ProcessedProject;
 import releaser.internal.project.ProjectCommandExecutor;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
+import releaser.internal.tech.ExecutionResult;
 import releaser.internal.versions.VersionsFetcher;
 
 import org.springframework.core.NestedExceptionUtils;
@@ -80,13 +81,14 @@ public class PostReleaseActions implements Closeable {
 	 * Clones the projects, checks out the proper branch and runs guides building and
 	 * deployment.
 	 * @param processedProjects - set of project with versions to assert against
+	 * @return result of the execution
 	 */
-	public void deployGuides(List<ProcessedProject> processedProjects) {
+	public ExecutionResult deployGuides(List<ProcessedProject> processedProjects) {
 		if (!this.properties.getGit().isUpdateSpringGuides()) {
 			log.info(
 					"Will not build and deploy latest Spring Guides, since the switch to do so "
 							+ "is off. Set [releaser.git.update-spring-guides] to [true] to change that");
-			return;
+			return ExecutionResult.skipped();
 		}
 		List<ProcessedProject> latestGaProcessedProjects = processedProjects.stream()
 				.filter(processedProject -> this.versionsFetcher
@@ -98,18 +100,20 @@ public class PostReleaseActions implements Closeable {
 				latestGaProcessedProjects);
 		log.info("Deployed all guides!");
 		assertExceptions(projectUrlAndExceptions);
+		return ExecutionResult.success();
 	}
 
 	/**
 	 * Clones the test project, updates it and runs tests.
 	 * @param projects - set of project with versions to assert against
+	 * @return result of the execution
 	 */
-	public void runUpdatedTests(Projects projects) {
+	public ExecutionResult runUpdatedTests(Projects projects) {
 		if (!this.properties.getGit().isRunUpdatedSamples()
 				|| !this.properties.getMetaRelease().isEnabled()) {
 			log.info("Will not update and run test samples, since the switch to do so "
 					+ "is off. Set [releaser.git.run-updated-samples] to [true] to change that");
-			return;
+			return ExecutionResult.skipped();
 		}
 		File file = this.projectGitHandler.cloneTestSamplesProject();
 		ProjectVersion projectVersion = newProjectVersion(file);
@@ -119,6 +123,7 @@ public class PostReleaseActions implements Closeable {
 		updateWithVersions(file, newProjects);
 		this.projectCommandExecutor.build(projectVersion, projectVersion,
 				file.getAbsolutePath());
+		return ExecutionResult.success();
 	}
 
 	/**
@@ -126,13 +131,14 @@ public class PostReleaseActions implements Closeable {
 	 * branch, updates all the poms with the new, bumped versions of release train
 	 * projects, commits the changes and pushes them.
 	 * @param projects - set of project with versions to assert against
+	 * @return result of the execution
 	 */
-	public void updateAllTestSamples(Projects projects) {
+	public ExecutionResult updateAllTestSamples(Projects projects) {
 		if (!this.properties.getGit().isUpdateAllTestSamples()
 				|| !this.properties.getMetaRelease().isEnabled()) {
 			log.info("Will not update all test samples, since the switch to do so "
 					+ "is off. Set [releaser.git.update-all-test-samples] to [true] to change that");
-			return;
+			return ExecutionResult.skipped();
 		}
 		List<ProjectUrlAndException> projectUrlAndExceptions = this.properties.getGit()
 				.getAllTestSampleUrls().entrySet().stream()
@@ -140,6 +146,7 @@ public class PostReleaseActions implements Closeable {
 				.flatMap(Collection::stream).collect(Collectors.toList());
 		log.info("Updated all samples!");
 		assertExceptions(projectUrlAndExceptions);
+		return ExecutionResult.success();
 	}
 
 	private void assertExceptions(List<ProjectUrlAndException> projectUrlAndExceptions) {
@@ -283,14 +290,15 @@ public class PostReleaseActions implements Closeable {
 	/**
 	 * Clones the release train documentation project.
 	 * @param projects - set of project with versions to assert against
+	 * @return result of the execution
 	 */
-	public void generateReleaseTrainDocumentation(Projects projects) {
+	public ExecutionResult generateReleaseTrainDocumentation(Projects projects) {
 		if (!this.properties.getGit().isUpdateReleaseTrainDocs()
 				|| !this.properties.getMetaRelease().isEnabled()) {
 			log.info(
 					"Will not update the release train documentation, since the switch to do so "
 							+ "is off. Set [releaser.git.update-release-train-docs] to [true] to change that");
-			return;
+			return ExecutionResult.skipped();
 		}
 		File file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
 		ProjectVersion projectVersion = newProjectVersion(file);
@@ -300,6 +308,7 @@ public class PostReleaseActions implements Closeable {
 		updateWithVersions(file, newProjects);
 		this.projectCommandExecutor.generateReleaseTrainDocs(releaseTrainVersion,
 				file.getAbsolutePath());
+		return ExecutionResult.success();
 	}
 
 	private Projects addVersionForTestsProject(Projects projects,

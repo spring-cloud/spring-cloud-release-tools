@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.util.StringUtils;
 
@@ -48,13 +49,13 @@ public class SaganUpdater {
 		this.releaserProperties = releaserProperties;
 	}
 
-	public void updateSagan(File projectFile, String branch,
+	public ExecutionResult updateSagan(File projectFile, String branch,
 			ProjectVersion originalVersion, ProjectVersion currentVersion,
 			Projects projects) {
 		if (!this.releaserProperties.getSagan().isUpdateSagan()) {
 			log.info("Will not update sagan, since the switch to do so "
 					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
-			return;
+			return ExecutionResult.skipped();
 		}
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion,
 				projects);
@@ -74,7 +75,9 @@ public class SaganUpdater {
 							+ "the current version [" + currentVersion
 							+ "] is older than that one. " + "Will do nothing."
 					: "No latest version found. Will do nothing.");
+			return ExecutionResult.skipped();
 		}
+		return ExecutionResult.success();
 	}
 
 	private void updateDocumentationIfNecessary(File projectFile, Project project) {

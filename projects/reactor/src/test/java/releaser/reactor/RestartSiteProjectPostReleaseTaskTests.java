@@ -26,9 +26,9 @@ import releaser.internal.options.Options;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.spring.ProjectToRun;
 import releaser.internal.spring.ProjectsFromBom;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

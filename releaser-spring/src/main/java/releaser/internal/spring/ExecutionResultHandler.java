@@ -18,6 +18,8 @@ package releaser.internal.spring;
 
 import java.util.function.Consumer;
 
+import releaser.internal.tech.ExecutionResult;
+
 /**
  * Handles the result of the execution of the train or project release. Example: You can
  * print the results in a table, throw exceptions when the build was faulty or just log

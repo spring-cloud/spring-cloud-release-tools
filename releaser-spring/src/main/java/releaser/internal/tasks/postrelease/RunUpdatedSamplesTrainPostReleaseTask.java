@@ -18,8 +18,8 @@ package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class RunUpdatedSamplesTrainPostReleaseTask
 		implements TrainPostReleaseReleaserTask {
@@ -57,8 +57,7 @@ public class RunUpdatedSamplesTrainPostReleaseTask
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.runUpdatedSamples(args.projects);
-		return ExecutionResult.success();
+		return this.releaser.runUpdatedSamples(args.projects);
 	}
 
 	@Override

@@ -17,7 +17,7 @@
 package releaser.internal.tasks;
 
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
+import releaser.internal.tech.ExecutionResult;
 
 /**
  * Marker interface for running post release tasks.

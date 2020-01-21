@@ -18,8 +18,8 @@ package releaser.internal.tasks.release;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.DryRunReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class UpdatingPomsReleaseTask implements DryRunReleaseReleaserTask {
 
@@ -56,9 +56,8 @@ public class UpdatingPomsReleaseTask implements DryRunReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.updateProjectFromBom(args.project, args.projects,
+		return this.releaser.updateProjectFromBom(args.project, args.projects,
 				args.versionFromBom);
-		return ExecutionResult.success();
 	}
 
 	@Override

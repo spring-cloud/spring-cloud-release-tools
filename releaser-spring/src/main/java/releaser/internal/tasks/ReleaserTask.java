@@ -21,8 +21,8 @@ import java.util.function.Function;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tech.BuildUnstableException;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.core.Ordered;
 

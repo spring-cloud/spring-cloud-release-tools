@@ -19,6 +19,7 @@ package releaser.internal.spring;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.tasks.ReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 /**
  * Knows how to run a flow of tasks.

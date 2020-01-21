@@ -38,8 +38,8 @@ import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganClient;
 import releaser.internal.spring.ArgsBuilder;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.spring.SpringReleaser;
+import releaser.internal.tech.ExecutionResult;
 import releaser.internal.template.TemplateGenerator;
 
 import org.springframework.beans.factory.annotation.Autowired;

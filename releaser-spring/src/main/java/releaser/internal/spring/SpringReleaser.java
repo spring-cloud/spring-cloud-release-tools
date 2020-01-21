@@ -17,6 +17,7 @@
 package releaser.internal.spring;
 
 import releaser.internal.options.Options;
+import releaser.internal.tech.ExecutionResult;
 
 /**
  * Contract for releasing a project or train .

@@ -18,8 +18,8 @@ package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class UpdateGuidesTrainPostReleaseTask implements TrainPostReleaseReleaserTask {
 
@@ -56,9 +56,8 @@ public class UpdateGuidesTrainPostReleaseTask implements TrainPostReleaseRelease
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.updateSpringGuides(args.versionFromBom, args.projects,
+		return this.releaser.updateSpringGuides(args.versionFromBom, args.projects,
 				args.processedProjects);
-		return ExecutionResult.success();
 	}
 
 	@Override

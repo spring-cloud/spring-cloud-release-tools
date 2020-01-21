@@ -25,7 +25,7 @@ import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.Test;
 import releaser.internal.ReleaserProperties;
 
-class SpringBatchFlowRunnerTests {
+class ProjectsToReleaseGroupsTests {
 
 	@Test
 	void releaseGroup() {

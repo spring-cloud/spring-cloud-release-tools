@@ -18,8 +18,8 @@ package releaser.internal.tasks.release;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.ReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class BumpBackToSnapshotReleaseTask implements ReleaseReleaserTask {
 
@@ -56,9 +56,8 @@ public class BumpBackToSnapshotReleaseTask implements ReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.rollbackReleaseVersion(args.project, args.projects,
+		return this.releaser.rollbackReleaseVersion(args.project, args.projects,
 				args.versionFromBom);
-		return ExecutionResult.success();
 	}
 
 	@Override

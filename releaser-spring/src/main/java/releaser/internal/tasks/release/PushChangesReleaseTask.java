@@ -18,8 +18,8 @@ package releaser.internal.tasks.release;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.ReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class PushChangesReleaseTask implements ReleaseReleaserTask {
 
@@ -56,8 +56,7 @@ public class PushChangesReleaseTask implements ReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.pushCurrentBranch(args.project);
-		return ExecutionResult.success();
+		return this.releaser.pushCurrentBranch(args.project);
 	}
 
 	@Override

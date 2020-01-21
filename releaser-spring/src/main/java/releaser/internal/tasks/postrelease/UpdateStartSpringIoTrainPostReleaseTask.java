@@ -18,8 +18,8 @@ package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class UpdateStartSpringIoTrainPostReleaseTask
 		implements TrainPostReleaseReleaserTask {
@@ -57,8 +57,7 @@ public class UpdateStartSpringIoTrainPostReleaseTask
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.updateStartSpringIo(args.versionFromBom, args.projects);
-		return ExecutionResult.success();
+		return this.releaser.updateStartSpringIo(args.versionFromBom, args.projects);
 	}
 
 	@Override

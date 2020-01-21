@@ -18,8 +18,8 @@ package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class UpdateDocsRepositoryTrainPostReleaseTask
 		implements TrainPostReleaseReleaserTask {
@@ -57,9 +57,8 @@ public class UpdateDocsRepositoryTrainPostReleaseTask
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.updateDocumentationRepositoryForTrain(args.properties,
+		return this.releaser.updateDocumentationRepositoryForTrain(args.properties,
 				args.projects, args.versionFromBom);
-		return ExecutionResult.success();
 	}
 
 	@Override

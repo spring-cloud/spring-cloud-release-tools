@@ -28,7 +28,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import releaser.internal.tasks.PostReleaseReleaserTask;
 import releaser.internal.tasks.ReleaseReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -128,13 +128,14 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 								.getStepExecution().getExecutionContext().get("errors");
 						RuntimeException exception = result.foundExceptions();
 						errors = addExceptionToErrors(errors, exception);
-						String status = result.isUnstable() ? "UNSTABLE"
-								: result.isFailure() ? "FAILURE" : "SUCCESS";
+						String status = result.toStringResult();
 						ExecutionResultReport entity = buildEntity(releaserTask, args,
 								status, errors);
 						contribution.getStepExecution().getExecutionContext()
 								.put("entity", entity);
 						if (result.isFailureOrUnstable()) {
+							log.warn("The execution of [{}] failed or was unstable",
+									entity.getReleaserTaskType().getSimpleName());
 							contribution.getStepExecution().getExecutionContext()
 									.put("errors", errors);
 						}
@@ -252,9 +253,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			List<ExecutionResult> results = new LinkedList<>();
 			for (StuffToRun flow : flows) {
 				log.info("Releasing group [{}]", flow.releaseGroup);
-				ExecutionResult executionResult = runInParallel(flow, flow.task).stream()
-						.map(this::result)
-						.reduce(new ExecutionResult(), ExecutionResult::merge);
+				ExecutionResult executionResult = runInParallel(flow);
 				log.info("Group [{}] execution result is [{}]", flow.releaseGroup,
 						executionResult);
 				if (executionResult.isFailure()) {
@@ -267,8 +266,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			return results.stream().reduce(new ExecutionResult(), ExecutionResult::merge);
 		}
 		// will run in sequence
-		return flows.stream().map(s -> runInSequence(s, s.task)).flatMap(s -> s)
-				.reduce(new ExecutionResult(), ExecutionResult::merge);
+		return runInSequence(flows);
 	}
 
 	private ExecutionResult result(Future<ExecutionResult> future) {
@@ -280,23 +278,47 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 		}
 	}
 
-	private List<Future<ExecutionResult>> runInParallel(StuffToRun stuffToRun,
-			CompositeReleaserTask releaserTask) {
+	private ExecutionResult runInParallel(StuffToRun stuffToRun) {
+		ExecutionResult results = ExecutionResult.success();
 		log.info("Running composite tasks in parallel for {}", stuffToRun.releaseGroup);
-		return stuffToRun.releaseGroup.projectsToRun.stream().map(s -> {
+		for (ProjectToRun.ProjectToRunSupplier s : stuffToRun.releaseGroup.projectsToRun) {
+			CompositeReleaserTask releaserTask = stuffToRun.task;
 			log.info("Scheduling a build for project [{}]", s.projectName());
-			return this.executorService.submit(() -> {
+			List<Future<ExecutionResult>> futures = new LinkedList<>();
+			futures.add(this.executorService.submit(() -> {
 				log.info("Running a composite task [{}] in parallel",
 						releaserTask.name());
 				return releaserTask.apply(Arguments.forProject(s.get()));
-			});
-		}).collect(Collectors.toCollection(LinkedList::new));
+			}));
+			boolean atLeastOneFailure = false;
+			for (Future<ExecutionResult> future : futures) {
+				ExecutionResult result = result(future);
+				results = results.merge(result);
+				if (result.isFailure()) {
+					atLeastOneFailure = true;
+				}
+			}
+			if (atLeastOneFailure) {
+				log.warn(
+						"At least one project failed within the group, will NOT continue with subsequent groups");
+				break;
+			}
+		}
+		return results;
 	}
 
-	private Stream<ExecutionResult> runInSequence(StuffToRun stuffToRun,
-			CompositeReleaserTask releaserTask) {
-		return stuffToRun.releaseGroup.projectsToRun.stream()
-				.map(s -> releaserTask.apply(Arguments.forProject(s.get())));
+	private ExecutionResult runInSequence(List<StuffToRun> stuffToRunList) {
+		ExecutionResult result = ExecutionResult.success();
+		for (StuffToRun stuffToRun : stuffToRunList) {
+			for (ProjectToRun.ProjectToRunSupplier s : stuffToRun.releaseGroup.projectsToRun) {
+				result = result
+						.merge(stuffToRun.task.apply(Arguments.forProject(s.get())));
+				if (result.isFailure()) {
+					return result;
+				}
+			}
+		}
+		return result;
 	}
 
 	private Job buildJobForFlows(Iterator<StuffToRun> flowsIterator) {
@@ -397,7 +419,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			if (thrownExceptions.isEmpty()) {
 				return ExecutionResult.success();
 			}
-			return new ExecutionResult(thrownExceptions);
+			return ExecutionResult.failure(thrownExceptions);
 		}
 		catch (JobExecutionException ex) {
 			return ExecutionResult.failure(ex);

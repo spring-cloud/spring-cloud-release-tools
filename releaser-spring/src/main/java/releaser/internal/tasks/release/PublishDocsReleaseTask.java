@@ -18,8 +18,8 @@ package releaser.internal.tasks.release;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.ReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class PublishDocsReleaseTask implements ReleaseReleaserTask {
 
@@ -56,8 +56,7 @@ public class PublishDocsReleaseTask implements ReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.publishDocs(args.originalVersion, args.versionFromBom);
-		return ExecutionResult.success();
+		return this.releaser.publishDocs(args.originalVersion, args.versionFromBom);
 	}
 
 	@Override

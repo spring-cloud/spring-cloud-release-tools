@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.CompositeReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.context.ApplicationContext;
 

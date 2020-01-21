@@ -18,8 +18,8 @@ package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
-import releaser.internal.spring.ExecutionResult;
 import releaser.internal.tasks.ProjectPostReleaseReleaserTask;
+import releaser.internal.tech.ExecutionResult;
 
 public class UpdateSaganProjectPostReleaseTask implements ProjectPostReleaseReleaserTask {
 
@@ -56,8 +56,8 @@ public class UpdateSaganProjectPostReleaseTask implements ProjectPostReleaseRele
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		this.releaser.updateSagan(args.project, args.versionFromBom, args.projects);
-		return ExecutionResult.success();
+		return this.releaser.updateSagan(args.project, args.versionFromBom,
+				args.projects);
 	}
 
 	@Override
