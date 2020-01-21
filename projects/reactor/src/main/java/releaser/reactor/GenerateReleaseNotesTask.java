@@ -146,19 +146,10 @@ public class GenerateReleaseNotesTask
 		String toVersionTag = "v" + args.versionFromBom.version;
 
 		if (Boolean.TRUE == args.options.interactive) {
-			String defaultRange = fromVersionTag + ".." + toVersionTag;
-			log.info("\nForce the log range if needed [{}]: ", defaultRange);
-			String modifiedRange = System.console().readLine();
-			if (!modifiedRange.trim().isEmpty()) {
-				String[] range = modifiedRange.split("\\.\\.");
-				if (range.length != 2) {
-					log.warn("Improper range format: {}, will use: {}", modifiedRange,
-							defaultRange);
-				}
-				else {
-					fromVersionTag = range[0];
-					toVersionTag = range[1];
-				}
+			log.info("\nForce the from in log range if needed [{}]: ", fromVersionTag);
+			String modifiedFrom = System.console().readLine();
+			if (!modifiedFrom.trim().isEmpty()) {
+				fromVersionTag = modifiedFrom;
 			}
 		}
 		log.info("Fetching the log for range {}..{}", fromVersionTag, toVersionTag);
