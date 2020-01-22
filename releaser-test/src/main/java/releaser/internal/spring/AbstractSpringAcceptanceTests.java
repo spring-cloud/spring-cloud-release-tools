@@ -57,7 +57,6 @@ import releaser.internal.template.TemplateGenerator;
 
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -352,9 +351,9 @@ public abstract class AbstractSpringAcceptanceTests {
 
 		public boolean exitedWithException;
 
-		public TestExecutionResultHandler(JobExplorer jobExplorer,
+		public TestExecutionResultHandler(BuildReportHandler buildReportHandler,
 				ConfigurableApplicationContext context) {
-			super(jobExplorer, context);
+			super(buildReportHandler, context);
 		}
 
 		@Override
@@ -401,9 +400,10 @@ public abstract class AbstractSpringAcceptanceTests {
 		}
 
 		@Bean
-		TestExecutionResultHandler testExecutionResultHandler(JobExplorer explorer,
+		TestExecutionResultHandler testExecutionResultHandler(
+				BuildReportHandler buildReportHandler,
 				ConfigurableApplicationContext context) {
-			return new TestExecutionResultHandler(explorer, context);
+			return new TestExecutionResultHandler(buildReportHandler, context);
 		}
 
 	}
