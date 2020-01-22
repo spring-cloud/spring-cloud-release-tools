@@ -43,7 +43,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.util.StringUtils;
 
-class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
+class SpringBatchExecutionResultHandler
+		implements ExecutionResultHandler, BuildReportHandler {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(SpringBatchExecutionResultHandler.class);
@@ -60,7 +61,7 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 
 	@Override
 	public void accept(ExecutionResult executionResult) {
-		buildSummaryTable();
+		reportBuildSummary();
 		if (executionResult.isFailure()) {
 			log.error("At least one failure occurred while running the release process",
 					executionResult.foundExceptions());
@@ -79,21 +80,21 @@ class SpringBatchExecutionResultHandler implements ExecutionResultHandler {
 	}
 
 	void exitSuccessfully() {
-		SpringApplication.exit(this.context, () -> 0);
-		System.exit(0);
+		System.exit(SpringApplication.exit(this.context, () -> 0));
 	}
 
 	void exitWithException() {
-		SpringApplication.exit(this.context, () -> 1);
-		System.exit(1);
+		System.exit(SpringApplication.exit(this.context, () -> 1));
 	}
 
-	private void buildSummaryTable() {
+	@Override
+	public void reportBuildSummary() {
 		List<String> jobNames = this.jobExplorer.getJobNames();
 		List<JobExecution> sortedJobExecutions = jobNames.stream()
 				.flatMap(name -> this.jobExplorer.findJobInstancesByJobName(name, 0, 100)
 						.stream())
 				.flatMap(instance -> this.jobExplorer.getJobExecutions(instance).stream())
+				.filter(j -> !j.isRunning())
 				.sorted(Comparator.comparing(JobExecution::getCreateTime))
 				.collect(Collectors.toList());
 		List<StepExecution> stepContexts = sortedJobExecutions.stream()

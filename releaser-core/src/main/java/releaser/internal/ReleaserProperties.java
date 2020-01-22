@@ -446,7 +446,7 @@ public class ReleaserProperties implements Serializable {
 		private String documentationUrl;
 
 		/**
-		 * URL to the release train project page repository.
+		 * The organization name on Github.
 		 */
 		@NotBlank
 		private String orgName;

@@ -21,24 +21,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import releaser.internal.options.Parser;
-import releaser.internal.spring.ExecutionResultHandler;
-import releaser.internal.spring.SpringReleaser;
 import releaser.internal.tasks.DryRunReleaseReleaserTask;
 import releaser.internal.tasks.ReleaserTask;
+import releaser.internal.tasks.release.PublishDocsReleaseTask;
+import releaser.reactor.GenerateReleaseNotesTask;
+import releaser.reactor.RestartSiteProjectPostReleaseTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(
-		classes = { ReleaserApplicationTests.Config.class, ReleaserApplication.class },
-		properties = { "releaser.sagan.update-sagan=false" })
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest(classes = { ReleaserApplication.class })
 @ActiveProfiles("test")
 class ReleaserApplicationTests {
 
@@ -51,31 +48,27 @@ class ReleaserApplicationTests {
 	}
 
 	@Test
-	void should_load_reactor_version_of_publish_docs() {
+	void should_load_generate_release_notes_in_dry_run() {
 		Map<String, DryRunReleaseReleaserTask> beans = context
 				.getBeansOfType(DryRunReleaseReleaserTask.class);
 		List<ReleaserTask> inOrder = new LinkedList<>(beans.values());
 		inOrder.sort(AnnotationAwareOrderComparator.INSTANCE);
-		System.out.println(inOrder);
+
+		assertThat(inOrder).anySatisfy(
+				task -> assertThat(task).isInstanceOf(GenerateReleaseNotesTask.class));
 	}
 
-	@Configuration
-	static class Config {
+	@Test
+	void should_load_restart_site() {
+		Map<String, ReleaserTask> beans = context.getBeansOfType(ReleaserTask.class);
+		List<ReleaserTask> inOrder = new LinkedList<>(beans.values());
+		inOrder.sort(AnnotationAwareOrderComparator.INSTANCE);
 
-		@Bean
-		SpringReleaser mockReleaser() {
-			return Mockito.mock(SpringReleaser.class);
-		}
-
-		@Bean
-		ExecutionResultHandler mockExecutionResultHandler() {
-			return Mockito.mock(ExecutionResultHandler.class);
-		}
-
-		@Bean
-		Parser mockParser() {
-			return Mockito.mock(Parser.class);
-		}
+		assertThat(inOrder).anySatisfy(task -> assertThat(task)
+				.isInstanceOf(RestartSiteProjectPostReleaseTask.class));
+		assertThat(inOrder).noneSatisfy(
+				task -> assertThat(task).isInstanceOf(PublishDocsReleaseTask.class)
+						.isNotInstanceOf(RestartSiteProjectPostReleaseTask.class));
 
 	}
 

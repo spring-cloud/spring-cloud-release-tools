@@ -17,10 +17,8 @@
 package releaser.reactor;
 
 import org.assertj.core.api.BDDAssertions;
-import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.project.ProjectVersion;
@@ -31,13 +29,10 @@ import releaser.internal.spring.ProjectsFromBom;
 import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(classes = RestartSiteProjectPostReleaseTaskTests.Config.class)
+@SpringBootTest
 @ActiveProfiles("test")
 class RestartSiteProjectPostReleaseTaskTests {
 
@@ -90,27 +85,6 @@ class RestartSiteProjectPostReleaseTaskTests {
 				return "whatever";
 			}
 		};
-	}
-
-	@Configuration
-	@EnableAutoConfiguration
-	static class Config extends ReactorConfiguration {
-
-		@Bean
-		Releaser mockReleaser() {
-			return BDDMockito.mock(Releaser.class);
-		}
-
-		@Bean
-		CloudFoundryOperations mockCloudFoundryOperations() {
-			return BDDMockito.mock(CloudFoundryOperations.class);
-		}
-
-		@Override
-		CfClient cfClient(CloudFoundryOperations cloudFoundryOperations) {
-			return BDDMockito.mock(CfClient.class);
-		}
-
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 
-package releaser.internal.github;
+package releaser.reactor;
 
-import com.jcabi.github.Github;
-import com.jcabi.github.RtGithub;
+import org.cloudfoundry.operations.CloudFoundryOperations;
+import org.mockito.BDDMockito;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
+/**
+ * @author Simon Baslé
+ */
 @Configuration
-class GithubConfiguration {
+@Profile("test")
+class CfTestConfiguration {
 
 	@Bean
-	BeanPostProcessor cachingGithubBeanPostProcessor() {
-		return new BeanPostProcessor() {
-			@Override
-			public Object postProcessAfterInitialization(Object bean, String beanName)
-					throws BeansException {
-				if (bean instanceof RtGithub) {
-					return new CachingGithub((Github) bean);
-				}
-				return bean;
-			}
-		};
+	CloudFoundryOperations mockCloudFoundryOperations() {
+		return BDDMockito.mock(CloudFoundryOperations.class);
 	}
 
 }
