@@ -369,7 +369,8 @@ public class SpringMetaReleaseAcceptanceTests
 							.getBean(TestExecutionResultHandler.class);
 					FirstTask firstTask = context.getBean(FirstTask.class);
 					SecondTask secondTask = context.getBean(SecondTask.class);
-					PostReleaseTask postReleaseTask = context.getBean(PostReleaseTask.class);
+					PostReleaseTask postReleaseTask = context
+							.getBean(PostReleaseTask.class);
 
 					ExecutionResult result = releaser
 							.release(new OptionsBuilder().metaRelease(true).options());

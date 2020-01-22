@@ -19,6 +19,7 @@ package releaser;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import releaser.internal.options.Parser;
+import releaser.internal.spring.BuildReportHandler;
 import releaser.internal.spring.ExecutionResultHandler;
 import releaser.internal.spring.SpringReleaser;
 
@@ -47,6 +48,11 @@ class ReleaserApplicationTests {
 		@Bean
 		ExecutionResultHandler mockExecutionResultHandler() {
 			return Mockito.mock(ExecutionResultHandler.class);
+		}
+
+		@Bean
+		BuildReportHandler mockBuildReportHandler() {
+			return Mockito.mock(BuildReportHandler.class);
 		}
 
 		@Bean
