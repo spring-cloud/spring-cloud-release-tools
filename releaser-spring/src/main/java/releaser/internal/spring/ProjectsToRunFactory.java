@@ -67,9 +67,13 @@ class ProjectsToRunFactory implements Closeable {
 			ProjectVersion version = new ProjectVersion(projectFolder);
 			ProjectsFromBom projectsFromBom = this.versionsToBumpFactory
 					.withProject(projectFolder);
-			return new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(
-					version.projectName, () -> new ProjectToRun(projectFolder,
-							projectsFromBom, version, properties, options)));
+			return new ProjectsToRun(
+					new ProjectToRun.ProjectToRunSupplier(version.projectName, () -> {
+						ReleaserProperties changedProps = updatePropertiesIfCustomConfigPresent(
+								properties.copy(), projectFolder);
+						return new ProjectToRun(projectFolder, projectsFromBom, version,
+								changedProps, options);
+					}));
 		}
 		log.info("Meta release picked");
 		return metaReleaseProjectsToRun(options, properties);
