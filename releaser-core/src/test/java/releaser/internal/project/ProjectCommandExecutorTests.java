@@ -16,18 +16,22 @@
 
 package releaser.internal.project;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
 import releaser.internal.PomUpdateAcceptanceTests;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
@@ -62,7 +66,7 @@ public class ProjectCommandExecutorTests {
 	ProjectCommandExecutor projectBuilder(ReleaserProperties properties) {
 		return new ProjectCommandExecutor(properties) {
 			@Override
-			ProcessExecutor executor(String workingDir) {
+			ReleaserProcessExecutor executor(String workingDir) {
 				return testExecutor(workingDir);
 			}
 		};
@@ -281,7 +285,7 @@ public class ProjectCommandExecutorTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		new ProcessExecutor(properties.getWorkingDir())
+		new ReleaserProcessExecutor(properties.getWorkingDir())
 				.runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
@@ -311,7 +315,7 @@ public class ProjectCommandExecutorTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		new ProcessExecutor(properties.getWorkingDir())
+		new ReleaserProcessExecutor(properties.getWorkingDir())
 				.runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
@@ -340,7 +344,7 @@ public class ProjectCommandExecutorTests {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		new ProcessExecutor(properties.getWorkingDir())
+		new ReleaserProcessExecutor(properties.getWorkingDir())
 				.runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
@@ -412,10 +416,10 @@ public class ProjectCommandExecutorTests {
 		properties.getBash().setPublishDocsCommands(new String[] { "ls -al",
 				"echo {{version}} {{oldVersion}} {{nextVersion}}" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor(properties) {
 			@Override
-			ProcessExecutor executor(String workingDir) {
+			ReleaserProcessExecutor executor(String workingDir) {
 				return executor;
 			}
 		};
@@ -435,10 +439,10 @@ public class ProjectCommandExecutorTests {
 				new String[] { "echo {{systemProps}} 1", "echo {{systemProps}} 2" });
 		properties.getBash().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor(properties) {
 			@Override
-			ProcessExecutor executor(String workingDir) {
+			ReleaserProcessExecutor executor(String workingDir) {
 				return executor;
 			}
 		};
@@ -457,10 +461,10 @@ public class ProjectCommandExecutorTests {
 		properties.getBash()
 				.setPublishDocsCommands(new String[] { "echo '{{version}}'" });
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor(properties) {
 			@Override
-			ProcessExecutor executor(String workingDir) {
+			ReleaserProcessExecutor executor(String workingDir) {
 				return executor;
 			}
 		};
@@ -478,10 +482,10 @@ public class ProjectCommandExecutorTests {
 		properties.getBash().setGenerateReleaseTrainDocsCommand("echo '{{version}}'");
 		File resolved = tmpFile("/builder/resolved");
 		properties.setWorkingDir(resolved.getPath());
-		TestProcessExecutor executor = testExecutor(properties.getWorkingDir());
+		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor(properties) {
 			@Override
-			ProcessExecutor executor(String workingDir) {
+			ReleaserProcessExecutor executor(String workingDir) {
 				return executor;
 			}
 		};
@@ -513,11 +517,12 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor(properties) {
 			@Override
-			ProcessExecutor executor(String workingDir) {
-				return new ProcessExecutor(properties.getWorkingDir()) {
+			ReleaserProcessExecutor executor(String workingDir) {
+				return new ReleaserProcessExecutor(properties.getWorkingDir()) {
 					@Override
-					Process startProcess(ProcessBuilder builder) {
-						return processWithInvalidExitCode();
+					ProcessResult doExecute(ProcessExecutor processExecutor)
+							throws IOException, InterruptedException, TimeoutException {
+						return new ProcessResult(1, null);
 					}
 				};
 			}
@@ -528,42 +533,8 @@ public class ProjectCommandExecutorTests {
 						"The process has exited with exit code [1]");
 	}
 
-	private Process processWithInvalidExitCode() {
-		return new Process() {
-			@Override
-			public OutputStream getOutputStream() {
-				return null;
-			}
-
-			@Override
-			public InputStream getInputStream() {
-				return null;
-			}
-
-			@Override
-			public InputStream getErrorStream() {
-				return null;
-			}
-
-			@Override
-			public int waitFor() {
-				return 0;
-			}
-
-			@Override
-			public int exitValue() {
-				return 1;
-			}
-
-			@Override
-			public void destroy() {
-
-			}
-		};
-	}
-
-	private TestProcessExecutor testExecutor(String workingDir) {
-		return new TestProcessExecutor(workingDir);
+	private TestReleaserProcessExecutor testExecutor(String workingDir) {
+		return new TestReleaserProcessExecutor(workingDir);
 	}
 
 	private File tmpFile(String relativePath) {
@@ -582,19 +553,35 @@ public class ProjectCommandExecutorTests {
 		return new ProjectVersion("foo", "0.100.0.BUILD-SNAPSHOT");
 	}
 
-	class TestProcessExecutor extends ProcessExecutor {
+	class TestReleaserProcessExecutor extends ReleaserProcessExecutor {
 
 		int counter = 0;
 
-		TestProcessExecutor(String workingDir) {
+		TestReleaserProcessExecutor(String workingDir) {
 			super(workingDir);
 		}
 
 		@Override
-		ProcessBuilder builder(String[] commands, String workingDir) {
+		ProcessExecutor processExecutor(String[] commands, String workingDir) {
 			this.counter++;
-			return super.builder(commands, workingDir)
-					.redirectOutput(tmpFile("/builder/resolved/resolved.log"));
+			final ProcessExecutor processExecutor = super.processExecutor(commands,
+					workingDir);
+
+			File tempFile = tmpFile("/builder/resolved/resolved.log");
+			try {
+				tempFile.createNewFile();
+				OutputStream fos = new BufferedOutputStream(
+						new FileOutputStream(tempFile));
+
+				return processExecutor
+						// use redirectOutputAlsoTo to avoid overriding all output
+						// destinations
+						.redirectOutput(fos);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				return processExecutor;
+			}
 		}
 
 	}
