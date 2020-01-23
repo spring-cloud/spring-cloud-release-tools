@@ -135,6 +135,11 @@
 			<version>${javax.json.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.zeroturnaround</groupId>
+			<artifactId>zt-exec</artifactId>
+			<version>${zt.exec.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

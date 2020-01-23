@@ -18,7 +18,6 @@ package releaser.internal.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -37,6 +36,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.ReleaserPropertiesAware;
 
@@ -179,8 +181,8 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		return executor(projectRoot).runCommand(substitutedCommands, waitTimeInMinutes);
 	}
 
-	ProcessExecutor executor(String workDir) {
-		return new ProcessExecutor(workDir);
+	ReleaserProcessExecutor executor(String workDir) {
+		return new ReleaserProcessExecutor(workDir);
 	}
 
 	public void publishDocs(ProjectVersion originalVersion,
@@ -264,63 +266,64 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 
 }
 
-class ProcessExecutor implements ReleaserPropertiesAware {
+class ReleaserProcessExecutor implements ReleaserPropertiesAware {
 
-	private static final Logger log = LoggerFactory.getLogger(ProcessExecutor.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(ReleaserProcessExecutor.class);
 
 	private static String[] OS_OPERATORS = { "|", "<", ">", "||", "&&" };
 
 	private String workingDir;
 
-	ProcessExecutor(String workingDir) {
+	ReleaserProcessExecutor(String workingDir) {
 		this.workingDir = workingDir;
 	}
 
 	String runCommand(String[] commands, long waitTimeInMinutes) {
+		String workingDir = this.workingDir;
+		log.info("Will run the command from [{}] and wait for result for [{}] minutes",
+				workingDir, waitTimeInMinutes);
+
 		try {
-			String workingDir = this.workingDir;
-			log.info(
-					"Will run the command from [{}] and wait for result for [{}] minutes",
-					workingDir, waitTimeInMinutes);
-			ProcessBuilder builder = builder(commands, workingDir);
-			Process process = startProcess(builder);
-			boolean finished = process.waitFor(waitTimeInMinutes, TimeUnit.MINUTES);
-			if (!finished) {
-				log.error("The command hasn't managed to finish in [{}] minutes",
-						waitTimeInMinutes);
-				process.destroyForcibly();
-				throw new IllegalStateException("Process waiting time of ["
-						+ waitTimeInMinutes + "] minutes exceeded");
-			}
-			if (process.exitValue() != 0) {
+			ProcessExecutor processExecutor = processExecutor(commands, workingDir)
+					.timeout(waitTimeInMinutes, TimeUnit.MINUTES);
+			final ProcessResult processResult = doExecute(processExecutor);
+
+			int processExitValue = processResult.getExitValue();
+			if (processExitValue != 0) {
 				throw new IllegalStateException("The process has exited with exit code ["
-						+ process.exitValue() + "]");
+						+ processExitValue + "]");
 			}
-			return convertStreamToString(process.getInputStream());
+			return processResult.outputUTF8();
 		}
 		catch (InterruptedException | IOException e) {
-			throw new IllegalStateException(e);
+			throw new IllegalStateException("Process execution failed", e);
+		}
+		catch (TimeoutException e) {
+			log.error("The command hasn't managed to finish in [{}] minutes",
+					waitTimeInMinutes);
+			throw new IllegalStateException("Process waiting time of ["
+					+ waitTimeInMinutes + "] minutes exceeded", e);
 		}
 	}
 
-	private String convertStreamToString(InputStream is) {
-		Scanner scanner = new Scanner(is).useDelimiter("\\A");
-		return scanner.hasNext() ? scanner.next() : "";
+	ProcessResult doExecute(ProcessExecutor processExecutor)
+			throws IOException, InterruptedException, TimeoutException {
+		return processExecutor.execute();
 	}
 
-	Process startProcess(ProcessBuilder builder) throws IOException {
-		return builder.start();
-	}
-
-	ProcessBuilder builder(String[] commands, String workingDir) {
+	ProcessExecutor processExecutor(String[] commands, String workingDir) {
 		String[] commandsToRun = commands;
 		String lastArg = String.join(" ", commands);
 		if (Arrays.stream(OS_OPERATORS).anyMatch(lastArg::contains)) {
 			commandsToRun = commandToExecute(lastArg);
 		}
 		log.info("Will run the command [{}]", Arrays.toString(commandsToRun));
-		return new ProcessBuilder(commandsToRun).directory(new File(workingDir))
-				.inheritIO();
+		return new ProcessExecutor().command(commandsToRun).destroyOnExit()
+				.readOutput(true)
+				.redirectOutputAlsoTo(
+						Slf4jStream.of(ReleaserProcessExecutor.class).asInfo())
+				.directory(new File(workingDir));
 	}
 
 	String[] commandToExecute(String lastArg) {
