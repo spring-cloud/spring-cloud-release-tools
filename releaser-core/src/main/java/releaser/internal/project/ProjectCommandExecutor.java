@@ -75,22 +75,22 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 	}
 
 	public String version() {
-		return executeCommand(
+		return executeCommandWithOutput(
 				new CommandPicker(this.properties, this.properties.getWorkingDir())
 						.version());
 	}
 
 	public String groupId() {
-		return executeCommand(
+		return executeCommandWithOutput(
 				new CommandPicker(this.properties, this.properties.getWorkingDir())
 						.groupId());
 	}
 
-	private String executeCommand(String command) {
+	private String executeCommandWithOutput(String command) {
 		try {
 			String projectRoot = this.properties.getWorkingDir();
 			String[] commands = command.split(" ");
-			return runCommand(projectRoot, commands).trim();
+			return captureCommandOutput(projectRoot, commands).trim();
 		}
 		catch (IllegalStateException e) {
 			throw e;
@@ -174,11 +174,19 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		runCommand(this.properties.getWorkingDir(), commands);
 	}
 
-	private String runCommand(String projectRoot, String[] commands) {
+	private void runCommand(String projectRoot, String[] commands) {
 		String[] substitutedCommands = substituteSystemProps(commands);
 		long waitTimeInMinutes = new CommandPicker(properties, projectRoot)
 				.waitTimeInMinutes();
-		return executor(projectRoot).runCommand(substitutedCommands, waitTimeInMinutes);
+		executor(projectRoot).runCommand(substitutedCommands, waitTimeInMinutes);
+	}
+
+	private String captureCommandOutput(String projectRoot, String[] commands) {
+		String[] substitutedCommands = substituteSystemProps(commands);
+		long waitTimeInMinutes = new CommandPicker(properties, projectRoot)
+				.waitTimeInMinutes();
+		return executor(projectRoot).runCommandWithOutput(substitutedCommands,
+				waitTimeInMinutes);
 	}
 
 	ReleaserProcessExecutor executor(String workDir) {
@@ -279,7 +287,15 @@ class ReleaserProcessExecutor implements ReleaserPropertiesAware {
 		this.workingDir = workingDir;
 	}
 
-	String runCommand(String[] commands, long waitTimeInMinutes) {
+	void runCommand(String[] commands, long waitTimeInMinutes) {
+		doRunCommand(commands, waitTimeInMinutes);
+	}
+
+	String runCommandWithOutput(String[] commands, long waitTimeInMinutes) {
+		return doRunCommand(commands, waitTimeInMinutes).outputUTF8();
+	}
+
+	private ProcessResult doRunCommand(String[] commands, long waitTimeInMinutes) {
 		String workingDir = this.workingDir;
 		log.info("Will run the command from [{}] and wait for result for [{}] minutes",
 				workingDir, waitTimeInMinutes);
@@ -288,13 +304,12 @@ class ReleaserProcessExecutor implements ReleaserPropertiesAware {
 			ProcessExecutor processExecutor = processExecutor(commands, workingDir)
 					.timeout(waitTimeInMinutes, TimeUnit.MINUTES);
 			final ProcessResult processResult = doExecute(processExecutor);
-
 			int processExitValue = processResult.getExitValue();
 			if (processExitValue != 0) {
 				throw new IllegalStateException("The process has exited with exit code ["
 						+ processExitValue + "]");
 			}
-			return processResult.outputUTF8();
+			return processResult;
 		}
 		catch (InterruptedException | IOException e) {
 			throw new IllegalStateException("Process execution failed", e);
