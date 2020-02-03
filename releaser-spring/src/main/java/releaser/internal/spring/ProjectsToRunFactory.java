@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
+import releaser.internal.ReleaserPropertiesUpdater;
 import releaser.internal.options.Options;
 import releaser.internal.project.ProjectVersion;
 

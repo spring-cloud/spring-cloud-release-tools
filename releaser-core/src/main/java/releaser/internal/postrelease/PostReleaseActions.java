@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
+import releaser.internal.ReleaserPropertiesUpdater;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
 import releaser.internal.git.ProjectGitHandler;
@@ -65,16 +66,20 @@ public class PostReleaseActions implements Closeable {
 
 	private final VersionsFetcher versionsFetcher;
 
+	private final ReleaserPropertiesUpdater releaserPropertiesUpdater;
+
 	public PostReleaseActions(ProjectGitHandler projectGitHandler,
 			ProjectPomUpdater projectPomUpdater, GradleUpdater gradleUpdater,
 			ProjectCommandExecutor projectCommandExecutor, ReleaserProperties properties,
-			VersionsFetcher versionsFetcher) {
+			VersionsFetcher versionsFetcher,
+			ReleaserPropertiesUpdater releaserPropertiesUpdater) {
 		this.projectGitHandler = projectGitHandler;
 		this.projectPomUpdater = projectPomUpdater;
 		this.gradleUpdater = gradleUpdater;
 		this.projectCommandExecutor = projectCommandExecutor;
 		this.properties = properties;
 		this.versionsFetcher = versionsFetcher;
+		this.releaserPropertiesUpdater = releaserPropertiesUpdater;
 	}
 
 	/**
@@ -116,14 +121,19 @@ public class PostReleaseActions implements Closeable {
 			return ExecutionResult.skipped();
 		}
 		File file = this.projectGitHandler.cloneTestSamplesProject();
+		ReleaserProperties projectProps = projectProps(file);
 		ProjectVersion projectVersion = newProjectVersion(file);
-		String releaseTrainVersion = projects.releaseTrain(this.properties).version;
+		String releaseTrainVersion = projects.releaseTrain(projectProps).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion,
 				releaseTrainVersion);
 		updateWithVersions(file, newProjects);
-		this.projectCommandExecutor.build(projectVersion, projectVersion,
+		this.projectCommandExecutor.build(projectProps, projectVersion, projectVersion,
 				file.getAbsolutePath());
 		return ExecutionResult.success();
+	}
+
+	ReleaserProperties projectProps(File file) {
+		return this.releaserPropertiesUpdater.updateProperties(this.properties, file);
 	}
 
 	/**
@@ -180,6 +190,7 @@ public class PostReleaseActions implements Closeable {
 									.cloneProjectFromOrg(processedProject.projectName());
 							this.projectGitHandler.checkout(clonedProject, tagName);
 							projectBuilder(processedProject).deployGuides(
+									processedProject.propertiesForProject,
 									processedProject.originalProjectVersion,
 									processedProject.newProjectVersion);
 						})))
@@ -187,7 +198,7 @@ public class PostReleaseActions implements Closeable {
 	}
 
 	ProjectCommandExecutor projectBuilder(ProcessedProject processedProject) {
-		return new ProjectCommandExecutor(processedProject.propertiesForProject);
+		return new ProjectCommandExecutor();
 	}
 
 	private Future<List<ProjectUrlAndException>> updateAllProjects(Projects projects,
@@ -300,13 +311,14 @@ public class PostReleaseActions implements Closeable {
 			return ExecutionResult.skipped();
 		}
 		File file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
+		ReleaserProperties projectProps = projectProps(file);
 		ProjectVersion projectVersion = newProjectVersion(file);
 		String releaseTrainVersion = projects.releaseTrain(this.properties).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion,
 				releaseTrainVersion);
 		updateWithVersions(file, newProjects);
-		this.projectCommandExecutor.generateReleaseTrainDocs(releaseTrainVersion,
-				file.getAbsolutePath());
+		this.projectCommandExecutor.generateReleaseTrainDocs(projectProps,
+				releaseTrainVersion, file.getAbsolutePath());
 		return ExecutionResult.success();
 	}
 

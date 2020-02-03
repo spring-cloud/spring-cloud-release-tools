@@ -40,14 +40,13 @@ import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 
 import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectCommandExecutor implements ReleaserPropertiesAware {
+public class ProjectCommandExecutor {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ProjectCommandExecutor.class);
@@ -58,39 +57,28 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 
 	private static final String NEXT_VERSION_MUSTACHE = "{{nextVersion}}";
 
-	private ReleaserProperties properties;
-
-	public ProjectCommandExecutor(ReleaserProperties properties) {
-		this.properties = properties;
-	}
-
-	// If you want to call commands that are not parameterized via the props
-	public ProjectCommandExecutor() {
-		this.properties = new ReleaserProperties();
-	}
-
-	public void build(ProjectVersion originalVersion,
+	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain) {
-		build(originalVersion, versionFromReleaseTrain, this.properties.getWorkingDir());
+		build(properties, originalVersion, versionFromReleaseTrain,
+				properties.getWorkingDir());
 	}
 
-	public String version() {
-		return executeCommandWithOutput(
-				new CommandPicker(this.properties, this.properties.getWorkingDir())
-						.version());
+	public String version(ReleaserProperties properties) {
+		return executeCommandWithOutput(properties,
+				new CommandPicker(properties, properties.getWorkingDir()).version());
 	}
 
-	public String groupId() {
-		return executeCommandWithOutput(
-				new CommandPicker(this.properties, this.properties.getWorkingDir())
-						.groupId());
+	public String groupId(ReleaserProperties properties) {
+		return executeCommandWithOutput(properties,
+				new CommandPicker(properties, properties.getWorkingDir()).groupId());
 	}
 
-	private String executeCommandWithOutput(String command) {
+	private String executeCommandWithOutput(ReleaserProperties properties,
+			String command) {
 		try {
-			String projectRoot = this.properties.getWorkingDir();
+			String projectRoot = properties.getWorkingDir();
 			String[] commands = command.split(" ");
-			return captureCommandOutput(projectRoot, commands).trim();
+			return captureCommandOutput(properties, projectRoot, commands).trim();
 		}
 		catch (IllegalStateException e) {
 			throw e;
@@ -100,14 +88,14 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void build(ProjectVersion originalVersion,
+	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain, String projectRoot) {
 		try {
-			String command = new CommandPicker(this.properties, projectRoot)
+			String command = new CommandPicker(properties, projectRoot)
 					.buildCommand(versionFromReleaseTrain);
 			String[] commands = replaceAllPlaceHolders(originalVersion,
 					versionFromReleaseTrain, command).split(" ");
-			runCommand(projectRoot, commands);
+			runCommand(properties, projectRoot, commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
 			log.info("No HTML files from docs contain unresolved tags");
 		}
@@ -116,14 +104,15 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void generateReleaseTrainDocs(String version, String projectRoot) {
+	public void generateReleaseTrainDocs(ReleaserProperties properties, String version,
+			String projectRoot) {
 		try {
 			String updatedCommand = new CommandPicker(properties, projectRoot)
 					.generateReleaseTrainDocsCommand(
 							new ProjectVersion(new File(projectRoot)))
 					.replace(VERSION_MUSTACHE, version);
-			runCommand(projectRoot, updatedCommand.split(" "));
-			assertNoHtmlFilesInDocsContainUnresolvedTags(this.properties.getWorkingDir());
+			runCommand(properties, projectRoot, updatedCommand.split(" "));
+			assertNoHtmlFilesInDocsContainUnresolvedTags(properties.getWorkingDir());
 			log.info("No HTML files from docs contain unresolved tags");
 		}
 		catch (Exception e) {
@@ -144,25 +133,27 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		}
 	}
 
-	public void deploy(ProjectVersion originalVersion, ProjectVersion version) {
-		doDeploy(originalVersion, version,
-				new CommandPicker(properties, this.properties.getWorkingDir())
+	public void deploy(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion version) {
+		doDeploy(properties, originalVersion, version,
+				new CommandPicker(properties, properties.getWorkingDir())
 						.deployCommand(version));
 	}
 
-	public void deployGuides(ProjectVersion originalVersion, ProjectVersion version) {
-		doDeploy(originalVersion, version,
-				new CommandPicker(properties, this.properties.getWorkingDir())
+	public void deployGuides(ReleaserProperties properties,
+			ProjectVersion originalVersion, ProjectVersion version) {
+		doDeploy(properties, originalVersion, version,
+				new CommandPicker(properties, properties.getWorkingDir())
 						.deployGuidesCommand(version));
 	}
 
-	private void doDeploy(ProjectVersion originalVersion, ProjectVersion changedVersion,
-			String command) {
+	private void doDeploy(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion changedVersion, String command) {
 		try {
 			String replacedCommand = replaceAllPlaceHolders(originalVersion,
 					changedVersion, command);
 			String[] commands = replacedCommand.split(" ");
-			runCommand(commands);
+			runCommand(properties, commands);
 			log.info("The project has successfully been deployed");
 		}
 		catch (Exception e) {
@@ -170,19 +161,21 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		}
 	}
 
-	private void runCommand(String[] commands) {
-		runCommand(this.properties.getWorkingDir(), commands);
+	private void runCommand(ReleaserProperties properties, String[] commands) {
+		runCommand(properties, properties.getWorkingDir(), commands);
 	}
 
-	private void runCommand(String projectRoot, String[] commands) {
-		String[] substitutedCommands = substituteSystemProps(commands);
+	private void runCommand(ReleaserProperties properties, String projectRoot,
+			String[] commands) {
+		String[] substitutedCommands = substituteSystemProps(properties, commands);
 		long waitTimeInMinutes = new CommandPicker(properties, projectRoot)
 				.waitTimeInMinutes();
 		executor(projectRoot).runCommand(substitutedCommands, waitTimeInMinutes);
 	}
 
-	private String captureCommandOutput(String projectRoot, String[] commands) {
-		String[] substitutedCommands = substituteSystemProps(commands);
+	private String captureCommandOutput(ReleaserProperties properties, String projectRoot,
+			String[] commands) {
+		String[] substitutedCommands = substituteSystemProps(properties, commands);
 		long waitTimeInMinutes = new CommandPicker(properties, projectRoot)
 				.waitTimeInMinutes();
 		return executor(projectRoot).runCommandWithOutput(substitutedCommands,
@@ -193,14 +186,14 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		return new ReleaserProcessExecutor(workDir);
 	}
 
-	public void publishDocs(ProjectVersion originalVersion,
+	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion changedVersion) {
 		try {
 			for (String command : new CommandPicker(properties).publishDocsCommands()) {
 				command = replaceAllPlaceHolders(originalVersion, changedVersion,
 						command);
 				String[] commands = command.split(" ");
-				runCommand(commands);
+				runCommand(properties, commands);
 			}
 			log.info("The docs got published successfully");
 		}
@@ -220,9 +213,10 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 	 * We need to insert the system properties as a list of -Dkey=value entries instead of
 	 * just pasting the String that contains these values.
 	 */
-	private String[] substituteSystemProps(String... commands) {
-		String systemProperties = new CommandPicker(this.properties).systemProperties();
-		String systemPropertiesPlaceholder = new CommandPicker(this.properties)
+	private String[] substituteSystemProps(ReleaserProperties properties,
+			String... commands) {
+		String systemProperties = new CommandPicker(properties).systemProperties();
+		String systemPropertiesPlaceholder = new CommandPicker(properties)
 				.systemPropertiesPlaceholder();
 		boolean containsSystemProps = systemProperties.contains("-D");
 		String[] splitSystemProps = StringUtils
@@ -267,14 +261,9 @@ public class ProjectCommandExecutor implements ReleaserPropertiesAware {
 		return commandsList.toArray(new String[commandsList.size()]);
 	}
 
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
-	}
-
 }
 
-class ReleaserProcessExecutor implements ReleaserPropertiesAware {
+class ReleaserProcessExecutor {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ReleaserProcessExecutor.class);
@@ -343,11 +332,6 @@ class ReleaserProcessExecutor implements ReleaserPropertiesAware {
 
 	String[] commandToExecute(String lastArg) {
 		return new String[] { "/bin/bash", "-c", lastArg };
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.workingDir = properties.getWorkingDir();
 	}
 
 }

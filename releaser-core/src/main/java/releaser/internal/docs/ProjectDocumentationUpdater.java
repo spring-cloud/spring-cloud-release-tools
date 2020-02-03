@@ -22,7 +22,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
@@ -30,7 +29,7 @@ import releaser.internal.project.Projects;
 /**
  * @author Marcin Grzejszczak
  */
-class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
+class ProjectDocumentationUpdater {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ProjectDocumentationUpdater.class);
@@ -39,7 +38,7 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 
 	private final List<CustomProjectDocumentationUpdater> updaters;
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	ProjectDocumentationUpdater(ReleaserProperties properties,
 			ProjectGitHandler gitHandler,
@@ -89,11 +88,6 @@ class ProjectDocumentationUpdater implements ReleaserPropertiesAware {
 			return false;
 		}
 		return true;
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 }

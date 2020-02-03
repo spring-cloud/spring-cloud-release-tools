@@ -21,6 +21,7 @@ import java.util.List;
 
 import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
+import releaser.internal.ReleaserPropertiesUpdater;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
 import releaser.internal.docs.CustomProjectDocumentationUpdater;
@@ -88,8 +89,8 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ProjectCommandExecutor projectBuilder(ReleaserProperties properties) {
-		return new ProjectCommandExecutor(properties);
+	ProjectCommandExecutor projectBuilder() {
+		return new ProjectCommandExecutor();
 	}
 
 	@Bean
@@ -139,9 +140,11 @@ class ReleaserConfiguration {
 	PostReleaseActions postReleaseActions(ProjectGitHandler handler,
 			ProjectPomUpdater pomUpdater, GradleUpdater gradleUpdater,
 			ProjectCommandExecutor projectCommandExecutor,
-			ReleaserProperties releaserProperties, VersionsFetcher versionsFetcher) {
+			ReleaserProperties releaserProperties, VersionsFetcher versionsFetcher,
+			ReleaserPropertiesUpdater releaserPropertiesUpdater) {
 		return new PostReleaseActions(handler, pomUpdater, gradleUpdater,
-				projectCommandExecutor, releaserProperties, versionsFetcher);
+				projectCommandExecutor, releaserProperties, versionsFetcher,
+				releaserPropertiesUpdater);
 	}
 
 	@Bean
@@ -172,8 +175,8 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ReleaserPropertiesUpdater releaserPropertiesUpdater(ApplicationContext context) {
-		return new ReleaserPropertiesUpdater(context);
+	ReleaserPropertiesUpdater releaserPropertiesUpdater() {
+		return new ReleaserPropertiesUpdater();
 	}
 
 	@Bean

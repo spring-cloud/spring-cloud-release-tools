@@ -34,7 +34,6 @@ import io.spring.initializr.metadata.InitializrProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.buildsystem.ProjectPomUpdater;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
@@ -51,7 +50,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class VersionsFetcher implements ReleaserPropertiesAware, Closeable {
+public class VersionsFetcher implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(VersionsFetcher.class);
 
@@ -59,7 +58,7 @@ public class VersionsFetcher implements ReleaserPropertiesAware, Closeable {
 
 	private final ToPropertiesConverter toPropertiesConverter;
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	public VersionsFetcher(ReleaserProperties properties,
 			ProjectPomUpdater projectPomUpdater) {
@@ -138,11 +137,6 @@ public class VersionsFetcher implements ReleaserPropertiesAware, Closeable {
 						this.properties.getVersions().getBomName(), ""));
 		log.info("Latest BOM version is [{}]", springCloudVersion.version);
 		return springCloudVersion;
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 	@Override

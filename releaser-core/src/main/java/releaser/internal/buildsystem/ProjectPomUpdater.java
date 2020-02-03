@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.project.Project;
 import releaser.internal.project.ProjectVersion;
@@ -45,7 +44,7 @@ import releaser.internal.project.Projects;
 /**
  * @author Marcin Grzejszczak
  */
-public class ProjectPomUpdater implements ReleaserPropertiesAware, Closeable {
+public class ProjectPomUpdater implements Closeable {
 
 	private static final List<String> IGNORED_SNAPSHOT_LINE_PATTERNS = Arrays.asList(
 			"^.*replace=.*$",
@@ -64,7 +63,7 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware, Closeable {
 
 	private final List<BomParser> bomParsers;
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	public ProjectPomUpdater(ReleaserProperties properties, List<BomParser> bomParsers) {
 		this.properties = properties;
@@ -171,11 +170,6 @@ public class ProjectPomUpdater implements ReleaserPropertiesAware, Closeable {
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 	@Override

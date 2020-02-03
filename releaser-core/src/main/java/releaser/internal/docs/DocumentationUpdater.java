@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.List;
 
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
@@ -29,28 +28,23 @@ import releaser.internal.template.TemplateGenerator;
 /**
  * @author Marcin Grzejszczak
  */
-public class DocumentationUpdater implements ReleaserPropertiesAware {
+public class DocumentationUpdater {
 
 	private final ProjectDocumentationUpdater projectDocumentationUpdater;
 
 	private final ReleaseTrainContentsUpdater releaseTrainContentsUpdater;
 
-	private ReleaserProperties properties;
-
 	public DocumentationUpdater(ProjectGitHandler gitHandler,
 			ReleaserProperties properties, TemplateGenerator templateGenerator,
 			List<CustomProjectDocumentationUpdater> updaters) {
-		this.properties = properties;
 		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(properties,
 				gitHandler, updaters);
-		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(
-				this.properties, gitHandler, templateGenerator);
+		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(properties,
+				gitHandler, templateGenerator);
 	}
 
-	DocumentationUpdater(ReleaserProperties properties,
-			ProjectDocumentationUpdater updater,
+	DocumentationUpdater(ProjectDocumentationUpdater updater,
 			ReleaseTrainContentsUpdater contentsUpdater) {
-		this.properties = properties;
 		this.projectDocumentationUpdater = updater;
 		this.releaseTrainContentsUpdater = contentsUpdater;
 	}
@@ -92,13 +86,6 @@ public class DocumentationUpdater implements ReleaserPropertiesAware {
 	 */
 	public File updateReleaseTrainWiki(Projects projects) {
 		return this.releaseTrainContentsUpdater.updateReleaseTrainWiki(projects);
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
-		this.releaseTrainContentsUpdater.setReleaserProperties(properties);
-		this.projectDocumentationUpdater.setReleaserProperties(properties);
 	}
 
 }

@@ -96,7 +96,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			ProjectVersion projectVersion = gradleProject(buildGradle);
 			this.projectName = projectVersion.projectName;
 			this.version = projectVersion.version;
-			this.groupId = new ProjectCommandExecutor(properties).groupId();
+			this.groupId = new ProjectCommandExecutor().groupId(properties);
 			this.artifactId = projectName;
 		}
 		else {
@@ -130,7 +130,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		String name = parentFolder.getName();
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.setWorkingDir(parentFolder.getAbsolutePath());
-		String version = new ProjectCommandExecutor(properties).version();
+		String version = new ProjectCommandExecutor().version(properties);
 		return new ProjectVersion(nameWithoutParent(name), version);
 	}
 

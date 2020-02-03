@@ -56,7 +56,8 @@ public class DeployArtifactsReleaseTask implements ReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return this.releaser.deploy(args.originalVersion, args.versionFromBom);
+		return this.releaser.deploy(args.properties, args.originalVersion,
+				args.versionFromBom);
 	}
 
 	@Override

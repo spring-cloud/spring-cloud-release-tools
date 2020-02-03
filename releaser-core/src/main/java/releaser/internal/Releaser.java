@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
 /**
  * @author Marcin Grzejszczak
  */
-public class Releaser implements ReleaserPropertiesAware {
+public class Releaser {
 
 	private static final Logger log = LoggerFactory.getLogger(Releaser.class);
 
@@ -118,9 +118,9 @@ public class Releaser implements ReleaserPropertiesAware {
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult buildProject(ProjectVersion originalVersion,
-			ProjectVersion versionFromBom) {
-		this.projectCommandExecutor.build(originalVersion, versionFromBom);
+	public ExecutionResult buildProject(ReleaserProperties properties,
+			ProjectVersion originalVersion, ProjectVersion versionFromBom) {
+		this.projectCommandExecutor.build(properties, originalVersion, versionFromBom);
 		log.info("\nProject was successfully built");
 		return ExecutionResult.success();
 	}
@@ -132,16 +132,17 @@ public class Releaser implements ReleaserPropertiesAware {
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult deploy(ProjectVersion originalVersion,
-			ProjectVersion versionFromBom) {
-		this.projectCommandExecutor.deploy(originalVersion, versionFromBom);
+	public ExecutionResult deploy(ReleaserProperties properties,
+			ProjectVersion originalVersion, ProjectVersion versionFromBom) {
+		this.projectCommandExecutor.deploy(properties, originalVersion, versionFromBom);
 		log.info("\nThe artifact was deployed successfully");
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult publishDocs(ProjectVersion originalVersion,
-			ProjectVersion changedVersion) {
-		this.projectCommandExecutor.publishDocs(originalVersion, changedVersion);
+	public ExecutionResult publishDocs(ReleaserProperties properties,
+			ProjectVersion originalVersion, ProjectVersion changedVersion) {
+		this.projectCommandExecutor.publishDocs(properties, originalVersion,
+				changedVersion);
 		log.info("\nThe docs were published successfully");
 		return ExecutionResult.success();
 	}
@@ -437,11 +438,6 @@ public class Releaser implements ReleaserPropertiesAware {
 			return ExecutionResult.success();
 		}
 		return ExecutionResult.skipped();
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.releaserProperties = properties;
 	}
 
 }

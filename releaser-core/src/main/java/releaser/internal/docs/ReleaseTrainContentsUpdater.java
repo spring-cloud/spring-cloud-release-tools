@@ -26,7 +26,6 @@ import java.util.StringJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
@@ -38,7 +37,7 @@ import org.springframework.util.StringUtils;
  * @author Marcin Grzejszczak
  */
 // TODO: [SPRING-CLOUD]
-class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
+class ReleaseTrainContentsUpdater {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ReleaseTrainContentsUpdater.class);
@@ -49,7 +48,7 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 
 	private final TemplateGenerator templateGenerator;
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	ReleaseTrainContentsUpdater(ReleaserProperties properties, ProjectGitHandler handler,
 			TemplateGenerator templateGenerator) {
@@ -164,11 +163,6 @@ class ReleaseTrainContentsUpdater implements ReleaserPropertiesAware {
 			}
 		}
 		return releaseTrainDocFile;
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 }

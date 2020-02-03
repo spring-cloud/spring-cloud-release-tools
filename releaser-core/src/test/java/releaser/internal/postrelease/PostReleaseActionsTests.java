@@ -39,6 +39,7 @@ import org.mockito.BDDMockito;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.PomUpdateAcceptanceTests;
 import releaser.internal.ReleaserProperties;
+import releaser.internal.ReleaserPropertiesUpdater;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
 import releaser.internal.buildsystem.TestUtils;
@@ -78,7 +79,9 @@ public class PostReleaseActionsTests {
 
 	VersionsFetcher versionsFetcher = fetcher(this.properties);
 
-	ProjectCommandExecutor builder = commandExecutor(this.properties);
+	ReleaserPropertiesUpdater releaserPropertiesUpdater = new ReleaserPropertiesUpdater();
+
+	ProjectCommandExecutor commandExecutor = new ProjectCommandExecutor();
 
 	private ProjectGitHandler projectGitHandler(ReleaserProperties properties) {
 		return new ProjectGitHandler(properties) {
@@ -111,10 +114,6 @@ public class PostReleaseActionsTests {
 		return new VersionsFetcher(properties, updater);
 	}
 
-	private ProjectCommandExecutor commandExecutor(ReleaserProperties properties) {
-		return new ProjectCommandExecutor(properties);
-	}
-
 	@Before
 	public void setup() throws Exception {
 		this.temporaryFolder = this.tmp.newFolder();
@@ -126,8 +125,8 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_update_test_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.runUpdatedTests(currentGa());
 
@@ -139,8 +138,8 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_update_test_is_called() {
 		this.properties.getGit().setRunUpdatedSamples(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.runUpdatedTests(currentGa());
 
@@ -158,8 +157,13 @@ public class PostReleaseActionsTests {
 				tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		properties.getMaven().setBuildCommand("touch build.log");
 		PostReleaseActions actions = new PostReleaseActions(projectGitHandler(properties),
-				projectPomUpdater(properties), this.gradleUpdater,
-				commandExecutor(properties), properties, fetcher(properties));
+				projectPomUpdater(properties), this.gradleUpdater, commandExecutor,
+				properties, fetcher(properties), releaserPropertiesUpdater) {
+			@Override
+			ReleaserProperties projectProps(File file) {
+				return properties;
+			}
+		};
 
 		actions.runUpdatedTests(currentGa());
 
@@ -181,8 +185,8 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_release_train_docs_generation_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -193,8 +197,8 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_the_switch_for_sample_check_is_off_and_release_train_docs_generation_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -209,8 +213,8 @@ public class PostReleaseActionsTests {
 				tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/");
 		this.properties.getMaven().setGenerateReleaseTrainDocsCommand("./test.sh");
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.generateReleaseTrainDocumentation(currentGa());
 
@@ -226,8 +230,8 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_is_not_meta_release_and_test_samples_update_is_called() {
 		this.properties.getMetaRelease().setEnabled(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.updateAllTestSamples(currentGa());
 
@@ -239,8 +243,8 @@ public class PostReleaseActionsTests {
 	public void should_do_nothing_when_the_switch_for_test_samples_update_check_is_off_and_update_is_called() {
 		this.properties.getGit().setUpdateReleaseTrainDocs(false);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.updateAllTestSamples(currentGa());
 
@@ -260,8 +264,8 @@ public class PostReleaseActionsTests {
 						tmpFile("spring-cloud-core-tests/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, properties,
-				versionsFetcher) {
+				this.updater, this.gradleUpdater, this.commandExecutor, properties,
+				versionsFetcher, releaserPropertiesUpdater) {
 			@Override
 			Projects getPostReleaseProjects(Projects projects) {
 				postReleaseProjects.set(super.getPostReleaseProjects(projects));
@@ -304,8 +308,8 @@ public class PostReleaseActionsTests {
 				.singletonList(tmpFile("spring-cloud-static/").getAbsolutePath() + "/"));
 		AtomicReference<Projects> postReleaseProjects = new AtomicReference<>();
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, properties,
-				versionsFetcher) {
+				this.updater, this.gradleUpdater, this.commandExecutor, properties,
+				versionsFetcher, releaserPropertiesUpdater) {
 			@Override
 			Projects getPostReleaseProjects(Projects projects) {
 				postReleaseProjects.set(super.getPostReleaseProjects(projects));
@@ -325,8 +329,8 @@ public class PostReleaseActionsTests {
 		this.properties.getGit().setUpdateSpringGuides(false);
 		VersionsFetcher versionsFetcher = BDDMockito.mock(VersionsFetcher.class);
 		PostReleaseActions actions = new PostReleaseActions(this.projectGitHandler,
-				this.updater, this.gradleUpdater, this.builder, this.properties,
-				versionsFetcher);
+				this.updater, this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater);
 
 		actions.deployGuides(Collections.emptyList());
 
@@ -346,7 +350,8 @@ public class PostReleaseActionsTests {
 		ProjectCommandExecutor projectCommandExecutor = BDDMockito
 				.mock(ProjectCommandExecutor.class);
 		PostReleaseActions actions = new PostReleaseActions(handler, this.updater,
-				this.gradleUpdater, this.builder, this.properties, versionsFetcher) {
+				this.gradleUpdater, this.commandExecutor, this.properties,
+				versionsFetcher, releaserPropertiesUpdater) {
 			@Override
 			ProjectCommandExecutor projectBuilder(ProcessedProject processedProject) {
 				projectBuilderStub.set(projectCommandExecutor);
@@ -362,7 +367,7 @@ public class PostReleaseActionsTests {
 		Awaitility.await().untilAsserted(() -> {
 			BDDAssertions.then(projectBuilderStub.get()).isNotNull();
 			BDDMockito.then(projectBuilderStub.get()).should()
-					.deployGuides(projectVersion, projectVersion);
+					.deployGuides(this.properties, projectVersion, projectVersion);
 		});
 	}
 

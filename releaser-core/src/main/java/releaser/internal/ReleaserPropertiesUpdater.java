@@ -14,56 +14,46 @@
  * limitations under the License.
  */
 
-package releaser.internal.spring;
+package releaser.internal;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
  */
-class ReleaserPropertiesUpdater {
+public class ReleaserPropertiesUpdater implements Closeable {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(ReleaserPropertiesUpdater.class);
 
-	private final ApplicationContext context;
+	private static final Map<File, ReleaserProperties> CACHE = new ConcurrentHashMap<>();
 
-	ReleaserPropertiesUpdater(ApplicationContext context) {
-		this.context = context;
-	}
-
-	ReleaserProperties updateProperties(ReleaserProperties properties,
+	public ReleaserProperties updateProperties(ReleaserProperties properties,
 			File clonedProjectFromOrg) {
-		ReleaserProperties props = updatePropertiesFromFile(properties,
-				clonedProjectFromOrg);
-		props.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
-		log.trace("Updated properties [\n\n{}\n\n]", props);
-		updateProperties(props);
-		return props;
-	}
-
-	void updateProperties(ReleaserProperties props) {
-		Map<String, ReleaserPropertiesAware> beans = this.context
-				.getBeansOfType(ReleaserPropertiesAware.class);
-		beans.values().forEach(aware -> aware.setReleaserProperties(props));
+		return CACHE.computeIfAbsent(clonedProjectFromOrg, file -> {
+			ReleaserProperties props = updatePropertiesFromFile(properties.copy(), file);
+			props.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
+			log.trace("Updated properties [\n\n{}\n\n]", props);
+			return props;
+		});
 	}
 
 	private ReleaserProperties updatePropertiesFromFile(ReleaserProperties copy,
@@ -158,6 +148,11 @@ class ReleaserPropertiesUpdater {
 
 	File releaserConfig(File clonedProjectFromOrg) {
 		return new File(clonedProjectFromOrg, "config/releaser.yml");
+	}
+
+	@Override
+	public void close() throws IOException {
+		CACHE.clear();
 	}
 
 }

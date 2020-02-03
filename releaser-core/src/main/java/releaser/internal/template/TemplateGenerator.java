@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import com.github.jknack.handlebars.Template;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.github.ProjectGitHubHandler;
 import releaser.internal.project.Projects;
 import releaser.internal.tech.HandlebarsHelper;
@@ -29,7 +28,7 @@ import releaser.internal.tech.HandlebarsHelper;
 /**
  * @author Marcin Grzejszczak
  */
-public class TemplateGenerator implements ReleaserPropertiesAware {
+public class TemplateGenerator {
 
 	private static final String EMAIL_TEMPLATE = "email";
 
@@ -49,7 +48,7 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 
 	private final ProjectGitHubHandler handler;
 
-	private ReleaserProperties props;
+	private final ReleaserProperties props;
 
 	public TemplateGenerator(ReleaserProperties props, ProjectGitHubHandler handler) {
 		this.props = props;
@@ -131,11 +130,6 @@ public class TemplateGenerator implements ReleaserPropertiesAware {
 	private Template template(String template) {
 		return HandlebarsHelper.template(this.props.getTemplate().getTemplateFolder(),
 				template);
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.props = properties;
 	}
 
 }

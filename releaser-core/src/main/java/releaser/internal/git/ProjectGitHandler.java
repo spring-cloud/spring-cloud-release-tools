@@ -30,7 +30,6 @@ import org.eclipse.jgit.transport.URIish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.tech.TemporaryFileStorage;
 
@@ -41,7 +40,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Marcin Grzejszczak
  */
-public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
+public class ProjectGitHandler implements Closeable {
 
 	private static final Map<URIish, File> CACHE = new ConcurrentHashMap<>();
 
@@ -55,7 +54,7 @@ public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	public ProjectGitHandler(ReleaserProperties properties) {
 		this.properties = properties;
@@ -312,11 +311,6 @@ public class ProjectGitHandler implements ReleaserPropertiesAware, Closeable {
 
 	GitRepo gitRepo(File workingDir) {
 		return new GitRepo(workingDir, this.properties);
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 	@Override

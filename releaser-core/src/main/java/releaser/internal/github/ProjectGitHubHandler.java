@@ -21,7 +21,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.tech.TemporaryFileStorage;
@@ -31,7 +30,7 @@ import releaser.internal.tech.TemporaryFileStorage;
  *
  * @author Marcin Grzejszczak
  */
-public class ProjectGitHubHandler implements ReleaserPropertiesAware {
+public class ProjectGitHubHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectGitHubHandler.class);
 
@@ -39,7 +38,7 @@ public class ProjectGitHubHandler implements ReleaserPropertiesAware {
 
 	private final GithubIssues githubIssues;
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	public ProjectGitHubHandler(ReleaserProperties properties,
 			List<CustomGithubIssues> customGithubIssues) {
@@ -85,11 +84,6 @@ public class ProjectGitHubHandler implements ReleaserPropertiesAware {
 
 	public String milestoneUrl(ProjectVersion releaseVersion) {
 		return this.githubMilestones.milestoneUrl(releaseVersion);
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 }

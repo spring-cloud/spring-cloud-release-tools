@@ -35,18 +35,17 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.ReleaserPropertiesAware;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
 /**
  * @author Marcin Grzejszczak
  */
-public class GradleUpdater implements ReleaserPropertiesAware {
+public class GradleUpdater {
 
 	private static final Logger log = LoggerFactory.getLogger(GradleUpdater.class);
 
-	private ReleaserProperties properties;
+	private final ReleaserProperties properties;
 
 	public GradleUpdater(ReleaserProperties properties) {
 		this.properties = properties;
@@ -76,11 +75,6 @@ public class GradleUpdater implements ReleaserPropertiesAware {
 		catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-	@Override
-	public void setReleaserProperties(ReleaserProperties properties) {
-		this.properties = properties;
 	}
 
 	private final class GradlePropertiesWalker extends SimpleFileVisitor<Path> {
