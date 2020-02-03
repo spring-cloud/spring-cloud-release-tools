@@ -402,8 +402,8 @@ public class Releaser implements ReleaserPropertiesAware {
 
 	public ExecutionResult updateDocumentationRepositoryForSingleProject(
 			Projects projects, ProjectVersion releaseVersion) {
-		if (releaseVersion.projectName.equals(
-				this.releaserProperties.getMetaRelease().getReleaseTrainProjectName())) {
+		if (releaseVersion.projectName
+				.equals(projects.releaseTrain(this.releaserProperties).projectName)) {
 			log.info("Will not update documentation for project that is a BOM project");
 			return ExecutionResult.skipped();
 		}

@@ -66,8 +66,8 @@ class SpringCloudCustomProjectDocumentationUpdater
 		ProjectVersion releaseTrainProject = new ProjectVersion(
 				this.releaserProperties.getMetaRelease().getReleaseTrainProjectName(),
 				branchToReleaseVersion(bomBranch));
-		File currentReleaseFolder = new File(clonedDocumentationProject, currentFolder(
-				releaseTrainProject.projectName, releaseTrainProject.version));
+		File currentReleaseFolder = new File(clonedDocumentationProject,
+				currentFolder(releaseTrainProject));
 		// remove the old way
 		removeAFolderWithRedirection(currentReleaseFolder);
 		File docsRepo = updateTheDocsRepo(releaseTrainProject, clonedDocumentationProject,
@@ -93,19 +93,20 @@ class SpringCloudCustomProjectDocumentationUpdater
 		}
 		log.info("Updating link to documentation for project [{}]",
 				currentProject.projectName);
-		ProjectVersion projectVersion = projects.forName(currentProject.projectName);
+		ProjectVersion currentProjectVersion = projects
+				.forName(currentProject.projectName);
 		File currentProjectReleaseFolder = new File(clonedDocumentationProject,
-				currentFolder(projectVersion.projectName, projectVersion.version));
+				currentFolder(currentProjectVersion));
 		removeAFolderWithRedirection(currentProjectReleaseFolder);
 		try {
-			updateTheDocsRepo(projectVersion, clonedDocumentationProject,
+			updateTheDocsRepo(currentProjectVersion, clonedDocumentationProject,
 					currentProjectReleaseFolder);
 			log.info("Processed [{}] for project with name [{}]",
-					currentProjectReleaseFolder, projectVersion.projectName);
+					currentProjectReleaseFolder, currentProjectVersion.projectName);
 		}
 		catch (Exception ex) {
 			log.warn("Exception occurred while trying o update the symlink of a project ["
-					+ projectVersion.projectName + "]", ex);
+					+ currentProjectVersion.projectName + "]", ex);
 		}
 		return pushChanges(clonedDocumentationProject);
 	}
@@ -120,9 +121,17 @@ class SpringCloudCustomProjectDocumentationUpdater
 		return Files.isSymbolicLink(currentFolder.toPath());
 	}
 
-	private String currentFolder(String projectName, String projectVersion) {
-		boolean releaseTrain = new ProjectVersion(projectName, projectVersion)
-				.isReleaseTrain();
+	private String currentFolder(ProjectVersion currentProjectVersion) {
+		String projectName = currentProjectVersion.projectName;
+		boolean releaseTrain;
+		try {
+			releaseTrain = currentProjectVersion.isReleaseTrain();
+		}
+		catch (IllegalStateException ex) {
+			log.warn("Exception occurred while trying to resolve if version ["
+					+ currentProjectVersion + "] is a release train", ex);
+			releaseTrain = false;
+		}
 		// release train -> static/current
 		// project -> static/spring-cloud-sleuth/current
 		return releaseTrain ? "current"

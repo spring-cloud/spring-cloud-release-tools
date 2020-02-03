@@ -218,8 +218,7 @@ public class PostReleaseActions implements Closeable {
 	private void commitUpdatedProject(Projects projects, String key,
 			ProjectVersion projectVersionForReleaseTrain, Projects postRelease,
 			String url) {
-		String releaseTrainVersion = projects.forName(
-				this.properties.getMetaRelease().getReleaseTrainProjectName()).version;
+		String releaseTrainVersion = projects.releaseTrain(this.properties).version;
 		String projectVersion = projects.forName(key).version;
 		log.info(
 				"Running version update for project [{}], url [{}], "

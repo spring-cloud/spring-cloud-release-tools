@@ -498,8 +498,8 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		private void assertIfValid() {
 			if (isInvalid()) {
-				throw new IllegalStateException(
-						"Version is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
+				throw new IllegalStateException("Version [" + print()
+						+ "] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
 			}
 		}
 

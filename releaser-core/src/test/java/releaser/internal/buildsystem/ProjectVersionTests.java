@@ -86,8 +86,8 @@ public class ProjectVersionTests {
 		String version = "1.0";
 
 		thenThrownBy(() -> projectVersion(version).bumpedVersion())
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Version is invalid");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
+						"Version [1.0] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
 	}
 
 	@Test
@@ -126,8 +126,8 @@ public class ProjectVersionTests {
 		String version = "1.0";
 
 		thenThrownBy(() -> projectVersion(version).postReleaseSnapshotVersion())
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Version is invalid");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
+						"Version [1.0] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
 	}
 
 	@Test
@@ -135,8 +135,8 @@ public class ProjectVersionTests {
 		String version = "1.0";
 
 		thenThrownBy(() -> projectVersion(version).major())
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Version is invalid");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
+						"Version [1.0] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
 	}
 
 	@Test
