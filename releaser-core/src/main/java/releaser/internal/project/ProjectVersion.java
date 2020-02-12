@@ -315,6 +315,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	 * E.g. 1.0.1.RELEASE is more mature than 1.0.2.RC2
 	 */
 	public boolean isMoreMature(ProjectVersion that) {
+		return isMoreMatureComparison(that) > 0;
+	}
+
+	private int isMoreMatureComparison(ProjectVersion that) {
 		SplitVersion thisSplit = assertVersion();
 		SplitVersion thatSplit = that.assertVersion();
 		int releaseTypeComparison = this.releaseType.compareTo(that.releaseType);
@@ -323,16 +327,30 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 				&& that.isReleaseOrServiceRelease();
 		// 1.0.1.M2 vs 1.0.0.RELEASE (x)
 		if (thisReleaseTypeHigher && !bothGa) {
-			return true;
+			return 1;
 		}
-		int versionComparison = thisSplit.gav().compareTo(thatSplit.gav());
-		if (versionComparison == 0) {
-			// 1.0.0.SR1 vs 1.0.1.RELEASE (x)
-			// Finchley.RELEASE vs Finchley.SR1 (x)
-			return thisReleaseTypeHigher;
+		int majorComparison = compare(thisSplit.major, thatSplit.major);
+		if (majorComparison != 0) {
+			return majorComparison;
 		}
-		// 1.0.0.SR1 vs 1.0.1.RELEASE (x)
-		return versionComparison > 0;
+		int minorComparison = compare(thisSplit.minor, thatSplit.minor);
+		if (minorComparison != 0) {
+			return minorComparison;
+		}
+		int patchComparison = compare(thisSplit.patch, thatSplit.patch);
+		if (patchComparison != 0) {
+			return patchComparison;
+		}
+		return releaseTypeComparison;
+	}
+
+	private int compare(String thisString, String thatString) {
+		try {
+			return Integer.valueOf(thisString).compareTo(Integer.valueOf(thatString));
+		}
+		catch (NumberFormatException ex) {
+			return thisString.compareTo(thatString);
+		}
 	}
 
 	public boolean isSameMinor(String version) {
