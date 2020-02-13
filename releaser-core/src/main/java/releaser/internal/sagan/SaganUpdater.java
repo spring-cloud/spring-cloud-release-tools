@@ -60,12 +60,14 @@ public class SaganUpdater {
 		}
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion,
 				projects);
-		Exception updateReleaseException = updateSaganForNonSnapshot(branch, originalVersion, currentVersion, projects);
+		Exception updateReleaseException = updateSaganForNonSnapshot(branch,
+				originalVersion, currentVersion, projects);
 		if (updateReleaseException == null) {
 			log.info("Updating Sagan releases with \n\n{}", update);
 			Project project = this.saganClient.updateRelease(currentVersion.projectName,
 					Collections.singletonList(update));
-			Optional<ProjectVersion> projectVersion = latestVersion(currentVersion, project);
+			Optional<ProjectVersion> projectVersion = latestVersion(currentVersion,
+					project);
 			log.info("Found the following latest project version [{}]", projectVersion);
 			boolean present = projectVersion.isPresent();
 			if (present && currentVersionNewerOrEqual(currentVersion, projectVersion)) {
@@ -80,7 +82,8 @@ public class SaganUpdater {
 				return ExecutionResult.skipped();
 			}
 		}
-		return updateReleaseException == null ? ExecutionResult.success() : ExecutionResult.unstable(updateReleaseException);
+		return updateReleaseException == null ? ExecutionResult.success()
+				: ExecutionResult.unstable(updateReleaseException);
 	}
 
 	private void updateDocumentationIfNecessary(File projectFile, Project project) {
@@ -150,8 +153,8 @@ public class SaganUpdater {
 		return currentVersion.compareTo(projectVersion.get()) >= 0;
 	}
 
-	private Exception updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion,
-			ProjectVersion version, Projects projects) {
+	private Exception updateSaganForNonSnapshot(String branch,
+			ProjectVersion originalVersion, ProjectVersion version, Projects projects) {
 		Exception updateReleaseException = null;
 		if (!version.isSnapshot()) {
 			log.info(
@@ -169,7 +172,8 @@ public class SaganUpdater {
 					ReleaseUpdate snapshotUpdate = releaseUpdate(branch, originalVersion,
 							new ProjectVersion(version.projectName, bumpedSnapshot),
 							projects);
-					log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
+					log.info("Updating Sagan with bumped snapshot \n\n[{}]",
+							snapshotUpdate);
 					this.saganClient.updateRelease(version.projectName,
 							Collections.singletonList(snapshotUpdate));
 				}
