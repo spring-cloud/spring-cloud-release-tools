@@ -164,12 +164,12 @@ public class SaganUpdater {
 			String snapshot = toSnapshot(version.version);
 			removeVersionFromSagan(version, snapshot);
 			if (version.isRelease() || version.isServiceRelease()) {
-				String bumpedSnapshot = toSnapshot(version.bumpedVersion());
-				ReleaseUpdate snapshotUpdate = releaseUpdate(branch, originalVersion,
-						new ProjectVersion(version.projectName, bumpedSnapshot),
-						projects);
-				log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
 				try {
+					String bumpedSnapshot = toSnapshot(version.bumpedVersion());
+					ReleaseUpdate snapshotUpdate = releaseUpdate(branch, originalVersion,
+							new ProjectVersion(version.projectName, bumpedSnapshot),
+							projects);
+					log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
 					this.saganClient.updateRelease(version.projectName,
 							Collections.singletonList(snapshotUpdate));
 				}
