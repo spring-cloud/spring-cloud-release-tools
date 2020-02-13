@@ -36,6 +36,7 @@ releaser:
     release-train-project-name: spring-cloud-stream-starters
     release-train-dependency-names:
       - spring-cloud-stream-dependencies
+      - spring-cloud-stream-starter-build
     git-org-url: https://github.com/spring-cloud
     projects-to-skip:
       - spring-boot
