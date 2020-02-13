@@ -61,22 +61,24 @@ public class SaganUpdater {
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion,
 				projects);
 		Exception updateReleaseException = updateSaganForNonSnapshot(branch, originalVersion, currentVersion, projects);
-		log.info("Updating Sagan releases with \n\n{}", update);
-		Project project = this.saganClient.updateRelease(currentVersion.projectName,
-				Collections.singletonList(update));
-		Optional<ProjectVersion> projectVersion = latestVersion(currentVersion, project);
-		log.info("Found the following latest project version [{}]", projectVersion);
-		boolean present = projectVersion.isPresent();
-		if (present && currentVersionNewerOrEqual(currentVersion, projectVersion)) {
-			updateDocumentationIfNecessary(projectFile, project);
-		}
-		else {
-			log.info(present
-					? "Latest version [" + projectVersion.get() + "] present and "
-							+ "the current version [" + currentVersion
-							+ "] is older than that one. " + "Will do nothing."
-					: "No latest version found. Will do nothing.");
-			return ExecutionResult.skipped();
+		if (updateReleaseException == null) {
+			log.info("Updating Sagan releases with \n\n{}", update);
+			Project project = this.saganClient.updateRelease(currentVersion.projectName,
+					Collections.singletonList(update));
+			Optional<ProjectVersion> projectVersion = latestVersion(currentVersion, project);
+			log.info("Found the following latest project version [{}]", projectVersion);
+			boolean present = projectVersion.isPresent();
+			if (present && currentVersionNewerOrEqual(currentVersion, projectVersion)) {
+				updateDocumentationIfNecessary(projectFile, project);
+			}
+			else {
+				log.info(present
+						? "Latest version [" + projectVersion.get() + "] present and "
+								+ "the current version [" + currentVersion
+								+ "] is older than that one. " + "Will do nothing."
+						: "No latest version found. Will do nothing.");
+				return ExecutionResult.skipped();
+			}
 		}
 		return updateReleaseException == null ? ExecutionResult.success() : ExecutionResult.unstable(updateReleaseException);
 	}
