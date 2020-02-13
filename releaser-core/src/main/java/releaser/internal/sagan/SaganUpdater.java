@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
+ * @author Oleg Zhurakousky
  */
 public class SaganUpdater {
 
@@ -59,7 +60,7 @@ public class SaganUpdater {
 		}
 		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion,
 				projects);
-		updateSaganForNonSnapshot(branch, originalVersion, currentVersion, projects);
+		Exception updateReleaseException = updateSaganForNonSnapshot(branch, originalVersion, currentVersion, projects);
 		log.info("Updating Sagan releases with \n\n{}", update);
 		Project project = this.saganClient.updateRelease(currentVersion.projectName,
 				Collections.singletonList(update));
@@ -77,7 +78,7 @@ public class SaganUpdater {
 					: "No latest version found. Will do nothing.");
 			return ExecutionResult.skipped();
 		}
-		return ExecutionResult.success();
+		return updateReleaseException == null ? ExecutionResult.success() : ExecutionResult.unstable(updateReleaseException);
 	}
 
 	private void updateDocumentationIfNecessary(File projectFile, Project project) {
@@ -147,8 +148,9 @@ public class SaganUpdater {
 		return currentVersion.compareTo(projectVersion.get()) >= 0;
 	}
 
-	private void updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion,
+	private Exception updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion,
 			ProjectVersion version, Projects projects) {
+		Exception updateReleaseException = null;
 		if (!version.isSnapshot()) {
 			log.info(
 					"Version is non snapshot [{}]. Will remove all older versions and mark this as current",
@@ -165,10 +167,18 @@ public class SaganUpdater {
 						new ProjectVersion(version.projectName, bumpedSnapshot),
 						projects);
 				log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
-				this.saganClient.updateRelease(version.projectName,
-						Collections.singletonList(snapshotUpdate));
+				try {
+					this.saganClient.updateRelease(version.projectName,
+							Collections.singletonList(snapshotUpdate));
+				}
+				catch (Exception e) {
+					log.warn("Failed to update [" + version.projectName + "/" + snapshot
+							+ "] from Sagan", e);
+					updateReleaseException = e;
+				}
 			}
 		}
+		return updateReleaseException;
 	}
 
 	private void removeAllSameMinorVersions(ProjectVersion version, Project project) {
@@ -184,7 +194,7 @@ public class SaganUpdater {
 			this.saganClient.deleteRelease(version.projectName, snapshot);
 		}
 		catch (Exception e) {
-			log.error("Failed to remove [" + version.projectName + "/" + snapshot
+			log.warn("Failed to remove [" + version.projectName + "/" + snapshot
 					+ "] from Sagan", e);
 		}
 	}
