@@ -83,7 +83,8 @@ public class SaganUpdater {
 			}
 		}
 		return updateReleaseException == null ? ExecutionResult.success()
-				: ExecutionResult.unstable(updateReleaseException);
+				: ExecutionResult.unstable(
+						new IllegalStateException(updateReleaseException.getMessage()));
 	}
 
 	private void updateDocumentationIfNecessary(File projectFile, Project project) {
