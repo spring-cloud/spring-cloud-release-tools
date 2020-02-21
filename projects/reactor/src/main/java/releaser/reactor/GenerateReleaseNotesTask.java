@@ -142,17 +142,50 @@ public class GenerateReleaseNotesTask
 		Issues issuesClient = repo.issues();
 		EnumMap<Type, List<ChangelogEntry>> entries = new EnumMap<>(Type.class);
 
-		String fromVersionTag = "v" + args.projectToRun.originalVersion.version;
 		String toVersionTag = "v" + args.versionFromBom.version;
+		if (args.options.dryRun == Boolean.TRUE
+				&& !gitHandler.findTagSha1(args.project, toVersionTag).isPresent()) {
+			toVersionTag = "HEAD";
+		}
+
+		// eg. 3.2.1 for current 3.2.2
+		String fromVersionTag = args.versionFromBom
+				.computePreviousPatchTag("v", "RELEASE").orElseGet(() -> {
+					Pattern pattern = args.versionFromBom
+							.computePreviousMinorTagPattern("v", "RELEASE")
+							.orElseGet(() -> args.versionFromBom
+									.computePreviousMajorTagPattern("v", "RELEASE"));
+					// eg. v3.2.*.RELEASE or v3.*.*.RELEASE
+					log.info(
+							"Couldn't simply compute previous version of {}, looking through tag list with pattern {}",
+							args.versionFromBom.version, pattern.pattern());
+
+					List<String> sortedTags = gitHandler
+							.findTagNamesMatching(args.project, pattern)
+							.collect(Collectors.toList());
+					if (sortedTags.isEmpty()) {
+						throw new IllegalStateException(
+								"Couldn't find a tag that matches pattern "
+										+ pattern.pattern());
+					}
+					sortedTags.forEach(System.out::println);
+					return sortedTags.get(0);
+				});
 
 		if (Boolean.TRUE == args.options.interactive) {
-			log.info("\nForce the from in log range if needed [{}]: ", fromVersionTag);
+			log.info("\nComputed log range is {}..{}", fromVersionTag, toVersionTag);
+			log.info("\nForce the FROM in log range if needed [{}]", fromVersionTag);
 			String modifiedFrom = System.console().readLine();
 			if (!modifiedFrom.trim().isEmpty()) {
 				fromVersionTag = modifiedFrom;
 			}
+			log.info("\nForce the TO in log range if needed [{}]", toVersionTag);
+			String modifiedTo = System.console().readLine();
+			if (!modifiedTo.trim().isEmpty()) {
+				toVersionTag = modifiedTo;
+			}
 		}
-		log.info("Fetching the log for range {}..{}", fromVersionTag, toVersionTag);
+		log.info("Will fetch the log for range {}..{}", fromVersionTag, toVersionTag);
 
 		// gather commits. we use tags in the format `vVERSION`
 		final List<SimpleCommit> revCommits = gitHandler.commitsBetween(args.project,
