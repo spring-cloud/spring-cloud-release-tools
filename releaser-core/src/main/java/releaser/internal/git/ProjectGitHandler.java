@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.transport.URIish;
@@ -316,6 +318,17 @@ public class ProjectGitHandler implements Closeable {
 	@Override
 	public void close() {
 		CACHE.clear();
+	}
+
+	/**
+	 * Find the tag names that match a {@link Pattern}.
+	 * @param clonedProject the base dir for the cloned repository
+	 * @param tagPattern the {@link Pattern} to use to filter tag names
+	 * @return a {@link Stream} of the tags whose name match the given {@link Pattern}
+	 */
+	public Stream<String> findTagNamesMatching(File clonedProject, Pattern tagPattern) {
+		return gitRepo(clonedProject).listTags()
+				.filter(tagName -> tagPattern.matcher(tagName).matches());
 	}
 
 }

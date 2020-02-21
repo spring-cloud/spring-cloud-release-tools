@@ -27,6 +27,7 @@ import org.junit.Test;
 import releaser.internal.git.GitRepoTests;
 import releaser.internal.project.ProjectVersion;
 
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
@@ -618,6 +619,69 @@ public class ProjectVersionTests {
 	@Test
 	public void should_return_empty_when_tag_name_is_non_ga() {
 		then(projectVersion("1.0.0.BUILD-SNAPSHOT").releaseTagName()).isEmpty();
+	}
+
+	@Test
+	public void should_return_decremented_patch_when_patch_above_zero() {
+		then(projectVersion("1.2.3.RELEASE").computePreviousPatchTag("v", "RELEASE"))
+				.contains("v1.2.2.RELEASE");
+	}
+
+	@Test
+	public void should_use_current_suffix_if_no_forced_suffix() {
+		then(projectVersion("1.2.3.WHATEVER").computePreviousPatchTag("v", ""))
+				.contains("v1.2.2.WHATEVER");
+	}
+
+	@Test
+	public void should_replace_suffix() {
+		then(projectVersion("1.2.3.WHATEVER").computePreviousPatchTag("v", "RELEASE"))
+				.contains("v1.2.2.RELEASE");
+	}
+
+	@Test
+	public void should_return_empty_when_patch_at_zero() {
+		then(projectVersion("1.2.0.WHATEVER").computePreviousPatchTag("v", "RELEASE"))
+				.isEmpty();
+	}
+
+	@Test
+	public void should_return_minor_pattern_when_minor_above_zero() {
+		then(projectVersion("1.2.0.WHATEVER")
+				.computePreviousMinorTagPattern("v", "RELEASE").get().pattern())
+						.isEqualTo("\\Qv1.1.\\E\\d+\\Q.RELEASE\\E");
+	}
+
+	@Test
+	public void should_compute_minor_pattern_with_current_suffix_if_no_forced_suffix() {
+		then(projectVersion("1.2.0.WHATEVER").computePreviousMinorTagPattern("v", "")
+				.get().pattern()).isEqualTo("\\Qv1.1.\\E\\d+\\Q.WHATEVER\\E");
+	}
+
+	@Test
+	public void should_return_empty_minor_pattern_when_minor_zero() {
+		then(projectVersion("1.0.0.WHATEVER").computePreviousMinorTagPattern("v",
+				"RELEASE")).isEmpty();
+	}
+
+	@Test
+	public void should_return_major_pattern_when_major_above_zero() {
+		then(projectVersion("1.0.0.WHATEVER")
+				.computePreviousMajorTagPattern("v", "RELEASE").pattern())
+						.isEqualTo("\\Qv0.\\E\\d+\\Q.\\E\\d+\\Q.RELEASE\\E");
+	}
+
+	@Test
+	public void should_compute_major_pattern_with_current_suffix_if_no_forced_suffix() {
+		then(projectVersion("1.0.0.WHATEVER").computePreviousMajorTagPattern("v", "")
+				.pattern()).isEqualTo("\\Qv0.\\E\\d+\\Q.\\E\\d+\\Q.WHATEVER\\E");
+	}
+
+	@Test
+	public void should_throw_major_pattern_when_major_zero() {
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> projectVersion("0.0.1.WHATEVER")
+						.computePreviousMajorTagPattern("v", "RELEASE"));
 	}
 
 	private void thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(

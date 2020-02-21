@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.Model;
@@ -264,6 +265,109 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 	public String major() {
 		return this.assertVersion().major;
+	}
+
+	/**
+	 * Compute the previous patch's version, without any prefix or suffix (ie
+	 * MAJOR.MINOR.PATCH only). If the patch number is already at 0, returns an empty
+	 * {@link Optional} instead.
+	 * @param prefix the prefix to prepend to the tag pattern (eg. if tags are in the form
+	 * vVERSION)
+	 * @param suffix the suffix to append to the tag pattern instead (eg. if tags are in
+	 * the form VERSION.RELEASE). this replaces the suffix in the version if any.
+	 * @return an {@link Optional} valued with the previous MAJOR.MINOR.PATCH, or empty if
+	 * PATCH is already 0
+	 * @see #computePreviousMinorTagPattern(String,String)
+	 */
+	public Optional<String> computePreviousPatchTag(String prefix, String suffix) {
+		SplitVersion splitVersion = this.assertVersion();
+		if (suffix.isEmpty()) {
+			suffix = splitVersion.suffix;
+		}
+		int patch;
+		try {
+			patch = Integer.parseInt(splitVersion.patch);
+		}
+		catch (NumberFormatException nfe) {
+			throw new IllegalArgumentException("Version " + this.version
+					+ " doesn't contain a numerical PATCH number", nfe);
+		}
+		if (patch == 0) {
+			return Optional.empty();
+		}
+		return Optional.of(prefix + splitVersion.major + splitVersion.delimiter
+				+ splitVersion.minor + splitVersion.delimiter + (patch - 1)
+				+ splitVersion.delimiter + suffix);
+	}
+
+	/**
+	 * Compute a {@link Pattern} that allows to identify all the version tags of the
+	 * previous MAJOR.MINOR (MAJOR.MINOR.*), provided MINOR is not 0. If MINOR is 0,
+	 * {@link Optional#empty()} is returned.
+	 * @param prefix the prefix to prepend to the tag pattern (eg. if tags are in the form
+	 * vVERSION)
+	 * @param suffix the suffix to append to the tag pattern (eg. if tags are in the form
+	 * VERSION.RELEASE)
+	 * @return a {@link Optional} of {@link Pattern} to identify all the versions in the
+	 * previous MAJOR.MINOR, or empty if current MINOR is 0
+	 * @see #computePreviousMajorTagPattern(String, String)
+	 */
+	public Optional<Pattern> computePreviousMinorTagPattern(String prefix,
+			String suffix) {
+		SplitVersion splitVersion = this.assertVersion();
+		if (suffix.isEmpty()) {
+			suffix = splitVersion.suffix;
+		}
+		String quotedSuffix = Pattern.quote(splitVersion.delimiter + suffix);
+		int minor;
+		try {
+			minor = Integer.parseInt(splitVersion.minor);
+		}
+		catch (NumberFormatException nfe) {
+			throw new IllegalArgumentException("Version " + this.version
+					+ " doesn't contain a numerical MINOR number", nfe);
+		}
+		if (minor == 0) {
+			return Optional.empty();
+		}
+		Pattern p = Pattern
+				.compile(Pattern
+						.quote(prefix + splitVersion.major + splitVersion.delimiter
+								+ (minor - 1) + splitVersion.delimiter)
+						+ "\\d+" + quotedSuffix);
+		return Optional.of(p);
+	}
+
+	/**
+	 * Compute a {@link Pattern} that allows to identify all the version tags of the
+	 * previous MAJOR. Throws {@link IllegalArgumentException} if MAJOR is 0.
+	 * @param prefix the prefix to prepend to the tag pattern (eg. if tags are in the form
+	 * vVERSION)
+	 * @param suffix the suffix to append to the tag pattern (eg. if tags are in the form
+	 * VERSION.RELEASE)
+	 * @return a {@link Pattern} to identify all the versions in the previous MAJOR
+	 */
+	public Pattern computePreviousMajorTagPattern(String prefix, String suffix) {
+		SplitVersion splitVersion = this.assertVersion();
+		if (suffix.isEmpty()) {
+			suffix = splitVersion.suffix;
+		}
+		String quotedSuffix = Pattern.quote(splitVersion.delimiter + suffix);
+		int major;
+		try {
+			major = Integer.parseInt(splitVersion.major);
+		}
+		catch (NumberFormatException nfe) {
+			throw new IllegalArgumentException("Version " + this.version
+					+ " doesn't contain a numerical MAJOR number", nfe);
+		}
+		if (major == 0) {
+			throw new IllegalArgumentException(
+					"Cannot compute previous MAJOR pattern with MAJOR of 0");
+		}
+		return Pattern.compile(
+				Pattern.quote(prefix + (major - 1) + splitVersion.delimiter) + "\\d+"
+						+ Pattern.quote(splitVersion.delimiter) + "\\d+" + quotedSuffix);
 	}
 
 	public boolean isSnapshot() {
