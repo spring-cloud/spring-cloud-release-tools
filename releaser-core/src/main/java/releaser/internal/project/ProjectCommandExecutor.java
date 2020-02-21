@@ -325,8 +325,12 @@ class ReleaserProcessExecutor {
 		log.info("Will run the command [{}]", Arrays.toString(commandsToRun));
 		return new ProcessExecutor().command(commandsToRun).destroyOnExit()
 				.readOutput(true)
-				.redirectOutputAlsoTo(
-						Slf4jStream.of(ReleaserProcessExecutor.class).asInfo())
+				// releaser.commands logger should be configured to redirect
+				// only to a file (with additivity=false). ideally the root logger should
+				// append to same file on top of whatever root appender, so that file
+				// contains the most output
+				.redirectOutputAlsoTo(Slf4jStream.of("releaser.commands").asInfo())
+				.redirectErrorAlsoTo(Slf4jStream.of("releaser.commands").asWarn())
 				.directory(new File(workingDir));
 	}
 
