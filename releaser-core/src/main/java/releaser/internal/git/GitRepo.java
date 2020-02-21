@@ -19,9 +19,13 @@ package releaser.internal.git;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.JSch;
@@ -44,9 +48,12 @@ import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.EmptyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
@@ -248,10 +255,46 @@ class GitRepo {
 	}
 
 	/**
+	 * List all the tags in the repository.
+	 * @return a {@link List} of all the tags in the repository.
+	 */
+	Stream<String> listTags() {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
+			final RevWalk walk = new RevWalk(git.getRepository());
+			List<Ref> allTagsNewestFirst = git.tagList().call();
+			Collections.sort(allTagsNewestFirst, (Comparator<Ref>) (o1, o2) -> {
+				Date d1;
+				Date d2;
+				try {
+					d1 = walk.parseTag(o1.getObjectId()).getTaggerIdent().getWhen();
+				}
+				catch (IOException ioe) {
+					return 1; // put at end
+				}
+				try {
+					d2 = walk.parseTag(o2.getObjectId()).getTaggerIdent().getWhen();
+				}
+				catch (IOException ioe) {
+					return -1; // put ahead
+				}
+				return d2.compareTo(d1); // more recent first
+			});
+			return allTagsNewestFirst.stream()
+					.map(ref -> Repository.shortenRefName(ref.getName()));
+		}
+		catch (Exception e) {
+			throw new IllegalStateException("Unable to fetch git tags", e);
+		}
+	}
+
+	/**
 	 * Look for a tag with the given name, and if not found looks for a branch.
 	 */
 	private Optional<Ref> findTagOrBranchHeadRevision(Git git, String tagOrBranch)
-			throws GitAPIException {
+			throws GitAPIException, IOException {
+		if (tagOrBranch.equals("HEAD")) {
+			return Optional.of(git.getRepository().exactRef(Constants.HEAD).getTarget());
+		}
 		final Optional<Ref> tag = git.tagList().call().stream()
 				.filter(ref -> ref.getName().equals("refs/tags/" + tagOrBranch))
 				.findFirst();
