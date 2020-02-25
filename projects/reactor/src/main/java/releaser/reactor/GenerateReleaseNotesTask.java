@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import com.jcabi.github.Coordinates;
 import com.jcabi.github.Github;
@@ -405,7 +406,23 @@ public class GenerateReleaseNotesTask
 		RepoCommit.Smart smartCommit = new RepoCommit.Smart(dumbCommit);
 		try {
 			JsonObject commitJson = smartCommit.json();
-			return "@" + commitJson.getJsonObject("author").getString("login");
+			JsonValue.ValueType authorType = commitJson.get("author").getValueType();
+			if (authorType == JsonValue.ValueType.OBJECT) {
+				return "@" + commitJson.getJsonObject("author").getString("login");
+			}
+			else if (authorType == JsonValue.ValueType.NULL) {
+				// assume author+committer, look under commit.author.name
+				if (commitJson.containsKey("commit")
+						&& commitJson.getJsonObject("commit").containsKey("author")) {
+					return "@" + commitJson.getJsonObject("commit")
+							.getJsonObject("author").getString("name");
+				}
+			}
+			// in case unexpected json, output the "sha", "commit", "author" and "committer"
+			return "@RAW{\"sha\", " + commitJson.get("sha") + ", \"author\", \""
+					+ commitJson.get("author") + ", \"committer\", \""
+					+ commitJson.get("committer") + ", \"commit\", \""
+					+ commitJson.get("commit") + "}";
 		}
 		catch (IOException e) {
 			return null;
