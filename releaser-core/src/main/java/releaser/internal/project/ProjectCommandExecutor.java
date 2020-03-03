@@ -205,7 +205,7 @@ public class ProjectCommandExecutor {
 	private String replaceAllPlaceHolders(ProjectVersion originalVersion,
 			ProjectVersion changedVersion, String command) {
 		return command.replace(VERSION_MUSTACHE, changedVersion.version)
-				.replace(NEXT_VERSION_MUSTACHE, originalVersion.bumpedVersion())
+				.replace(NEXT_VERSION_MUSTACHE, changedVersion.bumpedVersion())
 				.replace(OLD_VERSION_MUSTACHE, originalVersion.version);
 	}
 
