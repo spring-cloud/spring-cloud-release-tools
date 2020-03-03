@@ -418,7 +418,8 @@ public class GenerateReleaseNotesTask
 							.getJsonObject("author").getString("name");
 				}
 			}
-			// in case unexpected json, output the "sha", "commit", "author" and "committer"
+			// in case unexpected json, output the "sha", "commit", "author" and
+			// "committer"
 			return "@RAW{\"sha\", " + commitJson.get("sha") + ", \"author\", \""
 					+ commitJson.get("author") + ", \"committer\", \""
 					+ commitJson.get("committer") + ", \"commit\", \""

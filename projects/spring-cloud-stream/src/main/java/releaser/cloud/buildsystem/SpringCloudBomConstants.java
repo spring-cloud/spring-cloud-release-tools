@@ -40,11 +40,11 @@ final class SpringCloudBomConstants {
 	static final String CLOUD_STARTER_PARENT_ARTIFACT_ID = "spring-cloud-starter-parent";
 
 	// sc-stream
-	static final String STREAM_ARTIFACT_ID = "spring-cloud-stream";
 	static final String STREAM_DEPS_ARTIFACT_ID = "spring-cloud-stream-dependencies";
 	static final String STREAM_STARTER_ARTIFACT_ID = "spring-cloud-stream-starter";
 	static final String STREAM_STARTER_BUILD_ARTIFACT_ID = "spring-cloud-stream-starter-build";
 	static final String STREAM_STARTER_PARENT_ARTIFACT_ID = "spring-cloud-stream-starter-parent";
+	static final String STREAM_DOCS_ARTIFACT_ID = "spring-cloud-stream-docs";
 
 	private SpringCloudBomConstants() {
 		throw new IllegalStateException("Don't instantiate a utility class");

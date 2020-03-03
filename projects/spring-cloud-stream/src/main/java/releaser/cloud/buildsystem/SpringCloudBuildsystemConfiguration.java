@@ -23,8 +23,8 @@ import org.springframework.context.annotation.Configuration;
 class SpringCloudBuildsystemConfiguration {
 
 	@Bean
-	SpringCloudMavenBomParser springCloudMavenBomParser() {
-		return new SpringCloudMavenBomParser();
+	SpringCloudStreamMavenBomParser springCloudMavenBomParser() {
+		return new SpringCloudStreamMavenBomParser();
 	}
 
 }

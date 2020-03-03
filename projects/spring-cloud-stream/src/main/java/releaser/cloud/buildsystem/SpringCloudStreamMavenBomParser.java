@@ -43,16 +43,16 @@ import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_RELEASE_A
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_STARTER_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_STARTER_PARENT_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.SPRING_BOOT;
-import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_DEPS_ARTIFACT_ID;
+import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_DOCS_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_STARTER_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_STARTER_BUILD_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_STARTER_PARENT_ARTIFACT_ID;
 
-class SpringCloudMavenBomParser implements CustomBomParser {
+class SpringCloudStreamMavenBomParser implements CustomBomParser {
 
 	private static final Logger log = LoggerFactory
-			.getLogger(SpringCloudMavenBomParser.class);
+			.getLogger(SpringCloudStreamMavenBomParser.class);
 
 	@Override
 	public VersionsFromBom parseBom(File root, ReleaserProperties properties) {
@@ -161,11 +161,11 @@ class SpringCloudMavenBomParser implements CustomBomParser {
 		case CLOUD_STARTER_PARENT_ARTIFACT_ID:
 			updateSpringCloudVersions(newProjects, version);
 			break;
-		case STREAM_ARTIFACT_ID:
 		case STREAM_DEPS_ARTIFACT_ID:
 		case STREAM_STARTER_ARTIFACT_ID:
 		case STREAM_STARTER_BUILD_ARTIFACT_ID:
 		case STREAM_STARTER_PARENT_ARTIFACT_ID:
+		case STREAM_DOCS_ARTIFACT_ID:
 			updateStreamVersions(newProjects, version);
 			break;
 		}
@@ -204,12 +204,10 @@ class SpringCloudMavenBomParser implements CustomBomParser {
 	}
 
 	private void updateStreamVersions(Set<Project> newProjects, String version) {
-		remove(newProjects, STREAM_ARTIFACT_ID);
 		remove(newProjects, STREAM_DEPS_ARTIFACT_ID);
 		remove(newProjects, STREAM_STARTER_ARTIFACT_ID);
 		remove(newProjects, STREAM_STARTER_BUILD_ARTIFACT_ID);
 		remove(newProjects, STREAM_STARTER_PARENT_ARTIFACT_ID);
-		add(newProjects, STREAM_ARTIFACT_ID, version);
 		add(newProjects, STREAM_DEPS_ARTIFACT_ID, version);
 		add(newProjects, STREAM_STARTER_ARTIFACT_ID, version);
 		add(newProjects, STREAM_STARTER_BUILD_ARTIFACT_ID, version);
