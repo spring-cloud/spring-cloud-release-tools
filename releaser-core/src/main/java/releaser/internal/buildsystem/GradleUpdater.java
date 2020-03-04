@@ -45,12 +45,6 @@ public class GradleUpdater {
 
 	private static final Logger log = LoggerFactory.getLogger(GradleUpdater.class);
 
-	private final ReleaserProperties properties;
-
-	public GradleUpdater(ReleaserProperties properties) {
-		this.properties = properties;
-	}
-
 	/**
 	 * For the given root folder (typically the working directory) performs the whole flow
 	 * of updating {@code gradle.properties} with values from BOM project. Remember to
@@ -61,16 +55,18 @@ public class GradleUpdater {
 	 * @param versionFromBom - version for the project from Spring Cloud Release
 	 * @param assertVersions - should snapshots / milestone / rc presence be asserted
 	 */
-	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
-			ProjectVersion versionFromBom, boolean assertVersions) {
-		processAllGradleProps(projectRoot, projects, versionFromBom, assertVersions);
+	public void updateProjectFromReleaseTrain(ReleaserProperties properties,
+			File projectRoot, Projects projects, ProjectVersion versionFromBom,
+			boolean assertVersions) {
+		processAllGradleProps(properties, projectRoot, projects, versionFromBom,
+				assertVersions);
 	}
 
-	private void processAllGradleProps(File projectRoot, Projects projects,
-			ProjectVersion versionFromBom, boolean assertVersions) {
+	private void processAllGradleProps(ReleaserProperties properties, File projectRoot,
+			Projects projects, ProjectVersion versionFromBom, boolean assertVersions) {
 		try {
 			Files.walkFileTree(projectRoot.toPath(), new GradlePropertiesWalker(
-					this.properties, projects, versionFromBom, assertVersions));
+					properties, projects, versionFromBom, assertVersions));
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);

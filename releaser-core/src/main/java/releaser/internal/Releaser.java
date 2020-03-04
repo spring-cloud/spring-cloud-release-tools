@@ -109,10 +109,12 @@ public class Releaser {
 	private ExecutionResult updateProjectFromBom(File project, Projects versions,
 			ProjectVersion versionFromBom, boolean assertSnapshots) {
 		log.info("Will update the project with versions [{}]", versions);
+		ReleaserProperties updatedProperties = new ReleaserPropertiesUpdater()
+				.updateProperties(this.releaserProperties, project);
 		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
 				versionFromBom, assertSnapshots);
-		this.gradleUpdater.updateProjectFromReleaseTrain(project, versions,
-				versionFromBom, assertSnapshots);
+		this.gradleUpdater.updateProjectFromReleaseTrain(updatedProperties, project,
+				versions, versionFromBom, assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion.version);
 		return ExecutionResult.success();

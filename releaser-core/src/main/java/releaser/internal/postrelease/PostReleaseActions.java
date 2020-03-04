@@ -248,6 +248,11 @@ public class PostReleaseActions implements Closeable {
 		this.projectGitHandler.pushCurrentBranch(file);
 	}
 
+	private ReleaserProperties updatedProperties(File file) {
+		ReleaserPropertiesUpdater updater = new ReleaserPropertiesUpdater();
+		return updater.updateProperties(this.properties, file);
+	}
+
 	private ProjectVersion newProjectVersion(File file) {
 		try {
 			return new ProjectVersion(file);
@@ -265,10 +270,11 @@ public class PostReleaseActions implements Closeable {
 	}
 
 	private void updateWithVersions(File file, Projects newPostRelease) {
+		ReleaserProperties updatedProperties = updatedProperties(file);
 		this.projectPomUpdater.updateProjectFromReleaseTrain(file, newPostRelease,
 				newProjectVersion(file), false);
-		this.gradleUpdater.updateProjectFromReleaseTrain(file, newPostRelease,
-				newProjectVersion(file), false);
+		this.gradleUpdater.updateProjectFromReleaseTrain(updatedProperties, file,
+				newPostRelease, newProjectVersion(file), false);
 	}
 
 	private ProjectAndFuture run(String key, String url, Runnable runnable) {

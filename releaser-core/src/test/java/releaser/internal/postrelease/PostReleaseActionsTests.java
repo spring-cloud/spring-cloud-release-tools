@@ -177,8 +177,9 @@ public class PostReleaseActionsTests {
 
 	private void thenGradleUpdaterWasCalled() {
 		BDDMockito.then(this.gradleUpdater).should().updateProjectFromReleaseTrain(
-				BDDMockito.any(File.class), BDDMockito.any(Projects.class),
-				BDDMockito.any(ProjectVersion.class), BDDMockito.eq(false));
+				BDDMockito.any(ReleaserProperties.class), BDDMockito.any(File.class),
+				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class),
+				BDDMockito.eq(false));
 	}
 
 	@Test

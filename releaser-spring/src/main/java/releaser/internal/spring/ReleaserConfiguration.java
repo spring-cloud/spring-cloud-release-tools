@@ -124,8 +124,8 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	GradleUpdater gradleUpdater(ReleaserProperties properties) {
-		return new GradleUpdater(properties);
+	GradleUpdater gradleUpdater() {
+		return new GradleUpdater();
 	}
 
 	@Bean
