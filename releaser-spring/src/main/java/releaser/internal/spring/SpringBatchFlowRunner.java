@@ -134,8 +134,9 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 						contribution.getStepExecution().getExecutionContext()
 								.put("entity", entity);
 						if (result.isFailureOrUnstable()) {
-							log.warn("The execution of [{}] failed or was unstable",
-									entity.getReleaserTaskType().getSimpleName());
+							log.warn("The execution of [{}] failed [{}] / unstable [{}]",
+									entity.getReleaserTaskType().getSimpleName(),
+									result.isFailure(), result.isUnstable());
 							contribution.getStepExecution().getExecutionContext()
 									.put("errors", errors);
 						}
@@ -212,8 +213,8 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 					return stepExecution.getExitStatus();
 				}
 				else if (result.isUnstable()) {
-					return new ExitStatus(BuildUnstableException.EXIT_CODE,
-							BuildUnstableException.DESCRIPTION);
+					return ExitStatus.COMPLETED
+							.addExitDescription(BuildUnstableException.DESCRIPTION);
 				}
 				else if (result.isFailure()) {
 					return ExitStatus.FAILED;
@@ -226,6 +227,10 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	@Override
 	public ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties,
 			ProjectsToRun projectsToRun, TasksToRun tasksToRun) {
+		if (properties.isPostReleaseTasksOnly() && options.metaRelease) {
+			log.info("Only post release tasks will be executed for the meta release");
+			return ExecutionResult.skipped();
+		}
 		ProjectsToReleaseGroups groups = new ProjectsToReleaseGroups(properties);
 		List<ReleaseGroup> releaseGroups = groups.toReleaseGroup(projectsToRun);
 		if (groups.hasGroups()) {
@@ -416,10 +421,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 								+ execution.getExitStatus().getExitDescription() + "]"));
 			}
 			List<Exception> thrownExceptions = exceptionsThrownBySteps(execution);
-			if (thrownExceptions.isEmpty()) {
-				return ExecutionResult.success();
-			}
-			return ExecutionResult.failure(thrownExceptions);
+			return new ExecutionResult(thrownExceptions);
 		}
 		catch (JobExecutionException ex) {
 			return ExecutionResult.failure(ex);

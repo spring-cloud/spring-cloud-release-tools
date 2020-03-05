@@ -1,0 +1,7 @@
+releaser:
+  git:
+    org-name: hello
+
+spring:
+  batch:
+    initialize-schema: always

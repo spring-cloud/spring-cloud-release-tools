@@ -53,13 +53,13 @@ public class BuildUnstableException extends RuntimeException implements Serializ
 
 	public BuildUnstableException(Throwable cause) {
 		super(cause);
-		log.error("\n\n" + DESCRIPTION, cause);
+		log.warn("\n\n" + DESCRIPTION, cause);
 		this.exceptions.add(cause);
 	}
 
 	public BuildUnstableException(String message, List<Throwable> throwables) {
 		this(throwables);
-		log.error("\n\n" + DESCRIPTION + message + " with causes " + throwables);
+		log.warn("\n\n" + DESCRIPTION + message + " with causes " + throwables);
 	}
 
 	// for Jackson
