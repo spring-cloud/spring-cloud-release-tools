@@ -62,6 +62,12 @@ class SpringCloudCustomProjectDocumentationUpdater
 	@Override
 	public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
 			ProjectVersion currentProject, Projects projects, String bomBranch) {
+		if (!currentProject.projectName.startsWith("spring-cloud")) {
+			log.info(
+					"Skipping updating docs for project [{}] that does not start with spring-cloud prefix",
+					currentProject.projectName);
+			return clonedDocumentationProject;
+		}
 		log.debug("Cloning the doc project to [{}]", clonedDocumentationProject);
 		ProjectVersion releaseTrainProject = new ProjectVersion(
 				this.releaserProperties.getMetaRelease().getReleaseTrainProjectName(),
@@ -89,6 +95,12 @@ class SpringCloudCustomProjectDocumentationUpdater
 			log.warn(
 					"Can't update the documentation repo for project [{}] cause it's not present on the projects list {}",
 					currentProject.projectName, projects);
+			return clonedDocumentationProject;
+		}
+		if (!currentProject.projectName.startsWith("spring-cloud")) {
+			log.info(
+					"Skipping updating docs for project [{}] that does not start with spring-cloud prefix",
+					currentProject.projectName);
 			return clonedDocumentationProject;
 		}
 		log.info("Updating link to documentation for project [{}]",
@@ -156,16 +168,6 @@ class SpringCloudCustomProjectDocumentationUpdater
 	private String folderName(String path) {
 		int last = path.lastIndexOf(File.separator);
 		return last > 0 ? path.substring(last + 1) : path;
-	}
-
-	private String concreteVersionFolder(ProjectVersion projectVersion) {
-		String projectName = projectVersion.projectName;
-		boolean releaseTrain = projectVersion.isReleaseTrain();
-		// release train -> static/Hoxton.SR2/
-		// project -> static/spring-cloud-sleuth/1.2.3.RELEASE/
-		String prefix = releaseTrain ? projectVersion.version
-				: (projectName + "/" + projectVersion.version);
-		return prefix + "/";
 	}
 
 	private File pushChanges(File docsRepo) {

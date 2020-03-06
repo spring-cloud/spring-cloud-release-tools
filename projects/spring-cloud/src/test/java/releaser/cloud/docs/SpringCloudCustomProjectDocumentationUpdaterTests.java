@@ -164,6 +164,36 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@Test
+	public void should_do_nothing_when_release_train_docs_update_happen_for_a_project_that_does_not_start_with_spring_cloud() {
+		ProjectVersion springBootVersion = new ProjectVersion("spring-boot", "2.2.5");
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
+		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
+
+		new SpringCloudCustomProjectDocumentationUpdater(handler, properties)
+				.updateDocsRepoForReleaseTrain(this.clonedDocProject, springBootVersion,
+						bootProject(), "vDalston.SR3");
+
+		BDDMockito.then(handler).should(BDDMockito.never())
+				.commit(BDDMockito.any(File.class), BDDMockito.anyString());
+	}
+
+	@Test
+	public void should_do_nothing_when_single_project_docs_update_happen_for_a_project_that_does_not_start_with_spring_cloud() {
+		ProjectVersion springBootVersion = new ProjectVersion("spring-boot", "2.2.5");
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
+		ProjectGitHandler handler = BDDMockito.spy(new ProjectGitHandler(properties));
+
+		new SpringCloudCustomProjectDocumentationUpdater(handler, properties)
+				.updateDocsRepoForSingleProject(this.clonedDocProject, springBootVersion,
+						bootProject());
+
+		BDDMockito.then(handler).should(BDDMockito.never())
+				.commit(BDDMockito.any(File.class), BDDMockito.anyString());
+	}
+
+	@Test
 	public void should_not_update_current_version_in_the_docs_if_current_release_starts_with_lower_letter_than_the_stored_release()
 			throws IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
@@ -259,6 +289,10 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 
 	private Projects projects() {
 		return new Projects(new ProjectVersion("spring-cloud-sleuth", "1.0.0.RELEASE"));
+	}
+
+	private Projects bootProject() {
+		return new Projects(new ProjectVersion("spring-boot", "2.2.5.RELEASE"));
 	}
 
 }
