@@ -107,6 +107,7 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_true_for_a_valid_version() {
+		then(projectVersion("2020-1.M1").isValid()).isTrue();
 		then(projectVersion("1.0.1.BUILD-SNAPSHOT").isValid()).isTrue();
 		then(projectVersion("1.0.3.RC1").isValid()).isTrue();
 		then(projectVersion("1.0.4.M1").isValid()).isTrue();
