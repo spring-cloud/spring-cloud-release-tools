@@ -172,10 +172,6 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (this.version == null) {
 			throw new IllegalStateException("Version can't be null!");
 		}
-		if (this.version.equals("2020-1.M1")) {
-			SplitVersion splitVersion = SplitVersion.dot(new String[] { "2020-1", "M1" });
-			return splitVersion;
-		}
 		SplitVersion splitByHyphen = tryHyphenSeparatedVersion();
 		if (splitByHyphen != null) {
 			return splitByHyphen;
