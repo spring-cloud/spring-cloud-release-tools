@@ -151,6 +151,8 @@ public class ProjectVersionTests {
 		then(projectVersion("2.0.1.M1").major()).isEqualTo("2");
 		then(projectVersion("2.0.1.RC1").major()).isEqualTo("2");
 		then(projectVersion("Finchley.SR1").major()).isEqualTo("Finchley");
+		then(projectVersion("2020.0.0.M1").major()).isEqualTo("2020");
+		//then(projectVersion("2020.0.0").major()).isEqualTo("2020");
 	}
 
 	@Test
@@ -252,6 +254,10 @@ public class ProjectVersionTests {
 		String version = "1.0.1.RC1";
 
 		then(projectVersion(version).isRelease()).isFalse();
+
+		String newRCSuffixVersion = "1.0.1-RC1";
+
+		then(projectVersion(newRCSuffixVersion).isRelease()).isFalse();
 	}
 
 	@Test
@@ -281,6 +287,10 @@ public class ProjectVersionTests {
 		String version = "1.0.1.M1";
 
 		then(projectVersion(version).isMilestone()).isTrue();
+
+		String newMilestoneSuffix = "1.0.1-M1";
+
+		then(projectVersion(newMilestoneSuffix).isMilestone()).isTrue();
 	}
 
 	@Test
@@ -295,12 +305,18 @@ public class ProjectVersionTests {
 		String version = "1.0.1.RC3";
 
 		then(projectVersion(version).isRc()).isTrue();
+
+		String newRCSuffix = "1.0.1-RC3";
+
+		then(projectVersion(newRCSuffix).isRc()).isTrue();
 	}
 
 	@Test
 	public void should_return_true_when_checking_ga_version_against_ga() {
 		then(projectVersion("1.0.1.RELEASE").isReleaseOrServiceRelease()).isTrue();
 		then(projectVersion("1.0.1.SR1").isReleaseOrServiceRelease()).isTrue();
+		//then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
+		//then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
 	}
 
 	@Test
@@ -322,6 +338,11 @@ public class ProjectVersionTests {
 	public void should_return_true_when_versions_are_from_same_minor() {
 		String thisVersion = "1.3.1.RC3";
 		String thatVersion = "1.3.2.SR3";
+
+		then(projectVersion(thisVersion).isSameMinor(thatVersion)).isTrue();
+
+		thisVersion = "1.3.1-RC3";
+		thatVersion = "1.3.2-M2";
 
 		then(projectVersion(thisVersion).isSameMinor(thatVersion)).isTrue();
 	}
@@ -575,6 +596,7 @@ public class ProjectVersionTests {
 		then(projectVersion("1.0.0.BUILD-SNAPSHOT").unacceptableVersionPatterns())
 				.isEmpty();
 		then(projectVersion("1.0.0.SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
+		then(projectVersion("1.0.0-SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
 	}
 
 	@Test
@@ -589,15 +611,15 @@ public class ProjectVersionTests {
 		then(rcPatterns).isNotEmpty();
 		then(rcPatterns.get(0).pattern()).contains("SNAPSHOT");
 
-		List<Pattern> milestonePatternsWithASlash = projectVersion("1.0.0-M1")
+		List<Pattern> milestonePatternsWithDash = projectVersion("1.0.0-M1")
 				.unacceptableVersionPatterns();
-		then(milestonePatterns).isNotEmpty();
-		then(milestonePatterns.get(0).pattern()).contains("SNAPSHOT");
+		then(milestonePatternsWithDash).isNotEmpty();
+		then(milestonePatternsWithDash.get(0).pattern()).contains("SNAPSHOT");
 
-		List<Pattern> rcPatternsWithASlash = projectVersion("1.0.0-RC1")
+		List<Pattern> rcPatternsWithDash = projectVersion("1.0.0-RC1")
 				.unacceptableVersionPatterns();
-		then(rcPatterns).isNotEmpty();
-		then(rcPatterns.get(0).pattern()).contains("SNAPSHOT");
+		then(rcPatternsWithDash).isNotEmpty();
+		then(rcPatternsWithDash.get(0).pattern()).contains("SNAPSHOT");
 	}
 
 	@Test
@@ -616,9 +638,9 @@ public class ProjectVersionTests {
 				.unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatterns);
 
-		List<Pattern> srPatternsWithASlash = projectVersion("1.0.0-SR1")
+		List<Pattern> srPatternsWithDash = projectVersion("1.0.0-SR1")
 				.unacceptableVersionPatterns();
-		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatterns);
+		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatternsWithDash);
 
 		List<Pattern> unknownTypeOfVersion = projectVersion("1.0.0.SOMETHING")
 				.unacceptableVersionPatterns();
