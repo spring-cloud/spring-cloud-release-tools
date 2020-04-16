@@ -107,6 +107,7 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_true_for_a_valid_version() {
+		then(projectVersion("2020.0.0-SNAPSHOT").isValid()).isTrue();
 		then(projectVersion("2020.0.0-M1").isValid()).isTrue();
 		then(projectVersion("2020.0.0-RC2").isValid()).isTrue();
 		// then(projectVersion("2020.0.0").isValid()).isTrue();
@@ -227,6 +228,9 @@ public class ProjectVersionTests {
 		String version = "1.0.1.BUILD-SNAPSHOT";
 
 		then(projectVersion(version).isSnapshot()).isTrue();
+
+		String newSnapshotSuffixversion = "1.0.1-SNAPSHOT";
+		then(projectVersion(newSnapshotSuffixversion).isSnapshot()).isTrue();
 	}
 
 	@Test
@@ -255,6 +259,10 @@ public class ProjectVersionTests {
 		String version = "1.0.1.RELEASE";
 
 		then(projectVersion(version).isRelease()).isTrue();
+
+		String newReleaseSuffixVersion = "2020.0.0";
+
+		// then(projectVersion(newReleaseSuffixVersion).isRelease()).isTrue();
 	}
 
 	@Test
@@ -262,6 +270,10 @@ public class ProjectVersionTests {
 		String version = "1.0.1.SR1";
 
 		then(projectVersion(version).isServiceRelease()).isTrue();
+
+		String newServiceReleaseVersion = "2020.0.1";
+
+		// then(projectVersion(newServiceReleaseVersion).isRelease()).isTrue();
 	}
 
 	@Test
