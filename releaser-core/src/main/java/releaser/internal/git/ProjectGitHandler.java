@@ -152,6 +152,18 @@ public class ProjectGitHandler implements Closeable {
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully cloned the project to [{}]", clonedProject);
 		}
+		String releaseTrainBranch = this.properties.getGit().getReleaseTrainBranch();
+		if (!StringUtils.isEmpty(releaseTrainBranch)) {
+			if (log.isDebugEnabled()) {
+				log.debug("Checking out configured release train branch {}",
+						releaseTrainBranch);
+			}
+			if (gitRepo(clonedProject).hasBranch(releaseTrainBranch)) {
+				log.info("Branch [{}] exists. Will check it out", releaseTrainBranch);
+				checkout(clonedProject, releaseTrainBranch);
+			}
+			return clonedProject;
+		}
 		String version = this.properties.getFixedVersions().get(projectName);
 		if (StringUtils.isEmpty(version)) {
 			throw new IllegalStateException(

@@ -152,7 +152,7 @@ public class ProjectVersionTests {
 		then(projectVersion("2.0.1.RC1").major()).isEqualTo("2");
 		then(projectVersion("Finchley.SR1").major()).isEqualTo("Finchley");
 		then(projectVersion("2020.0.0.M1").major()).isEqualTo("2020");
-		//then(projectVersion("2020.0.0").major()).isEqualTo("2020");
+		// then(projectVersion("2020.0.0").major()).isEqualTo("2020");
 	}
 
 	@Test
@@ -315,8 +315,8 @@ public class ProjectVersionTests {
 	public void should_return_true_when_checking_ga_version_against_ga() {
 		then(projectVersion("1.0.1.RELEASE").isReleaseOrServiceRelease()).isTrue();
 		then(projectVersion("1.0.1.SR1").isReleaseOrServiceRelease()).isTrue();
-		//then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
-		//then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
+		// then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
+		// then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
 	}
 
 	@Test

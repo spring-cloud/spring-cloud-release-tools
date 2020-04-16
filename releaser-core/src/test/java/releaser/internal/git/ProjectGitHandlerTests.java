@@ -185,6 +185,19 @@ public class ProjectGitHandlerTests {
 	}
 
 	@Test
+	public void should_check_out_a_branch_if_it_exists_when_cloning_from_org_and_its_a_release_train_version_with_release_train_branch_set() {
+		this.properties.getGit().setReleaseTrainBranch("2020.0.x");
+		this.properties.getFixedVersions().put("spring-cloud-release", "2020.0.0-M1");
+		given(this.gitRepo.hasBranch(anyString())).willReturn(false);
+		given(this.gitRepo.hasBranch("2020.0.x")).willReturn(true);
+
+		this.updater.cloneProjectFromOrg("spring-cloud-release");
+
+		then(this.gitRepo).should().checkout("2020.0.x");
+		this.properties.getGit().setReleaseTrainBranch(null);
+	}
+
+	@Test
 	public void should_not_check_out_a_branch_if_it_does_not_exist_when_cloning_and_guessing_branch() {
 		given(this.gitRepo.hasBranch(anyString())).willReturn(true);
 		given(this.gitRepo.hasBranch("2.3.x")).willReturn(false);

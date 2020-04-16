@@ -479,12 +479,18 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Branch to check out for the release train project.
 		 */
+		// TODO: seems to only be for gh-docs? we guess when we could use this?
 		private String springProjectBranch;
 
 		/**
 		 * Branch to check out for the test samples.
 		 */
 		private String testSamplesBranch;
+
+		/**
+		 * Branch to check out for the release train.
+		 */
+		private String releaseTrainBranch;
 
 		/**
 		 * Branch to check out for the release train docs.
@@ -736,6 +742,14 @@ public class ReleaserProperties implements Serializable {
 			this.updateSpringProject = updateSpringProject;
 		}
 
+		public String getReleaseTrainBranch() {
+			return this.releaseTrainBranch;
+		}
+
+		public void setReleaseTrainBranch(String releaseTrainBranch) {
+			this.releaseTrainBranch = releaseTrainBranch;
+		}
+
 		public String getReleaseTrainDocsUrl() {
 			return this.releaseTrainDocsUrl;
 		}
@@ -813,6 +827,7 @@ public class ReleaserProperties implements Serializable {
 			return "Git{" + "releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\''
 					+ ", documentationUrl='" + this.documentationUrl + '\''
 					+ ", documentationBranch='" + this.documentationBranch + '\''
+					+ ", releaseTrainBranch='" + this.releaseTrainBranch + '\''
 					+ ", releaseTrainWikiUrl='" + this.releaseTrainWikiUrl + '\''
 					+ ", updateDocumentationRepo=" + this.updateDocumentationRepo
 					+ ", springProjectUrl=" + this.springProjectUrl
