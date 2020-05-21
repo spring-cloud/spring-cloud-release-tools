@@ -120,6 +120,13 @@ public class ProjectGitHandlerTests {
 	}
 
 	@Test
+	public void should_retrieve_version_from_branch_for_calver() {
+		String branch = this.updater.branchFromVersion("2020.0.0-M1");
+
+		BDDAssertions.then(branch).isEqualTo("2020.0.x");
+	}
+
+	@Test
 	public void should_throw_exception_when_no_fixed_version_passed_for_the_project() {
 		BDDAssertions
 				.thenThrownBy(

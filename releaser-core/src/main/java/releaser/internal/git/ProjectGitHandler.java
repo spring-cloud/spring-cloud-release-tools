@@ -279,22 +279,25 @@ public class ProjectGitHandler implements Closeable {
 	}
 
 	// let's go with convention... If fixed version contains e.g.
-	// 2.3.4.RELEASE of Sleuth, we will first check if `2.0.x` branch
+	// 2.3.4.RELEASE of Sleuth, we will first check if `2.3.x` branch
 	// exists. If not, then we will assume that `master` contains it
-	private String branchFromVersion(String version) {
+	String branchFromVersion(String version) {
 		// 2.3.4.RELEASE -> 2.3.4
 		// 2.3.4-RELEASE -> 2.3.4
 		// Camden.RELEASE -> Camden
 		// Camden-SR -> Camden
+		// 2020.0.0-M1 -> 2020.0.x
 		int indexOfDot = version.lastIndexOf(".");
 		int indexOfDash = version.indexOf("-");
 		int indexToPick = indexOfDot > 0 ? indexOfDot : indexOfDash;
 		String versionTillPatch = version.substring(0, indexToPick);
 		// 2.3.4 -> [2,3,4]
 		// Camden -> [Camden]
+		// 2020.0.0-M1 -> [2020, 0]
 		String[] splitVersion = versionTillPatch.split("\\.");
-		if (splitVersion.length == 3) {
+		if (splitVersion.length > 1) {
 			// [2,3,4] -> 2.3.x
+			// [2020, 0] -> 2020.0.x
 			return splitVersion[0] + "." + splitVersion[1] + ".x";
 		}
 		else if (splitVersion.length == 1) {
