@@ -142,8 +142,7 @@ class ReleaseTrainContentsUpdater {
 	private boolean isThisReleaseTrainVersionNewer(ProjectVersion releaseTrain,
 			String releaseVersionFromCurrentFile) {
 		if (StringUtils.hasText(releaseVersionFromCurrentFile)) {
-			return releaseTrain
-					.compareToReleaseTrainName(releaseVersionFromCurrentFile) > 0;
+			return releaseTrain.compareToReleaseTrain(releaseVersionFromCurrentFile) > 0;
 		}
 		return true;
 	}
@@ -229,9 +228,8 @@ class ReleaseTrainContentsParser {
 					// We want to find only headers like # Finchley.RELEASE and not any
 					// custom headers
 					.filter(s -> s.trim().startsWith("#") && s.contains("."))
-					.map(s -> s.substring(1).trim())
-					.filter(s -> new ProjectVersion("foo", s).isValid()).findFirst()
-					.orElse("");
+					.map(s -> s.substring(1).trim()).filter(ProjectVersion::isValid)
+					.findFirst().orElse("");
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);

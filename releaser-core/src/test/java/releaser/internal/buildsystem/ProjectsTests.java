@@ -166,12 +166,12 @@ public class ProjectsTests {
 		then(bumped.forName("spring-boot-dependencies").version)
 				.isEqualTo("2.0.0.RELEASE");
 		then(bumped.forName("spring-boot-starter").version).isEqualTo("2.0.0.RELEASE");
-		then(bumped.forName("foo").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(bumped.forName("bar").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(bumped.forName("baz").version).isEqualTo("1.0.2.BUILD-SNAPSHOT");
-		then(bumped.forName("foo2").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(bumped.forName("foo3").version).isEqualTo("Finchley.BUILD-SNAPSHOT");
-		then(bumped.forName("foo4").version).isEqualTo("Finchley.BUILD-SNAPSHOT");
+		then(bumped.forName("foo").version).isEqualTo("1.0.1.SNAPSHOT");
+		then(bumped.forName("bar").version).isEqualTo("1.0.1.SNAPSHOT");
+		then(bumped.forName("baz").version).isEqualTo("1.0.2.SNAPSHOT");
+		then(bumped.forName("foo2").version).isEqualTo("1.0.1.SNAPSHOT");
+		then(bumped.forName("foo3").version).isEqualTo("Finchley.SNAPSHOT");
+		then(bumped.forName("foo4").version).isEqualTo("Finchley.SNAPSHOT");
 	}
 
 	@Test
