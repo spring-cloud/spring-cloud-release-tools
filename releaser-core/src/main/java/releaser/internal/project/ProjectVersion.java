@@ -611,6 +611,8 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		private static final String SNAPSHOT_SUFFIX = "SNAPSHOT";
 
+		private static final String LEGACY_SNAPSHOT_SUFFIX = "BUILD-SNAPSHOT";
+
 		final String major;
 
 		final String minor;
@@ -734,7 +736,14 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		}
 
 		private SplitVersion withSnapshot() {
-			return new SplitVersion(major, minor, patch, delimiter, SNAPSHOT_SUFFIX);
+			return new SplitVersion(major, minor, patch, delimiter, suffix());
+		}
+
+		private String suffix() {
+			if (suffix.endsWith(LEGACY_SNAPSHOT_SUFFIX)) {
+				return LEGACY_SNAPSHOT_SUFFIX;
+			}
+			return SNAPSHOT_SUFFIX;
 		}
 
 	}

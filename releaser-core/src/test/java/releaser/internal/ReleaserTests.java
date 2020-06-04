@@ -152,8 +152,8 @@ public class ReleaserTests {
 				.contains("Project was successfully updated")
 				.contains("Successfully reverted the commit and bumped snapshot versions")
 				.contains("spring-boot-starter=>3.0.0.RELEASE")
-				.contains("spring-cloud-build=>2.0.1.BUILD-SNAPSHOT")
-				.contains("changed=>1.0.1.BUILD-SNAPSHOT");
+				.contains("spring-cloud-build=>2.0.1.SNAPSHOT")
+				.contains("changed=>1.0.1.SNAPSHOT");
 	}
 
 	@Test
