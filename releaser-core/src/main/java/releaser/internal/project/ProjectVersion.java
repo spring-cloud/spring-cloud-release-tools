@@ -88,6 +88,15 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		this.releaseType = toReleaseType();
 	}
 
+	// for version comparison
+	ProjectVersion(String version) {
+		this.projectName = "";
+		this.version = version;
+		this.groupId = "";
+		this.artifactId = "";
+		this.releaseType = toReleaseType();
+	}
+
 	public ProjectVersion(File project) {
 		File buildGradle = new File(project, "build.gradle");
 		if (buildGradle.exists()) {
@@ -169,38 +178,46 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	private SplitVersion assertVersion() {
-		if (this.version == null) {
+		return assertVersion(this.version);
+	}
+
+	private SplitVersion assertVersion(String version) {
+		if (version == null || StringUtils.isEmpty(version)) {
 			throw new IllegalStateException("Version can't be null!");
 		}
-		SplitVersion splitByHyphen = tryHyphenSeparatedVersion();
+		else if (version.endsWith(".") || version.endsWith("-")) {
+			throw new IllegalStateException("Version can't end with a delimiter!");
+		}
+		SplitVersion splitByHyphen = tryHyphenSeparatedVersion(version);
 		if (splitByHyphen != null) {
 			return splitByHyphen;
 		}
-		return dotSeparatedReleaseTrainsAndVersions();
+		return dotSeparatedReleaseTrainsAndVersions(version);
 	}
 
-	private SplitVersion tryHyphenSeparatedVersion() {
+	private SplitVersion tryHyphenSeparatedVersion(String version) {
 		// Check for hyphen separated BOMs versioning
 		// Dysprosium-BUILD-SNAPSHOT or Dysprosium-RELEASE
 		// 1.0.0-BUILD-SNAPSHOT or 1.0.0-RELEASE
-		String[] splitByHyphen = this.version.split("\\-");
+		// 1.0.0-SNAPSHOT or 1.0.0-RELEASE
+		String[] splitByHyphen = version.split("\\-");
 		int splitByHyphens = splitByHyphen.length;
 		int numberOfHyphens = splitByHyphens - 1;
-		int indexOfFirstHyphen = this.version.indexOf("-");
-		boolean buildSnapshot = this.version.endsWith("BUILD-SNAPSHOT");
+		int indexOfFirstHyphen = version.indexOf("-");
+		boolean buildSnapshot = version.endsWith("BUILD-SNAPSHOT");
 		if (numberOfHyphens == 1 && !buildSnapshot
 				|| (numberOfHyphens > 1 && buildSnapshot)) {
 			// Dysprosium or 1.0.0
-			String versionName = this.version.substring(0, indexOfFirstHyphen);
+			String versionName = version.substring(0, indexOfFirstHyphen);
 			boolean hasDots = versionName.contains(".");
 			// BUILD-SNAPSHOT
-			String versionType = this.version.substring(indexOfFirstHyphen + 1);
+			String versionType = version.substring(indexOfFirstHyphen + 1);
 			// Dysprosium-BUILD-SNAPSHOT
-			if (splitByHyphens > 1 && !hasDots && validVersionType()) {
+			if (splitByHyphens > 1 && !hasDots && validVersionType(version)) {
 				return SplitVersion.hyphen(versionName, versionType);
 			}
 			// Dysprosium-RELEASE
-			else if (splitByHyphens == 1 && !hasDots && validVersionType()) {
+			else if (splitByHyphens == 1 && !hasDots && validVersionType(version)) {
 				return SplitVersion.hyphen(splitByHyphen[0], splitByHyphen[1]);
 			}
 			// 1.0.0-RELEASE or 1.0.0-BUILD-SNAPSHOT
@@ -210,14 +227,14 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			}
 			else {
 				throw new UnsupportedOperationException(
-						"Unknown version [" + this.version + "]");
+						"Unknown version [" + version + "]");
 			}
 		}
 		return null;
 	}
 
-	private boolean validVersionType() {
-		return VALID_PATTERNS.stream().anyMatch(p -> p.matcher(this.version).matches());
+	private boolean validVersionType(String version) {
+		return VALID_PATTERNS.stream().anyMatch(p -> p.matcher(version).matches());
 	}
 
 	private String[] combinedArrays(String versionName, String versionType) {
@@ -231,8 +248,12 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	private SplitVersion dotSeparatedReleaseTrainsAndVersions() {
+		return dotSeparatedReleaseTrainsAndVersions(this.version);
+	}
+
+	private SplitVersion dotSeparatedReleaseTrainsAndVersions(String version) {
 		// Hoxton.BUILD-SNAPSHOT or 1.0.0.BUILD-SNAPSHOT
-		String[] splitVersion = this.version.split("\\.");
+		String[] splitVersion = version.split("\\.");
 		return SplitVersion.dot(splitVersion);
 	}
 
@@ -244,13 +265,22 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	public String postReleaseSnapshotVersion() {
 		SplitVersion splitVersion = assertVersion();
 		if (isReleaseOrServiceRelease()) {
-			return bumpedVersion(splitVersion).withBuildSnapshot().print();
+			return bumpedVersion(splitVersion).withSnapshot().print();
 		}
-		return splitVersion.withBuildSnapshot().print();
+		return splitVersion.withSnapshot().print();
 	}
 
 	public String groupId() {
 		return this.groupId;
+	}
+
+	public static boolean isValid(String version) {
+		try {
+			return new ProjectVersion(version).isValid();
+		}
+		catch (IllegalStateException e) {
+			return false;
+		}
 	}
 
 	public boolean isValid() {
@@ -391,6 +421,11 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		return splitVersion.isReleaseTrain();
 	}
 
+	public boolean isOldReleaseTrain() {
+		SplitVersion splitVersion = assertVersion();
+		return splitVersion.isOldReleaseTrain();
+	}
+
 	public boolean isReleaseOrServiceRelease() {
 		return isRelease() || isServiceRelease();
 	}
@@ -411,6 +446,31 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		}
 		else if (isServiceRelease()) {
 			return ReleaseType.SR;
+		}
+		else if (isSnapshot()) {
+			return ReleaseType.SNAPSHOT;
+		}
+		return releaseTypeForReleaseTrain();
+	}
+
+	/*
+	 * 2020.0.0-SNAPSHOT 2020.0.0-M1 2020.0.0-M4 2020.0.0-RC1 (those are done already)
+	 * 2020.0.0 -> this is RELEASE (no RELEASE suffix) 2020.0.1 -> this is SR1 (no SR1
+	 * suffix)
+	 */
+	private ReleaseType releaseTypeForReleaseTrain() {
+		try {
+			SplitVersion splitVersion = assertVersion();
+			if (StringUtils.isEmpty(splitVersion.suffix)
+					&& StringUtils.hasText(splitVersion.patch)) {
+				if ("0".equals(splitVersion.patch)) {
+					return ReleaseType.RELEASE;
+				}
+				return ReleaseType.SR;
+			}
+		}
+		catch (IllegalStateException ex) {
+			return ReleaseType.SNAPSHOT;
 		}
 		return ReleaseType.SNAPSHOT;
 	}
@@ -469,9 +529,16 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 	public boolean isSameReleaseTrainName(String version) {
 		assertVersionSet();
-		String[] splitThis = this.version.split("\\.");
-		String[] splitThat = version.split("\\.");
-		return splitThis[0].compareToIgnoreCase(splitThat[0]) == 0;
+		SplitVersion thisVersion = assertVersion();
+		SplitVersion thatVersion = assertVersion(version);
+		if (thisVersion.isOldReleaseTrain() && thatVersion.isOldReleaseTrain()) {
+			return thisVersion.major.compareToIgnoreCase(thatVersion.major) == 0;
+		}
+		else if (thisVersion.isOldReleaseTrain()) {
+			return false;
+		}
+		return thisVersion.major.equals(thatVersion.major)
+				&& thisVersion.minor.equals(thatVersion.minor);
 	}
 
 	private void assertVersionSet() {
@@ -480,20 +547,9 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		}
 	}
 
-	public int compareToReleaseTrainName(String version) {
-		assertVersionSet();
-		String[] split = version.split("\\.");
-		String thatName = split[0];
-		String thatValue = split.length > 1 ? split[1] : "";
-		String[] thisSplit = this.version.split("\\.");
-		String thisName = thisSplit[0];
-		String thisValue = thisSplit.length > 1 ? thisSplit[1] : "";
-		int nameComparison = thisName.compareTo(thatName);
-		if (nameComparison != 0) {
-			return nameComparison;
-		}
-		return new TrainVersionNumber(thisValue)
-				.compareTo(new TrainVersionNumber(thatValue));
+	public int compareToReleaseTrain(String version) {
+		return new TrainVersionNumber(this)
+				.compareTo(new TrainVersionNumber(new ProjectVersion(version)));
 	}
 
 	/**
@@ -547,13 +603,15 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		return this.version.compareTo(o.version);
 	}
 
-	private static final class SplitVersion {
+	static final class SplitVersion {
 
 		private static final String DOT = ".";
 
 		private static final String HYPHEN = "-";
 
-		private static final String BUILD_SNAPSHOT_SUFFIX = "BUILD-SNAPSHOT";
+		private static final String SNAPSHOT_SUFFIX = "SNAPSHOT";
+
+		private static final String LEGACY_SNAPSHOT_SUFFIX = "BUILD-SNAPSHOT";
 
 		final String major;
 
@@ -609,10 +667,13 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		}
 
 		private static SplitVersion version(String[] args, String delimiter) {
+			// Hoxton.SR4
 			if (args.length == 2) {
 				return new SplitVersion(args[0], "", "", delimiter, args[1]);
 			}
-			else if (args.length == 3) {
+			// 1.0.RELEASE
+			// but not 1.0.3
+			else if (args.length == 3 && notNumeric(args[2])) {
 				return new SplitVersion(args[0], args[1], "", delimiter, args[2]);
 			}
 			return new SplitVersion(args, delimiter);
@@ -626,17 +687,20 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		}
 
 		private boolean isInvalid() {
-			return wrongReleaseTrainVersion() || wrongLibraryVersion() || wrongDelimiter()
-					|| noSuffix();
+			return wrongDelimiter() || tooFewElements();
 		}
 
-		private boolean noSuffix() {
-			return StringUtils.isEmpty(suffix);
-		}
-
-		// Hoxton.BUILD-SNAPSHOT or Hoxton-BUILD-SNAPSHOT
+		// Hoxton.BUILD-SNAPSHOT or Hoxton-BUILD-SNAPSHOT or 2020.x.x
 		private boolean isReleaseTrain() {
-			return !isNumeric(this.major);
+			return isOldReleaseTrain() || calverReleaseTrain();
+		}
+
+		private boolean calverReleaseTrain() {
+			return Integer.parseInt(this.major) >= 2020;
+		}
+
+		private boolean isOldReleaseTrain() {
+			return notNumeric(this.major);
 		}
 
 		private SplitVersion fullVersionWithIncrementedPatch() {
@@ -645,85 +709,132 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 					delimiter, suffix);
 		}
 
-		private String gav() {
-			// Finchley
-			if (StringUtils.isEmpty(minor)) {
-				return String.format("%s", major);
-			}
-			// 1.0.1
-			return String.format("%s.%s.%s", major, minor, patch);
-		}
-
-		private String print() {
+		String print() {
 			// Finchley.SR2
 			if (StringUtils.isEmpty(minor)) {
-				return String.format("%s%s%s", major, delimiter, suffix);
+				return StringUtils.isEmpty(suffix) ? major
+						: String.format("%s%s%s", major, delimiter, suffix);
+			}
+			else if (StringUtils.isEmpty(suffix)) {
+				return String.format("%s.%s.%s", major, minor, patch);
 			}
 			return String.format("%s.%s.%s%s%s", major, minor, patch, delimiter, suffix);
 		}
 
-		private boolean isNumeric(String string) {
-			return string.matches("[0-9]+");
+		private static boolean notNumeric(String string) {
+			return !string.matches("[0-9]+");
 		}
 
 		private boolean wrongDelimiter() {
 			return !(DOT.equals(this.delimiter) || HYPHEN.equals(this.delimiter));
 		}
 
-		private boolean wrongLibraryVersion() {
-			// GOOD:
-			// 1.2.3.RELEASE, 1.2.3-RELEASE, Hoxton.BUILD-SNAPSHOT, Hoxton-RELEASE
-			// must have
-			// either major and suffix (release train)
-			// major, minor, patch and suffix
-			return isNumeric(major) && (StringUtils.isEmpty(minor)
-					|| StringUtils.isEmpty(patch) || StringUtils.isEmpty(suffix)
-					|| StringUtils.isEmpty(delimiter));
+		private boolean tooFewElements() {
+			// 1 is wrong but Finchley-SR3 is ok
+			return StringUtils.isEmpty(minor) && StringUtils.isEmpty(patch)
+					&& StringUtils.isEmpty(suffix);
 		}
 
-		private boolean wrongReleaseTrainVersion() {
-			// BAD: 1.EXAMPLE, GOOD: Hoxton.RELEASE
-			return isNumeric(major) && StringUtils.isEmpty(suffix);
+		private SplitVersion withSnapshot() {
+			return new SplitVersion(major, minor, patch, delimiter, suffix());
 		}
 
-		private SplitVersion withBuildSnapshot() {
-			return new SplitVersion(major, minor, patch, delimiter,
-					BUILD_SNAPSHOT_SUFFIX);
+		private String suffix() {
+			if (suffix.endsWith(LEGACY_SNAPSHOT_SUFFIX)) {
+				return LEGACY_SNAPSHOT_SUFFIX;
+			}
+			return SNAPSHOT_SUFFIX;
 		}
 
 	}
 
-}
+	private static class TrainVersionNumber implements Comparable<TrainVersionNumber> {
 
-class TrainVersionNumber implements Comparable<TrainVersionNumber> {
+		private final ProjectVersion version;
 
-	private final String version;
-
-	TrainVersionNumber(String version) {
-		this.version = version;
-	}
-
-	@Override
-	public int compareTo(TrainVersionNumber o) {
-		String thisLower = this.version.toLowerCase();
-		char thisFirst = thisLower.isEmpty() ? ' ' : thisLower.charAt(0);
-		String thatLower = o.version.toLowerCase();
-		char thatFirst = thatLower.isEmpty() ? ' ' : thatLower.charAt(0);
-		// B < M < RC < R < S
-		int charComparison = Character.compare(thisFirst, thatFirst);
-		if (charComparison != 0) {
-			return charComparison;
+		TrainVersionNumber(ProjectVersion version) {
+			this.version = version;
 		}
-		String thisVersion = this.version.replaceAll("\\D+", "");
-		boolean thisVersionEmpty = StringUtils.isEmpty(thisVersion);
-		String thatVersion = o.version.replaceAll("\\D+", "");
-		boolean thatVersionEmpty = StringUtils.isEmpty(thatVersion);
-		if (thisVersionEmpty || thatVersionEmpty) {
+
+		@Override
+		public int compareTo(TrainVersionNumber o) {
+			ProjectVersion thisVersion = this.version;
+			ProjectVersion thatVersion = o.version;
+			// 2020.0.0 vs ""
+			if (!thatVersion.isValid() && thisVersion.isValid()) {
+				return 1;
+				// "" vs 2020.0.0
+			}
+			else if (!thisVersion.isValid() && thatVersion.isValid()) {
+				return -1;
+			}
+			boolean thisOldTrain = isOldReleaseTrain(thisVersion);
+			boolean thatOldTrain = isOldReleaseTrain(thatVersion);
+			if (thisOldTrain && thatOldTrain) {
+				return letterBasedReleaseTrainComparison(o);
+			}
+			else if (thisOldTrain) {
+				return compareWithOldTrain(thisVersion, thatVersion);
+			}
+			else if (thatOldTrain) {
+				return -1 * compareWithOldTrain(thisVersion, thatVersion);
+			}
+			// new train comparison
 			return thisVersion.compareTo(thatVersion);
 		}
-		Integer thisNumber = Integer.valueOf(thisVersion);
-		Integer thatNumber = Integer.valueOf(thatVersion);
-		return thisNumber.compareTo(thatNumber);
+
+		private boolean isOldReleaseTrain(ProjectVersion projectVersion) {
+			try {
+				return projectVersion.isOldReleaseTrain();
+			}
+			catch (IllegalStateException ex) {
+				return false;
+			}
+		}
+
+		private int compareWithOldTrain(ProjectVersion oldTrain,
+				ProjectVersion thatVersion) {
+			// Hoxton.SR5 > 2020.0.0-M5
+			if (oldTrain.isReleaseOrServiceRelease()
+					&& !thatVersion.isReleaseOrServiceRelease()) {
+				return 1;
+			}
+			// Hoxton.SR5 < 2020.0.0-RELEASE
+			// Hoxton.M5 < 2020.0.0-M4
+			return -1;
+		}
+
+		private int letterBasedReleaseTrainComparison(TrainVersionNumber o) {
+			String thatName = o.version.major();
+			String thisName = this.version.major();
+			int nameComparison = thisName.compareTo(thatName);
+			if (nameComparison != 0) {
+				return nameComparison;
+			}
+			String thisSuffix = this.version.assertVersion().suffix;
+			String thisValue = thisSuffix;
+			String thisLower = thisValue.toLowerCase();
+			char thisFirst = thisLower.isEmpty() ? ' ' : thisLower.charAt(0);
+			String thatSuffix = o.version.assertVersion().suffix;
+			String thatLower = thatSuffix.toLowerCase();
+			char thatFirst = thatLower.isEmpty() ? ' ' : thatLower.charAt(0);
+			// B < M < RC < R < S
+			int charComparison = Character.compare(thisFirst, thatFirst);
+			if (charComparison != 0) {
+				return charComparison;
+			}
+			String thisVersion = this.version.toString().replaceAll("\\D+", "");
+			boolean thisVersionEmpty = StringUtils.isEmpty(thisVersion);
+			String thatVersion = o.version.toString().replaceAll("\\D+", "");
+			boolean thatVersionEmpty = StringUtils.isEmpty(thatVersion);
+			if (thisVersionEmpty || thatVersionEmpty) {
+				return thisVersion.compareTo(thatVersion);
+			}
+			Integer thisNumber = Integer.valueOf(thisVersion);
+			Integer thatNumber = Integer.valueOf(thatVersion);
+			return thisNumber.compareTo(thatNumber);
+		}
+
 	}
 
 }

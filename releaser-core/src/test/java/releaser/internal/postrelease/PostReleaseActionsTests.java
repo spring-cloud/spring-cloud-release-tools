@@ -285,7 +285,7 @@ public class PostReleaseActionsTests {
 		Git git = GitTestUtils.openGitProject(clonedFile);
 		BDDAssertions
 				.then(pomWithCloud.getProperties().getProperty("spring-cloud.version"))
-				.isEqualTo("Finchley.BUILD-SNAPSHOT");
+				.isEqualTo("Finchley.SNAPSHOT");
 		BDDAssertions.then(pomWithCloud.getParent().getVersion())
 				.isEqualTo("2.0.4.RELEASE");
 		Iterator<RevCommit> iterator = git.log().call().iterator();

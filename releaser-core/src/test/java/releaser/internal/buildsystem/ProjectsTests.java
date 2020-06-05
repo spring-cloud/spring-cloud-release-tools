@@ -78,9 +78,9 @@ public class ProjectsTests {
 	@Test
 	public void should_create_project_with_bumped_original_version_and_original_parent_versions() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
-		ProjectVersion build = new ProjectVersion("spring-cloud-build", "1.0.0.RELEASE");
+		ProjectVersion build = new ProjectVersion("spring-cloud-build", "1.0.0-RELEASE");
 		projectVersions.add(build);
-		ProjectVersion boot = new ProjectVersion("spring-boot-starter", "2.0.0.RELEASE");
+		ProjectVersion boot = new ProjectVersion("spring-boot-starter", "2.0.0-RELEASE");
 		projectVersions.add(boot);
 		ProjectVersion bootDeps = new ProjectVersion("spring-boot-dependencies",
 				"2.0.0.RELEASE");
@@ -94,9 +94,9 @@ public class ProjectsTests {
 				projects);
 
 		then(forRollback.forName("spring-cloud-build").version)
-				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
+				.isEqualTo("1.0.1-SNAPSHOT");
 		then(forRollback.forName("spring-boot-starter").version)
-				.isEqualTo("2.0.0.RELEASE");
+				.isEqualTo("2.0.0-RELEASE");
 		then(forRollback.forName("spring-boot-dependencies").version)
 				.isEqualTo("2.0.0.RELEASE");
 		then(forRollback.forName("spring-cloud-starter-foo").version)
@@ -166,12 +166,12 @@ public class ProjectsTests {
 		then(bumped.forName("spring-boot-dependencies").version)
 				.isEqualTo("2.0.0.RELEASE");
 		then(bumped.forName("spring-boot-starter").version).isEqualTo("2.0.0.RELEASE");
-		then(bumped.forName("foo").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(bumped.forName("bar").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(bumped.forName("foo").version).isEqualTo("1.0.1.SNAPSHOT");
+		then(bumped.forName("bar").version).isEqualTo("1.0.1.SNAPSHOT");
 		then(bumped.forName("baz").version).isEqualTo("1.0.2.BUILD-SNAPSHOT");
-		then(bumped.forName("foo2").version).isEqualTo("1.0.1.BUILD-SNAPSHOT");
+		then(bumped.forName("foo2").version).isEqualTo("1.0.1.SNAPSHOT");
 		then(bumped.forName("foo3").version).isEqualTo("Finchley.BUILD-SNAPSHOT");
-		then(bumped.forName("foo4").version).isEqualTo("Finchley.BUILD-SNAPSHOT");
+		then(bumped.forName("foo4").version).isEqualTo("Finchley.SNAPSHOT");
 	}
 
 	@Test

@@ -84,129 +84,129 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_throw_exception_if_version_is_not_long_enough() {
-		String version = "1.0";
+		String version = "1";
 
 		thenThrownBy(() -> projectVersion(version).bumpedVersion())
 				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
-						"Version [1.0] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
+						"Version [1] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
 	}
 
 	@Test
 	public void should_bump_version_by_patch_version() {
-		String version = "1.0.1.BUILD-SNAPSHOT";
+		String version = "1.0.1-SNAPSHOT";
 
-		then(projectVersion(version).bumpedVersion()).isEqualTo("1.0.2.BUILD-SNAPSHOT");
+		then(projectVersion(version).bumpedVersion()).isEqualTo("1.0.2-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_the_previous_version_for_release_train_version() {
-		String version = "Edgware.BUILD-SNAPSHOT";
+		String version = "Edgware-SNAPSHOT";
 
-		then(projectVersion(version).bumpedVersion()).isEqualTo("Edgware.BUILD-SNAPSHOT");
+		then(projectVersion(version).bumpedVersion()).isEqualTo("Edgware-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_true_for_a_valid_version() {
-		then(projectVersion("2020.0.0-SNAPSHOT").isValid()).isTrue();
-		then(projectVersion("2020.0.0-M1").isValid()).isTrue();
-		then(projectVersion("2020.0.0-RC2").isValid()).isTrue();
-		// then(projectVersion("2020.0.0").isValid()).isTrue();
-		then(projectVersion("1.0.1.BUILD-SNAPSHOT").isValid()).isTrue();
-		then(projectVersion("1.0.3.RC1").isValid()).isTrue();
-		then(projectVersion("1.0.4.M1").isValid()).isTrue();
-		then(projectVersion("Finchley.BUILD-SNAPSHOT").isValid()).isTrue();
-		then(projectVersion("Finchley.RELEASE").isValid()).isTrue();
-		then(projectVersion("Finchley.SR1").isValid()).isTrue();
+		then(ProjectVersion.isValid("2020.0.0-SNAPSHOT")).isTrue();
+		then(ProjectVersion.isValid("2020.0.0-M1")).isTrue();
+		then(ProjectVersion.isValid("2020.0.0-RC2")).isTrue();
+		// then(ProjectVersion.isValid("2020.0.0")).isTrue();
+		then(ProjectVersion.isValid("1.0.1-SNAPSHOT")).isTrue();
+		then(ProjectVersion.isValid("1.0.3-RC1")).isTrue();
+		then(ProjectVersion.isValid("1.0.4-M1")).isTrue();
+		then(ProjectVersion.isValid("Finchley-SNAPSHOT")).isTrue();
+		then(ProjectVersion.isValid("Finchley.RELEASE")).isTrue();
+		then(ProjectVersion.isValid("Finchley-SR1")).isTrue();
 	}
 
 	@Test
 	public void should_return_false_for_an_invalid_version() {
-		then(projectVersion("1").isValid()).isFalse();
-		then(projectVersion("1.").isValid()).isFalse();
-		then(projectVersion("1.0.4.").isValid()).isFalse();
-		then(projectVersion("Some random text").isValid()).isFalse();
+		then(ProjectVersion.isValid("1")).isFalse();
+		then(ProjectVersion.isValid("1.")).isFalse();
+		then(ProjectVersion.isValid("1.0.4.")).isFalse();
+		then(ProjectVersion.isValid("Some random text")).isFalse();
 	}
 
 	@Test
 	public void should_throw_exception_if_version_is_not_long_enough_when_bumping_snapshots() {
-		String version = "1.0";
+		String version = "1";
 
 		thenThrownBy(() -> projectVersion(version).postReleaseSnapshotVersion())
 				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
-						"Version [1.0] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
+						"Version [1] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
 	}
 
 	@Test
 	public void should_throw_exception_when_trying_to_get_major_from_invalid_version() {
-		String version = "1.0";
+		String version = "1";
 
 		thenThrownBy(() -> projectVersion(version).major())
 				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
-						"Version [1.0] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
+						"Version [1] is invalid. Should be of format [1.2.3.A] / [1.2.3-A] or [A.B] / [A-B]");
 	}
 
 	@Test
 	public void should_get_major_from_version() {
-		then(projectVersion("2.0.1.BUILD-SNAPSHOT").major()).isEqualTo("2");
-		then(projectVersion("2.0.1.M1").major()).isEqualTo("2");
-		then(projectVersion("2.0.1.RC1").major()).isEqualTo("2");
-		then(projectVersion("Finchley.SR1").major()).isEqualTo("Finchley");
-		then(projectVersion("2020.0.0.M1").major()).isEqualTo("2020");
+		then(projectVersion("2.0.1-SNAPSHOT").major()).isEqualTo("2");
+		then(projectVersion("2.0.1-M1").major()).isEqualTo("2");
+		then(projectVersion("2.0.1-RC1").major()).isEqualTo("2");
+		then(projectVersion("Finchley-SR1").major()).isEqualTo("Finchley");
+		then(projectVersion("2020.0.0-M1").major()).isEqualTo("2020");
 		// then(projectVersion("2020.0.0").major()).isEqualTo("2020");
 	}
 
 	@Test
 	public void should_not_bump_version_by_patch_version_when_non_ga_or_sr() {
-		then(projectVersion("1.0.1.BUILD-SNAPSHOT").postReleaseSnapshotVersion())
-				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(projectVersion("1.0.1.M1").postReleaseSnapshotVersion())
-				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(projectVersion("1.0.1.RC1").postReleaseSnapshotVersion())
-				.isEqualTo("1.0.1.BUILD-SNAPSHOT");
-		then(projectVersion("Finchley.SR1").postReleaseSnapshotVersion())
-				.isEqualTo("Finchley.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1-SNAPSHOT").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.1-SNAPSHOT");
+		then(projectVersion("1.0.1-M1").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.1-SNAPSHOT");
+		then(projectVersion("1.0.1-RC1").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.1-SNAPSHOT");
+		then(projectVersion("Finchley-SR1").postReleaseSnapshotVersion())
+				.isEqualTo("Finchley-SNAPSHOT");
 	}
 
 	@Test
 	public void should_not_bump_version_by_patch_version_when_non_ga_or_sr_with_hyphen() {
-		then(projectVersion("1.0.1-BUILD-SNAPSHOT").postReleaseSnapshotVersion())
-				.isEqualTo("1.0.1-BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1-SNAPSHOT").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.1-SNAPSHOT");
 		then(projectVersion("1.0.1-M1").postReleaseSnapshotVersion())
-				.isEqualTo("1.0.1-BUILD-SNAPSHOT");
+				.isEqualTo("1.0.1-SNAPSHOT");
 		then(projectVersion("1.0.1-RC1").postReleaseSnapshotVersion())
-				.isEqualTo("1.0.1-BUILD-SNAPSHOT");
+				.isEqualTo("1.0.1-SNAPSHOT");
 		then(projectVersion("Finchley-SR1").postReleaseSnapshotVersion())
-				.isEqualTo("Finchley-BUILD-SNAPSHOT");
+				.isEqualTo("Finchley-SNAPSHOT");
 	}
 
 	@Test
 	public void should_bump_version_by_patch_version_when_bumping_snapshots_for_ga() {
-		then(projectVersion("1.0.1.RELEASE").postReleaseSnapshotVersion())
-				.isEqualTo("1.0.2.BUILD-SNAPSHOT");
+		then(projectVersion("1.0.1-RELEASE").postReleaseSnapshotVersion())
+				.isEqualTo("1.0.2-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_the_previous_version_for_release_train_version_when_bumping_snapshots() {
-		String version = "Edgware.BUILD-SNAPSHOT";
+		String version = "Edgware-SNAPSHOT";
 
 		then(projectVersion(version).postReleaseSnapshotVersion())
-				.isEqualTo("Edgware.BUILD-SNAPSHOT");
+				.isEqualTo("Edgware-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_the_previous_version_for_hyphen_release_train_version_when_bumping_snapshots() {
-		String version = "Edgware-BUILD-SNAPSHOT";
+		String version = "Edgware-SNAPSHOT";
 
 		then(projectVersion(version).postReleaseSnapshotVersion())
-				.isEqualTo("Edgware-BUILD-SNAPSHOT");
+				.isEqualTo("Edgware-SNAPSHOT");
 	}
 
 	@Test
 	public void should_bump_version_by_patch_version_when_bumping_releases() {
-		String version = "1.0.1.RELEASE";
+		String version = "1.0.1-RELEASE";
 
 		then(projectVersion(version).postReleaseSnapshotVersion())
-				.isEqualTo("1.0.2.BUILD-SNAPSHOT");
+				.isEqualTo("1.0.2-SNAPSHOT");
 	}
 
 	@Test
@@ -214,20 +214,20 @@ public class ProjectVersionTests {
 		String version = "1.0.1-RELEASE";
 
 		then(projectVersion(version).postReleaseSnapshotVersion())
-				.isEqualTo("1.0.2-BUILD-SNAPSHOT");
+				.isEqualTo("1.0.2-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_the_previous_version_for_release_train_version_when_bumping_releases() {
-		String version = "Edgware.RELEASE";
+		String version = "Edgware-RELEASE";
 
 		then(projectVersion(version).postReleaseSnapshotVersion())
-				.isEqualTo("Edgware.BUILD-SNAPSHOT");
+				.isEqualTo("Edgware-SNAPSHOT");
 	}
 
 	@Test
 	public void should_return_true_for_snapshot_version() {
-		String version = "1.0.1.BUILD-SNAPSHOT";
+		String version = "1.0.1-SNAPSHOT";
 
 		then(projectVersion(version).isSnapshot()).isTrue();
 
@@ -244,14 +244,14 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_false_for_milestone_version() {
-		String version = "1.0.1.M1";
+		String version = "1.0.1-M1";
 
 		then(projectVersion(version).isRelease()).isFalse();
 	}
 
 	@Test
 	public void should_return_false_for_rc_version() {
-		String version = "1.0.1.RC1";
+		String version = "1.0.1-RC1";
 
 		then(projectVersion(version).isRelease()).isFalse();
 
@@ -273,7 +273,7 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_true_for_service_release_versions() {
-		String version = "1.0.1.SR1";
+		String version = "1.0.1-SR1";
 
 		then(projectVersion(version).isServiceRelease()).isTrue();
 
@@ -284,7 +284,7 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_true_when_checking_milestone_version_against_milestone() {
-		String version = "1.0.1.M1";
+		String version = "1.0.1-M1";
 
 		then(projectVersion(version).isMilestone()).isTrue();
 
@@ -295,14 +295,14 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_false_when_checking_milestone_version_against_non_milestone() {
-		String version = "1.0.1.RC1";
+		String version = "1.0.1-RC1";
 
 		then(projectVersion(version).isMilestone()).isFalse();
 	}
 
 	@Test
 	public void should_return_true_when_checking_rc_version_against_rc() {
-		String version = "1.0.1.RC3";
+		String version = "1.0.1-RC3";
 
 		then(projectVersion(version).isRc()).isTrue();
 
@@ -314,30 +314,29 @@ public class ProjectVersionTests {
 	@Test
 	public void should_return_true_when_checking_ga_version_against_ga() {
 		then(projectVersion("1.0.1.RELEASE").isReleaseOrServiceRelease()).isTrue();
-		then(projectVersion("1.0.1.SR1").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("1.0.1-SR1").isReleaseOrServiceRelease()).isTrue();
 		// then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
 		// then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
 	}
 
 	@Test
 	public void should_return_False_when_checking_ga_version_against_non_ga() {
-		then(projectVersion("1.0.1.BUILD-SNAPSHOT").isReleaseOrServiceRelease())
-				.isFalse();
+		then(projectVersion("1.0.1-SNAPSHOT").isReleaseOrServiceRelease()).isFalse();
 		then(projectVersion("1.0.1.M4").isReleaseOrServiceRelease()).isFalse();
-		then(projectVersion("1.0.1.RC4").isReleaseOrServiceRelease()).isFalse();
+		then(projectVersion("1.0.1-RC4").isReleaseOrServiceRelease()).isFalse();
 	}
 
 	@Test
 	public void should_return_false_when_checking_rc_version_against_non_rc() {
-		String version = "1.0.1.M1";
+		String version = "1.0.1-M1";
 
 		then(projectVersion(version).isRc()).isFalse();
 	}
 
 	@Test
 	public void should_return_true_when_versions_are_from_same_minor() {
-		String thisVersion = "1.3.1.RC3";
-		String thatVersion = "1.3.2.SR3";
+		String thisVersion = "1.3.1-RC3";
+		String thatVersion = "1.3.2-SR3";
 
 		then(projectVersion(thisVersion).isSameMinor(thatVersion)).isTrue();
 
@@ -349,32 +348,32 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_false_when_versions_of_different_sizes() {
-		String thisVersion = "1.3.1.RC3";
-		String thatVersion = "1.3.RC3";
+		String thisVersion = "1.3.1-RC3";
+		String thatVersion = "1.3-RC3";
 
 		then(projectVersion(thisVersion).isSameMinor(thatVersion)).isFalse();
 	}
 
 	@Test
 	public void should_return_false_when_versions_not_of_same_minor() {
-		String thisVersion = "1.3.1.RC3";
-		String thatVersion = "1.4.2.RC3";
+		String thisVersion = "1.3.1-RC3";
+		String thatVersion = "1.4.2-RC3";
 
 		then(projectVersion(thisVersion).isSameMinor(thatVersion)).isFalse();
 	}
 
 	@Test
 	public void should_return_equal_when_versions_are_the_same() {
-		String thisVersion = "1.3.1.SR3";
-		String thatVersion = "1.3.1.SR3";
+		String thisVersion = "1.3.1-SR3";
+		String thatVersion = "1.3.1-SR3";
 
 		then(projectVersion(thisVersion).compareTo(projectVersion(thatVersion))).isZero();
 	}
 
 	@Test
 	public void should_return_greater_when_versions_this_version_is_greater_than_the_other() {
-		String thisVersion = "1.3.2.SR3";
-		String thatVersion = "1.3.1.SR3";
+		String thisVersion = "1.3.2-SR3";
+		String thatVersion = "1.3.1-SR3";
 
 		then(projectVersion(thisVersion).compareTo(projectVersion(thatVersion)))
 				.isPositive();
@@ -382,8 +381,8 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_lower_when_versions_this_version_is_lower_than_the_other() {
-		String thisVersion = "1.3.0.RC3";
-		String thatVersion = "1.3.1.RC3";
+		String thisVersion = "1.3.0-RC3";
+		String thatVersion = "1.3.1-RC3";
 
 		then(projectVersion(thisVersion).compareTo(projectVersion(thatVersion)))
 				.isNegative();
@@ -393,220 +392,299 @@ public class ProjectVersionTests {
 	public void should_compare_builds_in_terms_of_maturity_for_projects() {
 		String thisVersion = "1.3.2.RELEASE";
 
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("1.3.1.BUILD-SNAPSHOT"))).isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1-SNAPSHOT")))
 				.isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1-M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1-RC1")))
 				.isTrue();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.1.RELEASE")))
 				.isTrue();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3.RELEASE")))
 				.isFalse();
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("1.3.3.BUILD-SNAPSHOT"))).isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3-SNAPSHOT")))
 				.isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3-M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.3.3-RC1")))
 				.isTrue();
 	}
 
 	@Test
 	public void should_compare_builds_in_terms_of_maturity_for_trains() {
-		String thisVersion = "Hoxton.SR1";
+		String thisVersion = "Hoxton-SR1";
 
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("Hoxton.BUILD-SNAPSHOT"))).isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton-SNAPSHOT")))
 				.isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton-M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton-RC1")))
 				.isTrue();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RELEASE")))
 				.isTrue();
 		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("Iexample.BUILD-SNAPSHOT"))).isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.M1")))
+				.isMoreMature(projectVersion("Iexample-SNAPSHOT"))).isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample-M1")))
 				.isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample-RC1")))
 				.isTrue();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RELEASE")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.SR1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample-SR1")))
 				.isFalse();
 
-		thisVersion = "Hoxton.BUILD-SNAPSHOT";
+		thisVersion = "Hoxton-SNAPSHOT";
 
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("Hoxton.BUILD-SNAPSHOT"))).isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton-SNAPSHOT")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton-M1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton-RC1")))
 				.isFalse();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("Hoxton.RELEASE")))
 				.isFalse();
 		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("Iexample.BUILD-SNAPSHOT"))).isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.M1")))
+				.isMoreMature(projectVersion("Iexample-SNAPSHOT"))).isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample-M1")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample-RC1")))
 				.isFalse();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.RELEASE")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample.SR1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("Iexample-SR1")))
 				.isFalse();
 
 		thisVersion = "1.0.1.RELEASE";
 
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("1.0.1.BUILD-SNAPSHOT"))).isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1-SNAPSHOT")))
 				.isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1-M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1-RC1")))
 				.isTrue();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RELEASE")))
 				.isFalse();
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("1.0.2.BUILD-SNAPSHOT"))).isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-SNAPSHOT")))
 				.isTrue();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-M1")))
+				.isTrue();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-RC1")))
 				.isTrue();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RELEASE")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.SR1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-SR1")))
 				.isFalse();
 
-		thisVersion = "1.0.1.BUILD-SNAPSHOT";
+		thisVersion = "1.0.1-SNAPSHOT";
 
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("1.0.1.BUILD-SNAPSHOT"))).isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1-SNAPSHOT")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1-M1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1-RC1")))
 				.isFalse();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.1.RELEASE")))
 				.isFalse();
-		then(projectVersion(thisVersion)
-				.isMoreMature(projectVersion("1.0.2.BUILD-SNAPSHOT"))).isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.M1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-SNAPSHOT")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RC1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-M1")))
+				.isFalse();
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-RC1")))
 				.isFalse();
 		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.RELEASE")))
 				.isFalse();
-		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2.SR1")))
+		then(projectVersion(thisVersion).isMoreMature(projectVersion("1.0.2-SR1")))
 				.isFalse();
 	}
 
 	@Test
 	public void should_return_empty_group_id_when_it_is_missing() {
-		ProjectVersion projectVersion = projectVersion("1.0.0.RC1");
+		ProjectVersion projectVersion = projectVersion("1.0.0-RC1");
 
 		then(projectVersion.groupId()).isEmpty();
 	}
 
 	@Test
 	public void should_return_true_when_release_train_names_are_the_same() {
-		String thisVersion = "Finchley.SR1";
-		String thatVersion = "Finchley.SR2";
+		String thisVersion = "Finchley-SR1";
+		String thatVersion = "Finchley-SR2";
 
 		then(projectVersion(thisVersion).isSameReleaseTrainName(thatVersion)).isTrue();
 	}
 
 	@Test
 	public void should_return_true_when_sr_has_two_digits() {
-		String thisVersion = "Finchley.SR1";
-		String thatVersion = "Finchley.SR10";
+		String thisVersion = "Finchley-SR1";
+		String thatVersion = "Finchley-SR10";
 
-		then(projectVersion(thatVersion).compareToReleaseTrainName(thisVersion))
-				.isPositive();
+		then(projectVersion(thatVersion).compareToReleaseTrain(thisVersion)).isPositive();
 	}
 
 	@Test
 	public void should_return_false_when_release_train_name_are_different() {
-		String thisVersion = "Finchley.SR1";
-		String thatVersion = "Greenwich.SR1";
+		String thisVersion = "Finchley-SR1";
+		String thatVersion = "Greenwich-SR1";
 
 		then(projectVersion(thisVersion).isSameReleaseTrainName(thatVersion)).isFalse();
 	}
 
 	@Test
 	public void should_return_positive_when_release_train_is_greater_than_the_other_one() {
-		String thisVersion = "Finchley.SR2";
-		String thatVersion = "Finchley.SR1";
+		String thisVersion = "Finchley-SR2";
+		String thatVersion = "Finchley-SR1";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
-				.isPositive();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isPositive();
 
-		thisVersion = "Greenwich.SR1";
-		thatVersion = "Finchley.SR2";
+		thisVersion = "Greenwich-SR1";
+		thatVersion = "Finchley-SR2";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
-				.isPositive();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isPositive();
 	}
 
 	@Test
 	public void should_return_0_when_release_train_is_equal_than_the_other_one() {
-		String thisVersion = "Finchley.SR1";
-		String thatVersion = "Finchley.SR1";
+		String thisVersion = "Finchley-SR1";
+		String thatVersion = "Finchley-SR1";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isZero();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isZero();
 	}
 
 	@Test
 	public void should_return_minus_1_when_release_train_is_smaller_than_the_other_one() {
-		String thisVersion = "Finchley.SR1";
-		String thatVersion = "Finchley.SR2";
+		String thisVersion = "Finchley-SR1";
+		String thatVersion = "Finchley-SR2";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
-				.isNegative();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isNegative();
 
-		thisVersion = "Finchley.SR2";
-		thatVersion = "Greenwich.SR1";
+		thisVersion = "Finchley-SR2";
+		thatVersion = "Greenwich-SR1";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
-				.isNegative();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isNegative();
 	}
 
 	@Test
 	public void should_return_minus_1_when_this_train_is_empty() {
 		String thisVersion = "";
-		String thatVersion = "Finchley.SR2";
+		String thatVersion = "Finchley-SR2";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
-				.isNegative();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isNegative();
 
 		thisVersion = "";
 		thatVersion = "";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion)).isZero();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isZero();
 	}
 
 	@Test
 	public void should_return_plus_1_when_that_train_is_empty() {
-		String thisVersion = "Finchley.SR1";
+		String thisVersion = "Finchley-SR1";
 		String thatVersion = "";
 
-		then(projectVersion(thisVersion).compareToReleaseTrainName(thatVersion))
-				.isPositive();
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isPositive();
+	}
+
+	@Test
+	public void should_return_true_when_calver_release_train_names_are_the_same() {
+		String thisVersion = "2020.0.1";
+		String thatVersion = "2020.0.2";
+
+		then(projectVersion(thisVersion).isSameReleaseTrainName(thatVersion)).isTrue();
+	}
+
+	@Test
+	public void should_return_true_when_calver_sr_has_two_digits() {
+		String thisVersion = "2020.0.1";
+		String thatVersion = "2020.0.10";
+
+		then(projectVersion(thatVersion).compareToReleaseTrain(thisVersion)).isPositive();
+	}
+
+	@Test
+	public void should_return_false_when_calver_release_train_name_are_different() {
+		String thisVersion = "2020.0.1";
+		String thatVersion = "2020.1.0";
+
+		then(projectVersion(thisVersion).isSameReleaseTrainName(thatVersion)).isFalse();
+	}
+
+	@Test
+	public void should_return_positive_when_calver_release_train_is_greater_than_the_other_one() {
+		String thisVersion = "2020.0.2";
+		String thatVersion = "2020.0.1";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isPositive();
+
+		thisVersion = "2020.1.1";
+		thatVersion = "2020.0.2";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isPositive();
+	}
+
+	@Test
+	public void should_return_0_when_calver_release_train_is_equal_than_the_other_one() {
+		String thisVersion = "2020.0.1";
+		String thatVersion = "2020.0.1";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isZero();
+	}
+
+	@Test
+	public void should_return_minus_1_when_calver_release_train_is_smaller_than_the_other_one() {
+		String thisVersion = "2020.0.1";
+		String thatVersion = "2020.0.2";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isNegative();
+
+		thisVersion = "2020.0.2";
+		thatVersion = "2020.1.1";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isNegative();
+	}
+
+	@Test
+	public void should_return_minus_1_when_this_calver_train_is_empty() {
+		String thisVersion = "";
+		String thatVersion = "2020.1.1";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isNegative();
+
+		thisVersion = "";
+		thatVersion = "";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isZero();
+	}
+
+	@Test
+	public void should_return_plus_1_when_that_calver_train_is_empty() {
+		String thisVersion = "2020.1.1";
+		String thatVersion = "";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isPositive();
+	}
+
+	@Test
+	public void should_return_greater_than_when_comparing_calver_to_non_calver() {
+		String thisVersion = "2020.1.1";
+		String thatVersion = "Greenwich-SR5";
+
+		then(projectVersion(thisVersion).compareToReleaseTrain(thatVersion)).isPositive();
 	}
 
 	@Test
 	public void should_return_no_unacceptable_patterns_for_a_snapshot_version() {
-		then(projectVersion("1.0.0.BUILD-SNAPSHOT").unacceptableVersionPatterns())
-				.isEmpty();
+		then(projectVersion("1.0.0-SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
 		then(projectVersion("1.0.0.SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
 		then(projectVersion("1.0.0-SNAPSHOT").unacceptableVersionPatterns()).isEmpty();
 	}
 
 	@Test
 	public void should_return_snapshot_unacceptable_patterns_for_a_milestone_or_rc_version() {
-		List<Pattern> milestonePatterns = projectVersion("1.0.0.M1")
+		List<Pattern> milestonePatterns = projectVersion("1.0.0-M1")
 				.unacceptableVersionPatterns();
 		then(milestonePatterns).isNotEmpty();
 		then(milestonePatterns.get(0).pattern()).contains("SNAPSHOT");
 
-		List<Pattern> rcPatterns = projectVersion("1.0.0.RC1")
+		List<Pattern> rcPatterns = projectVersion("1.0.0-RC1")
 				.unacceptableVersionPatterns();
 		then(rcPatterns).isNotEmpty();
 		then(rcPatterns.get(0).pattern()).contains("SNAPSHOT");
@@ -634,7 +712,7 @@ public class ProjectVersionTests {
 		gaPatterns = projectVersion("1.0.0-RELEASE").unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(gaPatterns);
 
-		List<Pattern> srPatterns = projectVersion("1.0.0.SR1")
+		List<Pattern> srPatterns = projectVersion("1.0.0-SR1")
 				.unacceptableVersionPatterns();
 		thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(srPatterns);
 
@@ -656,7 +734,7 @@ public class ProjectVersionTests {
 
 	@Test
 	public void should_return_empty_when_tag_name_is_non_ga() {
-		then(projectVersion("1.0.0.BUILD-SNAPSHOT").releaseTagName()).isEmpty();
+		then(projectVersion("1.0.0-SNAPSHOT").releaseTagName()).isEmpty();
 	}
 
 	@Test
@@ -729,8 +807,7 @@ public class ProjectVersionTests {
 		then(unknownTypeOfVersion.get(1).pattern()).contains("M[0-9]");
 		then(unknownTypeOfVersion.get(2).pattern()).contains("RC");
 
-		then(unknownTypeOfVersion.get(0).matcher("SomeName-BUILD-SNAPSHOT").matches())
-				.isTrue();
+		then(unknownTypeOfVersion.get(0).matcher("SomeName-SNAPSHOT").matches()).isTrue();
 		then(unknownTypeOfVersion.get(0).matcher("SomeName.BUILD-SNAPSHOT").matches())
 				.isTrue();
 

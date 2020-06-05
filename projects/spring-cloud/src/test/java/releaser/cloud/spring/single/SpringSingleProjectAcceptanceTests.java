@@ -122,11 +122,11 @@ public class SpringSingleProjectAcceptanceTests
 					Iterator<RevCommit> iterator = commits.iterator();
 					tagIsPresentInOrigin(origin, "v2.1.2.RELEASE");
 					commitIsPresent(iterator,
-							"Bumping versions to 2.1.3.BUILD-SNAPSHOT after release");
+							"Bumping versions to 2.1.3.SNAPSHOT after release");
 					commitIsPresent(iterator, "Going back to snapshots");
 					commitIsPresent(iterator, "Update SNAPSHOT to 2.1.2.RELEASE");
-					pomVersionIsEqualTo(project, "2.1.3.BUILD-SNAPSHOT");
-					consulPomParentVersionIsEqualTo(project, "2.1.3.BUILD-SNAPSHOT");
+					pomVersionIsEqualTo(project, "2.1.3.SNAPSHOT");
+					consulPomParentVersionIsEqualTo(project, "2.1.3.SNAPSHOT");
 					then(gitHubHandler.closedMilestones).isTrue();
 					then(emailTemplate()).doesNotExist();
 					then(blogTemplate()).doesNotExist();
@@ -187,10 +187,10 @@ public class SpringSingleProjectAcceptanceTests
 					tagIsPresentInOrigin(origin, "v2.1.6.RELEASE");
 					// we're running against camden sc-release
 					commitIsPresent(iterator,
-							"Bumping versions to 2.1.7.BUILD-SNAPSHOT after release");
+							"Bumping versions to 2.1.7.SNAPSHOT after release");
 					commitIsPresent(iterator, "Going back to snapshots");
 					commitIsPresent(iterator, "Update SNAPSHOT to 2.1.6.RELEASE");
-					pomVersionIsEqualTo(project, "2.1.7.BUILD-SNAPSHOT");
+					pomVersionIsEqualTo(project, "2.1.7.SNAPSHOT");
 					pomParentVersionIsEqualTo(project, "spring-cloud-build-dependencies",
 							"2.1.6.RELEASE");
 					then(gitHubHandler.closedMilestones).isTrue();
@@ -249,7 +249,7 @@ public class SpringSingleProjectAcceptanceTests
 					Iterable<RevCommit> commits = listOfCommits(project);
 					tagIsPresentInOrigin(origin, "v1.2.0.RC1");
 					commitIsNotPresent(commits,
-							"Bumping versions to 1.2.1.BUILD-SNAPSHOT after release");
+							"Bumping versions to 1.2.1.SNAPSHOT after release");
 					Iterator<RevCommit> iterator = listOfCommits(project).iterator();
 					commitIsPresent(iterator, "Going back to snapshots");
 					commitIsPresent(iterator, "Update SNAPSHOT to 1.2.0.RC1");
