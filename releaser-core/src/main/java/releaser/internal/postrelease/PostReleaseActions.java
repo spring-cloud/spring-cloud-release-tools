@@ -316,13 +316,12 @@ public class PostReleaseActions implements Closeable {
 							+ "is off. Set [releaser.git.update-release-train-docs] to [true] to change that");
 			return ExecutionResult.skipped();
 		}
-		File file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
+		ProjectVersion releaseTrain = projects.releaseTrain(this.properties);
+		File file = this.projectGitHandler
+				.cloneReleaseTrainDocumentationProject(releaseTrain.releaseTagName());
 		ReleaserProperties projectProps = projectProps(file);
-		ProjectVersion projectVersion = newProjectVersion(file);
-		String releaseTrainVersion = projects.releaseTrain(this.properties).version;
-		Projects newProjects = addVersionForTestsProject(projects, projectVersion,
-				releaseTrainVersion);
-		updateWithVersions(file, newProjects);
+		String releaseTrainVersion = releaseTrain.version;
+		updateWithVersions(file, projects);
 		this.projectCommandExecutor.generateReleaseTrainDocs(projectProps,
 				releaseTrainVersion, file.getAbsolutePath());
 		return ExecutionResult.success();

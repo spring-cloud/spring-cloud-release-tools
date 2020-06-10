@@ -119,6 +119,11 @@ public class ProjectGitHandler implements Closeable {
 				this.properties.getGit().getReleaseTrainDocsBranch());
 	}
 
+	public File cloneReleaseTrainDocumentationProject(String branch) {
+		return cloneAndCheckOut(this.properties.getGit().getReleaseTrainDocsUrl(),
+				branch);
+	}
+
 	public File cloneDocumentationProject() {
 		return cloneAndCheckOut(this.properties.getGit().getDocumentationUrl(),
 				this.properties.getGit().getDocumentationBranch());
