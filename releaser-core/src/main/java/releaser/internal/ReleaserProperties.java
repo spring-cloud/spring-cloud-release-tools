@@ -18,7 +18,6 @@ package releaser.internal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -251,12 +250,12 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * @return docs publishing commands
 		 */
-		String[] getPublishDocsCommands();
+		String getPublishDocsCommand();
 
 		/**
 		 * @param publishDocsCommands to set
 		 */
-		void setPublishDocsCommands(String[] publishDocsCommands);
+		void setPublishDocsCommand(String publishDocsCommands);
 
 		/**
 		 * @return generate release train docs command
@@ -962,15 +961,8 @@ public class ReleaserProperties implements Serializable {
 		 **/
 		private String deployGuidesCommand = "./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}";
 
-		/**
-		 * Command to be executed to publish documentation. If present "{{version}}" will
-		 * be replaced by the provided version.
-		 */
-		private String[] publishDocsCommands = { "mkdir -p target",
-				"wget https://raw.githubusercontent.com/spring-cloud/"
-						+ "spring-cloud-build/master/"
-						+ "docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh",
-				"chmod +x target/gh-pages.sh", "./target/gh-pages.sh -v {{version}} -c" };
+
+		private String publishDocsCommand = "./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}}";
 
 		/**
 		 * Command to be executed to generate release train documentation.
@@ -990,10 +982,12 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private long waitTimeInMinutes = 20;
 
+		@Override
 		public String getBuildCommand() {
 			return this.buildCommand;
 		}
 
+		@Override
 		public void setBuildCommand(String buildCommand) {
 			this.buildCommand = buildCommand;
 		}
@@ -1006,43 +1000,53 @@ public class ReleaserProperties implements Serializable {
 			this.waitTimeInMinutes = waitTimeInMinutes;
 		}
 
+		@Override
 		public String getDeployCommand() {
 			return this.deployCommand;
 		}
 
+		@Override
 		public void setDeployCommand(String deployCommand) {
 			this.deployCommand = deployCommand;
 		}
 
+		@Override
 		public String getDeployGuidesCommand() {
 			return this.deployGuidesCommand;
 		}
 
+		@Override
 		public void setDeployGuidesCommand(String deployGuidesCommand) {
 			this.deployGuidesCommand = deployGuidesCommand;
 		}
 
-		public String[] getPublishDocsCommands() {
-			return this.publishDocsCommands;
+		@Override
+		public String getPublishDocsCommand() {
+			return this.publishDocsCommand;
 		}
 
-		public void setPublishDocsCommands(String[] publishDocsCommands) {
-			this.publishDocsCommands = publishDocsCommands;
+		@Override
+		public void setPublishDocsCommand(String publishDocsCommand) {
+			this.publishDocsCommand = publishDocsCommand;
 		}
 
+		@Override
 		public String getGenerateReleaseTrainDocsCommand() {
 			return this.generateReleaseTrainDocsCommand;
 		}
 
+		@Override
 		public void setGenerateReleaseTrainDocsCommand(
 				String generateReleaseTrainDocsCommand) {
 			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
 		}
 
+		@Override
 		public String getSystemProperties() {
 			return this.systemProperties;
 		}
 
+		@Override
 		public void setSystemProperties(String systemProperties) {
 			this.systemProperties = systemProperties;
 		}
@@ -1051,7 +1055,7 @@ public class ReleaserProperties implements Serializable {
 		public String toString() {
 			return "Maven{" + "buildCommand='" + this.buildCommand + '\''
 					+ ", deployCommand='" + this.deployCommand + '\''
-					+ ", publishDocsCommands=" + Arrays.toString(this.publishDocsCommands)
+					+ ", publishDocsCommand=" + this.publishDocsCommand
 					+ "generateReleaseTrainDocsCommand='"
 					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes="
 					+ this.waitTimeInMinutes + '}';
@@ -1093,8 +1097,7 @@ public class ReleaserProperties implements Serializable {
 		 * be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
 		 * version and "{{oldVersion}}" with the version before version updating.
 		 */
-		private String[] publishDocsCommands = { "mkdir -p target",
-				"echo \"{{version}}\"" };
+		private String publishDocsCommand = "mkdir -p target && echo \"{{version}}\"";
 
 		/**
 		 * Command to be executed to generate release train documentation.
@@ -1113,10 +1116,12 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private long waitTimeInMinutes = 20;
 
+		@Override
 		public String getBuildCommand() {
 			return this.buildCommand;
 		}
 
+		@Override
 		public void setBuildCommand(String buildCommand) {
 			this.buildCommand = buildCommand;
 		}
@@ -1129,43 +1134,53 @@ public class ReleaserProperties implements Serializable {
 			this.waitTimeInMinutes = waitTimeInMinutes;
 		}
 
+		@Override
 		public String getDeployCommand() {
 			return this.deployCommand;
 		}
 
+		@Override
 		public void setDeployCommand(String deployCommand) {
 			this.deployCommand = deployCommand;
 		}
 
+		@Override
 		public String getDeployGuidesCommand() {
 			return this.deployGuidesCommand;
 		}
 
+		@Override
 		public void setDeployGuidesCommand(String deployGuidesCommand) {
 			this.deployGuidesCommand = deployGuidesCommand;
 		}
 
-		public String[] getPublishDocsCommands() {
-			return this.publishDocsCommands;
+		@Override
+		public String getPublishDocsCommand() {
+			return this.publishDocsCommand;
 		}
 
-		public void setPublishDocsCommands(String[] publishDocsCommands) {
-			this.publishDocsCommands = publishDocsCommands;
+		@Override
+		public void setPublishDocsCommand(String publishDocsCommand) {
+			this.publishDocsCommand = publishDocsCommand;
 		}
 
+		@Override
 		public String getGenerateReleaseTrainDocsCommand() {
 			return this.generateReleaseTrainDocsCommand;
 		}
 
+		@Override
 		public void setGenerateReleaseTrainDocsCommand(
 				String generateReleaseTrainDocsCommand) {
 			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
 		}
 
+		@Override
 		public String getSystemProperties() {
 			return this.systemProperties;
 		}
 
+		@Override
 		public void setSystemProperties(String systemProperties) {
 			this.systemProperties = systemProperties;
 		}
@@ -1174,7 +1189,7 @@ public class ReleaserProperties implements Serializable {
 		public String toString() {
 			return "Bash{" + "buildCommand='" + this.buildCommand + '\''
 					+ ", deployCommand='" + this.deployCommand + '\''
-					+ ", publishDocsCommands=" + Arrays.toString(this.publishDocsCommands)
+					+ ", publishDocsCommands=" + this.publishDocsCommand
 					+ "generateReleaseTrainDocsCommand='"
 					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes="
 					+ this.waitTimeInMinutes + '}';
@@ -1237,8 +1252,7 @@ public class ReleaserProperties implements Serializable {
 		 * Command to be executed to publish documentation. If present "{{version}}" will
 		 * be replaced by the provided version.
 		 */
-		private String[] publishDocsCommands = {
-				"./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}" };
+		private String publishDocsCommand = "./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}";
 
 		/**
 		 * Command to be executed to generate release train documentation.
@@ -1257,10 +1271,12 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private long waitTimeInMinutes = 20;
 
+		@Override
 		public String getBuildCommand() {
 			return this.buildCommand;
 		}
 
+		@Override
 		public void setBuildCommand(String buildCommand) {
 			this.buildCommand = buildCommand;
 		}
@@ -1273,43 +1289,53 @@ public class ReleaserProperties implements Serializable {
 			this.waitTimeInMinutes = waitTimeInMinutes;
 		}
 
+		@Override
 		public String getDeployCommand() {
 			return this.deployCommand;
 		}
 
+		@Override
 		public void setDeployCommand(String deployCommand) {
 			this.deployCommand = deployCommand;
 		}
 
+		@Override
 		public String getDeployGuidesCommand() {
 			return this.deployGuidesCommand;
 		}
 
+		@Override
 		public void setDeployGuidesCommand(String deployGuidesCommand) {
 			this.deployGuidesCommand = deployGuidesCommand;
 		}
 
-		public String[] getPublishDocsCommands() {
-			return this.publishDocsCommands;
+		@Override
+		public String getPublishDocsCommand() {
+			return this.publishDocsCommand;
 		}
 
-		public void setPublishDocsCommands(String[] publishDocsCommands) {
-			this.publishDocsCommands = publishDocsCommands;
+		@Override
+		public void setPublishDocsCommand(String publishDocsCommand) {
+			this.publishDocsCommand = publishDocsCommand;
 		}
 
+		@Override
 		public String getGenerateReleaseTrainDocsCommand() {
 			return this.generateReleaseTrainDocsCommand;
 		}
 
+		@Override
 		public void setGenerateReleaseTrainDocsCommand(
 				String generateReleaseTrainDocsCommand) {
 			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
 		}
 
+		@Override
 		public String getSystemProperties() {
 			return this.systemProperties;
 		}
 
+		@Override
 		public void setSystemProperties(String systemProperties) {
 			this.systemProperties = systemProperties;
 		}
@@ -1339,7 +1365,7 @@ public class ReleaserProperties implements Serializable {
 					.add("buildCommand='" + buildCommand + "'")
 					.add("deployCommand='" + deployCommand + "'")
 					.add("deployGuidesCommand='" + deployGuidesCommand + "'")
-					.add("publishDocsCommands=" + Arrays.toString(publishDocsCommands))
+					.add("publishDocsCommands=" + publishDocsCommand)
 					.add("generateReleaseTrainDocsCommand='"
 							+ generateReleaseTrainDocsCommand + "'")
 					.add("systemProperties='" + systemProperties + "'")

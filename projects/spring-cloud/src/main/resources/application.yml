@@ -63,8 +63,7 @@ releaser:
     build-command: "./mvnw clean install -B -Pdocs {{systemProps}}"
     deploy-command: "./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}"
     deploy-guides-command: "./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}"
-    publish-docs-commands:
-      - "./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}}"
+    publish-docs-command: "./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}}"
     generate-release-train-docs-command: "./mvnw clean deploy -Pdocs,train-docs -pl train-docs"
     system-properties: ""
     wait-time-in-minutes: 20
@@ -72,8 +71,7 @@ releaser:
     build-command: 'echo "{{systemProps}}"'
     deploy-command: 'echo "{{systemProps}}"'
     deploy-guides-command: 'echo "{{systemProps}}"'
-    publish-docs-commands:
-      - 'echo "{{systemProps}}"'
+    publish-docs-command: 'echo "{{systemProps}}"'
     generate-release-train-docs-command: 'echo "{{systemProps}}"'
     system-properties: ""
     wait-time-in-minutes: 20
@@ -92,8 +90,7 @@ releaser:
     build-command: "./gradlew clean build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}"
     deploy-command: "./gradlew publish --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}"
     deploy-guides-command: "./gradlew clean build deployGuides --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}"
-    publish-docs-commands:
-      - "echo 'TODO'"
+    publish-docs-command: "echo 'TODO'"
     generate-release-train-docs-command: "echo 'TODO'"
     system-properties: ""
     wait-time-in-minutes: 20

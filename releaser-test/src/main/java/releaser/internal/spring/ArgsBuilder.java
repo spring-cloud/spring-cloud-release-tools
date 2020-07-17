@@ -50,7 +50,7 @@ public class ArgsBuilder {
 				"releaser.maven.build-command=echo build",
 				"releaser.maven.deploy-command=echo deploy",
 				"releaser.maven.deploy-guides-command=echo guides",
-				"releaser.maven.publish-docs-commands=echo docs",
+				"releaser.maven.publish-docs-command=echo docs",
 				"releaser.maven.generate-release-train-docs-command=echo releaseTrainDocs",
 				"releaser.working-dir=" + project.getPath(),
 				"releaser.git.spring-project-url=" + tmpFile("spring-cloud").getAbsolutePath() + "/",
@@ -113,8 +113,8 @@ public class ArgsBuilder {
 	}
 
 	public ArgsBuilder mavenPublishCommand(String command) throws Exception {
-		removeIfPresent("releaser.maven.publish-docs-commands");
-		this.args.add("releaser.maven.publish-docs-commands=" + command);
+		removeIfPresent("releaser.maven.publish-docs-command");
+		this.args.add("releaser.maven.publish-docs-command=" + command);
 		return this;
 	}
 
