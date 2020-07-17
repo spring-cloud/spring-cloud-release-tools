@@ -425,8 +425,8 @@ public class ProjectCommandExecutorTests {
 	@Test
 	public void should_successfully_execute_a_publish_docs_command() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash().setPublishDocsCommands(new String[] { "ls -al",
-				"echo {{version}} {{oldVersion}} {{nextVersion}}" });
+		properties.getBash().setPublishDocsCommand(
+				"ls -al && echo {{version}} {{oldVersion}} {{nextVersion}}");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor() {
@@ -448,8 +448,8 @@ public class ProjectCommandExecutorTests {
 	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder()
 			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash().setPublishDocsCommands(
-				new String[] { "echo {{systemProps}} 1", "echo {{systemProps}} 2" });
+		properties.getBash().setPublishDocsCommand(
+				"echo {{systemProps}} 1 && echo {{systemProps}} 2");
 		properties.getBash().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
@@ -463,8 +463,9 @@ public class ProjectCommandExecutorTests {
 		builder.publishDocs(properties, original(),
 				new ProjectVersion("foo", "Finchley.RELEASE"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("-Dhello=world -Dfoo=bar 2");
+		String s = asString(tmpFile("/builder/resolved/resolved.log"));
+		System.out.println("====> " + s);
+		then(s).contains("-Dhello=world -Dfoo=bar 2");
 		then(executor.counter).isEqualTo(2);
 	}
 
@@ -472,8 +473,7 @@ public class ProjectCommandExecutorTests {
 	public void should_successfully_execute_a_publish_docs_command_and_substitute_the_version()
 			throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash()
-				.setPublishDocsCommands(new String[] { "echo '{{version}}'" });
+		properties.getBash().setPublishDocsCommand("echo '{{version}}'");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor() {
@@ -515,8 +515,7 @@ public class ProjectCommandExecutorTests {
 	@Test
 	public void should_throw_exception_when_publish_docs_command_took_too_long_to_execute() {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash()
-				.setPublishDocsCommands(new String[] { "sleep 1", "sleep 1" });
+		properties.getBash().setPublishDocsCommand("sleep 1 && sleep 1");
 		properties.getBash().setWaitTimeInMinutes(0);
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);

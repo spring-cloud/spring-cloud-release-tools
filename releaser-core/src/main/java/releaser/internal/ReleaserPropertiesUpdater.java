@@ -107,8 +107,8 @@ public class ReleaserPropertiesUpdater implements Closeable {
 				commandCopy::setDeployCommand);
 		overrideStringIfPresent(fromProject::getGenerateReleaseTrainDocsCommand,
 				commandCopy::setGenerateReleaseTrainDocsCommand);
-		overrideArrayIfPresent(fromProject::getPublishDocsCommands,
-				commandCopy::setPublishDocsCommands);
+		overrideStringIfPresent(fromProject::getPublishDocsCommand,
+				commandCopy::setPublishDocsCommand);
 		overrideStringIfPresent(fromProject::getDeployGuidesCommand,
 				commandCopy::setDeployGuidesCommand);
 		overrideStringIfPresent(fromProject::getSystemProperties,

@@ -189,9 +189,13 @@ public class ProjectCommandExecutor {
 	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion changedVersion) {
 		try {
-			for (String command : new CommandPicker(properties).publishDocsCommands()) {
+			String providedCommand = new CommandPicker(properties)
+					.publishDocsCommand(originalVersion);
+			String[] providedCommands = StringUtils
+					.delimitedListToStringArray(providedCommand, "&&");
+			for (String command : providedCommands) {
 				command = replaceAllPlaceHolders(originalVersion, changedVersion,
-						command);
+						command.trim());
 				String[] commands = command.split(" ");
 				runCommand(properties, commands);
 			}
@@ -379,14 +383,16 @@ class CommandPicker {
 		return releaserProperties.getBash().getSystemProperties();
 	}
 
-	public String[] publishDocsCommands() {
+	public String publishDocsCommand(ProjectVersion version) {
 		if (projectType == ProjectType.GRADLE) {
-			return releaserProperties.getGradle().getPublishDocsCommands();
+			return mavenCommandWithSystemProps(
+					releaserProperties.getGradle().getPublishDocsCommand(), version);
 		}
 		else if (projectType == ProjectType.MAVEN) {
-			return releaserProperties.getMaven().getPublishDocsCommands();
+			return mavenCommandWithSystemProps(
+					releaserProperties.getMaven().getPublishDocsCommand(), version);
 		}
-		return releaserProperties.getBash().getPublishDocsCommands();
+		return releaserProperties.getBash().getPublishDocsCommand();
 	}
 
 	String systemPropertiesPlaceholder() {
