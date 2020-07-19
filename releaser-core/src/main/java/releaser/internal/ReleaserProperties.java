@@ -253,9 +253,9 @@ public class ReleaserProperties implements Serializable {
 		String getPublishDocsCommand();
 
 		/**
-		 * @param publishDocsCommands to set
+		 * @param publishDocsCommand to set
 		 */
-		void setPublishDocsCommand(String publishDocsCommands);
+		void setPublishDocsCommand(String publishDocsCommand);
 
 		/**
 		 * @return generate release train docs command
@@ -1192,7 +1192,7 @@ public class ReleaserProperties implements Serializable {
 		public String toString() {
 			return "Bash{" + "buildCommand='" + this.buildCommand + '\''
 					+ ", deployCommand='" + this.deployCommand + '\''
-					+ ", publishDocsCommands=" + this.publishDocsCommand
+					+ ", publishDocsCommand=" + this.publishDocsCommand
 					+ "generateReleaseTrainDocsCommand='"
 					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes="
 					+ this.waitTimeInMinutes + '}';
@@ -1368,7 +1368,7 @@ public class ReleaserProperties implements Serializable {
 					.add("buildCommand='" + buildCommand + "'")
 					.add("deployCommand='" + deployCommand + "'")
 					.add("deployGuidesCommand='" + deployGuidesCommand + "'")
-					.add("publishDocsCommands=" + publishDocsCommand)
+					.add("publishDocsCommand=" + publishDocsCommand)
 					.add("generateReleaseTrainDocsCommand='"
 							+ generateReleaseTrainDocsCommand + "'")
 					.add("systemProperties='" + systemProperties + "'")
