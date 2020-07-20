@@ -42,7 +42,7 @@
 		<initializr-metadata.version>0.8.0.BUILD-SNAPSHOT</initializr-metadata.version>
 		<awaitility.version>3.1.6</awaitility.version>
 		<sagan-site.version>1.0.0.BUILD-SNAPSHOT</sagan-site.version>
-		<javax.json.version>1.0.4</javax.json.version>
+		<javax.json.version>1.1.4</javax.json.version>
 		<jopt-simple.version>5.0.3</jopt-simple.version>
 		<fliptables.version>1.0.2</fliptables.version>
 		<zt.exec.version>1.11</zt.exec.version>
