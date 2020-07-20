@@ -17,7 +17,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<cloudfoundry-client.version>4.3.0.RELEASE</cloudfoundry-client.version>
+		<cloudfoundry-client.version>4.8.0.RELEASE</cloudfoundry-client.version>
 	</properties>
 
 	<dependencies>
