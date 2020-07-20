@@ -191,6 +191,7 @@ public class ProjectCommandExecutor {
 		try {
 			String providedCommand = new CommandPicker(properties)
 					.publishDocsCommand(originalVersion);
+			log.info("Executing command(s) for publishing docs " + providedCommand);
 			String[] providedCommands = StringUtils
 					.delimitedListToStringArray(providedCommand, "&&");
 			for (String command : providedCommands) {
