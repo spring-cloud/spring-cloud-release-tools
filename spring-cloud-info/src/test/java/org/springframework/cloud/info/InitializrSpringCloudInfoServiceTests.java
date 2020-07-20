@@ -107,7 +107,7 @@ public class InitializrSpringCloudInfoServiceTests {
 
 	@Test
 	public void getSpringCloudReleaseVersionTest() throws Exception {
-		String bomVersion = "vHoxton.BUILD-SNAPSHOT";
+		String bomVersion = "v2020.0.0-SNAPSHOT";
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);

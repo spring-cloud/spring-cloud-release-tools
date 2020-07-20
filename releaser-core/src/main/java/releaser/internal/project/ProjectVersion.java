@@ -252,7 +252,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	private SplitVersion dotSeparatedReleaseTrainsAndVersions(String version) {
-		// Hoxton.BUILD-SNAPSHOT or 1.0.0.BUILD-SNAPSHOT
+		// 2020.0.0-SNAPSHOT or 1.0.0.BUILD-SNAPSHOT
 		String[] splitVersion = version.split("\\.");
 		return SplitVersion.dot(splitVersion);
 	}
@@ -690,7 +690,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return wrongDelimiter() || tooFewElements();
 		}
 
-		// Hoxton.BUILD-SNAPSHOT or Hoxton-BUILD-SNAPSHOT or 2020.x.x
+		// 2020.0.0-SNAPSHOT or Hoxton-BUILD-SNAPSHOT or 2020.x.x
 		private boolean isReleaseTrain() {
 			return isOldReleaseTrain() || calverReleaseTrain();
 		}
