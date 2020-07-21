@@ -39,7 +39,7 @@
 		<maven-model.version>3.6.3</maven-model.version>
 		<versions-maven-plugin.version>2.3</versions-maven-plugin.version>
 		<handlebars.version>4.0.6</handlebars.version>
-		<initializr-metadata.version>0.8.0.BUILD-SNAPSHOT</initializr-metadata.version>
+		<initializr-metadata.version>0.10.0-SNAPSHOT</initializr-metadata.version>
 		<awaitility.version>3.1.6</awaitility.version>
 		<sagan-site.version>1.0.0.BUILD-SNAPSHOT</sagan-site.version>
 		<javax.json.version>1.1.4</javax.json.version>
