@@ -18,7 +18,7 @@
 		<maven-model.version>3.6.3</maven-model.version>
 		<scs.version>2.1.2.RELEASE</scs.version>
 		<spring-cloud-bom.version>Greenwich.RELEASE</spring-cloud-bom.version>
-		<spring-rest-docs.version>2.0.3.RELEASE</spring-rest-docs.version>
+		<spring-rest-docs.version>2.0.4.RELEASE</spring-rest-docs.version>
 	</properties>
 
 	<dependencies>
