@@ -13,7 +13,7 @@
 	<artifactId>spring-cloud-info</artifactId>
 
 	<properties>
-		<maven-core.version>3.6.1</maven-core.version>
+		<maven-core.version>3.6.3</maven-core.version>
 		<javax.json-api.version>1.1.4</javax.json-api.version>
 		<maven-model.version>3.6.3</maven-model.version>
 		<scs.version>3.1.5.RELEASE</scs.version>
