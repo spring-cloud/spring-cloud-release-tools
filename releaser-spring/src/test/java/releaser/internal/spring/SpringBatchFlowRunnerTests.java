@@ -17,6 +17,7 @@
 package releaser.internal.spring;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,10 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.HttpServerErrorException;
 
 @SpringBootTest
 @ActiveProfiles("batch")
@@ -135,7 +139,9 @@ class MyProjectPostReleaseTask implements ProjectPostReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return ExecutionResult.unstable(new RuntimeException("Some instability"));
+		return ExecutionResult.unstable(
+				HttpServerErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "foo",
+						new HttpHeaders(), "".getBytes(), Charset.defaultCharset()));
 	}
 
 	@Override
