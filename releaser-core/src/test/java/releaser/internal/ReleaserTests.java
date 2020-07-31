@@ -42,7 +42,7 @@ import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganUpdater;
 import releaser.internal.template.TemplateGenerator;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -55,7 +55,7 @@ import static org.mockito.Mockito.never;
 public class ReleaserTests {
 
 	@Rule
-	public OutputCapture outputCapture = new OutputCapture();
+	public OutputCaptureRule outputCapture = new OutputCaptureRule();
 
 	@Mock
 	ProjectPomUpdater projectPomUpdater;

@@ -23,7 +23,7 @@ import org.assertj.core.api.BDDAssertions;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 /**
  * @author Marcin Grzejszczak
@@ -31,7 +31,7 @@ import org.springframework.boot.test.rule.OutputCapture;
 public class SpringCloudGhPagesParserTests {
 
 	@Rule
-	public OutputCapture capture = new OutputCapture();
+	public OutputCaptureRule capture = new OutputCaptureRule();
 
 	File rawHtml = new File(SpringCloudGhPagesParserTests.class
 			.getResource("/raw/spring-cloud-gh-pages-index.html").toURI());

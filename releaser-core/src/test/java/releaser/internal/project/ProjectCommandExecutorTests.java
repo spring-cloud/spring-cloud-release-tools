@@ -36,7 +36,7 @@ import releaser.internal.PomUpdateAcceptanceTests;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -51,7 +51,7 @@ public class ProjectCommandExecutorTests {
 	public TemporaryFolder tmp = new TemporaryFolder();
 
 	@Rule
-	public OutputCapture outputCapture = new OutputCapture();
+	public OutputCaptureRule outputCapture = new OutputCaptureRule();
 
 	File temporaryFolder;
 

@@ -31,7 +31,7 @@ import org.mockito.BDDMockito;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 /**
  * @author Marcin Grzejszczak
@@ -42,7 +42,7 @@ public class GithubIssuesTests {
 	public TemporaryFolder folder = new TemporaryFolder();
 
 	@Rule
-	public OutputCapture capture = new OutputCapture();
+	public OutputCaptureRule capture = new OutputCaptureRule();
 
 	MkGithub github;
 

@@ -30,7 +30,7 @@ import org.junit.rules.TemporaryFolder;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
@@ -44,7 +44,7 @@ public class GithubMilestonesTests {
 	public TemporaryFolder folder = new TemporaryFolder();
 
 	@Rule
-	public OutputCapture capture = new OutputCapture();
+	public OutputCaptureRule capture = new OutputCaptureRule();
 
 	MkGithub github;
 
