@@ -961,7 +961,6 @@ public class ReleaserProperties implements Serializable {
 		 **/
 		private String deployGuidesCommand = "./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}";
 
-
 		private String publishDocsCommand = "./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}}";
 
 		/**

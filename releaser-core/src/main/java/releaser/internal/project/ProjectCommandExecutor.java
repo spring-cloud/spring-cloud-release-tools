@@ -190,8 +190,9 @@ public class ProjectCommandExecutor {
 			ProjectVersion changedVersion) {
 		try {
 			String providedCommand = new CommandPicker(properties)
-					.publishDocsCommand(originalVersion);
-			log.info("Executing command(s) for publishing docs " + providedCommand + " / " + properties);
+					.publishDocsCommand(changedVersion);
+			log.info("Executing command(s) for publishing docs " + providedCommand + " / "
+					+ properties);
 			String[] providedCommands = StringUtils
 					.delimitedListToStringArray(providedCommand, "&&");
 			for (String command : providedCommands) {
