@@ -17,7 +17,7 @@
 		<javax.json-api.version>1.1.4</javax.json-api.version>
 		<maven-model.version>3.6.3</maven-model.version>
 		<scs.version>3.1.5.RELEASE</scs.version>
-		<spring-cloud-bom.version>Greenwich.RELEASE</spring-cloud-bom.version>
+		<spring-cloud-bom.version>Hoxton.SR7</spring-cloud-bom.version>
 		<spring-rest-docs.version>2.0.4.RELEASE</spring-rest-docs.version>
 	</properties>
 
