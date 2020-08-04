@@ -48,6 +48,8 @@ class ProjectDocumentationUpdater {
 		this.updaters = updaters;
 	}
 
+	// Not needed any more cause all projects publish to docs.spring.io
+	@Deprecated
 	public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
 			String bomBranch) {
 		if (!shouldUpdate(currentProject)) {
@@ -61,6 +63,8 @@ class ProjectDocumentationUpdater {
 				projects, bomBranch);
 	}
 
+	// Not needed any more cause all projects publish to docs.spring.io
+	@Deprecated
 	public File updateDocsRepoForSingleProject(Projects projects,
 			ProjectVersion currentProject) {
 		if (!shouldUpdate(currentProject)) {

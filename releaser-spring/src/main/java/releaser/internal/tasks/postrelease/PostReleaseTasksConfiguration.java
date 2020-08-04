@@ -63,22 +63,6 @@ class PostReleaseTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty("releaser.git.update-documentation-repo")
-	UpdateDocsRepositoryProjectPostReleaseTask updateDocsRepositoryProjectPostReleaseTask(
-			Releaser releaser) {
-		return new UpdateDocsRepositoryProjectPostReleaseTask(releaser);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnProperty("releaser.git.update-documentation-repo")
-	UpdateDocsRepositoryTrainPostReleaseTask updateDocsRepositoryTrainPostReleaseTask(
-			Releaser releaser) {
-		return new UpdateDocsRepositoryTrainPostReleaseTask(releaser);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-guides-repo")
 	UpdateGuidesTrainPostReleaseTask updateGuidesTrainPostReleaseTask(Releaser releaser) {
 		return new UpdateGuidesTrainPostReleaseTask(releaser);

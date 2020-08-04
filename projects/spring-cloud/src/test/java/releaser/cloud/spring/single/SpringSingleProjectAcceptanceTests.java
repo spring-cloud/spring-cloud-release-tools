@@ -17,10 +17,8 @@
 package releaser.cloud.spring.single;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -28,9 +26,8 @@ import org.junit.Test;
 import org.mockito.BDDMockito;
 import releaser.cloud.spring.AbstractSpringCloudAcceptanceTests;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.docs.CustomProjectDocumentationUpdater;
+import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.GitTestUtils;
-import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.github.ProjectGitHubHandler;
 import releaser.internal.options.OptionsBuilder;
 import releaser.internal.postrelease.PostReleaseActions;
@@ -40,9 +37,7 @@ import releaser.internal.sagan.SaganClient;
 import releaser.internal.spring.ArgsBuilder;
 import releaser.internal.spring.SpringReleaser;
 import releaser.internal.tech.ExecutionResult;
-import releaser.internal.template.TemplateGenerator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -108,8 +103,6 @@ public class SpringSingleProjectAcceptanceTests
 					TestProjectGitHubHandler gitHubHandler = context
 							.getBean(TestProjectGitHubHandler.class);
 					SaganClient saganClient = context.getBean(SaganClient.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
@@ -141,10 +134,6 @@ public class SpringSingleProjectAcceptanceTests
 							.deleteRelease("spring-cloud-consul", "2.1.2.BUILD-SNAPSHOT");
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
-					then(Files.readSymbolicLink(
-							new File(testDocumentationUpdater.getDocumentationRepo(),
-									"spring-cloud-consul/current").toPath())
-							.toString()).isEqualTo("2.1.2.RELEASE");
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
 
 					// print results
@@ -172,8 +161,6 @@ public class SpringSingleProjectAcceptanceTests
 					TestProjectGitHubHandler gitHubHandler = context
 							.getBean(TestProjectGitHubHandler.class);
 					SaganClient saganClient = context.getBean(SaganClient.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
@@ -207,10 +194,6 @@ public class SpringSingleProjectAcceptanceTests
 							.deleteRelease("spring-cloud-build", "2.1.6.BUILD-SNAPSHOT");
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
-					then(Files.readSymbolicLink(
-							new File(testDocumentationUpdater.getDocumentationRepo(),
-									"spring-cloud-build/current").toPath())
-							.toString()).isEqualTo("2.1.6.RELEASE");
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
 
 					// print results
@@ -236,8 +219,6 @@ public class SpringSingleProjectAcceptanceTests
 					TestProjectGitHubHandler gitHubHandler = context
 							.getBean(TestProjectGitHubHandler.class);
 					SaganClient saganClient = context.getBean(SaganClient.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
@@ -269,9 +250,6 @@ public class SpringSingleProjectAcceptanceTests
 					// we update guides only for SR / RELEASE
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
-					// haven't even checked out the branch
-					then(new File(testDocumentationUpdater.getDocumentationRepo(),
-							"current/index.html")).doesNotExist();
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
 
 					// print results
@@ -397,13 +375,8 @@ public class SpringSingleProjectAcceptanceTests
 		}
 
 		@Bean
-		TestDocumentationUpdater testDocumentationUpdater(
-				ProjectGitHandler projectGitHandler,
-				ReleaserProperties releaserProperties,
-				TemplateGenerator templateGenerator, @Autowired(
-						required = false) List<CustomProjectDocumentationUpdater> updaters) {
-			return new TestDocumentationUpdater(projectGitHandler, releaserProperties,
-					templateGenerator, updaters);
+		DocumentationUpdater testDocumentationUpdater() {
+			return BDDMockito.mock(DocumentationUpdater.class);
 		}
 
 	}
