@@ -27,3 +27,4 @@ nbdist/
 *.log
 _site
 effective.pom
+.sdkmanrc

@@ -42,18 +42,14 @@ import org.mockito.BDDMockito;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestPomReader;
 import releaser.internal.buildsystem.TestUtils;
-import releaser.internal.docs.CustomProjectDocumentationUpdater;
-import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.GitTestUtils;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.options.Options;
 import releaser.internal.postrelease.PostReleaseActions;
-import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.sagan.Project;
 import releaser.internal.sagan.Release;
 import releaser.internal.tasks.ReleaserTask;
-import releaser.internal.template.TemplateGenerator;
 
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -306,40 +302,6 @@ public abstract class AbstractSpringAcceptanceTests {
 			File file = super.cloneProjectFromOrg(projectName);
 			this.clonedProjects.add(file);
 			return file;
-		}
-
-	}
-
-	public static class TestDocumentationUpdater extends DocumentationUpdater {
-
-		private File documentationRepo;
-
-		public TestDocumentationUpdater(ProjectGitHandler gitHandler,
-				ReleaserProperties properties, TemplateGenerator templateGenerator,
-				List<CustomProjectDocumentationUpdater> updaters) {
-			super(gitHandler, properties, templateGenerator, updaters);
-		}
-
-		@Override
-		public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
-				String bomReleaseBranch) {
-			File documentationRepo = super.updateDocsRepo(projects, currentProject,
-					bomReleaseBranch);
-			this.documentationRepo = documentationRepo;
-			return documentationRepo;
-		}
-
-		@Override
-		public File updateDocsRepoForSingleProject(Projects projects,
-				ProjectVersion currentProject) {
-			File documentationRepo = super.updateDocsRepoForSingleProject(projects,
-					currentProject);
-			this.documentationRepo = documentationRepo;
-			return documentationRepo;
-		}
-
-		public File getDocumentationRepo() {
-			return documentationRepo;
 		}
 
 	}

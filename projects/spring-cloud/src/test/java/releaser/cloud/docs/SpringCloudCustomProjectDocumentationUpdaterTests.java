@@ -43,8 +43,6 @@ import releaser.internal.template.TemplateGenerator;
 
 import org.springframework.util.FileSystemUtils;
 
-import static org.assertj.core.api.BDDAssertions.then;
-
 /**
  * @author Marcin Grzejszczak
  */
@@ -79,18 +77,6 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		this.gitHubHandler = new ProjectGitHubHandler(this.properties,
 				Collections.singletonList(
 						SpringCloudGithubIssuesAccessor.springCloud(this.properties)));
-	}
-
-	@Test
-	public void should_not_update_current_version_in_the_docs_if_current_release_is_not_ga_or_sr() {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
-				"Angel.M7");
-		ReleaserProperties properties = SpringCloudReleaserProperties.get();
-
-		File updatedDocs = projectDocumentationUpdater(properties)
-				.updateDocsRepo(projects(), releaseTrainVersion, "vAngel.M7");
-
-		then(updatedDocs).isNull();
 	}
 
 	@NotNull
@@ -212,74 +198,6 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 		BDDAssertions.then(current).isSymbolicLink();
 		BDDAssertions.then(Files.readSymbolicLink(current).toString())
 				.isNotEqualTo("Angel.SR33");
-	}
-
-	@Test
-	public void should_update_current_version_in_the_docs_if_current_release_starts_with_v_and_then_higher_letter_than_the_stored_release()
-			throws IOException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
-				"Finchley.SR33");
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setUpdateDocumentationRepo(true);
-		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
-
-		File updatedDocs = projectDocumentationUpdater(properties)
-				.updateDocsRepo(projects(), releaseTrainVersion, "vFinchley.SR33");
-
-		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
-				.doesNotExist();
-		Path current = new File(updatedDocs, "current/").toPath();
-		BDDAssertions.then(current).isSymbolicLink();
-		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.isEqualTo("Finchley.SR33");
-	}
-
-	@Test
-	public void should_update_current_version_in_the_docs_if_current_release_starts_with_higher_letter_than_the_stored_release()
-			throws IOException {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
-				"Finchley.SR33");
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setUpdateDocumentationRepo(true);
-		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
-
-		DocumentationUpdater updater = projectDocumentationUpdater(properties);
-		ProjectVersion sleuthVersion = new ProjectVersion("spring-cloud-sleuth",
-				"2.0.0.RELEASE");
-		Projects bom = new Projects(sleuthVersion);
-		File updatedDocs = updater.updateDocsRepo(bom, releaseTrainVersion,
-				"vFinchley.SR33");
-
-		BDDAssertions.then(new File(updatedDocs, "current/index.html").toPath())
-				.doesNotExist();
-		Path current = new File(updatedDocs, "current/").toPath();
-		BDDAssertions.then(current).isSymbolicLink();
-		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.isEqualTo("Finchley.SR33");
-
-		updatedDocs = updater.updateDocsRepoForSingleProject(bom, sleuthVersion);
-
-		BDDAssertions.then(
-				new File(updatedDocs, "spring-cloud-sleuth/current/index.html").toPath())
-				.doesNotExist();
-		current = new File(updatedDocs, "spring-cloud-sleuth/current/").toPath();
-		BDDAssertions.then(current).isSymbolicLink();
-		BDDAssertions.then(Files.readSymbolicLink(current).toString())
-				.isEqualTo("2.0.0.RELEASE");
-	}
-
-	@Test
-	public void should_not_update_current_version_in_the_docs_if_switch_is_off() {
-		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release",
-				"Finchley.SR33");
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
-		properties.getGit().setUpdateDocumentationRepo(false);
-
-		File updatedDocs = projectDocumentationUpdater(properties)
-				.updateDocsRepo(projects(), releaseTrainVersion, "Finchley.SR33");
-
-		then(updatedDocs).isNull();
 	}
 
 	private File file(String relativePath) throws URISyntaxException {

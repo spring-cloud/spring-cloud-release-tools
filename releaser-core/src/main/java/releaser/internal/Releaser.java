@@ -388,39 +388,6 @@ public class Releaser {
 		}
 	}
 
-	public ExecutionResult updateDocumentationRepositoryForTrain(
-			ReleaserProperties properties, Projects projects,
-			ProjectVersion releaseVersion) {
-		String releaseBranch = properties.getPom().getBranch();
-		File file = this.documentationUpdater.updateDocsRepo(projects, releaseVersion,
-				releaseBranch);
-		if (file != null) {
-			log.info(
-					"\nSuccessfully updated documentation repository for train branch [{}]",
-					releaseBranch);
-			return ExecutionResult.success();
-		}
-		return ExecutionResult.skipped();
-	}
-
-	public ExecutionResult updateDocumentationRepositoryForSingleProject(
-			Projects projects, ProjectVersion releaseVersion) {
-		if (releaseVersion.projectName
-				.equals(projects.releaseTrain(this.releaserProperties).projectName)) {
-			log.info("Will not update documentation for project that is a BOM project");
-			return ExecutionResult.skipped();
-		}
-		File file = this.documentationUpdater.updateDocsRepoForSingleProject(projects,
-				releaseVersion);
-		if (file != null) {
-			log.info(
-					"\nSuccessfully updated documentation repository for a project with name [{}]",
-					releaseVersion.projectName);
-			return ExecutionResult.success();
-		}
-		return ExecutionResult.skipped();
-	}
-
 	public ExecutionResult runUpdatedSamples(Projects projects) {
 		return this.postReleaseActions.runUpdatedTests(projects);
 	}

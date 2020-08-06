@@ -21,7 +21,6 @@ import java.util.List;
 
 import releaser.internal.ReleaserProperties;
 import releaser.internal.git.ProjectGitHandler;
-import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.template.TemplateGenerator;
 
@@ -47,35 +46,6 @@ public class DocumentationUpdater {
 			ReleaseTrainContentsUpdater contentsUpdater) {
 		this.projectDocumentationUpdater = updater;
 		this.releaseTrainContentsUpdater = contentsUpdater;
-	}
-
-	/**
-	 * Updates the documentation repository if current release train version is greater or
-	 * equal than the one stored in the repo.
-	 * @param projects list of projects with updated versions
-	 * @param currentProject the project we're parsing
-	 * @param bomReleaseBranch branch of the BOM
-	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
-	 * used
-	 */
-	public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
-			String bomReleaseBranch) {
-		return this.projectDocumentationUpdater.updateDocsRepo(projects, currentProject,
-				bomReleaseBranch);
-	}
-
-	/**
-	 * Updates the documentation repository if current release train version is greater or
-	 * equal than the one stored in the repo.
-	 * @param projects list of projects with updated versions
-	 * @param currentProject the project we're parsing
-	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
-	 * used
-	 */
-	public File updateDocsRepoForSingleProject(Projects projects,
-			ProjectVersion currentProject) {
-		return this.projectDocumentationUpdater.updateDocsRepoForSingleProject(projects,
-				currentProject);
 	}
 
 	/**

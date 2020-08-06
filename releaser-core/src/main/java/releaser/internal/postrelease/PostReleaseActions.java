@@ -321,7 +321,6 @@ public class PostReleaseActions implements Closeable {
 				.cloneReleaseTrainDocumentationProject(releaseTrain.releaseTagName());
 		ReleaserProperties projectProps = projectProps(file);
 		String releaseTrainVersion = releaseTrain.version;
-		updateWithVersions(file, projects);
 		this.projectCommandExecutor.generateReleaseTrainDocs(projectProps,
 				releaseTrainVersion, file.getAbsolutePath());
 		return ExecutionResult.success();

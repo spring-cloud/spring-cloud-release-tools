@@ -19,17 +19,14 @@ package releaser.cloud.spring.meta;
 import java.io.File;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 import org.mockito.BDDMockito;
 import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.docs.CustomProjectDocumentationUpdater;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.GitTestUtils;
-import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.options.OptionsBuilder;
 import releaser.internal.postrelease.PostReleaseActions;
 import releaser.internal.project.Projects;
@@ -44,9 +41,7 @@ import releaser.internal.tasks.composite.ReleaseCompositeTask;
 import releaser.internal.tasks.release.BuildProjectReleaseTask;
 import releaser.internal.tech.BuildUnstableException;
 import releaser.internal.tech.ExecutionResult;
-import releaser.internal.template.TemplateGenerator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -86,8 +81,6 @@ public class SpringMetaReleaseAcceptanceTests
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
 							.getBean(NonAssertingTestProjectGitHandler.class);
 					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
@@ -101,13 +94,12 @@ public class SpringMetaReleaseAcceptanceTests
 					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
 
 					then(result.isFailureOrUnstable()).isFalse();
-					// consul, release, documentation
-					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(3);
+					// consul, release
+					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(2);
 					// don't want to verify the docs
 					thenAllStepsWereExecutedForEachProject(
 							nonAssertingTestProjectGitHandler);
 					thenSaganWasCalled(saganUpdater);
-					thenDocumentationWasUpdated(testDocumentationUpdater);
 					then(clonedProject(nonAssertingTestProjectGitHandler,
 							"spring-cloud-consul").tagList().call()).extracting("name")
 									.contains("refs/tags/v5.3.5.RELEASE");
@@ -136,8 +128,8 @@ public class SpringMetaReleaseAcceptanceTests
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
 							.getBean(NonAssertingTestProjectGitHandler.class);
 					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
+					DocumentationUpdater testDocumentationUpdater = context
+							.getBean(DocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
@@ -158,7 +150,6 @@ public class SpringMetaReleaseAcceptanceTests
 					// thenAllStepsWereExecutedForEachProject(
 					// nonAssertingTestProjectGitHandler);
 					thenSaganWasCalled(saganUpdater);
-					thenDocumentationWasUpdated(testDocumentationUpdater);
 					then(clonedProject(nonAssertingTestProjectGitHandler,
 							"spring-cloud-consul").tagList().call()).extracting("name")
 									.contains("refs/tags/v5.3.5.RELEASE");
@@ -185,8 +176,8 @@ public class SpringMetaReleaseAcceptanceTests
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
 							.getBean(NonAssertingTestProjectGitHandler.class);
 					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
+					DocumentationUpdater testDocumentationUpdater = context
+							.getBean(DocumentationUpdater.class);
 					PostReleaseActions postReleaseActions = context
 							.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
@@ -206,7 +197,6 @@ public class SpringMetaReleaseAcceptanceTests
 					thenAllDryRunStepsWereExecutedForEachProject(
 							nonAssertingTestProjectGitHandler);
 					thenSaganWasNotCalled(saganUpdater);
-					thenDocumentationWasNotUpdated(testDocumentationUpdater);
 					then(clonedProject(nonAssertingTestProjectGitHandler,
 							"spring-cloud-consul").tagList().call()).extracting("name")
 									.doesNotContain("refs/tags/v5.3.5.RELEASE");
@@ -274,8 +264,8 @@ public class SpringMetaReleaseAcceptanceTests
 					BuildProjectReleaseTask build = context
 							.getBean(BuildProjectReleaseTask.class);
 					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
+					DocumentationUpdater testDocumentationUpdater = context
+							.getBean(DocumentationUpdater.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
 							.getBean(TestExecutionResultHandler.class);
 
@@ -295,7 +285,6 @@ public class SpringMetaReleaseAcceptanceTests
 
 					// post release
 					thenSaganWasCalled(saganUpdater);
-					thenDocumentationWasUpdated(testDocumentationUpdater);
 					thenWikiPageWasUpdated(testDocumentationUpdater);
 				});
 	}
@@ -321,8 +310,8 @@ public class SpringMetaReleaseAcceptanceTests
 					BuildProjectReleaseTask build = context
 							.getBean(BuildProjectReleaseTask.class);
 					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
-					TestDocumentationUpdater testDocumentationUpdater = context
-							.getBean(TestDocumentationUpdater.class);
+					DocumentationUpdater testDocumentationUpdater = context
+							.getBean(DocumentationUpdater.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
 							.getBean(TestExecutionResultHandler.class);
 
@@ -342,7 +331,6 @@ public class SpringMetaReleaseAcceptanceTests
 
 					// post release
 					thenSaganWasCalled(saganUpdater);
-					thenDocumentationWasUpdated(testDocumentationUpdater);
 					thenWikiPageWasUpdated(testDocumentationUpdater);
 				});
 	}
@@ -492,13 +480,8 @@ public class SpringMetaReleaseAcceptanceTests
 		}
 
 		@Bean
-		TestDocumentationUpdater testDocumentationUpdater(
-				ProjectGitHandler projectGitHandler,
-				ReleaserProperties releaserProperties,
-				TemplateGenerator templateGenerator, @Autowired(
-						required = false) List<CustomProjectDocumentationUpdater> updaters) {
-			return BDDMockito.spy(new TestDocumentationUpdater(projectGitHandler,
-					releaserProperties, templateGenerator, updaters));
+		DocumentationUpdater testDocumentationUpdater() {
+			return BDDMockito.mock(DocumentationUpdater.class);
 		}
 
 	}

@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.mockito.BDDMockito;
 import releaser.internal.ReleaserProperties;
-import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.github.ProjectGitHubHandler;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
@@ -129,19 +128,6 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests
 				BDDMockito.any(File.class), BDDMockito.anyString(),
 				BDDMockito.any(ProjectVersion.class),
 				BDDMockito.any(ProjectVersion.class), BDDMockito.any(Projects.class));
-	}
-
-	public void thenDocumentationWasUpdated(DocumentationUpdater documentationUpdater) {
-		BDDMockito.then(documentationUpdater).should().updateDocsRepo(
-				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class),
-				BDDMockito.anyString());
-	}
-
-	public void thenDocumentationWasNotUpdated(
-			DocumentationUpdater documentationUpdater) {
-		BDDMockito.then(documentationUpdater).should(BDDMockito.never()).updateDocsRepo(
-				BDDMockito.any(Projects.class), BDDMockito.any(ProjectVersion.class),
-				BDDMockito.anyString());
 	}
 
 	public static class NonAssertingTestProjectGitHubHandler
