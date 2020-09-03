@@ -45,7 +45,7 @@
 		<javax.json.version>1.1.4</javax.json.version>
 		<jopt-simple.version>5.0.4</jopt-simple.version>
 		<fliptables.version>1.1.0</fliptables.version>
-		<zt.exec.version>1.11</zt.exec.version>
+		<zt.exec.version>1.12</zt.exec.version>
 	</properties>
 
 	<dependencyManagement>
