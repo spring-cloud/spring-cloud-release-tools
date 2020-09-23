@@ -65,9 +65,11 @@ class VersionsToBumpFactory implements Closeable {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects fixedVersions = this.releaser.fixedVersions();
 		log.info("Got the following fixed versions [{}]", fixedVersions);
-		String fixedVersionForProject = fixedVersions.containsProject(originalVersion.projectName)
-				? fixedVersions.forName(originalVersion.projectName).version : "";
-		log.info("Found fixed version for this project [{}] is [{}]", originalVersion.projectName, fixedVersionForProject);
+		String fixedVersionForProject = fixedVersions
+				.containsProject(originalVersion.projectName)
+						? fixedVersions.forName(originalVersion.projectName).version : "";
+		log.info("Found fixed version for this project [{}] is [{}]",
+				originalVersion.projectName, fixedVersionForProject);
 		ProjectVersion versionFromBom = StringUtils.hasText(fixedVersionForProject)
 				? new ProjectVersion(originalVersion.projectName, fixedVersionForProject)
 				: new ProjectVersion(project);
@@ -85,7 +87,8 @@ class VersionsToBumpFactory implements Closeable {
 		return cachedProjectsFromBom(versionFromBom, projectsToUpdate);
 	}
 
-	private ProjectsFromBom cachedProjectsFromBom(ProjectVersion versionFromBom, Projects projectsToUpdate) {
+	private ProjectsFromBom cachedProjectsFromBom(ProjectVersion versionFromBom,
+			Projects projectsToUpdate) {
 		return new ProjectsFromBom(projectsToUpdate, versionFromBom);
 	}
 

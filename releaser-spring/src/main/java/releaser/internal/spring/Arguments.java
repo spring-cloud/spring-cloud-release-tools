@@ -146,15 +146,11 @@ public final class Arguments implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Arguments{" +
-				"project=" + project +
-				", projects=" + projects +
-				", originalVersion=" + originalVersion +
-				", versionFromBom=" + versionFromBom +
-				", properties=" + properties +
-				", options=" + options +
-				", projectToRun=" + projectToRun +
-				", processedProjects=" + processedProjects +
-				'}';
+		return "Arguments{" + "project=" + project + ", projects=" + projects
+				+ ", originalVersion=" + originalVersion + ", versionFromBom="
+				+ versionFromBom + ", properties=" + properties + ", options=" + options
+				+ ", projectToRun=" + projectToRun + ", processedProjects="
+				+ processedProjects + '}';
 	}
+
 }
