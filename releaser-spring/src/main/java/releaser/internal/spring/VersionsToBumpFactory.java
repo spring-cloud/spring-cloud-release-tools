@@ -64,8 +64,10 @@ class VersionsToBumpFactory implements Closeable {
 	private ProjectsFromBom fetchVersionsFromFixedProjects(File project) {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects fixedVersions = this.releaser.fixedVersions();
+		log.info("Got the following fixed versions [{}]", fixedVersions);
 		String fixedVersionForProject = fixedVersions.containsProject(project.getName())
 				? fixedVersions.forName(project.getName()).version : "";
+		log.info("Found fixed version for this project is [{}]", fixedVersionForProject);
 		ProjectVersion versionFromBom = StringUtils.hasText(fixedVersionForProject)
 				? new ProjectVersion(originalVersion.projectName, fixedVersionForProject)
 				: new ProjectVersion(project);

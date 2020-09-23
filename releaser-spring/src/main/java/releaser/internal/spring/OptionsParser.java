@@ -63,7 +63,7 @@ class OptionsParser implements Parser {
 	public Options parse(String[] args) {
 		OptionParser parser = new OptionParser();
 		parser.allowsUnrecognizedOptions();
-		log.info("Got following args <{}>", args);
+		log.info("Got following args <{}>", (Object[]) args);
 		try {
 			ArgumentAcceptingOptionSpec<Boolean> metaReleaseOpt = parser
 					.acceptsAll(Arrays.asList("x", "meta-release"),

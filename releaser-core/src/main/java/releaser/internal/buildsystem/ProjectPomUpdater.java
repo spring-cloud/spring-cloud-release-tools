@@ -121,8 +121,8 @@ public class ProjectPomUpdater implements Closeable {
 		Set<Project> projects = this.properties.getFixedVersions().entrySet().stream()
 				.map(entry -> new Project(entry.getKey(), entry.getValue()))
 				.collect(Collectors.toSet());
-		if (log.isDebugEnabled()) {
-			log.debug("Will apply the following fixed versions {}", projects);
+		if (log.isInfoEnabled()) {
+			log.info("Will apply the following fixed versions {}", projects);
 		}
 		return new VersionsFromBomBuilder().releaserProperties(this.properties)
 				.parsers(compositeBomParser().customBomParsers()).projects(projects)
