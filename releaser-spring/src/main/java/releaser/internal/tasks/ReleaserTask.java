@@ -18,6 +18,8 @@ package releaser.internal.tasks;
 
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.spring.Arguments;
@@ -30,6 +32,8 @@ import org.springframework.core.Ordered;
  * Describes a single release task.
  */
 public interface ReleaserTask extends Ordered, Function<Arguments, ExecutionResult> {
+
+	Logger log = LoggerFactory.getLogger(ReleaserTask.class);
 
 	/**
 	 * @return name of the release task (e.g. 'Build')
@@ -69,6 +73,7 @@ public interface ReleaserTask extends Ordered, Function<Arguments, ExecutionResu
 	 */
 	default ExecutionResult apply(Arguments args) {
 		try {
+			log.info("Running a task [{}] with arguments [{}]", name(), args);
 			return runTask(args);
 		}
 		catch (BuildUnstableException ex) {

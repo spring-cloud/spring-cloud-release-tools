@@ -527,7 +527,7 @@ class CommandPicker {
 					profiles);
 		}
 		else {
-			log.info("The build is a snapshot one - will not add any profiles");
+			log.info("The version [" + version.toString() + "] is a snapshot one - will not add any profiles");
 		}
 		return trimmedCommand;
 	}

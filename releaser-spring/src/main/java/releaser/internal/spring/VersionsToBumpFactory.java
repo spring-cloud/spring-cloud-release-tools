@@ -64,16 +64,16 @@ class VersionsToBumpFactory implements Closeable {
 	private ProjectsFromBom fetchVersionsFromFixedProjects(File project) {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects fixedVersions = this.releaser.fixedVersions();
-		log.info("Got the following fixed versions [{}]", fixedVersions);
+		log.debug("Got the following fixed versions [{}]", fixedVersions);
 		String fixedVersionForProject = fixedVersions.containsProject(project.getName())
 				? fixedVersions.forName(project.getName()).version : "";
-		log.info("Found fixed version for this project is [{}]", fixedVersionForProject);
+		log.debug("Found fixed version for this project is [{}]", fixedVersionForProject);
 		ProjectVersion versionFromBom = StringUtils.hasText(fixedVersionForProject)
 				? new ProjectVersion(originalVersion.projectName, fixedVersionForProject)
 				: new ProjectVersion(project);
 		fixedVersions.add(versionFromBom);
 		printSettingVersionFromFixedVersions(fixedVersions);
-		return cachedProjectsFromBom(project, versionFromBom, fixedVersions);
+		return cachedProjectsFromBom(versionFromBom, fixedVersions);
 	}
 
 	private ProjectsFromBom fetchVersionsFromGitForSingleProject(File project) {
@@ -81,11 +81,10 @@ class VersionsToBumpFactory implements Closeable {
 		Projects projectsToUpdate = this.releaser.retrieveVersionsFromBom();
 		ProjectVersion versionFromBom = assertNoSnapshotsForANonSnapshotProject(project,
 				projectsToUpdate);
-		return cachedProjectsFromBom(project, versionFromBom, projectsToUpdate);
+		return cachedProjectsFromBom(versionFromBom, projectsToUpdate);
 	}
 
-	private ProjectsFromBom cachedProjectsFromBom(File project,
-			ProjectVersion versionFromBom, Projects projectsToUpdate) {
+	private ProjectsFromBom cachedProjectsFromBom(ProjectVersion versionFromBom, Projects projectsToUpdate) {
 		return new ProjectsFromBom(projectsToUpdate, versionFromBom);
 	}
 
