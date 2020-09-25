@@ -75,7 +75,6 @@ public class ExecutionResult implements Serializable {
 			return new RuntimeException(
 					"[Breaking self reference chain] " + cause.toString());
 		}
-		System.out.println("Not breaking the reference chain. . . i think");
 		return cause;
 	}
 
