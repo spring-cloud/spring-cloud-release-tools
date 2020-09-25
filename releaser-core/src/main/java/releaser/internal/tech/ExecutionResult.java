@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 /**
@@ -69,10 +70,12 @@ public class ExecutionResult implements Serializable {
 	}
 
 	private static Exception breakReferenceChain(Exception cause) {
-		if (cause instanceof HttpServerErrorException) {
+		if (cause instanceof HttpServerErrorException || cause instanceof HttpClientErrorException) {
+			System.out.println("Breaking the reference chain. . . i think");
 			return new RuntimeException(
 					"[Breaking self reference chain] " + cause.toString());
 		}
+		System.out.println("Not breaking the reference chain. . . i think");
 		return cause;
 	}
 
