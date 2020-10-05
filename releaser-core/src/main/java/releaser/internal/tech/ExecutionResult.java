@@ -70,7 +70,8 @@ public class ExecutionResult implements Serializable {
 	}
 
 	private static Exception breakReferenceChain(Exception cause) {
-		if (cause instanceof HttpServerErrorException || cause instanceof HttpClientErrorException) {
+		if (cause instanceof HttpServerErrorException
+				|| cause instanceof HttpClientErrorException) {
 			System.out.println("Breaking the reference chain. . . i think");
 			return new RuntimeException(
 					"[Breaking self reference chain] " + cause.toString());
