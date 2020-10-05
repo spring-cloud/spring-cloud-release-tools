@@ -38,6 +38,7 @@ final class SpringCloudBomConstants {
 	static final String CLOUD_RELEASE_ARTIFACT_ID = "spring-cloud-release";
 	static final String CLOUD_STARTER_ARTIFACT_ID = "spring-cloud-starter";
 	static final String CLOUD_STARTER_PARENT_ARTIFACT_ID = "spring-cloud-starter-parent";
+	static final String CLOUD_STARTER_BUILD_ARTIFACT_ID = "spring-cloud-starter-build";
 
 	// sc-stream
 	static final String STREAM_DEPS_ARTIFACT_ID = "spring-cloud-stream-dependencies";

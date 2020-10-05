@@ -41,6 +41,7 @@ import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_DEPENDENC
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_RELEASE_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_STARTER_ARTIFACT_ID;
+import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_STARTER_BUILD_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.CLOUD_STARTER_PARENT_ARTIFACT_ID;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.SPRING_BOOT;
 import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_DEPS_ARTIFACT_ID;
@@ -159,6 +160,7 @@ class SpringCloudMavenBomParser implements CustomBomParser {
 		case CLOUD_RELEASE_ARTIFACT_ID:
 		case CLOUD_STARTER_ARTIFACT_ID:
 		case CLOUD_STARTER_PARENT_ARTIFACT_ID:
+		case CLOUD_STARTER_BUILD_ARTIFACT_ID:
 			updateSpringCloudVersions(newProjects, version);
 			break;
 		case STREAM_DEPS_ARTIFACT_ID:
@@ -196,11 +198,13 @@ class SpringCloudMavenBomParser implements CustomBomParser {
 		remove(newProjects, CLOUD_RELEASE_ARTIFACT_ID);
 		remove(newProjects, CLOUD_STARTER_ARTIFACT_ID);
 		remove(newProjects, CLOUD_STARTER_PARENT_ARTIFACT_ID);
+		remove(newProjects, CLOUD_STARTER_BUILD_ARTIFACT_ID);
 		add(newProjects, CLOUD_DEPENDENCIES_ARTIFACT_ID, version);
 		add(newProjects, CLOUD_ARTIFACT_ID, version);
 		add(newProjects, CLOUD_RELEASE_ARTIFACT_ID, version);
 		add(newProjects, CLOUD_STARTER_ARTIFACT_ID, version);
 		add(newProjects, CLOUD_STARTER_PARENT_ARTIFACT_ID, version);
+		add(newProjects, CLOUD_STARTER_BUILD_ARTIFACT_ID, version);
 	}
 
 	private void updateStreamVersions(Set<Project> newProjects, String version) {
