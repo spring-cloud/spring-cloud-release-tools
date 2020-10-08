@@ -18,7 +18,7 @@ releaser:
     spring-project-url: https://github.com/spring-projects/spring-cloud
     test-samples-project-url: https://github.com/spring-cloud/spring-cloud-core-tests
     release-train-docs-url: https://github.com/spring-cloud-samples/scripts
-    release-train-wiki-url: https://github.com/spring-projects/spring-cloud.wiki
+    release-train-wiki-url: https://github.com/spring-cloud/spring-cloud-release.wiki
     documentation-branch: gh-pages
     spring-project-branch: gh-pages
     test-samples-branch: master
