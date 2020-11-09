@@ -19,8 +19,12 @@ package releaser.internal.tech;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 /**
  * Task execution result. Contains a list of exceptions thrown while running the task.
@@ -57,11 +61,22 @@ public class ExecutionResult implements Serializable {
 	}
 
 	public static ExecutionResult failure(Exception throwable) {
-		return new ExecutionResult(throwable);
+		return new ExecutionResult(breakReferenceChain(throwable));
 	}
 
 	public static ExecutionResult failure(List<Exception> throwables) {
-		return new ExecutionResult(throwables);
+		return new ExecutionResult(throwables.stream()
+				.map(ExecutionResult::breakReferenceChain).collect(Collectors.toList()));
+	}
+
+	private static Exception breakReferenceChain(Exception cause) {
+		if (cause instanceof HttpServerErrorException
+				|| cause instanceof HttpClientErrorException) {
+			System.out.println("Breaking the reference chain. . . i think");
+			return new RuntimeException(
+					"[Breaking self reference chain] " + cause.toString());
+		}
+		return cause;
 	}
 
 	public static ExecutionResult unstable(Exception ex) {

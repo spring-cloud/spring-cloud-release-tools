@@ -49,6 +49,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -423,7 +424,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			List<Exception> thrownExceptions = exceptionsThrownBySteps(execution);
 			return new ExecutionResult(thrownExceptions);
 		}
-		catch (JobExecutionException ex) {
+		catch (JobExecutionException | UnexpectedJobExecutionException ex) {
 			return ExecutionResult.failure(ex);
 		}
 	}

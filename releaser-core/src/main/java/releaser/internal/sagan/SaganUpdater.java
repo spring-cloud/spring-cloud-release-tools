@@ -64,22 +64,30 @@ public class SaganUpdater {
 				originalVersion, currentVersion, projects);
 		if (updateReleaseException == null) {
 			log.info("Updating Sagan releases with \n\n{}", update);
-			Project project = this.saganClient.updateRelease(currentVersion.projectName,
-					Collections.singletonList(update));
-			Optional<ProjectVersion> projectVersion = latestVersion(currentVersion,
-					project);
-			log.info("Found the following latest project version [{}]", projectVersion);
-			boolean present = projectVersion.isPresent();
-			if (present && currentVersionNewerOrEqual(currentVersion, projectVersion)) {
-				updateDocumentationIfNecessary(projectFile, project);
+			try {
+				Project project = this.saganClient.updateRelease(
+						currentVersion.projectName, Collections.singletonList(update));
+				Optional<ProjectVersion> projectVersion = latestVersion(currentVersion,
+						project);
+				log.info("Found the following latest project version [{}]",
+						projectVersion);
+				boolean present = projectVersion.isPresent();
+				if (present
+						&& currentVersionNewerOrEqual(currentVersion, projectVersion)) {
+					updateDocumentationIfNecessary(projectFile, project);
+				}
+				else {
+					log.info(present
+							? "Latest version [" + projectVersion.get() + "] present and "
+									+ "the current version [" + currentVersion
+									+ "] is older than that one. " + "Will do nothing."
+							: "No latest version found. Will do nothing.");
+					return ExecutionResult.skipped();
+				}
 			}
-			else {
-				log.info(present
-						? "Latest version [" + projectVersion.get() + "] present and "
-								+ "the current version [" + currentVersion
-								+ "] is older than that one. " + "Will do nothing."
-						: "No latest version found. Will do nothing.");
-				return ExecutionResult.skipped();
+			catch (Exception ex) {
+				log.warn("Exception occurred while trying to update sagan release", ex);
+				updateReleaseException = ex;
 			}
 		}
 		return updateReleaseException == null ? ExecutionResult.success()
