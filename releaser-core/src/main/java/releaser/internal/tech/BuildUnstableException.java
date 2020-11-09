@@ -19,12 +19,22 @@ package releaser.internal.tech;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+
+/**
+ * Exception to be thrown if one wants to continue with the build and throw this exception
+ * at the end of the release.
+ *
+ * @author Marcin Grzejszczak
+ */
 /**
  * Exception to be thrown if one wants to continue with the build and throw this exception
  * at the end of the release.
@@ -52,18 +62,28 @@ public class BuildUnstableException extends RuntimeException implements Serializ
 	private final List<Throwable> exceptions = new ArrayList<>();
 
 	public BuildUnstableException(Throwable cause) {
-		super(cause);
+		super(breakReferenceChain(cause));
 		log.warn("\n\n" + DESCRIPTION, cause);
-		this.exceptions.add(cause);
+		this.exceptions.add((breakReferenceChain(cause)));
 	}
 
 	public BuildUnstableException(String message, List<Throwable> throwables) {
-		this(throwables);
+		this(throwables.stream().map(BuildUnstableException::breakReferenceChain)
+				.collect(Collectors.toList()));
 		log.warn("\n\n" + DESCRIPTION + message + " with causes " + throwables);
 	}
 
 	// for Jackson
 	public BuildUnstableException() {
+	}
+
+	private static Throwable breakReferenceChain(Throwable cause) {
+		if (cause instanceof HttpServerErrorException
+				|| cause instanceof HttpClientErrorException) {
+			return new RuntimeException(
+					"[Breaking self reference chain] " + cause.toString());
+		}
+		return cause;
 	}
 
 	@JsonCreator
