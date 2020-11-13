@@ -30,7 +30,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 
-		<spring-cloud-bom.version>Hoxton.SR6</spring-cloud-bom.version>
+		<spring-cloud-bom.version>Hoxton.SR9</spring-cloud-bom.version>
 		<jcabi-github.version>1.0</jcabi-github.version>
 		<jsch-agent.version>0.0.9</jsch-agent.version>
 		<hibernate-validator.version>5.4.1.Final</hibernate-validator.version>
