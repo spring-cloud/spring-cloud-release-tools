@@ -317,8 +317,16 @@ public class PostReleaseActions implements Closeable {
 			return ExecutionResult.skipped();
 		}
 		ProjectVersion releaseTrain = projects.releaseTrain(this.properties);
-		File file = this.projectGitHandler
-				.cloneReleaseTrainDocumentationProject(releaseTrain.releaseTagName());
+		File file;
+		String branch = releaseTrain.releaseTagName();
+		if (StringUtils.hasText(branch)) {
+			file = this.projectGitHandler
+					.cloneReleaseTrainDocumentationProject(branch);
+		}
+		else {
+			// this is a milestone or snapshot, not a release
+			file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
+		}
 		ReleaserProperties projectProps = projectProps(file);
 		String releaseTrainVersion = releaseTrain.version;
 		this.projectCommandExecutor.generateReleaseTrainDocs(projectProps,
