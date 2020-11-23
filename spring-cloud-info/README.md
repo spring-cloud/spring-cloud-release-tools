@@ -28,4 +28,4 @@ data from GitHub.
 ## REST API
 The rest API is documented via Spring Rest Docs and is published along with the app to Pivotal
 Cloud Foundry.  You can find the REST API documentation at 
-https://spring-cloud-info.cfapps.io/docs/spring-cloud-info.html.
+https://spring-cloud-info.apps.pcfone.io/docs/spring-cloud-info.html.
