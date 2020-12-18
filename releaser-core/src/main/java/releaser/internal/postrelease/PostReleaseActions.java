@@ -320,8 +320,7 @@ public class PostReleaseActions implements Closeable {
 		File file;
 		String branch = releaseTrain.releaseTagName();
 		if (StringUtils.hasText(branch)) {
-			file = this.projectGitHandler
-					.cloneReleaseTrainDocumentationProject(branch);
+			file = this.projectGitHandler.cloneReleaseTrainDocumentationProject(branch);
 		}
 		else {
 			// this is a milestone or snapshot, not a release
