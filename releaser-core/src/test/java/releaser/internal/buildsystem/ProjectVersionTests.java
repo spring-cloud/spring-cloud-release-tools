@@ -110,7 +110,8 @@ public class ProjectVersionTests {
 		then(ProjectVersion.isValid("2020.0.0-SNAPSHOT")).isTrue();
 		then(ProjectVersion.isValid("2020.0.0-M1")).isTrue();
 		then(ProjectVersion.isValid("2020.0.0-RC2")).isTrue();
-		// then(ProjectVersion.isValid("2020.0.0")).isTrue();
+		then(ProjectVersion.isValid("2020.0.0")).isTrue();
+		then(ProjectVersion.isValid("2020.1.1")).isTrue();
 		then(ProjectVersion.isValid("1.0.1-SNAPSHOT")).isTrue();
 		then(ProjectVersion.isValid("1.0.3-RC1")).isTrue();
 		then(ProjectVersion.isValid("1.0.4-M1")).isTrue();
@@ -152,7 +153,8 @@ public class ProjectVersionTests {
 		then(projectVersion("2.0.1-RC1").major()).isEqualTo("2");
 		then(projectVersion("Finchley-SR1").major()).isEqualTo("Finchley");
 		then(projectVersion("2020.0.0-M1").major()).isEqualTo("2020");
-		// then(projectVersion("2020.0.0").major()).isEqualTo("2020");
+		then(projectVersion("2020.0.0").major()).isEqualTo("2020");
+		then(projectVersion("2021.1.1").major()).isEqualTo("2021");
 	}
 
 	@Test
@@ -268,7 +270,7 @@ public class ProjectVersionTests {
 
 		String newReleaseSuffixVersion = "2020.0.0";
 
-		// then(projectVersion(newReleaseSuffixVersion).isRelease()).isTrue();
+		then(projectVersion(newReleaseSuffixVersion).isRelease()).isTrue();
 	}
 
 	@Test
@@ -279,7 +281,7 @@ public class ProjectVersionTests {
 
 		String newServiceReleaseVersion = "2020.0.1";
 
-		// then(projectVersion(newServiceReleaseVersion).isRelease()).isTrue();
+		then(projectVersion(newServiceReleaseVersion).isServiceRelease()).isTrue();
 	}
 
 	@Test

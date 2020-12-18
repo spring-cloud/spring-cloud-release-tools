@@ -413,7 +413,16 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	public boolean isRelease() {
-		return this.version != null && this.version.contains("RELEASE");
+		if (!StringUtils.hasText(this.version)) {
+			return false;
+		}
+		SplitVersion splitVersion = assertVersion();
+		if (splitVersion.calverReleaseTrain()) {
+			if (Integer.parseInt(splitVersion.patch) == 0) {
+				return true;
+			}
+		}
+		return this.version.contains("RELEASE");
 	}
 
 	public boolean isReleaseTrain() {
@@ -431,7 +440,16 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	public boolean isServiceRelease() {
-		return this.version != null && this.version.matches(".*.SR[0-9]+");
+		if (!StringUtils.hasText(this.version)) {
+			return false;
+		}
+		SplitVersion splitVersion = assertVersion();
+		if (splitVersion.calverReleaseTrain()) {
+			if (Integer.parseInt(splitVersion.patch) > 0) {
+				return true;
+			}
+		}
+		return this.version.matches(".*.SR[0-9]+");
 	}
 
 	private ReleaseType toReleaseType() {
@@ -696,7 +714,12 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		}
 
 		private boolean calverReleaseTrain() {
-			return Integer.parseInt(this.major) >= 2020;
+			try {
+				return Integer.parseInt(this.major) >= 2020;
+			}
+			catch (NumberFormatException e) {
+				return false;
+			}
 		}
 
 		private boolean isOldReleaseTrain() {
