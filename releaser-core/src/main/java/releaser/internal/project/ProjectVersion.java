@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.tech.PomReader;
 
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.StringUtils;
 
 enum ReleaseType {
@@ -417,6 +418,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return false;
 		}
 		SplitVersion splitVersion = assertVersion();
+		log.info("isRelease split version: " + splitVersion);
 		if (splitVersion.calverReleaseTrain()) {
 			if (Integer.parseInt(splitVersion.patch) == 0) {
 				return true;
@@ -769,6 +771,17 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return SNAPSHOT_SUFFIX;
 		}
 
+		@Override
+		public String toString() {
+			return new ToStringCreator(this)
+					.append("major", major)
+					.append("minor", minor)
+					.append("patch", patch)
+					.append("delimiter", delimiter)
+					.append("suffix", suffix)
+					.toString();
+
+		}
 	}
 
 	private static class TrainVersionNumber implements Comparable<TrainVersionNumber> {
