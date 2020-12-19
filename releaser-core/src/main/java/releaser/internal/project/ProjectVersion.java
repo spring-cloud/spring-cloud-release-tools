@@ -417,14 +417,16 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (!StringUtils.hasText(this.version)) {
 			return false;
 		}
+		if (this.version.contains("RELEASE")) {
+			return true;
+		}
 		SplitVersion splitVersion = assertVersion();
-		log.info("isRelease split version: " + splitVersion);
-		if (splitVersion.calverReleaseTrain()) {
+		if (StringUtils.isEmpty(splitVersion.suffix)) { // this is an x.y.z release
 			if (Integer.parseInt(splitVersion.patch) == 0) {
 				return true;
 			}
 		}
-		return this.version.contains("RELEASE");
+		return false;
 	}
 
 	public boolean isReleaseTrain() {
@@ -445,13 +447,16 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (!StringUtils.hasText(this.version)) {
 			return false;
 		}
+		if (this.version.matches(".*.SR[0-9]+")) {
+			return true;
+		}
 		SplitVersion splitVersion = assertVersion();
-		if (splitVersion.calverReleaseTrain()) {
+		if (StringUtils.isEmpty(splitVersion.suffix)) { // this is an x.y.z release
 			if (Integer.parseInt(splitVersion.patch) > 0) {
 				return true;
 			}
 		}
-		return this.version.matches(".*.SR[0-9]+");
+		return false;
 	}
 
 	private ReleaseType toReleaseType() {
@@ -773,15 +778,12 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this)
-					.append("major", major)
-					.append("minor", minor)
-					.append("patch", patch)
-					.append("delimiter", delimiter)
-					.append("suffix", suffix)
-					.toString();
+			return new ToStringCreator(this).append("major", major).append("minor", minor)
+					.append("patch", patch).append("delimiter", delimiter)
+					.append("suffix", suffix).toString();
 
 		}
+
 	}
 
 	private static class TrainVersionNumber implements Comparable<TrainVersionNumber> {
