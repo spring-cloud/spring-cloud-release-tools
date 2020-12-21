@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.Model;
@@ -60,6 +61,9 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	private static final String RELEASE_REGEX = "^.*[\\.|\\-]RELEASE.*$";
 
 	private static final String SR_REGEX = "^.*[\\.|\\-]SR[0-9]+.*$";
+
+	private static final Pattern SEMVER_PATTERN = Pattern
+			.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
 
 	private static final List<Pattern> VALID_PATTERNS = Arrays.asList(SNAPSHOT_PATTERN,
 			Pattern.compile(MILESTONE_REGEX), Pattern.compile(RC_REGEX),
@@ -197,6 +201,17 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	private SplitVersion tryHyphenSeparatedVersion(String version) {
+
+		// 3.1.0, 3.0.0, 2.1.1, etc...
+		Matcher matcher = SEMVER_PATTERN.matcher(version);
+		if (matcher.matches()) {
+			String major = matcher.group(1);
+			String minor = matcher.group(2);
+			String patch = matcher.group(3);
+			// new style semver releases only use hyphen
+			return SplitVersion.hyphen(major, minor, patch);
+		}
+
 		// Check for hyphen separated BOMs versioning
 		// Dysprosium-BUILD-SNAPSHOT or Dysprosium-RELEASE
 		// 1.0.0-BUILD-SNAPSHOT or 1.0.0-RELEASE
@@ -207,26 +222,6 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		int indexOfFirstHyphen = version.indexOf("-");
 		boolean buildSnapshot = version.endsWith("BUILD-SNAPSHOT");
 
-		String[] splitVersion = StringUtils.delimitedListToStringArray(version, ".");
-		boolean newVersionSchema = splitVersion.length == 3;
-		for (int i = 0; i < splitVersion.length && newVersionSchema; i++) {
-			try {
-				int v = Integer.parseInt(splitVersion[i]);
-				if (i == 0) {
-					newVersionSchema = v == 3;
-				}
-				else if (i == 1) {
-					newVersionSchema = v >= 1;
-				}
-			}
-			catch (Exception e) {
-				newVersionSchema = false;
-			}
-		}
-		if (newVersionSchema) {
-			SplitVersion v = SplitVersion.hyphen(splitVersion);
-			return v;
-		}
 		if (numberOfHyphens == 1 && !buildSnapshot
 				|| (numberOfHyphens > 1 && buildSnapshot)) {
 			// Dysprosium or 1.0.0
@@ -698,6 +693,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		private static String orDefault(String[] args, int argIndex) {
 			return args.length > argIndex ? args[argIndex] : "";
+		}
+
+		static SplitVersion hyphen(String major, String minor, String patch) {
+			return new SplitVersion(major, minor, patch, HYPHEN, "");
 		}
 
 		static SplitVersion hyphen(String major, String suffix) {

@@ -225,6 +225,18 @@ public class ProjectVersionTests {
 		version = "3.1.0";
 		then(projectVersion(version).postReleaseSnapshotVersion())
 				.isEqualTo("3.1.1-SNAPSHOT");
+
+		version = "3.0.0";
+		then(projectVersion(version).postReleaseSnapshotVersion())
+				.isEqualTo("3.0.1-SNAPSHOT");
+
+		version = "2.0.0";
+		then(projectVersion(version).postReleaseSnapshotVersion())
+				.isEqualTo("2.0.1-SNAPSHOT");
+
+		version = "3.0.1";
+		then(projectVersion(version).postReleaseSnapshotVersion())
+				.isEqualTo("3.0.2-SNAPSHOT");
 	}
 
 	@Test
