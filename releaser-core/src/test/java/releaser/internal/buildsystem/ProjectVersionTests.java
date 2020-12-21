@@ -221,6 +221,10 @@ public class ProjectVersionTests {
 
 		then(projectVersion(version).postReleaseSnapshotVersion())
 				.isEqualTo("1.0.2-SNAPSHOT");
+
+		version = "3.1.0";
+		then(projectVersion(version).postReleaseSnapshotVersion())
+				.isEqualTo("3.1.1-SNAPSHOT");
 	}
 
 	@Test
@@ -286,9 +290,9 @@ public class ProjectVersionTests {
 		String version = "1.0.1-SR1";
 
 		then(projectVersion(version).isServiceRelease()).isTrue();
-
+		//
 		String newServiceReleaseVersion = "2020.0.1";
-
+		//
 		then(projectVersion(newServiceReleaseVersion).isServiceRelease()).isTrue();
 
 		newServiceReleaseVersion = "3.0.1";

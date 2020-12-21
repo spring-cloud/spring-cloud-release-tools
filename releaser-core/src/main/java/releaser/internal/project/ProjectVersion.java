@@ -206,6 +206,27 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		int numberOfHyphens = splitByHyphens - 1;
 		int indexOfFirstHyphen = version.indexOf("-");
 		boolean buildSnapshot = version.endsWith("BUILD-SNAPSHOT");
+
+		String[] splitVersion = StringUtils.delimitedListToStringArray(version, ".");
+		boolean newVersionSchema = splitVersion.length == 3;
+		for (int i = 0; i < splitVersion.length && newVersionSchema; i++) {
+			try {
+				int v = Integer.parseInt(splitVersion[i]);
+				if (i == 0) {
+					newVersionSchema = v == 3;
+				}
+				else if (i == 1) {
+					newVersionSchema = v >= 1;
+				}
+			}
+			catch (Exception e) {
+				newVersionSchema = false;
+			}
+		}
+		if (newVersionSchema) {
+			SplitVersion v = SplitVersion.hyphen(splitVersion);
+			return v;
+		}
 		if (numberOfHyphens == 1 && !buildSnapshot
 				|| (numberOfHyphens > 1 && buildSnapshot)) {
 			// Dysprosium or 1.0.0
