@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import releaser.internal.ReleaserProperties;
@@ -44,7 +43,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = RestTemplateSaganClientTests.Config.class)
-@AutoConfigureStubRunner(ids = "sagan:sagan-site")
+@AutoConfigureStubRunner(ids = "io.spring.sagan:sagan-site")
 public class RestTemplateSaganClientTests {
 
 	@Value("${stubrunner.runningstubs.sagan-site.port}")
@@ -64,7 +63,6 @@ public class RestTemplateSaganClientTests {
 	}
 
 	@Test
-	@Ignore("2 stubs point to the same endpoint")
 	public void should_get_a_project() {
 		Project project = this.client.getProject("spring-framework");
 

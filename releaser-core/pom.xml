@@ -117,7 +117,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>sagan</groupId>
+			<groupId>io.spring.sagan</groupId>
 			<artifactId>sagan-site</artifactId>
 			<classifier>stubs</classifier>
 			<version>${sagan-site.version}</version>
