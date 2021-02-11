@@ -115,4 +115,3 @@ releaser:
     projects-to-skip:
       - spring-boot
       - spring-cloud-stream
-      - spring-cloud-task
