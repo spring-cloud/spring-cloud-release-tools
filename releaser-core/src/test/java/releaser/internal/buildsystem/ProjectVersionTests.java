@@ -345,8 +345,10 @@ public class ProjectVersionTests {
 	public void should_return_true_when_checking_ga_version_against_ga() {
 		then(projectVersion("1.0.1.RELEASE").isReleaseOrServiceRelease()).isTrue();
 		then(projectVersion("1.0.1-SR1").isReleaseOrServiceRelease()).isTrue();
-		// then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
-		// then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("2021.0.0").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("2022.0.3").isReleaseOrServiceRelease()).isTrue();
 	}
 
 	@Test
