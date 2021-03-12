@@ -54,7 +54,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	private static final Pattern SNAPSHOT_PATTERN = Pattern
 			.compile("^.*[\\.|\\-](BUILD-)?SNAPSHOT.*$");
 
-	private static final String MILESTONE_REGEX = ".*[\\.|\\-]M[0-9]+";
+	private static final String MILESTONE_REGEX = "^.*[\\.|\\-]M[0-9]+.*$";
 
 	private static final String RC_REGEX = "^.*[\\.|\\-]RC.*$";
 
