@@ -35,7 +35,7 @@ import releaser.internal.git.GitRepoTests;
 import releaser.internal.project.Project;
 import releaser.internal.tech.PomReader;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.util.FileSystemUtils;
 
 /**
@@ -44,7 +44,7 @@ import org.springframework.util.FileSystemUtils;
 public class PomUpdaterTests {
 
 	@Rule
-	public OutputCapture capture = new OutputCapture();
+	public OutputCaptureRule capture = new OutputCaptureRule();
 
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();

@@ -237,7 +237,7 @@ public class ProjectPomUpdater implements Closeable {
 								.stream()
 								.filter(pattern -> IGNORED_SNAPSHOT_LINE_PATTERNS.stream()
 										.noneMatch(line::matches)
-										&& pattern.matcher(line).matches())
+										&& pattern.matcher(line).lookingAt())
 								.findFirst().orElse(null);
 						if (matchingPattern != null) {
 							if (log.isDebugEnabled()) {

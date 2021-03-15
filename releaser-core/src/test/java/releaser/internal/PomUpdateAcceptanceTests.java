@@ -115,7 +115,7 @@ public class PomUpdateAcceptanceTests {
 	}
 
 	@Test
-	public void should_not_fail_update_when_after_updating_a_release_version_there_still_is_a_snapshot_version_in_a_non_deployable_module()
+	public void should_fail_update_when_after_updating_a_release_version_there_still_is_a_snapshot_version_in_a_non_deployable_module()
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
@@ -129,6 +129,61 @@ public class PomUpdateAcceptanceTests {
 				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
 						project, projects, projects.forFile(project), true))
 				.hasMessageContaining("<version>0.3.1.BUILD-SNAPSHOT</version>");
+	}
+
+	@Test
+	public void should_fail_update_when_after_updating_a_release_version_there_still_is_a_milestone_version_in_a_non_deployable_module()
+			throws Exception {
+		ReleaserProperties releaserProperties = branchReleaserProperties();
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections
+						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
+		projects.removeIf(projectVersion -> projectVersion.projectName
+				.contains("spring-cloud-build"));
+		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.RELEASE"));
+		File project = new File(this.temporaryFolder,
+				"/spring-cloud-sleuth-with-milestone-dep");
+
+		BDDAssertions
+				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
+						project, projects, projects.forFile(project), true))
+				.hasMessageContaining("<zipkin.version>1.19.2-M2</zipkin.version>");
+	}
+
+	@Test
+	public void should_fail_update_when_after_updating_a_release_candidate_version_there_still_is_a_milestone_version_in_a_non_deployable_module()
+			throws Exception {
+		ReleaserProperties releaserProperties = branchReleaserProperties();
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections
+						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
+		projects.removeIf(
+				projectVersion -> projectVersion.projectName.equals("spring-cloud"));
+		projects.add(new ProjectVersion("spring-cloud", "Camden.RC1"));
+		projects.removeIf(projectVersion -> projectVersion.projectName
+				.equals("spring-cloud-dependencies"));
+		projects.add(new ProjectVersion("spring-cloud-dependencies", "Camden.RC1"));
+		projects.removeIf(projectVersion -> projectVersion.projectName
+				.equals("spring-cloud-starter"));
+		projects.add(new ProjectVersion("spring-cloud-starter", "Camden.RC1"));
+		projects.removeIf(projectVersion -> projectVersion.projectName
+				.equals("spring-cloud-starter-build"));
+		projects.add(new ProjectVersion("spring-cloud-starter-build", "Camden.RC1"));
+		projects.removeIf(projectVersion -> projectVersion.projectName
+				.equals("spring-cloud-release"));
+		projects.add(new ProjectVersion("spring-cloud-release", "Camden.RC1"));
+		projects.removeIf(projectVersion -> projectVersion.projectName
+				.contains("spring-cloud-build"));
+		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.RELEASE"));
+		File project = new File(this.temporaryFolder,
+				"/spring-cloud-sleuth-with-milestone-dep");
+
+		BDDAssertions
+				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
+						project, projects, projects.forFile(project), true))
+				.hasMessageContaining("<zipkin.version>1.19.2-M2</zipkin.version>");
 	}
 
 	@Test

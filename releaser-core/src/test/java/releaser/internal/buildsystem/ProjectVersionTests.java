@@ -345,8 +345,10 @@ public class ProjectVersionTests {
 	public void should_return_true_when_checking_ga_version_against_ga() {
 		then(projectVersion("1.0.1.RELEASE").isReleaseOrServiceRelease()).isTrue();
 		then(projectVersion("1.0.1-SR1").isReleaseOrServiceRelease()).isTrue();
-		// then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
-		// then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("1.0.0").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("1.0.1").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("2021.0.0").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("2022.0.3").isReleaseOrServiceRelease()).isTrue();
 	}
 
 	@Test
@@ -837,15 +839,25 @@ public class ProjectVersionTests {
 		then(unknownTypeOfVersion.get(1).pattern()).contains("M[0-9]");
 		then(unknownTypeOfVersion.get(2).pattern()).contains("RC");
 
-		then(unknownTypeOfVersion.get(0).matcher("SomeName-SNAPSHOT").matches()).isTrue();
-		then(unknownTypeOfVersion.get(0).matcher("SomeName.BUILD-SNAPSHOT").matches())
+		then(unknownTypeOfVersion.get(0).matcher("SomeName-SNAPSHOT").lookingAt())
 				.isTrue();
+		then(unknownTypeOfVersion.get(0).matcher("SomeName.BUILD-SNAPSHOT").lookingAt())
+				.isTrue();
+		then(unknownTypeOfVersion.get(0)
+				.matcher("\t\t<version>1.19.2-SNAPSHOT</version>\n").lookingAt())
+						.isTrue();
 
-		then(unknownTypeOfVersion.get(1).matcher("SomeName-M3").matches()).isTrue();
-		then(unknownTypeOfVersion.get(1).matcher("SomeName.M3").matches()).isTrue();
+		then(unknownTypeOfVersion.get(1).matcher("SomeName-M3").lookingAt()).isTrue();
+		then(unknownTypeOfVersion.get(1).matcher("SomeName.M3").lookingAt()).isTrue();
+		then(unknownTypeOfVersion.get(1)
+				.matcher("\t\t<zipkin.version>1.19.2-M2</zipkin.version>\n").lookingAt())
+						.isTrue();
 
-		then(unknownTypeOfVersion.get(2).matcher("SomeName-RC3").matches()).isTrue();
-		then(unknownTypeOfVersion.get(2).matcher("SomeName.RC3").matches()).isTrue();
+		then(unknownTypeOfVersion.get(2).matcher("SomeName-RC3").lookingAt()).isTrue();
+		then(unknownTypeOfVersion.get(2).matcher("SomeName.RC3").lookingAt()).isTrue();
+		then(unknownTypeOfVersion.get(2)
+				.matcher("<zipkin.version>1.19.2-RC1</zipkin.version>").lookingAt())
+						.isTrue();
 	}
 
 	private ProjectVersion projectVersion(String version) {
