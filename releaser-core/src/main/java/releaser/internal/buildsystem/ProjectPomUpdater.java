@@ -51,6 +51,8 @@ public class ProjectPomUpdater implements Closeable {
 			// issue [#80]
 			"^[\\s]*<!--.*-->.*$");
 
+	private static final String SPECIAL_LINE_IGNORING_COMMENT = "@releaser:version-check-off";
+
 	private static final Logger log = LoggerFactory.getLogger(ProjectPomUpdater.class);
 
 	private static final boolean UPDATE_FIXED_VERSIONS = true;
@@ -237,6 +239,7 @@ public class ProjectPomUpdater implements Closeable {
 								.stream()
 								.filter(pattern -> IGNORED_SNAPSHOT_LINE_PATTERNS.stream()
 										.noneMatch(line::matches)
+										&& !line.contains(SPECIAL_LINE_IGNORING_COMMENT)
 										&& pattern.matcher(line).lookingAt())
 								.findFirst().orElse(null);
 						if (matchingPattern != null) {

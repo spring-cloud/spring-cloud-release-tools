@@ -158,6 +158,32 @@ public class PomUpdateAcceptanceTests {
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
 				Collections
 						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+		Projects projects = projects(projectPomUpdater);
+		File project = new File(this.temporaryFolder,
+				"/spring-cloud-sleuth-with-milestone-dep");
+
+		BDDAssertions
+				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
+						project, projects, projects.forFile(project), true))
+				.hasMessageContaining("<zipkin.version>1.19.2-M2</zipkin.version>");
+	}
+
+	@Test
+	public void should_not_fail_update_when_after_updating_a_release_candidate_version_there_still_is_a_milestone_version_with_a_line_to_ignore()
+			throws Exception {
+		ReleaserProperties releaserProperties = branchReleaserProperties();
+		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
+				Collections
+						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+		Projects projects = projects(projectPomUpdater);
+		File project = new File(this.temporaryFolder,
+				"/spring-cloud-sleuth-with-ignored-line");
+
+		projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
+				projects.forFile(project), true);
+	}
+
+	private Projects projects(ProjectPomUpdater projectPomUpdater) {
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		projects.removeIf(
 				projectVersion -> projectVersion.projectName.equals("spring-cloud"));
@@ -177,13 +203,7 @@ public class PomUpdateAcceptanceTests {
 		projects.removeIf(projectVersion -> projectVersion.projectName
 				.contains("spring-cloud-build"));
 		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.RELEASE"));
-		File project = new File(this.temporaryFolder,
-				"/spring-cloud-sleuth-with-milestone-dep");
-
-		BDDAssertions
-				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
-						project, projects, projects.forFile(project), true))
-				.hasMessageContaining("<zipkin.version>1.19.2-M2</zipkin.version>");
+		return projects;
 	}
 
 	@Test

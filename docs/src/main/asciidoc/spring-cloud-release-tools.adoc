@@ -610,3 +610,15 @@ $ eval `ssh-agent`
 # to store the pass in the agent
 $ ssh-add ~/.ssh/id_rsa
 ----
+
+==== Skipping version check
+
+If you know what you're doing and want to skip snapshot / milestone version check for poms or any other files, just set the following comment [`@releaser:version-check-off`] in the same line where the version appears. Example:
+
+[source,xml]
+----
+	<properties>
+		<zipkin.version>1.19.2-M2</zipkin.version><!-- @releaser:version-check-off -->
+		<zipkin-reporter.version>0.6.12</zipkin-reporter.version>
+	</properties>
+----
