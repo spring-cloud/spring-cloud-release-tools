@@ -44,6 +44,7 @@ releaser:
       spring-cloud-sleuth:
         - https://github.com/spring-cloud-samples/sleuth-issues
         - https://github.com/spring-cloud-samples/sleuth-documentation-apps
+        - https://github.com/spring-cloud-samples/spring-cloud-sleuth-samples
       spring-cloud-contract:
         - https://github.com/spring-cloud-samples/spring-cloud-contract-samples
         - https://github.com/spring-cloud-samples/the-legacy-app
