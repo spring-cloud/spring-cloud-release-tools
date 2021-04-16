@@ -3,8 +3,7 @@
 :repo: spring-cloud-release-tools
 :branch: master
 
-image::https://circleci.com/gh/{org}/{repo}/tree/{branch}.svg?style=svg["CircleCI",link="https://circleci.com/gh/{org}/{repo}/tree/{branch}"]
-image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codecov",link="https://codecov.io/gh/{org}/{repo}"]
+image::https://github.com/{org}/{repo}/workflows/Build/badge.svg?style=svg["Build",link="https://github.com/{org}/{repo}/actions"]
 
 include::spring-cloud-release-tools.adoc[]
 
