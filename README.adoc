@@ -9,8 +9,7 @@ Edit the files in the src/main/asciidoc/ directory instead.
 :repo: spring-cloud-release-tools
 :branch: master
 
-image::https://circleci.com/gh/{org}/{repo}/tree/{branch}.svg?style=svg["CircleCI",link="https://circleci.com/gh/{org}/{repo}/tree/{branch}"]
-image::https://codecov.io/gh/{org}/{repo}/branch/{branch}/graph/badge.svg["codecov",link="https://codecov.io/gh/{org}/{repo}"]
+image::https://github.com/{org}/{repo}/workflows/Build/badge.svg?style=svg["Build",link="https://github.com/{org}/{repo}/actions"]
 
 == Spring Cloud Release Tools
 
@@ -546,7 +545,7 @@ Below you can find a table with all the releaser options.
 |releaser.bash.deploy-command | echo "{{systemProps}}" | Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
 |releaser.bash.deploy-guides-command | echo "{{systemProps}}" | Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
 |releaser.bash.generate-release-train-docs-command | echo "{{version}}" | Command to be executed to generate release train documentation.
-|releaser.bash.publish-docs-command | [mkdir -p target, echo "{{version}}"] | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.bash.publish-docs-command | mkdir -p target && echo "{{version}}" | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
 |releaser.bash.system-properties |  | Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.
 |releaser.bash.wait-time-in-minutes | 20 | Max wait time in minutes for the process to finish.
 |releaser.fixed-versions |  | Project name to its version - overrides all versions retrieved from a release train repository like Spring Cloud Release.
@@ -558,8 +557,10 @@ Below you can find a table with all the releaser options.
 |releaser.git.fetch-versions-from-git | true | If {@code true} then should fill the map of versions from Git. If {@code false} then picks fixed versions.
 |releaser.git.number-of-checked-milestones | 50 | In order not to iterate endlessly over milestones we introduce a threshold of milestones that we will go through to find the matching milestone.
 |releaser.git.oauth-token |  | GitHub OAuth token to be used to interact with GitHub repo.
+|releaser.git.org-name |  | The organization name on Github.
 |releaser.git.password |  | Optional Git password. If not passed keys will be used for authentication.
 |releaser.git.release-train-bom-url |  | URL to a release train repository.
+|releaser.git.release-train-branch |  | Branch to check out for the release train.
 |releaser.git.release-train-docs-branch |  | Branch to check out for the release train docs.
 |releaser.git.release-train-docs-url |  | URL to the release train documentation.
 |releaser.git.release-train-wiki-page-prefix |  | Page prefix for the release train wiki. E.g. for [Spring-Cloud-Finchley-Release-Notes] it would be [Spring-Cloud].
@@ -584,14 +585,14 @@ Below you can find a table with all the releaser options.
 |releaser.gradle.generate-release-train-docs-command | ./gradlew generateReleaseTrainDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}} | Command to be executed to generate release train documentation.
 |releaser.gradle.gradle-props-substitution |  | A mapping that should be applied to {@code gradle.properties} in order to perform a substitution of properties. The mapping is from a property inside {@code gradle.properties} to the projects name. Example. In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You want this property to get updated with the value of {@code spring-cloud-contract} version. Then it's enough to do the mapping like this for this Releaser's property: {@code verifierVersion=spring-cloud-contract}.
 |releaser.gradle.ignored-gradle-regex |  | List of regular expressions of ignored gradle props. Defaults to test projects and samples.
-|releaser.gradle.publish-docs-command | [./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}] | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
+|releaser.gradle.publish-docs-command | ./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}} | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
 |releaser.gradle.system-properties |  | Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.
 |releaser.gradle.wait-time-in-minutes | 20 | Max wait time in minutes for the process to finish.
 |releaser.maven.build-command | ./mvnw clean install -B -Pdocs {{systemProps}} | Command to be executed to build the project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
 |releaser.maven.deploy-command | ./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}} | Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
 |releaser.maven.deploy-guides-command | ./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}} | Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
 |releaser.maven.generate-release-train-docs-command | bash release_train.sh --retrieveversions --version {{version}} --ghpages --auto | Command to be executed to generate release train documentation.
-|releaser.maven.publish-docs-command | [mkdir -p target, wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/ghpages.sh -O target/gh-pages.sh, chmod +x target/gh-pages.sh, ./target/gh-pages.sh -v {{version}} -c] | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
+|releaser.maven.publish-docs-command | ./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}} | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
 |releaser.maven.system-properties |  | Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.
 |releaser.maven.wait-time-in-minutes | 20 | Max wait time in minutes for the process to finish.
 |releaser.meta-release.enabled | false | Are we releasing the whole suite of apps or only one?
@@ -704,6 +705,18 @@ To fix that just call, run the following commands before running the app:
 $ eval `ssh-agent`
 # to store the pass in the agent
 $ ssh-add ~/.ssh/id_rsa
+----
+
+==== Skipping version check
+
+If you know what you're doing and want to skip snapshot / milestone version check for poms or any other files, just set the following comment [`@releaser:version-check-off`] in the same line where the version appears. Example:
+
+[source,xml]
+----
+	<properties>
+		<zipkin.version>1.19.2-M2</zipkin.version><!-- @releaser:version-check-off -->
+		<zipkin-reporter.version>0.6.12</zipkin-reporter.version>
+	</properties>
 ----
 
 == Building
