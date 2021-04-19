@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: springcloud/pipeline-base
+    environment:
+      _JAVA_OPTIONS: "-Xms1024m -Xmx2048m"
+    branches:
+      ignore:
+        - gh-pages # list of branches to ignore
+    steps:
+      - checkout
+      - run:
+          name: "Running build"
+          command: echo $(env)
