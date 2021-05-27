@@ -22,8 +22,8 @@ releaser:
     release-train-wiki-url: https://github.com/spring-cloud/spring-cloud-release.wiki
     documentation-branch: gh-pages
     spring-project-branch: gh-pages
-    test-samples-branch: master
-    release-train-docs-branch: master
+    test-samples-branch: main
+    release-train-docs-branch: main
     release-train-wiki-page-prefix: Spring-Cloud
     # clone-destination-dir:
     fetch-versions-from-git: true
@@ -50,7 +50,7 @@ releaser:
         - https://github.com/spring-cloud-samples/the-legacy-app
         - https://github.com/spring-cloud-samples/sc-contract-car-rental
   pom:
-    branch: master
+    branch: main
     pom-with-boot-starter-parent: spring-cloud-starter-parent/pom.xml
     this-train-bom: spring-cloud-dependencies/pom.xml
     bom-version-pattern: "^(spring-cloud-.*)\\.version$"
