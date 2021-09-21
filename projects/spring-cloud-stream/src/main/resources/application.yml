@@ -14,7 +14,7 @@ releaser:
     number-of-checked-milestones: 50
     update-github-milestones: true
   pom:
-    branch: master
+    branch: main
     pom-with-boot-starter-parent: spring-cloud-starter-parent/pom.xml
     this-train-bom: spring-cloud-stream-dependencies/pom.xml
     bom-version-pattern: "^(spring-cloud-.*)\\.version$"

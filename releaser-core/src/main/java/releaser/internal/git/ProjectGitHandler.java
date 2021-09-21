@@ -180,11 +180,11 @@ public class ProjectGitHandler implements Closeable {
 	/**
 	 * From the version analyzes the branch and checks it out. E.g. - for
 	 * spring-cloud-release’s `Finchley.RELEASE version will resolve either Finchley
-	 * branch or will fallback to master if there’s no Finchley branch - for
+	 * branch or will fallback to main if there’s no Finchley branch - for
 	 * spring-cloud-sleuth’s `2.1.0.RELEASE version will resolve 2.1.x branch
 	 * @param url - of project to clone
 	 * @param versions - list of versions to check against, if none matches, will fallback
-	 * to master
+	 * to main
 	 * @return location of the cloned project
 	 */
 	public File cloneAndGuessBranch(String url, String... versions) {
@@ -201,10 +201,10 @@ public class ProjectGitHandler implements Closeable {
 		}
 		String branchToCheckout = Arrays.stream(versions).map(this::branchFromVersion)
 				.map(version -> gitRepo(clonedProject).hasBranch(version) ? version : "")
-				.filter(StringUtils::hasText).findFirst().orElse("master");
-		if ("master".equals(branchToCheckout)) {
+				.filter(StringUtils::hasText).findFirst().orElse("main");
+		if ("main".equals(branchToCheckout)) {
 			log.info(
-					"None of the versions {} matches a branch. Assuming that should work with master branch",
+					"None of the versions {} matches a branch. Assuming that should work with main branch",
 					(Object) versions);
 			return clonedProject;
 		}
@@ -285,7 +285,7 @@ public class ProjectGitHandler implements Closeable {
 
 	// let's go with convention... If fixed version contains e.g.
 	// 2.3.4.RELEASE of Sleuth, we will first check if `2.3.x` branch
-	// exists. If not, then we will assume that `master` contains it
+	// exists. If not, then we will assume that `main` contains it
 	String branchFromVersion(String version) {
 		// 2.3.4.RELEASE -> 2.3.4
 		// 2.3.4-RELEASE -> 2.3.4
