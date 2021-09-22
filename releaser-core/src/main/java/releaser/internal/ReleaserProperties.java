@@ -846,9 +846,9 @@ public class ReleaserProperties implements Serializable {
 
 		/**
 		 * Which branch of release train BOM should be checked out. Defaults to
-		 * {@code master}.
+		 * {@code main}.
 		 */
-		private String branch = "master";
+		private String branch = "main";
 
 		/**
 		 * Subfolder of the pom that contains the {@code spring-boot-starer-parent}

@@ -45,19 +45,19 @@ IMPORTANT: If you're doing a e.g. `M1` release, remember to not have any snapsho
 
 Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], which the following image shows:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasers.png[Releaser view]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/releasers.png[Releaser view]
 
 . Pick the proper releaser project (for example, `spring-cloud-build-releaser`).
 The following image shows the settings for this example:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/scBuildReleaser.png[Spring Cloud Build Releaser - build with parameters]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/scBuildReleaser.png[Spring Cloud Build Releaser - build with parameters]
 
 . Next, click `Build with parameters`.
 The following image shows the UI for doing so:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningScBuildReleaser.png[Updated `RELEASER_POM_BRANCH`]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/runningScBuildReleaser.png[Updated `RELEASER_POM_BRANCH`]
 
-Pick from which branch you would like the project (for example, `spring-cloud-build` - defaults to `master`) to be built and update the `RELEASER_POM_BRANCH` to point to the checked-out branch of Spring Cloud Release (for example, `springCloudBuildRelease`).
+Pick from which branch you would like the project (for example, `spring-cloud-build` - defaults to `main`) to be built and update the `RELEASER_POM_BRANCH` to point to the checked-out branch of Spring Cloud Release (for example, `springCloudBuildRelease`).
 You can pick whether you want to perform only post-release tasks or the whole release.
 
 . Finally, click `Build`.
@@ -129,15 +129,15 @@ $ git add greenwich_sr2.properties && git commit -m "Added Greenwich.SR2 propert
 
 Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], as the following image shows:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasersForMetaRelease.png[Releaser view]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/releasersForMetaRelease.png[Releaser view]
 
 . Pick the proper meta-releaser project (for example, `spring-cloud-meta-releaser`), as the following image shows:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/springCloudMetaRelease.png[Spring Cloud Meta Releaser - build with parameters]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/springCloudMetaRelease.png[Spring Cloud Meta Releaser - build with parameters]
 
 . Next, click `Build with parameters`.
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Spring Cloud Meta Releaser view]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Spring Cloud Meta Releaser view]
 
 You have quite a few options to pick, but the most important one is to set the value of the `RELEASE_VERSION` to the given release train version (for example, `Greenwich.SR2`).
 Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.
@@ -184,7 +184,7 @@ All the tasks are opt in, so if you do opt in for everything you'll get:
 
 - Uses the fixed versions to clone and check out each project (e.g. `spring-cloud-sleuth: 2.1.0.RELEASE`)
 - From the version analyzes the branch and checks it out. E.g.
-** for `spring-cloud-release`'s `Finchley.RELEASE` version will resolve either `Finchley` branch or will fallback to `master` if there's no `Finchley` branch.
+** for `spring-cloud-release`'s `Finchley.RELEASE` version will resolve either `Finchley` branch or will fallback to `main` if there's no `Finchley` branch.
 ** for `spring-cloud-sleuth`'s `2.1.0.RELEASE` version will resolve `2.1.x` branch
 - Performs the release tasks per each project
 - Performs the post release tasks at the end of the release
@@ -556,7 +556,7 @@ IMPORTANT: For the meta-releaser to work we assume that the path to the configur
 
 ==== Specifying A Branch
 
-By deafult the releaser will default to using the `master` branch of `spring-cloud-release`.
+By deafult the releaser will default to using the `main` branch of `spring-cloud-release`.
 If you would like to use another branch you can specify it using the `releaser.pom.branch` property.
 
 [source,bash]

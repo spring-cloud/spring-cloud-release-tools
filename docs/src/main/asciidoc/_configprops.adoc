@@ -64,7 +64,7 @@
 |releaser.meta-release.release-train-dependency-names |  | All the names of dependencies that should be updated with the release train project version.
 |releaser.meta-release.release-train-project-name |  | Name of the release train project.
 |releaser.pom.bom-version-pattern |  | The pattern to match a version property in a BOM. Remember to catch the dependency name in a group. E.g. "^(spring-cloud-.*)\\.version$".
-|releaser.pom.branch | master | Which branch of release train BOM should be checked out. Defaults to {@code master}.
+|releaser.pom.branch | main | Which branch of release train BOM should be checked out. Defaults to {@code main}.
 |releaser.pom.ignored-pom-regex | ^.*\.git/.*$ | List of regular expressions of ignored poms. Defaults to test projects and samples.
 |releaser.pom.pom-with-boot-starter-parent |  | Subfolder of the pom that contains the {@code spring-boot-starer-parent} dependency.
 |releaser.pom.this-train-bom |  | Subfolder of the pom that contains the versions for the release train.

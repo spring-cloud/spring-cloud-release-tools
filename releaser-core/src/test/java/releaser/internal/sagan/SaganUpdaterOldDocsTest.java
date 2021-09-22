@@ -203,10 +203,10 @@ public class SaganUpdaterOldDocsTest {
 	}
 
 	@Test
-	public void should_update_sagan_from_master() {
+	public void should_update_sagan_from_main() {
 		ProjectVersion projectVersion = version("1.0.0.BUILD-SNAPSHOT");
 
-		this.saganUpdater.updateSagan(new File("."), "master", projectVersion,
+		this.saganUpdater.updateSagan(new File("."), "main", projectVersion,
 				projectVersion, projects);
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
@@ -218,7 +218,7 @@ public class SaganUpdaterOldDocsTest {
 	public void should_update_sagan_from_release_version() {
 		ProjectVersion projectVersion = version("1.0.0.RELEASE");
 
-		this.saganUpdater.updateSagan(new File("."), "master", projectVersion,
+		this.saganUpdater.updateSagan(new File("."), "main", projectVersion,
 				projectVersion, projects);
 
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.RC1");
@@ -234,7 +234,7 @@ public class SaganUpdaterOldDocsTest {
 	}
 
 	@Test
-	public void should_update_sagan_from_non_master() {
+	public void should_update_sagan_from_non_main() {
 		ProjectVersion projectVersion = version("1.1.0.BUILD-SNAPSHOT");
 
 		this.saganUpdater.updateSagan(new File("."), "1.1.x", projectVersion,

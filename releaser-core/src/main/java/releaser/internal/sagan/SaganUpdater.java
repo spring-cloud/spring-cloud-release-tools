@@ -279,7 +279,7 @@ public class SaganUpdater {
 			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName
 					+ "/{version}/reference/html/";
 		}
-		if (branch.toLowerCase().contains("master")) {
+		if (branch.toLowerCase().contains("main")) {
 			// sleuth/
 			return "https://cloud.spring.io/" + version.projectName + "/reference/html/";
 		}
@@ -294,7 +294,7 @@ public class SaganUpdater {
 			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName
 					+ "/{version}/";
 		}
-		if (branch.toLowerCase().contains("master")) {
+		if (branch.toLowerCase().contains("main")) {
 			// sleuth/
 			return "https://cloud.spring.io/" + version.projectName + "/"
 					+ version.projectName + ".html";
