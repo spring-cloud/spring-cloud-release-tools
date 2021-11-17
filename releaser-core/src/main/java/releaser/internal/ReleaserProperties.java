@@ -944,7 +944,7 @@ public class ReleaserProperties implements Serializable {
 		 * replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
 		 * version and "{{oldVersion}}" with the version before version updating.
 		 **/
-		private String buildCommand = "./mvnw clean install -B -Pdocs {{systemProps}}";
+		private String buildCommand = "./scripts/build.sh {{systemProps}}";
 
 		/**
 		 * Command to be executed to deploy a built project. If present "{{version}}" will
