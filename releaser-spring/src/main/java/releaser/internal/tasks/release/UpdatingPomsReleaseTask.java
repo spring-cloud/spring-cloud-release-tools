@@ -56,8 +56,7 @@ public class UpdatingPomsReleaseTask implements DryRunReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return this.releaser.updateProjectFromBom(args.project, args.projects,
-				args.versionFromBom);
+		return this.releaser.updateProjectFromBom(args.project, args.projects, args.versionFromBom);
 	}
 
 	@Override

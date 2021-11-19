@@ -35,18 +35,15 @@ import org.springframework.util.StringUtils;
 /**
  * @author Marcin Grzejszczak
  */
-class SpringCloudCustomProjectDocumentationUpdater
-		implements CustomProjectDocumentationUpdater {
+class SpringCloudCustomProjectDocumentationUpdater implements CustomProjectDocumentationUpdater {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(SpringCloudCustomProjectDocumentationUpdater.class);
+	private static final Logger log = LoggerFactory.getLogger(SpringCloudCustomProjectDocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
 
 	private final ReleaserProperties releaserProperties;
 
-	SpringCloudCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler,
-			ReleaserProperties releaserProperties) {
+	SpringCloudCustomProjectDocumentationUpdater(ProjectGitHandler gitHandler, ReleaserProperties releaserProperties) {
 		this.gitHandler = gitHandler;
 		this.releaserProperties = releaserProperties;
 	}
@@ -60,11 +57,10 @@ class SpringCloudCustomProjectDocumentationUpdater
 	 * used
 	 */
 	@Override
-	public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
-			ProjectVersion currentProject, Projects projects, String bomBranch) {
+	public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject, ProjectVersion currentProject,
+			Projects projects, String bomBranch) {
 		if (!currentProject.projectName.startsWith("spring-cloud")) {
-			log.info(
-					"Skipping updating docs for project [{}] that does not start with spring-cloud prefix",
+			log.info("Skipping updating docs for project [{}] that does not start with spring-cloud prefix",
 					currentProject.projectName);
 			return clonedDocumentationProject;
 		}
@@ -72,12 +68,10 @@ class SpringCloudCustomProjectDocumentationUpdater
 		ProjectVersion releaseTrainProject = new ProjectVersion(
 				this.releaserProperties.getMetaRelease().getReleaseTrainProjectName(),
 				branchToReleaseVersion(bomBranch));
-		File currentReleaseFolder = new File(clonedDocumentationProject,
-				currentFolder(releaseTrainProject));
+		File currentReleaseFolder = new File(clonedDocumentationProject, currentFolder(releaseTrainProject));
 		// remove the old way
 		removeAFolderWithRedirection(currentReleaseFolder);
-		File docsRepo = updateTheDocsRepo(releaseTrainProject, clonedDocumentationProject,
-				currentReleaseFolder);
+		File docsRepo = updateTheDocsRepo(releaseTrainProject, clonedDocumentationProject, currentReleaseFolder);
 		return pushChanges(docsRepo);
 	}
 
@@ -89,8 +83,8 @@ class SpringCloudCustomProjectDocumentationUpdater
 	 * used
 	 */
 	@Override
-	public File updateDocsRepoForSingleProject(File clonedDocumentationProject,
-			ProjectVersion currentProject, Projects projects) {
+	public File updateDocsRepoForSingleProject(File clonedDocumentationProject, ProjectVersion currentProject,
+			Projects projects) {
 		if (!projects.containsProject(currentProject.projectName)) {
 			log.warn(
 					"Can't update the documentation repo for project [{}] cause it's not present on the projects list {}",
@@ -98,23 +92,18 @@ class SpringCloudCustomProjectDocumentationUpdater
 			return clonedDocumentationProject;
 		}
 		if (!currentProject.projectName.startsWith("spring-cloud")) {
-			log.info(
-					"Skipping updating docs for project [{}] that does not start with spring-cloud prefix",
+			log.info("Skipping updating docs for project [{}] that does not start with spring-cloud prefix",
 					currentProject.projectName);
 			return clonedDocumentationProject;
 		}
-		log.info("Updating link to documentation for project [{}]",
-				currentProject.projectName);
-		ProjectVersion currentProjectVersion = projects
-				.forName(currentProject.projectName);
-		File currentProjectReleaseFolder = new File(clonedDocumentationProject,
-				currentFolder(currentProjectVersion));
+		log.info("Updating link to documentation for project [{}]", currentProject.projectName);
+		ProjectVersion currentProjectVersion = projects.forName(currentProject.projectName);
+		File currentProjectReleaseFolder = new File(clonedDocumentationProject, currentFolder(currentProjectVersion));
 		removeAFolderWithRedirection(currentProjectReleaseFolder);
 		try {
-			updateTheDocsRepo(currentProjectVersion, clonedDocumentationProject,
-					currentProjectReleaseFolder);
-			log.info("Processed [{}] for project with name [{}]",
-					currentProjectReleaseFolder, currentProjectVersion.projectName);
+			updateTheDocsRepo(currentProjectVersion, clonedDocumentationProject, currentProjectReleaseFolder);
+			log.info("Processed [{}] for project with name [{}]", currentProjectReleaseFolder,
+					currentProjectVersion.projectName);
 		}
 		catch (Exception ex) {
 			log.warn("Exception occurred while trying o update the symlink of a project ["
@@ -140,14 +129,13 @@ class SpringCloudCustomProjectDocumentationUpdater
 			releaseTrain = currentProjectVersion.isReleaseTrain();
 		}
 		catch (IllegalStateException ex) {
-			log.warn("Exception occurred while trying to resolve if version ["
-					+ currentProjectVersion + "] is a release train", ex);
+			log.warn("Exception occurred while trying to resolve if version [" + currentProjectVersion
+					+ "] is a release train", ex);
 			releaseTrain = false;
 		}
 		// release train -> static/current
 		// project -> static/spring-cloud-sleuth/current
-		return releaseTrain ? "current"
-				: (StringUtils.hasText(projectName) ? projectName : "") + "/current";
+		return releaseTrain ? "current" : (StringUtils.hasText(projectName) ? projectName : "") + "/current";
 	}
 
 	String linkToVersion(File file) {
@@ -176,33 +164,28 @@ class SpringCloudCustomProjectDocumentationUpdater
 		return docsRepo;
 	}
 
-	private File updateTheDocsRepo(ProjectVersion projectVersion,
-			File documentationProject, File currentVersionFolder) {
+	private File updateTheDocsRepo(ProjectVersion projectVersion, File documentationProject,
+			File currentVersionFolder) {
 		try {
 			String storedVersion = linkToVersion(currentVersionFolder);
 			String currentVersion = projectVersion.version;
-			boolean newerVersion = StringUtils.isEmpty(storedVersion)
-					|| isMoreMature(storedVersion, currentVersion);
+			boolean newerVersion = StringUtils.isEmpty(storedVersion) || isMoreMature(storedVersion, currentVersion);
 			if (!newerVersion) {
-				log.info("Current version [{}] is not newer than the stored one [{}]",
-						currentVersion, storedVersion);
+				log.info("Current version [{}] is not newer than the stored one [{}]", currentVersion, storedVersion);
 				return documentationProject;
 			}
 			boolean deleted = Files.deleteIfExists(currentVersionFolder.toPath())
 					|| FileSystemUtils.deleteRecursively(currentVersionFolder.toPath());
 			if (deleted) {
-				log.info("Deleted current version folder link at [{}]",
-						currentVersionFolder);
+				log.info("Deleted current version folder link at [{}]", currentVersionFolder);
 			}
 			boolean creatingParentDirs = currentVersionFolder.getParentFile().mkdirs();
 			if (!creatingParentDirs) {
-				log.warn("Failed to create parent directory of [{}]",
-						currentVersionFolder);
+				log.warn("Failed to create parent directory of [{}]", currentVersionFolder);
 			}
 			File newTarget = new File(projectVersion.version);
 			Files.createSymbolicLink(currentVersionFolder.toPath(), newTarget.toPath());
-			log.info("Updated the link [{}] to point to [{}]",
-					currentVersionFolder.toPath(),
+			log.info("Updated the link [{}] to point to [{}]", currentVersionFolder.toPath(),
 					Files.readSymbolicLink(currentVersionFolder.toPath()));
 			return commitChanges(currentVersion, documentationProject);
 		}
@@ -212,8 +195,7 @@ class SpringCloudCustomProjectDocumentationUpdater
 	}
 
 	private boolean isMoreMature(String storedVersion, String currentVersion) {
-		return new ProjectVersion("project", currentVersion)
-				.isMoreMature(new ProjectVersion("project", storedVersion));
+		return new ProjectVersion("project", currentVersion).isMoreMature(new ProjectVersion("project", storedVersion));
 	}
 
 	private String branchToReleaseVersion(String branch) {
@@ -223,8 +205,7 @@ class SpringCloudCustomProjectDocumentationUpdater
 		return branch;
 	}
 
-	private File commitChanges(String currentVersion, File documentationProject)
-			throws IOException {
+	private File commitChanges(String currentVersion, File documentationProject) throws IOException {
 		log.info("Updated the symbolic links");
 		this.gitHandler.commit(documentationProject,
 				"Updating the link to the current version to [" + currentVersion + "]");

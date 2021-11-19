@@ -48,39 +48,31 @@ class CfConfiguration {
 	@Bean
 	PasswordGrantTokenProvider tokenProvider(@Value("${cf.username}") String username,
 			@Value("${cf.password}") String password) {
-		return PasswordGrantTokenProvider.builder().password(password).username(username)
+		return PasswordGrantTokenProvider.builder().password(password).username(username).build();
+	}
+
+	@Bean
+	ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+		return ReactorCloudFoundryClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider)
 				.build();
 	}
 
 	@Bean
-	ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext,
-			TokenProvider tokenProvider) {
-		return ReactorCloudFoundryClient.builder().connectionContext(connectionContext)
-				.tokenProvider(tokenProvider).build();
+	ReactorDopplerClient dopplerClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+		return ReactorDopplerClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider).build();
 	}
 
 	@Bean
-	ReactorDopplerClient dopplerClient(ConnectionContext connectionContext,
-			TokenProvider tokenProvider) {
-		return ReactorDopplerClient.builder().connectionContext(connectionContext)
-				.tokenProvider(tokenProvider).build();
+	ReactorUaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+		return ReactorUaaClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider).build();
 	}
 
 	@Bean
-	ReactorUaaClient uaaClient(ConnectionContext connectionContext,
-			TokenProvider tokenProvider) {
-		return ReactorUaaClient.builder().connectionContext(connectionContext)
-				.tokenProvider(tokenProvider).build();
-	}
-
-	@Bean
-	DefaultCloudFoundryOperations defaultCloudFoundryOperations(
-			CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient,
-			UaaClient uaaClient, @Value("${cf.organization}") String organizationId,
+	DefaultCloudFoundryOperations defaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
+			DopplerClient dopplerClient, UaaClient uaaClient, @Value("${cf.organization}") String organizationId,
 			@Value("${cf.space}") String spaceId) {
-		return DefaultCloudFoundryOperations.builder()
-				.cloudFoundryClient(cloudFoundryClient).dopplerClient(dopplerClient)
-				.uaaClient(uaaClient).organization(organizationId).space(spaceId).build();
+		return DefaultCloudFoundryOperations.builder().cloudFoundryClient(cloudFoundryClient)
+				.dopplerClient(dopplerClient).uaaClient(uaaClient).organization(organizationId).space(spaceId).build();
 	}
 
 }

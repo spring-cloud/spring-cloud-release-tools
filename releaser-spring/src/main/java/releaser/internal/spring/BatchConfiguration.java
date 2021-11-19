@@ -62,8 +62,7 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean(ExecutionResultHandler.class)
-	SpringBatchExecutionResultHandler springBatchExecutionResultHandler(
-			BuildReportHandler buildReportHandler,
+	SpringBatchExecutionResultHandler springBatchExecutionResultHandler(BuildReportHandler buildReportHandler,
 			ConfigurableApplicationContext context) {
 		return new SpringBatchExecutionResultHandler(buildReportHandler, context);
 	}
@@ -77,15 +76,12 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory,
-			JobBuilderFactory jobBuilderFactory,
+	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
-			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
-			ConfigurableApplicationContext context, ReleaserProperties releaserProperties,
-			BuildReportHandler reportHandler) {
-		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
-				projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier,
-				context, releaserProperties, reportHandler);
+			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier, ConfigurableApplicationContext context,
+			ReleaserProperties releaserProperties, BuildReportHandler reportHandler) {
+		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory, projectsToRunFactory, jobLauncher,
+				flowRunnerTaskExecutorSupplier, context, releaserProperties, reportHandler);
 	}
 
 	@Bean
@@ -110,8 +106,7 @@ class BatchConfiguration {
 			protected JobExplorer createJobExplorer() throws Exception {
 				JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
 				jobExplorerFactoryBean.setDataSource(dataSource);
-				jobExplorerFactoryBean
-						.setSerializer(myJackson2ExecutionContextStringSerializer);
+				jobExplorerFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
 				jobExplorerFactoryBean.afterPropertiesSet();
 				return jobExplorerFactoryBean.getObject();
 			}
@@ -120,8 +115,7 @@ class BatchConfiguration {
 			protected JobRepository createJobRepository() throws Exception {
 				JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
 				jobRepositoryFactoryBean.setDataSource(dataSource);
-				jobRepositoryFactoryBean
-						.setSerializer(myJackson2ExecutionContextStringSerializer);
+				jobRepositoryFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
 				jobRepositoryFactoryBean.setTransactionManager(transactionManager);
 				jobRepositoryFactoryBean.afterPropertiesSet();
 				return jobRepositoryFactoryBean.getObject();

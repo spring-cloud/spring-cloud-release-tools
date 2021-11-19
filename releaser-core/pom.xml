@@ -42,6 +42,16 @@
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>${org.eclipse.jgit-version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit.gpg.bc</artifactId>
+			<version>${org.eclipse.jgit-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit.ssh.jsch</artifactId>
+			<version>${org.eclipse.jgit-version}</version>
+		</dependency>
 		<!-- a proxy to ssh-agent and Pageant in Java -->
 		<dependency>
 			<groupId>com.jcraft</groupId>
@@ -102,6 +112,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

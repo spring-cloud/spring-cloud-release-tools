@@ -56,8 +56,7 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 	/**
 	 * Github tags path.
 	 */
-	public static final String SPRING_CLOUD_RELEASE_TAGS_PATH = "repos/"
-			+ SPRING_CLOUD_RELEASE_COORDINATES + "/tags";
+	public static final String SPRING_CLOUD_RELEASE_TAGS_PATH = "repos/" + SPRING_CLOUD_RELEASE_COORDINATES + "/tags";
 
 	private static final String SPRING_CLOUD_RELEASE_RAW = "https://raw.githubusercontent.com/"
 			+ SPRING_CLOUD_RELEASE_COORDINATES;
@@ -87,8 +86,8 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 	@Cacheable("springCloudVersions")
 	public Collection<String> getSpringCloudVersions() throws IOException {
 		List<String> releaseVersions = new ArrayList<>();
-		JsonReader reader = github.entry().uri().path(SPRING_CLOUD_RELEASE_TAGS_PATH)
-				.back().fetch().as(JsonResponse.class).json();
+		JsonReader reader = github.entry().uri().path(SPRING_CLOUD_RELEASE_TAGS_PATH).back().fetch()
+				.as(JsonResponse.class).json();
 		JsonArray tags = reader.readArray();
 		reader.close();
 		List<JsonObject> tagsList = tags.getValuesAs(JsonObject.class);
@@ -108,12 +107,10 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 		}
 		try {
 			Map<String, String> versions = new HashMap<>();
-			Model model = reader.readPomFromUrl(
-					String.format(SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion));
+			Model model = reader.readPomFromUrl(String.format(SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion));
 			for (String name : model.getProperties().stringPropertyNames()) {
 				if (name.startsWith("spring-cloud-")) {
-					versions.put(name.replace(".version", ""),
-							model.getProperties().getProperty(name));
+					versions.put(name.replace(".version", ""), model.getProperties().getProperty(name));
 				}
 			}
 			versions.put("spring-boot", getSpringCloudBootVersion(bomVersion));
@@ -138,8 +135,7 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 
 	@Override
 	@Cacheable("milestoneDueDate")
-	public Milestone getMilestoneDueDate(String name)
-			throws SpringCloudMilestoneNotFoundException, IOException {
+	public Milestone getMilestoneDueDate(String name) throws SpringCloudMilestoneNotFoundException, IOException {
 		Iterable<com.jcabi.github.Milestone> milestones = getMilestonesFromGithub();
 		for (com.jcabi.github.Milestone milestone : milestones) {
 			JsonObject json = milestone.json();
@@ -149,8 +145,7 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 				}
 				else {
 					Instant instant = Instant.parse(json.getString("due_on"));
-					return new Milestone(LocalDateTime
-							.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()))
+					return new Milestone(LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()))
 							.toLocalDate().toString());
 				}
 			}
@@ -161,15 +156,12 @@ public abstract class SpringCloudRelease implements SpringCloudInfoService {
 	private Iterable<com.jcabi.github.Milestone> getMilestonesFromGithub() {
 		Map<String, String> params = new HashMap<>();
 		params.put("state", "open");
-		return github.repos()
-				.get(new Coordinates.Simple(SPRING_CLOUD_RELEASE_COORDINATES))
-				.milestones().iterate(params);
+		return github.repos().get(new Coordinates.Simple(SPRING_CLOUD_RELEASE_COORDINATES)).milestones()
+				.iterate(params);
 	}
 
-	private String getSpringCloudBootVersion(String bomVersion)
-			throws IOException, XmlPullParserException {
-		Model model = reader.readPomFromUrl(
-				String.format(SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion));
+	private String getSpringCloudBootVersion(String bomVersion) throws IOException, XmlPullParserException {
+		Model model = reader.readPomFromUrl(String.format(SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion));
 		return model.getParent().getVersion();
 	}
 

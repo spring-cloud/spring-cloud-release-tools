@@ -43,8 +43,8 @@ class ReleaseNotesTemplateGenerator {
 
 	private final NotesGenerator notesGenerator;
 
-	ReleaseNotesTemplateGenerator(Template template, String releaseVersion,
-			File blogOutput, Projects projects, ProjectGitHubHandler handler) {
+	ReleaseNotesTemplateGenerator(Template template, String releaseVersion, File blogOutput, Projects projects,
+			ProjectGitHubHandler handler) {
 		this.template = template;
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;
@@ -57,15 +57,13 @@ class ReleaseNotesTemplateGenerator {
 			Map<String, Object> map = ImmutableMap.<String, Object>builder()
 					.put("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
 					.put("releaseVersion", this.releaseVersion)
-					.put("projects", this.notesGenerator.fromProjects(this.projects))
-					.build();
+					.put("projects", this.notesGenerator.fromProjects(this.projects)).build();
 			String blog = this.template.apply(map);
 			Files.write(this.blogOutput.toPath(), blog.getBytes());
 			return this.blogOutput;
 		}
 		catch (IOException e) {
-			throw new IllegalStateException(
-					"Exception occurred while trying to generate release notes", e);
+			throw new IllegalStateException("Exception occurred while trying to generate release notes", e);
 		}
 	}
 

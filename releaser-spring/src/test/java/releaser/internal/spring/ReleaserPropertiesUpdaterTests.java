@@ -32,8 +32,8 @@ public class ReleaserPropertiesUpdaterTests {
 	File relaserUpdater;
 
 	public ReleaserPropertiesUpdaterTests() throws URISyntaxException {
-		this.relaserUpdater = new File(ReleaserPropertiesUpdaterTests.class
-				.getResource("/projects/releaser-updater/").toURI());
+		this.relaserUpdater = new File(
+				ReleaserPropertiesUpdaterTests.class.getResource("/projects/releaser-updater/").toURI());
 	}
 
 	@Test
@@ -41,8 +41,7 @@ public class ReleaserPropertiesUpdaterTests {
 		ReleaserProperties original = originalReleaserProperties();
 		ReleaserPropertiesUpdater updater = new ReleaserPropertiesUpdater();
 
-		ReleaserProperties props = updater.updateProperties(original,
-				this.relaserUpdater);
+		ReleaserProperties props = updater.updateProperties(original, this.relaserUpdater);
 
 		BDDAssertions.then(props.getMaven().getBuildCommand()).isEqualTo("maven_build");
 		BDDAssertions.then(props.getGradle().getBuildCommand()).isEqualTo("gradle_build");

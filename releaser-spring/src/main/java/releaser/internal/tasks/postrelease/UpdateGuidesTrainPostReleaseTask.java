@@ -56,8 +56,7 @@ public class UpdateGuidesTrainPostReleaseTask implements TrainPostReleaseRelease
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return this.releaser.updateSpringGuides(args.versionFromBom, args.projects,
-				args.processedProjects);
+		return this.releaser.updateSpringGuides(args.versionFromBom, args.projects, args.processedProjects);
 	}
 
 	@Override

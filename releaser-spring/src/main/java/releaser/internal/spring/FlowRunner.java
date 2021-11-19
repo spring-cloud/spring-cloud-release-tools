@@ -33,8 +33,7 @@ public interface FlowRunner {
 	 * @param releaserTask - the task to run
 	 * @return the decision on what to do with the task
 	 */
-	default Decision beforeTask(Options options, ReleaserProperties properties,
-			ReleaserTask releaserTask) {
+	default Decision beforeTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
 		return Decision.CONTINUE;
 	}
 
@@ -45,8 +44,7 @@ public interface FlowRunner {
 	 * @param releaserTask - the task to run
 	 * @return the decision on what to do with the task
 	 */
-	default Decision afterTask(Options options, ReleaserProperties properties,
-			ReleaserTask releaserTask) {
+	default Decision afterTask(Options options, ReleaserProperties properties, ReleaserTask releaserTask) {
 		return Decision.CONTINUE;
 	}
 
@@ -58,8 +56,8 @@ public interface FlowRunner {
 	 * @param tasksToRun - set of release tasks to run for each project
 	 * @return the result of release execution
 	 */
-	ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties,
-			ProjectsToRun projectToRuns, TasksToRun tasksToRun);
+	ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties, ProjectsToRun projectToRuns,
+			TasksToRun tasksToRun);
 
 	/**
 	 * Runs the post release tasks.
@@ -69,8 +67,7 @@ public interface FlowRunner {
 	 * @param tasksToRun - set of post release tasks to run for each project
 	 * @return the result of release execution
 	 */
-	ExecutionResult runPostReleaseTrainTasks(Options options,
-			ReleaserProperties properties, String executingTaskName,
+	ExecutionResult runPostReleaseTrainTasks(Options options, ReleaserProperties properties, String executingTaskName,
 			TasksToRun tasksToRun);
 
 	/**

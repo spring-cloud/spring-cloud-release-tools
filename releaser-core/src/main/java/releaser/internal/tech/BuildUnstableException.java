@@ -46,8 +46,7 @@ public class BuildUnstableException extends RuntimeException implements Serializ
 	 */
 	public static final String EXIT_CODE = "BUILD_UNSTABLE";
 
-	private static final Logger log = LoggerFactory
-			.getLogger(BuildUnstableException.class);
+	private static final Logger log = LoggerFactory.getLogger(BuildUnstableException.class);
 
 	/**
 	 * List of exceptions causing this instability.
@@ -61,8 +60,7 @@ public class BuildUnstableException extends RuntimeException implements Serializ
 	}
 
 	public BuildUnstableException(String message, List<Throwable> throwables) {
-		this(throwables.stream().map(BuildUnstableException::breakReferenceChain)
-				.collect(Collectors.toList()));
+		this(throwables.stream().map(BuildUnstableException::breakReferenceChain).collect(Collectors.toList()));
 		log.warn("\n\n" + DESCRIPTION + message + " with causes " + throwables);
 	}
 
@@ -72,8 +70,7 @@ public class BuildUnstableException extends RuntimeException implements Serializ
 
 	private static Throwable breakReferenceChain(Throwable cause) {
 		if (cause instanceof HttpServerErrorException) {
-			return new RuntimeException(
-					"[Breaking self reference chain] " + cause.toString());
+			return new RuntimeException("[Breaking self reference chain] " + cause.toString());
 		}
 		return cause;
 	}

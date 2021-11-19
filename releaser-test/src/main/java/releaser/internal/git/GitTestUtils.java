@@ -57,8 +57,7 @@ public final class GitTestUtils {
 		return new GitRepo.JGitFactory().init(project);
 	}
 
-	public static File clonedProject(File baseDir, File projectToClone)
-			throws IOException {
+	public static File clonedProject(File baseDir, File projectToClone) throws IOException {
 		GitRepo projectRepo = new GitRepo(baseDir);
 		return projectRepo.cloneProject(new URIish(projectToClone.toURI().toURL()));
 	}

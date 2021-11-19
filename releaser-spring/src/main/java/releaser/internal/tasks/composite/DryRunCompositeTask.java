@@ -83,13 +83,10 @@ public class DryRunCompositeTask implements CompositeReleaserTask {
 				.getBeansOfType(DryRunReleaseReleaserTask.class);
 		List<DryRunReleaseReleaserTask> values = new LinkedList<>(dryRunTasks.values());
 		values.sort(AnnotationAwareOrderComparator.INSTANCE);
-		log.info("For project [{}], found the following dry run tasks {}",
-				args.project.getName(),
-				values.stream().map(r -> r.getClass().getSimpleName())
-						.collect(Collectors.toCollection(LinkedList::new)));
-		return flowRunner().runReleaseTasks(args.options, args.properties,
-				new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(
-						args.originalVersion.projectName, () -> args.projectToRun)),
+		log.info("For project [{}], found the following dry run tasks {}", args.project.getName(), values.stream()
+				.map(r -> r.getClass().getSimpleName()).collect(Collectors.toCollection(LinkedList::new)));
+		return flowRunner().runReleaseTasks(args.options, args.properties, new ProjectsToRun(
+				new ProjectToRun.ProjectToRunSupplier(args.originalVersion.projectName, () -> args.projectToRun)),
 				new TasksToRun(values));
 	}
 

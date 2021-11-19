@@ -45,8 +45,7 @@ public class SpringCloudInfoApplication {
 			SpringCloudInfoConfigurationProperties properties) {
 		Github github = new RtGithub(properties.getGit().getOauthToken());
 		RestTemplate rest = new RestTemplateBuilder().build();
-		return new InitializrSpringCloudInfoService(rest, github,
-				new GithubPomReader(new MavenXpp3Reader(), rest));
+		return new InitializrSpringCloudInfoService(rest, github, new GithubPomReader(new MavenXpp3Reader(), rest));
 	}
 
 	@Configuration
@@ -54,8 +53,7 @@ public class SpringCloudInfoApplication {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http.authorizeRequests().anyRequest().permitAll().and().httpBasic().disable()
-					.csrf().disable();
+			http.authorizeRequests().anyRequest().permitAll().and().httpBasic().disable().csrf().disable();
 		}
 
 	}

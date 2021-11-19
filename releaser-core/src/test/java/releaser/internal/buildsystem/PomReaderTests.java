@@ -46,12 +46,10 @@ public class PomReaderTests {
 
 	@Before
 	public void setup() throws URISyntaxException {
-		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release")
-				.toURI();
+		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
 		this.springCloudReleaseProject = new File(scRelease);
 		this.springCloudReleaseProjectPom = new File(scRelease.getPath(), "pom.xml");
-		this.empty = new File(
-				GitRepoTests.class.getResource("/projects/project/empty.xml").toURI());
+		this.empty = new File(GitRepoTests.class.getResource("/projects/project/empty.xml").toURI());
 		this.licenseFile = new File(scRelease.getPath(), "LICENSE.txt");
 	}
 
@@ -78,16 +76,14 @@ public class PomReaderTests {
 
 	@Test
 	public void should_throw_exception_when_file_is_invalid() {
-		thenThrownBy(() -> PomReader.readPom(this.licenseFile))
-				.hasMessageStartingWith("Failed to read file: ")
+		thenThrownBy(() -> PomReader.readPom(this.licenseFile)).hasMessageStartingWith("Failed to read file: ")
 				.hasCauseInstanceOf(XmlPullParserException.class);
 	}
 
 	@Test
 	public void should_throw_exception_when_file_is_empty() {
 		thenThrownBy(() -> PomReader.readPom(this.empty)).hasMessageStartingWith("File [")
-				.hasMessageContaining("] is empty")
-				.hasCauseInstanceOf(EOFException.class);
+				.hasMessageContaining("] is empty").hasCauseInstanceOf(EOFException.class);
 	}
 
 }

@@ -167,8 +167,7 @@ class CachingRepos implements Repos, Closeable {
 
 	@Override
 	public Repo get(Coordinates coordinates) {
-		return CACHE.computeIfAbsent(coordinates,
-				o -> new CachingRepo(this.delegate.get(coordinates)));
+		return CACHE.computeIfAbsent(coordinates, o -> new CachingRepo(this.delegate.get(coordinates)));
 	}
 
 	@Override
@@ -216,47 +215,40 @@ class CachingRepo implements Repo, Closeable {
 
 	@Override
 	public Coordinates coordinates() {
-		return (Coordinates) CACHE.computeIfAbsent(
-				new RepoKey(this.delegate, "coordinates"),
+		return (Coordinates) CACHE.computeIfAbsent(new RepoKey(this.delegate, "coordinates"),
 				s -> this.delegate.coordinates());
 	}
 
 	@Override
 	public Issues issues() {
-		return (Issues) CACHE.computeIfAbsent(new RepoKey(this.delegate, "issues"),
-				s -> this.delegate.issues());
+		return (Issues) CACHE.computeIfAbsent(new RepoKey(this.delegate, "issues"), s -> this.delegate.issues());
 	}
 
 	@Override
 	public Milestones milestones() {
-		return (Milestones) CACHE.computeIfAbsent(
-				new RepoKey(this.delegate, "milestones"),
+		return (Milestones) CACHE.computeIfAbsent(new RepoKey(this.delegate, "milestones"),
 				s -> this.delegate.milestones());
 	}
 
 	@Override
 	public Pulls pulls() {
-		return (Pulls) CACHE.computeIfAbsent(new RepoKey(this.delegate, "pulls"),
-				s -> this.delegate.pulls());
+		return (Pulls) CACHE.computeIfAbsent(new RepoKey(this.delegate, "pulls"), s -> this.delegate.pulls());
 	}
 
 	@Override
 	public Hooks hooks() {
-		return (Hooks) CACHE.computeIfAbsent(new RepoKey(this.delegate, "hooks"),
-				s -> this.delegate.hooks());
+		return (Hooks) CACHE.computeIfAbsent(new RepoKey(this.delegate, "hooks"), s -> this.delegate.hooks());
 	}
 
 	@Override
 	public IssueEvents issueEvents() {
-		return (IssueEvents) CACHE.computeIfAbsent(
-				new RepoKey(this.delegate, "issueEvents"),
+		return (IssueEvents) CACHE.computeIfAbsent(new RepoKey(this.delegate, "issueEvents"),
 				s -> this.delegate.issueEvents());
 	}
 
 	@Override
 	public Labels labels() {
-		return (Labels) CACHE.computeIfAbsent(new RepoKey(this.delegate, "labels"),
-				s -> this.delegate.labels());
+		return (Labels) CACHE.computeIfAbsent(new RepoKey(this.delegate, "labels"), s -> this.delegate.labels());
 	}
 
 	@Override
@@ -267,63 +259,54 @@ class CachingRepo implements Repo, Closeable {
 
 	@Override
 	public Releases releases() {
-		return (Releases) CACHE.computeIfAbsent(new RepoKey(this.delegate, "releases"),
-				s -> this.delegate.releases());
+		return (Releases) CACHE.computeIfAbsent(new RepoKey(this.delegate, "releases"), s -> this.delegate.releases());
 	}
 
 	@Override
 	public DeployKeys keys() {
-		return (DeployKeys) CACHE.computeIfAbsent(new RepoKey(this.delegate, "keys"),
-				s -> this.delegate.keys());
+		return (DeployKeys) CACHE.computeIfAbsent(new RepoKey(this.delegate, "keys"), s -> this.delegate.keys());
 	}
 
 	@Override
 	public Forks forks() {
-		return (Forks) CACHE.computeIfAbsent(new RepoKey(this.delegate, "forks"),
-				s -> this.delegate.forks());
+		return (Forks) CACHE.computeIfAbsent(new RepoKey(this.delegate, "forks"), s -> this.delegate.forks());
 	}
 
 	@Override
 	public RepoCommits commits() {
-		return (RepoCommits) CACHE.computeIfAbsent(
-				new RepoKey(this.delegate, "repoCommits"), s -> this.delegate.commits());
+		return (RepoCommits) CACHE.computeIfAbsent(new RepoKey(this.delegate, "repoCommits"),
+				s -> this.delegate.commits());
 	}
 
 	@Override
 	public Branches branches() {
-		return (Branches) CACHE.computeIfAbsent(new RepoKey(this.delegate, "branches"),
-				s -> this.delegate.branches());
+		return (Branches) CACHE.computeIfAbsent(new RepoKey(this.delegate, "branches"), s -> this.delegate.branches());
 	}
 
 	@Override
 	public Contents contents() {
-		return (Contents) CACHE.computeIfAbsent(new RepoKey(this.delegate, "contents"),
-				s -> this.delegate.contents());
+		return (Contents) CACHE.computeIfAbsent(new RepoKey(this.delegate, "contents"), s -> this.delegate.contents());
 	}
 
 	@Override
 	public Collaborators collaborators() {
-		return (Collaborators) CACHE.computeIfAbsent(
-				new RepoKey(this.delegate, "collaborators"),
+		return (Collaborators) CACHE.computeIfAbsent(new RepoKey(this.delegate, "collaborators"),
 				s -> this.delegate.collaborators());
 	}
 
 	@Override
 	public Git git() {
-		return (Git) CACHE.computeIfAbsent(new RepoKey(this.delegate, "git"),
-				s -> this.delegate.git());
+		return (Git) CACHE.computeIfAbsent(new RepoKey(this.delegate, "git"), s -> this.delegate.git());
 	}
 
 	@Override
 	public Stars stars() {
-		return (Stars) CACHE.computeIfAbsent(new RepoKey(this.delegate, "stars"),
-				s -> this.delegate.stars());
+		return (Stars) CACHE.computeIfAbsent(new RepoKey(this.delegate, "stars"), s -> this.delegate.stars());
 	}
 
 	@Override
 	public Notifications notifications() {
-		return (Notifications) CACHE.computeIfAbsent(
-				new RepoKey(this.delegate, "notifications"),
+		return (Notifications) CACHE.computeIfAbsent(new RepoKey(this.delegate, "notifications"),
 				s -> this.delegate.notifications());
 	}
 
@@ -334,15 +317,14 @@ class CachingRepo implements Repo, Closeable {
 
 	@Override
 	public JsonObject json() throws IOException {
-		return (JsonObject) CACHE.computeIfAbsent(new RepoKey(this.delegate, "json"),
-				s -> {
-					try {
-						return this.delegate.json();
-					}
-					catch (IOException ex) {
-						throw new IllegalStateException(ex);
-					}
-				});
+		return (JsonObject) CACHE.computeIfAbsent(new RepoKey(this.delegate, "json"), s -> {
+			try {
+				return this.delegate.json();
+			}
+			catch (IOException ex) {
+				throw new IllegalStateException(ex);
+			}
+		});
 	}
 
 	@Override
@@ -382,8 +364,7 @@ class RepoKey {
 			return false;
 		}
 		RepoKey repoKey = (RepoKey) o;
-		return Objects.equals(this.repo, repoKey.repo)
-				&& Objects.equals(this.key, repoKey.key);
+		return Objects.equals(this.repo, repoKey.repo) && Objects.equals(this.key, repoKey.key);
 	}
 
 	@Override

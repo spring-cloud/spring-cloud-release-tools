@@ -70,8 +70,7 @@ public class RestTemplateSaganClientTests {
 
 		then(project.id).isEqualTo("spring-framework");
 		then(project.name).isEqualTo("Spring Framework");
-		then(project.repoUrl)
-				.isEqualTo("https://github.com/spring-projects/spring-framework");
+		then(project.repoUrl).isEqualTo("https://github.com/spring-projects/spring-framework");
 		then(project.siteUrl).isEqualTo("https://projects.spring.io/spring-framework");
 		then(project.category).isEqualTo("active");
 		then(project.stackOverflowTags).isNotBlank();
@@ -80,10 +79,8 @@ public class RestTemplateSaganClientTests {
 		then(project.projectReleases).isNotEmpty();
 		Release release = project.projectReleases.get(0);
 		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo(
-				"http://docs.spring.io/spring/docs/5.0.0.RC4/spring-framework-reference/");
-		then(release.apiDocUrl)
-				.isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/javadoc-api/");
+		then(release.refDocUrl).isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/spring-framework-reference/");
+		then(release.apiDocUrl).isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/javadoc-api/");
 		then(release.groupId).isEqualTo("org.springframework");
 		then(release.artifactId).isEqualTo("spring-context");
 		then(release.repository.id).isEqualTo("spring-milestones");
@@ -103,10 +100,8 @@ public class RestTemplateSaganClientTests {
 		Release release = this.client.getRelease("spring-framework", "5.0.0.RC4");
 
 		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo(
-				"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/");
-		then(release.apiDocUrl)
-				.isEqualTo("http://docs.spring.io/spring/docs/{version}/javadoc-api/");
+		then(release.refDocUrl).isEqualTo("http://docs.spring.io/spring/docs/{version}/spring-framework-reference/");
+		then(release.apiDocUrl).isEqualTo("http://docs.spring.io/spring/docs/{version}/javadoc-api/");
 		then(release.groupId).isEqualTo("org.springframework");
 		then(release.artifactId).isEqualTo("spring-context");
 		then(release.repository.id).isEqualTo("spring-milestones");
@@ -186,8 +181,8 @@ public class RestTemplateSaganClientTests {
 		sithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
 		sithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
 
-		List<ReleaseUpdate> updates = Arrays.asList(firstRelease, secondRelease,
-				thirdRelease, fourthRelease, fithRelease, sithRelease);
+		List<ReleaseUpdate> updates = Arrays.asList(firstRelease, secondRelease, thirdRelease, fourthRelease,
+				fithRelease, sithRelease);
 
 		Project project = this.client.updateRelease("spring-framework", updates);
 
@@ -237,8 +232,7 @@ public class RestTemplateSaganClientTests {
 	}
 
 	private RestTemplate restTemplate(ReleaserProperties properties) {
-		return new RestTemplateBuilder()
-				.basicAuthentication(properties.getGit().getOauthToken(), "").build();
+		return new RestTemplateBuilder().basicAuthentication(properties.getGit().getOauthToken(), "").build();
 	}
 
 	@Configuration

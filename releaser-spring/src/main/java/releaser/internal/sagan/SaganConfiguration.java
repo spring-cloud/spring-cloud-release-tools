@@ -44,8 +44,7 @@ class SaganConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "false",
-			matchIfMissing = true)
+	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "false", matchIfMissing = true)
 	SaganClient noOpSaganClient() {
 		return new SaganClient() {
 			@Override
@@ -64,8 +63,7 @@ class SaganConfiguration {
 			}
 
 			@Override
-			public Project updateRelease(String projectName,
-					List<ReleaseUpdate> releaseUpdate) {
+			public Project updateRelease(String projectName, List<ReleaseUpdate> releaseUpdate) {
 				return null;
 			}
 
@@ -81,8 +79,7 @@ class SaganConfiguration {
 				"In order to connect to Sagan you need to pass the Github OAuth token. "
 						+ "You can do it via the [--releaser.git.oauth-token=...] "
 						+ "command line argument or an env variable [export RELEASER_GIT_OAUTH_TOKEN=...].");
-		return new RestTemplateBuilder()
-				.basicAuthentication(properties.getGit().getOauthToken(), "").build();
+		return new RestTemplateBuilder().basicAuthentication(properties.getGit().getOauthToken(), "").build();
 	}
 
 }

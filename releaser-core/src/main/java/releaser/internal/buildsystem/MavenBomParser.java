@@ -50,10 +50,8 @@ class MavenBomParser implements BomParser {
 
 	MavenBomParser(ReleaserProperties properties, List<CustomBomParser> customParsers) {
 		this.thisTrainBomLocation = properties.getPom().getThisTrainBom();
-		this.versionPattern = StringUtils
-				.hasText(properties.getPom().getBomVersionPattern())
-						? Pattern.compile(properties.getPom().getBomVersionPattern())
-						: Pattern.compile(".*");
+		this.versionPattern = StringUtils.hasText(properties.getPom().getBomVersionPattern())
+				? Pattern.compile(properties.getPom().getBomVersionPattern()) : Pattern.compile(".*");
 		this.properties = properties;
 		this.customParsers = customParsers;
 	}
@@ -71,13 +69,11 @@ class MavenBomParser implements BomParser {
 		if (model == null) {
 			return VersionsFromBom.EMPTY_VERSION;
 		}
-		Set<Project> projects = model.getProperties().entrySet().stream()
-				.filter(propertyMatchesVersionPattern()).map(toProject())
-				.collect(Collectors.toSet());
+		Set<Project> projects = model.getProperties().entrySet().stream().filter(propertyMatchesVersionPattern())
+				.map(toProject()).collect(Collectors.toSet());
 		String releaseTrainProjectVersion = model.getVersion();
 		projects.add(
-				new Project(this.properties.getMetaRelease().getReleaseTrainProjectName(),
-						releaseTrainProjectVersion));
+				new Project(this.properties.getMetaRelease().getReleaseTrainProjectName(), releaseTrainProjectVersion));
 		// @formatter:off
 		return new VersionsFromBomBuilder()
 				.thisProjectRoot(thisProjectRoot)

@@ -20,7 +20,6 @@ package releaser.internal.tasks;
  * Marker interface for a post release task for a single project. Example: update the
  * GitHub milestone for the project.
  */
-public interface ProjectPostReleaseReleaserTask
-		extends SingleProjectReleaserTask, PostReleaseReleaserTask {
+public interface ProjectPostReleaseReleaserTask extends SingleProjectReleaserTask, PostReleaseReleaserTask {
 
 }

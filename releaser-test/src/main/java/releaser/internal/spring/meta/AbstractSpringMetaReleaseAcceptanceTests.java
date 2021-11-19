@@ -36,45 +36,34 @@ import static org.assertj.core.api.BDDAssertions.then;
 /**
  * @author Marcin Grzejszczak
  */
-public abstract class AbstractSpringMetaReleaseAcceptanceTests
-		extends AbstractSpringAcceptanceTests {
+public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTests {
 
 	public ArgsBuilder metaReleaseArgs(File project) throws Exception {
-		return new ArgsBuilder(project, this.tmp)
-				.releaseTrainUrl("/projects/spring-cloud-release/")
-				.projectsToSkip("spring-boot", "spring-cloud-build",
-						"spring-cloud-commons", "spring-cloud-stream",
-						"spring-cloud-task", "spring-cloud-function", "spring-cloud-aws",
-						"spring-cloud-bus", "spring-cloud-config", "spring-cloud-netflix",
-						"spring-cloud-cloudfoundry", "spring-cloud-gateway",
-						"spring-cloud-security", "spring-cloud-zookeeper",
-						"spring-cloud-sleuth", "spring-cloud-contract",
-						"spring-cloud-vault")
+		return new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
+				.projectsToSkip("spring-boot", "spring-cloud-build", "spring-cloud-commons", "spring-cloud-stream",
+						"spring-cloud-task", "spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus",
+						"spring-cloud-config", "spring-cloud-netflix", "spring-cloud-cloudfoundry",
+						"spring-cloud-gateway", "spring-cloud-security", "spring-cloud-zookeeper",
+						"spring-cloud-sleuth", "spring-cloud-contract", "spring-cloud-vault")
 				.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
 				.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
 				.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
 				.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
-				.releaseTrainBomUrl(
-						file("/projects/spring-cloud-release/").toURI().toString());
+				.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 	}
 
 	public ArgsBuilder metaReleaseArgsForParallel(File project) throws Exception {
-		return new ArgsBuilder(project, this.tmp)
-				.releaseTrainUrl("/projects/spring-cloud-release/")
-				.projectsToSkip("spring-boot", "spring-cloud-commons",
-						"spring-cloud-stream", "spring-cloud-task",
-						"spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus",
-						"spring-cloud-config", "spring-cloud-netflix",
-						"spring-cloud-cloudfoundry", "spring-cloud-gateway",
-						"spring-cloud-security", "spring-cloud-zookeeper",
-						"spring-cloud-sleuth", "spring-cloud-contract",
-						"spring-cloud-vault")
+		return new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
+				.projectsToSkip("spring-boot", "spring-cloud-commons", "spring-cloud-stream", "spring-cloud-task",
+						"spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus", "spring-cloud-config",
+						"spring-cloud-netflix", "spring-cloud-cloudfoundry", "spring-cloud-gateway",
+						"spring-cloud-security", "spring-cloud-zookeeper", "spring-cloud-sleuth",
+						"spring-cloud-contract", "spring-cloud-vault")
 				.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
 				.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
 				.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
 				.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
-				.releaseTrainBomUrl(
-						file("/projects/spring-cloud-release/").toURI().toString());
+				.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 	}
 
 	public Map<String, String> edgwareSr10() {
@@ -104,12 +93,9 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests
 	public void thenAllStepsWereExecutedForEachProject(
 			NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler) {
 		nonAssertingTestProjectGitHandler.clonedProjects.stream()
-				.filter(f -> !f.getName().contains("angel")
-						&& !f.getName().equals("spring-cloud"))
-				.forEach(project -> {
-					then(Arrays.asList("spring-cloud-starter-build",
-							"spring-cloud-consul"))
-									.contains(pom(project).getArtifactId());
+				.filter(f -> !f.getName().contains("angel") && !f.getName().equals("spring-cloud")).forEach(project -> {
+					then(Arrays.asList("spring-cloud-starter-build", "spring-cloud-consul"))
+							.contains(pom(project).getArtifactId());
 					then(new File("/tmp/executed_build")).exists();
 					then(new File("/tmp/executed_deploy")).exists();
 					then(new File("/tmp/executed_docs")).exists();
@@ -117,21 +103,18 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests
 	}
 
 	public void thenSaganWasCalled(SaganUpdater saganUpdater) {
-		BDDMockito.then(saganUpdater).should(BDDMockito.atLeastOnce()).updateSagan(
-				BDDMockito.any(File.class), BDDMockito.anyString(),
-				BDDMockito.any(ProjectVersion.class),
-				BDDMockito.any(ProjectVersion.class), BDDMockito.any(Projects.class));
+		BDDMockito.then(saganUpdater).should(BDDMockito.atLeastOnce()).updateSagan(BDDMockito.any(File.class),
+				BDDMockito.anyString(), BDDMockito.any(ProjectVersion.class), BDDMockito.any(ProjectVersion.class),
+				BDDMockito.any(Projects.class));
 	}
 
 	public void thenSaganWasNotCalled(SaganUpdater saganUpdater) {
-		BDDMockito.then(saganUpdater).should(BDDMockito.never()).updateSagan(
-				BDDMockito.any(File.class), BDDMockito.anyString(),
-				BDDMockito.any(ProjectVersion.class),
-				BDDMockito.any(ProjectVersion.class), BDDMockito.any(Projects.class));
+		BDDMockito.then(saganUpdater).should(BDDMockito.never()).updateSagan(BDDMockito.any(File.class),
+				BDDMockito.anyString(), BDDMockito.any(ProjectVersion.class), BDDMockito.any(ProjectVersion.class),
+				BDDMockito.any(Projects.class));
 	}
 
-	public static class NonAssertingTestProjectGitHubHandler
-			extends ProjectGitHubHandler {
+	public static class NonAssertingTestProjectGitHubHandler extends ProjectGitHubHandler {
 
 		boolean closedMilestones = false;
 
@@ -154,8 +137,7 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests
 		}
 
 		@Override
-		public void createIssueInStartSpringIo(Projects projects,
-				ProjectVersion version) {
+		public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
 			this.issueCreatedInStartSpringIo = true;
 		}
 

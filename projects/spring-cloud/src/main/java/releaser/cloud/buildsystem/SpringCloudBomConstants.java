@@ -24,8 +24,7 @@ final class SpringCloudBomConstants {
 	// boot
 	static final String SPRING_BOOT = "spring-boot";
 	static final String BOOT_STARTER_ARTIFACT_ID = "spring-boot-starter";
-	static final String BOOT_STARTER_PARENT_ARTIFACT_ID = BOOT_STARTER_ARTIFACT_ID
-			+ "-parent";
+	static final String BOOT_STARTER_PARENT_ARTIFACT_ID = BOOT_STARTER_ARTIFACT_ID + "-parent";
 	static final String BOOT_DEPENDENCIES_ARTIFACT_ID = "spring-boot-dependencies";
 
 	// sc-build

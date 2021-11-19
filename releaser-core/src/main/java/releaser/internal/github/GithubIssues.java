@@ -33,8 +33,7 @@ class GithubIssues {
 	}
 
 	private CustomGithubIssues customGithubIssues() {
-		return this.customGithubIssues.isEmpty() ? CustomGithubIssues.NO_OP
-				: this.customGithubIssues.get(0);
+		return this.customGithubIssues.isEmpty() ? CustomGithubIssues.NO_OP : this.customGithubIssues.get(0);
 	}
 
 	void fileIssueInSpringGuides(Projects projects, ProjectVersion version) {

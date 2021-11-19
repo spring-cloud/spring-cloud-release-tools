@@ -92,7 +92,6 @@ public interface ReleaserTask extends Ordered, Function<Arguments, ExecutionResu
 	 * shouldn't be stopped (which means that the build is unstable)
 	 * @throws RuntimeException - when the task failed for any other reason
 	 */
-	ExecutionResult runTask(Arguments args)
-			throws BuildUnstableException, RuntimeException;
+	ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException;
 
 }

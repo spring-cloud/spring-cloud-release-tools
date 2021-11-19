@@ -51,8 +51,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 	private static final Logger log = LoggerFactory.getLogger(ProjectVersion.class);
 
-	private static final Pattern SNAPSHOT_PATTERN = Pattern
-			.compile("^.*[\\.|\\-](BUILD-)?SNAPSHOT.*$");
+	private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("^.*[\\.|\\-](BUILD-)?SNAPSHOT.*$");
 
 	private static final String MILESTONE_REGEX = "^.*[\\.|\\-]M[0-9]+.*$";
 
@@ -62,12 +61,11 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 	private static final String SR_REGEX = "^.*[\\.|\\-]SR[0-9]+.*$";
 
-	private static final Pattern SEMVER_PATTERN = Pattern
-			.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
+	private static final Pattern SEMVER_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
 
 	private static final List<Pattern> VALID_PATTERNS = Arrays.asList(SNAPSHOT_PATTERN,
-			Pattern.compile(MILESTONE_REGEX), Pattern.compile(RC_REGEX),
-			Pattern.compile(RELEASE_REGEX), Pattern.compile(SR_REGEX));
+			Pattern.compile(MILESTONE_REGEX), Pattern.compile(RC_REGEX), Pattern.compile(RELEASE_REGEX),
+			Pattern.compile(SR_REGEX));
 
 	/**
 	 * Name of the project.
@@ -164,8 +162,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (StringUtils.hasText(model.getGroupId())) {
 			return model.getGroupId();
 		}
-		if (model.getParent() != null
-				&& StringUtils.hasText(model.getParent().getGroupId())) {
+		if (model.getParent() != null && StringUtils.hasText(model.getParent().getGroupId())) {
 			return model.getParent().getGroupId();
 		}
 		return "";
@@ -222,8 +219,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		int indexOfFirstHyphen = version.indexOf("-");
 		boolean buildSnapshot = version.endsWith("BUILD-SNAPSHOT");
 
-		if (numberOfHyphens == 1 && !buildSnapshot
-				|| (numberOfHyphens > 1 && buildSnapshot)) {
+		if (numberOfHyphens == 1 && !buildSnapshot || (numberOfHyphens > 1 && buildSnapshot)) {
 			// Dysprosium or 1.0.0
 			String versionName = version.substring(0, indexOfFirstHyphen);
 			boolean hasDots = versionName.contains(".");
@@ -243,8 +239,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 				return SplitVersion.hyphen(newArray);
 			}
 			else {
-				throw new UnsupportedOperationException(
-						"Unknown version [" + version + "]");
+				throw new UnsupportedOperationException("Unknown version [" + version + "]");
 			}
 		}
 		return null;
@@ -336,15 +331,14 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			patch = Integer.parseInt(splitVersion.patch);
 		}
 		catch (NumberFormatException nfe) {
-			throw new IllegalArgumentException("Version " + this.version
-					+ " doesn't contain a numerical PATCH number", nfe);
+			throw new IllegalArgumentException("Version " + this.version + " doesn't contain a numerical PATCH number",
+					nfe);
 		}
 		if (patch == 0) {
 			return Optional.empty();
 		}
-		return Optional.of(prefix + splitVersion.major + splitVersion.delimiter
-				+ splitVersion.minor + splitVersion.delimiter + (patch - 1)
-				+ splitVersion.delimiter + suffix);
+		return Optional.of(prefix + splitVersion.major + splitVersion.delimiter + splitVersion.minor
+				+ splitVersion.delimiter + (patch - 1) + splitVersion.delimiter + suffix);
 	}
 
 	/**
@@ -359,8 +353,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	 * previous MAJOR.MINOR, or empty if current MINOR is 0
 	 * @see #computePreviousMajorTagPattern(String, String)
 	 */
-	public Optional<Pattern> computePreviousMinorTagPattern(String prefix,
-			String suffix) {
+	public Optional<Pattern> computePreviousMinorTagPattern(String prefix, String suffix) {
 		SplitVersion splitVersion = this.assertVersion();
 		if (suffix.isEmpty()) {
 			suffix = splitVersion.suffix;
@@ -371,17 +364,15 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			minor = Integer.parseInt(splitVersion.minor);
 		}
 		catch (NumberFormatException nfe) {
-			throw new IllegalArgumentException("Version " + this.version
-					+ " doesn't contain a numerical MINOR number", nfe);
+			throw new IllegalArgumentException("Version " + this.version + " doesn't contain a numerical MINOR number",
+					nfe);
 		}
 		if (minor == 0) {
 			return Optional.empty();
 		}
-		Pattern p = Pattern
-				.compile(Pattern
-						.quote(prefix + splitVersion.major + splitVersion.delimiter
-								+ (minor - 1) + splitVersion.delimiter)
-						+ "\\d+" + quotedSuffix);
+		Pattern p = Pattern.compile(Pattern
+				.quote(prefix + splitVersion.major + splitVersion.delimiter + (minor - 1) + splitVersion.delimiter)
+				+ "\\d+" + quotedSuffix);
 		return Optional.of(p);
 	}
 
@@ -405,16 +396,14 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			major = Integer.parseInt(splitVersion.major);
 		}
 		catch (NumberFormatException nfe) {
-			throw new IllegalArgumentException("Version " + this.version
-					+ " doesn't contain a numerical MAJOR number", nfe);
+			throw new IllegalArgumentException("Version " + this.version + " doesn't contain a numerical MAJOR number",
+					nfe);
 		}
 		if (major == 0) {
-			throw new IllegalArgumentException(
-					"Cannot compute previous MAJOR pattern with MAJOR of 0");
+			throw new IllegalArgumentException("Cannot compute previous MAJOR pattern with MAJOR of 0");
 		}
-		return Pattern.compile(
-				Pattern.quote(prefix + (major - 1) + splitVersion.delimiter) + "\\d+"
-						+ Pattern.quote(splitVersion.delimiter) + "\\d+" + quotedSuffix);
+		return Pattern.compile(Pattern.quote(prefix + (major - 1) + splitVersion.delimiter) + "\\d+"
+				+ Pattern.quote(splitVersion.delimiter) + "\\d+" + quotedSuffix);
 	}
 
 	public boolean isSnapshot() {
@@ -502,8 +491,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	private ReleaseType releaseTypeForReleaseTrain() {
 		try {
 			SplitVersion splitVersion = assertVersion();
-			if (StringUtils.isEmpty(splitVersion.suffix)
-					&& StringUtils.hasText(splitVersion.patch)) {
+			if (StringUtils.isEmpty(splitVersion.suffix) && StringUtils.hasText(splitVersion.patch)) {
 				if ("0".equals(splitVersion.patch)) {
 					return ReleaseType.RELEASE;
 				}
@@ -528,8 +516,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		SplitVersion thatSplit = that.assertVersion();
 		int releaseTypeComparison = this.releaseType.compareTo(that.releaseType);
 		boolean thisReleaseTypeHigher = releaseTypeComparison > 0;
-		boolean bothGa = this.isReleaseOrServiceRelease()
-				&& that.isReleaseOrServiceRelease();
+		boolean bothGa = this.isReleaseOrServiceRelease() && that.isReleaseOrServiceRelease();
 		// 1.0.1.M2 vs 1.0.0.RELEASE (x)
 		if (thisReleaseTypeHigher && !bothGa) {
 			return 1;
@@ -578,8 +565,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		else if (thisVersion.isOldReleaseTrain()) {
 			return false;
 		}
-		return thisVersion.major.equals(thatVersion.major)
-				&& thisVersion.minor.equals(thatVersion.minor);
+		return thisVersion.major.equals(thatVersion.major) && thisVersion.minor.equals(thatVersion.minor);
 	}
 
 	private void assertVersionSet() {
@@ -589,8 +575,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	public int compareToReleaseTrain(String version) {
-		return new TrainVersionNumber(this)
-				.compareTo(new TrainVersionNumber(new ProjectVersion(version)));
+		return new TrainVersionNumber(this).compareTo(new TrainVersionNumber(new ProjectVersion(version)));
 	}
 
 	/**
@@ -634,8 +619,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return Collections.singletonList(SNAPSHOT_PATTERN);
 		}
 		// treat like GA
-		return Arrays.asList(SNAPSHOT_PATTERN, Pattern.compile(MILESTONE_REGEX),
-				Pattern.compile(RC_REGEX));
+		return Arrays.asList(SNAPSHOT_PATTERN, Pattern.compile(MILESTONE_REGEX), Pattern.compile(RC_REGEX));
 	}
 
 	@Override
@@ -666,8 +650,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		// 1.0.0.RELEASE
 		// 1.0.0-RELEASE
-		private SplitVersion(String major, String minor, String patch, String delimiter,
-				String suffix) {
+		private SplitVersion(String major, String minor, String patch, String delimiter, String suffix) {
 			this.major = major;
 			this.minor = minor;
 			this.patch = patch;
@@ -755,15 +738,13 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		private SplitVersion fullVersionWithIncrementedPatch() {
 			int incrementedPatch = Integer.parseInt(patch) + 1;
-			return new SplitVersion(major, minor, Integer.toString(incrementedPatch),
-					delimiter, suffix);
+			return new SplitVersion(major, minor, Integer.toString(incrementedPatch), delimiter, suffix);
 		}
 
 		String print() {
 			// Finchley.SR2
 			if (StringUtils.isEmpty(minor)) {
-				return StringUtils.isEmpty(suffix) ? major
-						: String.format("%s%s%s", major, delimiter, suffix);
+				return StringUtils.isEmpty(suffix) ? major : String.format("%s%s%s", major, delimiter, suffix);
 			}
 			else if (StringUtils.isEmpty(suffix)) {
 				return String.format("%s.%s.%s", major, minor, patch);
@@ -781,8 +762,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		private boolean tooFewElements() {
 			// 1 is wrong but Finchley-SR3 is ok
-			return StringUtils.isEmpty(minor) && StringUtils.isEmpty(patch)
-					&& StringUtils.isEmpty(suffix);
+			return StringUtils.isEmpty(minor) && StringUtils.isEmpty(patch) && StringUtils.isEmpty(suffix);
 		}
 
 		private SplitVersion withSnapshot() {
@@ -798,9 +778,8 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this).append("major", major).append("minor", minor)
-					.append("patch", patch).append("delimiter", delimiter)
-					.append("suffix", suffix).toString();
+			return new ToStringCreator(this).append("major", major).append("minor", minor).append("patch", patch)
+					.append("delimiter", delimiter).append("suffix", suffix).toString();
 
 		}
 
@@ -850,11 +829,9 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			}
 		}
 
-		private int compareWithOldTrain(ProjectVersion oldTrain,
-				ProjectVersion thatVersion) {
+		private int compareWithOldTrain(ProjectVersion oldTrain, ProjectVersion thatVersion) {
 			// Hoxton.SR5 > 2020.0.0-M5
-			if (oldTrain.isReleaseOrServiceRelease()
-					&& !thatVersion.isReleaseOrServiceRelease()) {
+			if (oldTrain.isReleaseOrServiceRelease() && !thatVersion.isReleaseOrServiceRelease()) {
 				return 1;
 			}
 			// Hoxton.SR5 < 2020.0.0-RELEASE

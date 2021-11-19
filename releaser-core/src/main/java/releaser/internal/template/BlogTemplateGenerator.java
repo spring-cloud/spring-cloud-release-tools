@@ -34,8 +34,7 @@ import releaser.internal.project.Projects;
  */
 class BlogTemplateGenerator {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(BlogTemplateGenerator.class);
+	private static final Logger log = LoggerFactory.getLogger(BlogTemplateGenerator.class);
 
 	private static final Pattern RC_PATTERN = Pattern.compile("(.*)(RC)([0-9]+)");
 
@@ -53,8 +52,8 @@ class BlogTemplateGenerator {
 
 	private final NotesGenerator notesGenerator;
 
-	BlogTemplateGenerator(Template template, String releaseVersion, File blogOutput,
-			Projects projects, ProjectGitHubHandler handler) {
+	BlogTemplateGenerator(Template template, String releaseVersion, File blogOutput, Projects projects,
+			ProjectGitHubHandler handler) {
 		this.template = template;
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;
@@ -73,24 +72,21 @@ class BlogTemplateGenerator {
 			// - [Spring Milestone](https://repo.spring.io/milestone/) repository
 			// releaseVersion '- Dalston.RELEASE
 			boolean release = this.releaseVersion.contains("RELEASE");
-			boolean nonRelease = !(release
-					|| SR_PATTERN.matcher(this.releaseVersion).matches());
+			boolean nonRelease = !(release || SR_PATTERN.matcher(this.releaseVersion).matches());
 			String availability = availability(release);
 			String releaseName = parsedReleaseName(this.releaseVersion);
 			String releaseLink = link(nonRelease);
-			Map<String, Object> map = ImmutableMap.<String, Object>builder()
-					.put("availability", availability).put("releaseName", releaseName)
-					.put("releaseLink", releaseLink)
+			Map<String, Object> map = ImmutableMap.<String, Object>builder().put("availability", availability)
+					.put("releaseName", releaseName).put("releaseLink", releaseLink)
 					.put("releaseVersion", this.releaseVersion)
-					.put("projects", this.notesGenerator.fromProjects(this.projects))
-					.put("nonRelease", nonRelease).build();
+					.put("projects", this.notesGenerator.fromProjects(this.projects)).put("nonRelease", nonRelease)
+					.build();
 			String blog = this.template.apply(map);
 			Files.write(this.blogOutput.toPath(), blog.getBytes());
 			return this.blogOutput;
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(
-					"Exception occurred while trying to create a blog entry", e);
+			throw new IllegalStateException("Exception occurred while trying to create a blog entry", e);
 		}
 	}
 
@@ -116,8 +112,7 @@ class BlogTemplateGenerator {
 		}
 		if (log.isWarnEnabled()) {
 			log.warn("Unrecognized release [{}] . "
-					+ "Hopefully, you know what you're doing. Will treat it as milestone",
-					this.releaseVersion);
+					+ "Hopefully, you know what you're doing. Will treat it as milestone", this.releaseVersion);
 		}
 		return milestone(milestone);
 	}
@@ -136,8 +131,7 @@ class BlogTemplateGenerator {
 			return "[Spring Milestone](https://repo.spring.io/milestone/) repository";
 		}
 		return "[Maven Central](https://repo1.maven.org/maven2/"
-				+ "org/springframework/cloud/spring-cloud-dependencies/"
-				+ this.releaseVersion + "/)";
+				+ "org/springframework/cloud/spring-cloud-dependencies/" + this.releaseVersion + "/)";
 	}
 
 }

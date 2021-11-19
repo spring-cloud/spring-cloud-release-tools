@@ -50,8 +50,7 @@ public class ReleaseTrainContentsUpdaterTests {
 
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
-	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(this.properties,
-			Collections.emptyList()) {
+	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(this.properties, Collections.emptyList()) {
 		@Override
 		public String milestoneUrl(ProjectVersion releaseVersion) {
 			return "http://www.foo.com/";
@@ -60,11 +59,10 @@ public class ReleaseTrainContentsUpdaterTests {
 
 	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties);
 
-	TemplateGenerator templateGenerator = new TemplateGenerator(this.properties,
-			this.projectGitHubHandler);
+	TemplateGenerator templateGenerator = new TemplateGenerator(this.properties, this.projectGitHubHandler);
 
-	ReleaseTrainContentsUpdater updater = new ReleaseTrainContentsUpdater(this.properties,
-			this.projectGitHandler, this.templateGenerator);
+	ReleaseTrainContentsUpdater updater = new ReleaseTrainContentsUpdater(this.properties, this.projectGitHandler,
+			this.templateGenerator);
 
 	File springCloudRepo;
 
@@ -82,8 +80,7 @@ public class ReleaseTrainContentsUpdaterTests {
 	}
 
 	private File file(String relativePath) throws URISyntaxException {
-		return new File(
-				ReleaseTrainContentsUpdaterTests.class.getResource(relativePath).toURI());
+		return new File(ReleaseTrainContentsUpdaterTests.class.getResource(relativePath).toURI());
 	}
 
 	@Test
@@ -110,58 +107,44 @@ public class ReleaseTrainContentsUpdaterTests {
 			throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().setUpdateReleaseTrainWiki(true);
-		this.properties.getGit()
-				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
+		this.properties.getGit().setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
 
 		File file = this.updater.updateReleaseTrainWiki(oldReleaseTrain());
 
 		BDDAssertions.then(file).isNotNull();
 		BDDAssertions.then(edgwareWikiEntryContent(file)).doesNotContain("# Edgware.SR7")
-				.doesNotContain(
-						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
-		BDDAssertions
-				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
-						.getShortMessage())
+				.doesNotContain("Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
+		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator().next().getShortMessage())
 				.doesNotContain("Updating project page to release train");
 	}
 
 	@Test
-	public void should_update_the_contents_of_wiki_when_release_train_greater()
-			throws GitAPIException, IOException {
+	public void should_update_the_contents_of_wiki_when_release_train_greater() throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().setUpdateReleaseTrainWiki(true);
-		this.properties.getGit()
-				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
+		this.properties.getGit().setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
 
 		File file = this.updater.updateReleaseTrainWiki(newReleaseTrain());
 
 		BDDAssertions.then(file).isNotNull();
 		BDDAssertions.then(edgwareWikiEntryContent(file)).contains("# Edgware.SR7")
-				.contains(
-						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
-		BDDAssertions
-				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
-						.getShortMessage())
+				.contains("Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
+		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [Edgware.SR7]");
 	}
 
 	@Test
-	public void should_generate_the_contents_of_wiki_when_release_train_missing()
-			throws GitAPIException, IOException {
+	public void should_generate_the_contents_of_wiki_when_release_train_missing() throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().setUpdateReleaseTrainWiki(true);
-		this.properties.getGit()
-				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
+		this.properties.getGit().setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
 
 		File file = this.updater.updateReleaseTrainWiki(freshNewReleaseTrain());
 
 		BDDAssertions.then(file).isNotNull();
-		BDDAssertions.then(greenwichWikiEntryContent(file))
-				.contains("# Greenwich.RELEASE").contains(
-						"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
-		BDDAssertions
-				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
-						.getShortMessage())
+		BDDAssertions.then(greenwichWikiEntryContent(file)).contains("# Greenwich.RELEASE")
+				.contains("Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
+		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [Greenwich.RELEASE]");
 	}
 

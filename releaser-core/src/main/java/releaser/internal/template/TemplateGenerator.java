@@ -59,8 +59,7 @@ public class TemplateGenerator {
 		this.releaseNotesOutput = new File("target/notes.md");
 	}
 
-	TemplateGenerator(ReleaserProperties props, File output,
-			ProjectGitHubHandler handler) {
+	TemplateGenerator(ReleaserProperties props, File output, ProjectGitHubHandler handler) {
 		this.props = props;
 		this.emailOutput = output;
 		this.blogOutput = output;
@@ -97,8 +96,7 @@ public class TemplateGenerator {
 		File blogOutput = file(this.blogOutput);
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(BLOG_TEMPLATE);
-		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects,
-				this.handler).blog();
+		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects, this.handler).blog();
 	}
 
 	public File tweet(Projects projects) {
@@ -112,8 +110,8 @@ public class TemplateGenerator {
 		File output = file(this.releaseNotesOutput);
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(RELEASE_NOTES_TEMPLATE);
-		return new ReleaseNotesTemplateGenerator(template, releaseVersion, output,
-				projects, this.handler).releaseNotes();
+		return new ReleaseNotesTemplateGenerator(template, releaseVersion, output, projects, this.handler)
+				.releaseNotes();
 	}
 
 	private String parsedVersion(Projects projects) {
@@ -128,8 +126,7 @@ public class TemplateGenerator {
 	}
 
 	private Template template(String template) {
-		return HandlebarsHelper.template(this.props.getTemplate().getTemplateFolder(),
-				template);
+		return HandlebarsHelper.template(this.props.getTemplate().getTemplateFolder(), template);
 	}
 
 }

@@ -44,8 +44,8 @@ public class ProcessedProject implements Serializable {
 	 */
 	public final ProjectVersion originalProjectVersion;
 
-	public ProcessedProject(ReleaserProperties propertiesForProject,
-			ProjectVersion newProjectVersion, ProjectVersion originalProjectVersion) {
+	public ProcessedProject(ReleaserProperties propertiesForProject, ProjectVersion newProjectVersion,
+			ProjectVersion originalProjectVersion) {
 		this.propertiesForProject = propertiesForProject;
 		this.newProjectVersion = newProjectVersion;
 		this.originalProjectVersion = originalProjectVersion;
@@ -53,9 +53,8 @@ public class ProcessedProject implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ProcessedProject{" + "name=" + this.newProjectVersion.projectName
-				+ ",version=" + this.newProjectVersion.version + '}'
-				+ ",originalProjectVersion=" + this.originalProjectVersion + '}';
+		return "ProcessedProject{" + "name=" + this.newProjectVersion.projectName + ",version="
+				+ this.newProjectVersion.version + '}' + ",originalProjectVersion=" + this.originalProjectVersion + '}';
 	}
 
 	public String projectName() {

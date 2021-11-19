@@ -30,7 +30,7 @@ import org.junit.rules.TemporaryFolder;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
@@ -44,7 +44,7 @@ public class GithubMilestonesTests {
 	public TemporaryFolder folder = new TemporaryFolder();
 
 	@Rule
-	public OutputCapture capture = new OutputCapture();
+	public OutputCaptureRule capture = new OutputCaptureRule();
 
 	MkGithub github;
 
@@ -102,8 +102,7 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_not_close_milestone_when_the_milestone_contains_numeric_version_only()
-			throws IOException {
+	public void should_not_close_milestone_when_the_milestone_contains_numeric_version_only() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
@@ -137,16 +136,14 @@ public class GithubMilestonesTests {
 
 			@Override
 			URL foundMilestoneUrl(Milestone.Smart milestone) throws IOException {
-				return new URL(
-						"https://api.github.com/repos/spring-cloud/spring-cloud-sleuth/milestones/33");
+				return new URL("https://api.github.com/repos/spring-cloud/spring-cloud-sleuth/milestones/33");
 			}
 		};
 		this.repo.milestones().create("0.2.0.RELEASE");
 
 		String url = milestones.milestoneUrl(gaSleuthProject());
 
-		then(url).isEqualTo(
-				"https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
+		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
 	}
 
 	@Test
@@ -157,8 +154,7 @@ public class GithubMilestonesTests {
 
 		String url = milestones.milestoneUrl(gaSleuthProject());
 
-		then(url).isEqualTo(
-				"https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
+		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
 	}
 
 	@Test
@@ -186,8 +182,7 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_return_null_if_no_matching_milestone_was_found_within_threshold()
-			throws IOException {
+	public void should_return_null_if_no_matching_milestone_was_found_within_threshold() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withThreshold()) {
 			@Override
 			String org() {
@@ -203,8 +198,7 @@ public class GithubMilestonesTests {
 
 		milestones.closeMilestone(gaSleuthProject());
 
-		then(this.capture.toString()).contains(
-				"No matching milestones were found within the provided threshold [0]");
+		then(this.capture.toString()).contains("No matching milestones were found within the provided threshold [0]");
 	}
 
 	private ProjectVersion nonGaSleuthProject() {
@@ -212,8 +206,7 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_there_is_no_matching_milestone()
-			throws IOException {
+	public void should_throw_exception_when_there_is_no_matching_milestone() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
@@ -232,8 +225,7 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_print_that_no_milestones_were_found_when_io_problems_occurred()
-			throws IOException {
+	public void should_print_that_no_milestones_were_found_when_io_problems_occurred() throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
@@ -260,8 +252,7 @@ public class GithubMilestonesTests {
 	public void should_throw_exception_when_no_token_was_passed() {
 		GithubMilestones milestones = new GithubMilestones(new ReleaserProperties());
 
-		thenThrownBy(() -> milestones.closeMilestone(nonGaSleuthProject()))
-				.isInstanceOf(IllegalArgumentException.class)
+		thenThrownBy(() -> milestones.closeMilestone(nonGaSleuthProject())).isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("You must set the value of the OAuth token");
 	}
 

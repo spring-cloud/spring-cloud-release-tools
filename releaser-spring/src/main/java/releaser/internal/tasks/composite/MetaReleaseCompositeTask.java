@@ -36,8 +36,7 @@ public class MetaReleaseCompositeTask implements CompositeReleaserTask {
 	 */
 	public static final int ORDER = -80;
 
-	private static final Logger log = LoggerFactory
-			.getLogger(MetaReleaseCompositeTask.class);
+	private static final Logger log = LoggerFactory.getLogger(MetaReleaseCompositeTask.class);
 
 	private final ApplicationContext context;
 
