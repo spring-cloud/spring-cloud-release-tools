@@ -151,6 +151,30 @@ public class TemplateGeneratorTests {
 	}
 
 	@Test
+	public void should_generate_blog_from_template_for_tag_without_v_prefix_release_using_calver()
+			throws IOException {
+		this.props.getPom().setBranch("2020.0.5");
+		Projects projects = new Projects(new HashSet<ProjectVersion>() {
+			{
+				add(new ProjectVersion("spring-cloud-sleuth", "1.0.0"));
+				add(new ProjectVersion("spring-cloud-consul", "1.0.1"));
+			}
+		});
+
+		File generatedBlog = new TemplateGenerator(this.props, this.handler)
+				.blog(projects);
+
+		then(content(generatedBlog))
+				.contains("General Availability (RELEASE) of the [Spring Cloud 2020.0.5]")
+				.contains("The release can be found in [Maven Central]")
+				.contains("### Spring Cloud Sleuth")
+				.contains(
+						"| Spring Cloud Sleuth    | 1.0.0    | ([issues](https://foo.bar.com))")
+				.contains("<version>2020.0.5</version>").contains(
+						"mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.5'");
+	}
+
+	@Test
 	public void should_generate_sr_blog_from_template_for_tag_with_v_prefix_release()
 			throws IOException {
 		this.props.getPom().setBranch("vDalston.SR1");
@@ -251,6 +275,32 @@ public class TemplateGeneratorTests {
 	}
 
 	@Test
+	public void should_generate_milestone_blog_from_template_for_tag_without_v_prefix_release_calver()
+			throws IOException {
+		this.props.getPom().setBranch("2020.0.0-M1");
+		Projects projects = new Projects(new HashSet<ProjectVersion>() {
+			{
+				add(new ProjectVersion("spring-cloud-sleuth", "1.0.0-M1"));
+				add(new ProjectVersion("spring-cloud-consul", "1.0.1-M1"));
+			}
+		});
+
+		File generatedBlog = new TemplateGenerator(this.props, this.handler)
+				.blog(projects);
+
+		then(content(generatedBlog))
+				.contains("Milestone 1 (M1) of the [Spring Cloud 2020.0.0]")
+				.contains("The release can be found in [Spring Milestone]")
+				.contains("### Spring Cloud Sleuth")
+				.contains(
+						"| Spring Cloud Sleuth    | 1.0.0-M1    | ([issues](https://foo.bar.com))")
+				.contains("<id>spring-milestones</id>")
+				.contains("url 'https://repo.spring.io/milestone'")
+				.contains("<version>2020.0.0-M1</version>").contains(
+						"mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.0-M1'");
+	}
+
+	@Test
 	public void should_generate_rc_blog_from_template_for_tag_with_v_prefix_release()
 			throws IOException {
 		this.props.getPom().setBranch("vDalston.RC1");
@@ -300,6 +350,32 @@ public class TemplateGeneratorTests {
 				.contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.RC1</version>").contains(
 						"mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RC1'");
+	}
+
+	@Test
+	public void should_generate_rc_blog_from_template_for_tag_without_v_prefix_release_calver()
+			throws IOException {
+		this.props.getPom().setBranch("2020.0.0-RC1");
+		Projects projects = new Projects(new HashSet<ProjectVersion>() {
+			{
+				add(new ProjectVersion("spring-cloud-sleuth", "1.0.0-RC1"));
+				add(new ProjectVersion("spring-cloud-consul", "1.0.1-RC1"));
+			}
+		});
+
+		File generatedBlog = new TemplateGenerator(this.props, this.handler)
+				.blog(projects);
+
+		then(content(generatedBlog))
+				.contains("Release Candidate 1 (RC1) of the [Spring Cloud 2020.0.0]")
+				.contains("The release can be found in [Spring Milestone]")
+				.contains("### Spring Cloud Sleuth")
+				.contains(
+						"| Spring Cloud Sleuth    | 1.0.0-RC1    | ([issues](https://foo.bar.com))")
+				.contains("<id>spring-milestones</id>")
+				.contains("url 'https://repo.spring.io/milestone'")
+				.contains("<version>2020.0.0-RC1</version>").contains(
+						"mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.0-RC1'");
 	}
 
 	@Test
