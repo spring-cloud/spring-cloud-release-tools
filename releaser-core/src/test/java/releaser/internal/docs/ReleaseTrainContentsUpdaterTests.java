@@ -165,12 +165,35 @@ public class ReleaseTrainContentsUpdaterTests {
 				.contains("Updating project page to release train [Greenwich.RELEASE]");
 	}
 
+	@Test
+	public void should_generate_the_contents_of_wiki_when_release_train_missing_calvar()
+			throws GitAPIException, IOException {
+		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setUpdateReleaseTrainWiki(true);
+		this.properties.getGit()
+				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
+
+		File file = this.updater.updateReleaseTrainWiki(freshNewReleaseTrainCalver());
+
+		BDDAssertions.then(file).isNotNull();
+		BDDAssertions.then(calverWikiEntryContent(file)).contains("# 2020.0.5").contains(
+				"Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
+		BDDAssertions
+				.then(GitTestUtils.openGitProject(file).log().call().iterator().next()
+						.getShortMessage())
+				.contains("Updating project page to release train [2020.0.5]");
+	}
+
 	private String edgwareWikiEntryContent(File file) throws IOException {
 		return string(file, "Spring-Cloud-Edgware-Release-Notes.md");
 	}
 
 	private String greenwichWikiEntryContent(File file) throws IOException {
 		return string(file, "Spring-Cloud-Greenwich-Release-Notes.md");
+	}
+
+	private String calverWikiEntryContent(File file) throws IOException {
+		return string(file, "Spring-Cloud-2020.0-Release-Notes.md");
 	}
 
 	private String string(File file, String s) throws IOException {
@@ -243,6 +266,30 @@ public class ReleaseTrainContentsUpdaterTests {
 				new ProjectVersion("spring-cloud-task", "2.0.0.RELEASE"),
 				// newer release train
 				new ProjectVersion("spring-cloud-release", "Greenwich.RELEASE"),
+				new ProjectVersion("spring-cloud-vault", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-gateway", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-openfeign", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-function", "1.0.0.RELEASE"));
+	}
+
+	Projects freshNewReleaseTrainCalver() {
+		return new Projects(new ProjectVersion("spring-cloud-aws", "3.0.0.RELEASE"),
+				new ProjectVersion("spring-cloud-bus", "2.0.0.RELEASE"),
+				new ProjectVersion("spring-cloud-cli", "2.0.0.RELEASE"),
+				new ProjectVersion("spring-cloud-commons", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-contract", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-config", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-netflix", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-security", "2.0.0.RELEASE"),
+				new ProjectVersion("spring-cloud-cloudfoundry", "2.0.0.RELEASE"),
+				new ProjectVersion("spring-cloud-consul", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-sleuth", "2.0.1.RELEASE"),
+				new ProjectVersion("spring-cloud-stream", "2020.0.0"),
+				new ProjectVersion("spring-cloud-zookeeper", "2.0.0.RELEASE"),
+				new ProjectVersion("spring-boot", "2.0.4.RELEASE"),
+				new ProjectVersion("spring-cloud-task", "2.0.0.RELEASE"),
+				// newer release train, current version in file is 2020.0.4
+				new ProjectVersion("spring-cloud-release", "2020.0.5"),
 				new ProjectVersion("spring-cloud-vault", "2.0.1.RELEASE"),
 				new ProjectVersion("spring-cloud-gateway", "2.0.1.RELEASE"),
 				new ProjectVersion("spring-cloud-openfeign", "2.0.1.RELEASE"),

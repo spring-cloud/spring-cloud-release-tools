@@ -194,7 +194,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			throw new IllegalStateException("Version can't end with a delimiter!");
 		}
 		SplitVersion splitByHyphen = tryHyphenSeparatedVersion(version);
-		if (splitByHyphen != null) {
+		if (splitByHyphen != null && !splitByHyphen.calverReleaseTrain()) {
 			return splitByHyphen;
 		}
 		return dotSeparatedReleaseTrainsAndVersions(version);
@@ -312,6 +312,15 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 	public String major() {
 		return this.assertVersion().major;
+	}
+
+	public boolean isCalver() {
+		return this.assertVersion().calverReleaseTrain();
+	}
+
+	public String majorAndMinor() {
+		return this.assertVersion().major + this.assertVersion().delimiter
+				+ this.assertVersion().minor;
 	}
 
 	/**
@@ -740,7 +749,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return isOldReleaseTrain() || calverReleaseTrain();
 		}
 
-		private boolean calverReleaseTrain() {
+		public boolean calverReleaseTrain() {
 			try {
 				return Integer.parseInt(this.major) >= 2020;
 			}

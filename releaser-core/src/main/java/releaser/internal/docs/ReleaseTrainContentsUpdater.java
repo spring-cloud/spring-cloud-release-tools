@@ -72,7 +72,10 @@ class ReleaseTrainContentsUpdater {
 		}
 		File releaseTrainWiki = this.handler.cloneReleaseTrainWiki();
 		ProjectVersion releaseTrain = projects.releaseTrain(this.properties);
-		String releaseTrainName = releaseTrain.major();
+		// When using calver this need to be a major plus minor (ie if the release is
+		// 2020.0.1, the name of the wiki page is 2020.0)
+		String releaseTrainName = releaseTrain.isCalver() ? releaseTrain.majorAndMinor()
+				: releaseTrain.major();
 		String wikiPagePrefix = this.properties.getGit().getReleaseTrainWikiPagePrefix();
 		String releaseTrainDocFileName = releaseTrainDocFileName(releaseTrainName,
 				wikiPagePrefix);
