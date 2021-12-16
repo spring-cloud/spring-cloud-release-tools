@@ -72,11 +72,13 @@ class BlogTemplateGenerator {
 			// springframework/cloud/spring-cloud-dependencies/Dalston.RELEASE/)
 			// - [Spring Milestone](https://repo.spring.io/milestone/) repository
 			// releaseVersion '- Dalston.RELEASE
-			boolean release = this.releaseVersion.contains("RELEASE");
+			boolean release = !SR_PATTERN.matcher(this.releaseVersion).matches()
+					&& !RC_PATTERN.matcher(this.releaseVersion).matches()
+					&& !MILESTONE_PATTERN.matcher(this.releaseVersion).matches();
 			boolean nonRelease = !(release
 					|| SR_PATTERN.matcher(this.releaseVersion).matches());
 			String availability = availability(release);
-			String releaseName = parsedReleaseName(this.releaseVersion);
+			String releaseName = parsedReleaseName(this.releaseVersion, release);
 			String releaseLink = link(nonRelease);
 			Map<String, Object> map = ImmutableMap.<String, Object>builder()
 					.put("availability", availability).put("releaseName", releaseName)
@@ -94,7 +96,16 @@ class BlogTemplateGenerator {
 		}
 	}
 
-	private String parsedReleaseName(String version) {
+	private String parsedReleaseName(String version, boolean release) {
+		if (version.split("\\.").length > 2) {
+			// Calver
+			if (release) {
+				return version;
+			}
+			else {
+				return version.substring(0, version.lastIndexOf("-"));
+			}
+		}
 		return version.substring(0, version.indexOf("."));
 	}
 
