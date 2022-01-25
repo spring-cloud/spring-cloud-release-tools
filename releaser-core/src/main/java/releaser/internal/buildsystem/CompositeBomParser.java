@@ -39,15 +39,13 @@ class CompositeBomParser implements BomParser {
 	}
 
 	private BomParser firstMatching(File thisProjectRoot) {
-		return this.parsers.stream().filter(b -> b.isApplicable(thisProjectRoot))
-				.findFirst().orElseThrow(
-						() -> new IllegalStateException("Can't find a matching parser"));
+		return this.parsers.stream().filter(b -> b.isApplicable(thisProjectRoot)).findFirst()
+				.orElseThrow(() -> new IllegalStateException("Can't find a matching parser"));
 	}
 
 	@Override
 	public List<CustomBomParser> customBomParsers() {
-		return this.parsers.stream().flatMap(b -> b.customBomParsers().stream())
-				.collect(Collectors.toList());
+		return this.parsers.stream().flatMap(b -> b.customBomParsers().stream()).collect(Collectors.toList());
 	}
 
 }

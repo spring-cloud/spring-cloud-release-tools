@@ -35,8 +35,7 @@ public class InitializrSpringCloudInfoService extends SpringCloudRelease {
 
 	private RestTemplate rest;
 
-	public InitializrSpringCloudInfoService(RestTemplate rest, Github github,
-			GithubPomReader reader) {
+	public InitializrSpringCloudInfoService(RestTemplate rest, Github github, GithubPomReader reader) {
 		super(github, reader);
 		this.rest = rest;
 	}
@@ -48,17 +47,16 @@ public class InitializrSpringCloudInfoService extends SpringCloudRelease {
 		Map<String, SpringBootAndCloudVersion> cache = new HashMap<>();
 		Map<String, Object> response = rest.getForObject(INITIALIZR_URL, Map.class);
 		if (!response.containsKey("bom-ranges")) {
-			throw new SpringCloudVersionNotFoundException(new InitializrParseException(
-					"bom-ranges key not found in Initializr info endpoint"));
+			throw new SpringCloudVersionNotFoundException(
+					new InitializrParseException("bom-ranges key not found in Initializr info endpoint"));
 		}
 		Map<String, Object> bomRanges = (Map<String, Object>) response.get("bom-ranges");
 		if (!bomRanges.containsKey("spring-cloud")) {
-			throw new SpringCloudVersionNotFoundException(new InitializrParseException(
-					"spring-cloud key not found in Initializr info endpoint"));
+			throw new SpringCloudVersionNotFoundException(
+					new InitializrParseException("spring-cloud key not found in Initializr info endpoint"));
 		}
 
-		Map<String, String> springCloud = (Map<String, String>) bomRanges
-				.get("spring-cloud");
+		Map<String, String> springCloud = (Map<String, String>) bomRanges.get("spring-cloud");
 		for (String key : springCloud.keySet()) {
 			String rangeString = springCloud.get(key);
 			cache.put(key, parseRangeString(rangeString, key));
@@ -71,8 +69,7 @@ public class InitializrSpringCloudInfoService extends SpringCloudRelease {
 		throw new SpringCloudVersionNotFoundException(springBootVersion);
 	}
 
-	private SpringBootAndCloudVersion parseRangeString(String rangeString,
-			String springCloudVersion) {
+	private SpringBootAndCloudVersion parseRangeString(String rangeString, String springCloudVersion) {
 		// Example of rangeString Spring Boot >=2.0.0.M3 and <2.0.0.M5
 		String versions = rangeString.substring(13);
 		boolean startVersionInclusive = true;
@@ -94,12 +91,11 @@ public class InitializrSpringCloudInfoService extends SpringCloudRelease {
 			cleanedVersions = versions.split(" and <");
 		}
 		if (cleanedVersions.length == 1) {
-			return new SpringBootAndCloudVersion(cleanedVersions[0],
-					startVersionInclusive, "99999.99999.99999.RELEASE",
+			return new SpringBootAndCloudVersion(cleanedVersions[0], startVersionInclusive, "99999.99999.99999.RELEASE",
 					endVersionInclusive, springCloudVersion);
 		}
-		return new SpringBootAndCloudVersion(cleanedVersions[0], startVersionInclusive,
-				cleanedVersions[1], endVersionInclusive, springCloudVersion);
+		return new SpringBootAndCloudVersion(cleanedVersions[0], startVersionInclusive, cleanedVersions[1],
+				endVersionInclusive, springCloudVersion);
 	}
 
 }

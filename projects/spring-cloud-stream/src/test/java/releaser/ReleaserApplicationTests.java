@@ -27,8 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@SpringBootTest(
-		classes = { ReleaserApplicationTests.Config.class, ReleaserApplication.class },
+@SpringBootTest(classes = { ReleaserApplicationTests.Config.class, ReleaserApplication.class },
 		properties = { "releaser.sagan.update-sagan=false" })
 class ReleaserApplicationTests {
 

@@ -65,8 +65,7 @@ public final class TemporaryFileStorage {
 				if (file.isDirectory()) {
 					Files.walkFileTree(file.toPath(), new SimpleFileVisitor<Path>() {
 						@Override
-						public FileVisitResult visitFile(Path file,
-								BasicFileAttributes attrs) throws IOException {
+						public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 							if (log.isTraceEnabled()) {
 								log.trace("Removing file [" + file + "]");
 							}
@@ -75,8 +74,7 @@ public final class TemporaryFileStorage {
 						}
 
 						@Override
-						public FileVisitResult postVisitDirectory(Path dir,
-								IOException exc) throws IOException {
+						public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
 							if (log.isTraceEnabled()) {
 								log.trace("Removing dir [" + dir + "]");
 							}
@@ -110,9 +108,8 @@ public final class TemporaryFileStorage {
 				return tempDir;
 			}
 		}
-		throw new IllegalStateException("Failed to create directory within "
-				+ TEMP_DIR_ATTEMPTS + " attempts (tried " + baseName + "0 to " + baseName
-				+ (TEMP_DIR_ATTEMPTS - 1) + ")");
+		throw new IllegalStateException("Failed to create directory within " + TEMP_DIR_ATTEMPTS + " attempts (tried "
+				+ baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ")");
 	}
 
 }

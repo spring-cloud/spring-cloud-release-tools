@@ -25,11 +25,9 @@ import releaser.internal.git.ProjectGitHandler;
  */
 public class TestDocumentationUpdater extends DocumentationUpdater {
 
-	public TestDocumentationUpdater(ReleaserProperties properties,
-			CustomProjectDocumentationUpdater updater, ProjectGitHandler handler,
-			TestReleaseContentsUpdater testRelease) {
-		super(new ProjectDocumentationUpdater(properties, handler,
-				Collections.singletonList(updater)), testRelease);
+	public TestDocumentationUpdater(ReleaserProperties properties, CustomProjectDocumentationUpdater updater,
+			ProjectGitHandler handler, TestReleaseContentsUpdater testRelease) {
+		super(new ProjectDocumentationUpdater(properties, handler, Collections.singletonList(updater)), testRelease);
 	}
 
 }

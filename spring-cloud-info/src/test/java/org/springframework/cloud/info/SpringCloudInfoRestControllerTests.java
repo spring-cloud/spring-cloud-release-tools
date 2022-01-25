@@ -68,8 +68,8 @@ public class SpringCloudInfoRestControllerTests {
 	@Before
 	public void setUp() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-				.apply(documentationConfiguration(this.restDocumentation).uris()
-						.withHost("spring-cloud-info.cfapps.io").withPort(80))
+				.apply(documentationConfiguration(this.restDocumentation).uris().withHost("spring-cloud-info.cfapps.io")
+						.withPort(80))
 				.build();
 	}
 
@@ -78,59 +78,47 @@ public class SpringCloudInfoRestControllerTests {
 		doReturn(new SpringCloudVersion("Greenwich.RELEASE")).when(springCloudInfoService)
 				.getSpringCloudVersion(eq("2.1.1.RELEASE"));
 		this.mockMvc
-				.perform(get("/springcloudversion/springboot/{bootVersion}",
-						"2.1.1.RELEASE").accept(MediaType.APPLICATION_JSON))
+				.perform(get("/springcloudversion/springboot/{bootVersion}", "2.1.1.RELEASE")
+						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andDo(document("springcloudversion",
-						pathParameters(parameterWithName("bootVersion")
-								.description("The Spring Boot version")),
-						responseFields(fieldWithPath("version")
-								.description("Spring Cloud version"))));
+						pathParameters(parameterWithName("bootVersion").description("The Spring Boot version")),
+						responseFields(fieldWithPath("version").description("Spring Cloud version"))));
 	}
 
 	@Test
 	public void versions() throws Exception {
-		doReturn(springCloudVersions.stream().map(v -> v.replaceFirst("v", ""))
-				.collect(Collectors.toList())).when(springCloudInfoService)
-						.getSpringCloudVersions();
-		this.mockMvc
-				.perform(get("/springcloudversions").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andDo(document("springcloudversions", responseFields(
-						fieldWithPath("[]").description("An array versions"))));
+		doReturn(springCloudVersions.stream().map(v -> v.replaceFirst("v", "")).collect(Collectors.toList()))
+				.when(springCloudInfoService).getSpringCloudVersions();
+		this.mockMvc.perform(get("/springcloudversions").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andDo(document("springcloudversions",
+						responseFields(fieldWithPath("[]").description("An array versions"))));
 	}
 
 	@Test
 	public void bomVersions() throws Exception {
 		doReturn(SpringCloudInfoTestData.releaseVersions).when(springCloudInfoService)
 				.getReleaseVersions(eq("Finchley.SR1"));
-		this.mockMvc
-				.perform(get("/bomversions/Finchley.SR1")
-						.accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(get("/bomversions/Finchley.SR1").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andDo(document("bomversions"));
 	}
 
 	@Test
 	public void milestones() throws Exception {
-		doReturn(SpringCloudInfoTestData.milestoneStrings.keySet())
-				.when(springCloudInfoService).getMilestones();
-		this.mockMvc.perform(get("/milestones").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk()).andDo(document("milestones"));
+		doReturn(SpringCloudInfoTestData.milestoneStrings.keySet()).when(springCloudInfoService).getMilestones();
+		this.mockMvc.perform(get("/milestones").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andDo(document("milestones"));
 	}
 
 	@Test
 	public void milestoneDueDate() throws Exception {
-		doReturn(new SpringCloudInfoService.Milestone("2019-07-31"))
-				.when(springCloudInfoService).getMilestoneDueDate(eq("Hoxton.RELEASE"));
-		this.mockMvc
-				.perform(get("/milestones/{release}/duedate", "Hoxton.RELEASE")
-						.accept(MediaType.APPLICATION_JSON))
+		doReturn(new SpringCloudInfoService.Milestone("2019-07-31")).when(springCloudInfoService)
+				.getMilestoneDueDate(eq("Hoxton.RELEASE"));
+		this.mockMvc.perform(get("/milestones/{release}/duedate", "Hoxton.RELEASE").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andDo(document("milestoneduedate",
-						pathParameters(parameterWithName("release")
-								.description("The Spring Cloud release train name")),
-						responseFields(fieldWithPath("dueDate")
-								.description("Spring Cloud milestone due date"))));
+						pathParameters(parameterWithName("release").description("The Spring Cloud release train name")),
+						responseFields(fieldWithPath("dueDate").description("Spring Cloud milestone due date"))));
 	}
 
 }

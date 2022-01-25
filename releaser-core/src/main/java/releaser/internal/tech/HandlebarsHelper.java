@@ -34,8 +34,7 @@ public final class HandlebarsHelper {
 
 	public static Template template(String templateSubFolder, String templateName) {
 		try {
-			Handlebars handlebars = new Handlebars(
-					new ClassPathTemplateLoader("/templates/" + templateSubFolder));
+			Handlebars handlebars = new Handlebars(new ClassPathTemplateLoader("/templates/" + templateSubFolder));
 			handlebars.registerHelper("replace", StringHelpers.replace);
 			handlebars.registerHelper("capitalizeFirst", StringHelpers.capitalizeFirst);
 			return handlebars.compile(templateName);

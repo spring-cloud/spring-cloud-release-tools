@@ -60,14 +60,13 @@ public class Options implements Serializable {
 	 */
 	public String range = "";
 
-	Options(Boolean metaRelease, Boolean fullRelease, Boolean interactive, Boolean dryRun,
-			List<String> taskNames, String startFrom, String range) {
+	Options(Boolean metaRelease, Boolean fullRelease, Boolean interactive, Boolean dryRun, List<String> taskNames,
+			String startFrom, String range) {
 		this.metaRelease = metaRelease;
 		this.fullRelease = fullRelease;
 		this.interactive = interactive;
 		this.dryRun = dryRun;
-		this.taskNames = taskNames.stream().map(this::removeQuotingChars)
-				.collect(Collectors.toList());
+		this.taskNames = taskNames.stream().map(this::removeQuotingChars).collect(Collectors.toList());
 		this.startFrom = removeQuotingChars(startFrom);
 		this.range = removeQuotingChars(range);
 	}
@@ -81,9 +80,8 @@ public class Options implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Options{" + "metaRelease=" + this.metaRelease + ", fullRelease="
-				+ this.fullRelease + ", interactive=" + this.interactive + ", dryRun="
-				+ this.dryRun + ", taskNames=" + this.taskNames + ", startFrom='"
+		return "Options{" + "metaRelease=" + this.metaRelease + ", fullRelease=" + this.fullRelease + ", interactive="
+				+ this.interactive + ", dryRun=" + this.dryRun + ", taskNames=" + this.taskNames + ", startFrom='"
 				+ this.startFrom + '\'' + ", range='" + this.range + '\'' + '}';
 	}
 

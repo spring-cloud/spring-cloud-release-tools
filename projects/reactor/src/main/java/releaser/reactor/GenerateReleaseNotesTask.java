@@ -61,11 +61,9 @@ import releaser.internal.tech.ExecutionResult;
 /**
  * @author Simon Baslé
  */
-public class GenerateReleaseNotesTask
-		implements ProjectPostReleaseReleaserTask, DryRunReleaseReleaserTask {
+public class GenerateReleaseNotesTask implements ProjectPostReleaseReleaserTask, DryRunReleaseReleaserTask {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(GenerateReleaseNotesTask.class);
+	private static final Logger log = LoggerFactory.getLogger(GenerateReleaseNotesTask.class);
 
 	private static final String NAME = "releaseNotes";
 
@@ -106,20 +104,18 @@ public class GenerateReleaseNotesTask
 	}
 
 	@Override
-	public ExecutionResult runTask(Arguments args)
-			throws BuildUnstableException, RuntimeException {
+	public ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException {
 		if (args.versionFromBom.isSnapshot()) {
 			log.info("\nWon't generate notes for a snapshot version");
 			return ExecutionResult.success();
 		}
 
-		Repo repo = github.repos().get(new Coordinates.Simple(
-				args.properties.getGit().getOrgName(), args.projectToRun.name()));
+		Repo repo = github.repos()
+				.get(new Coordinates.Simple(args.properties.getGit().getOrgName(), args.projectToRun.name()));
 
 		String releaseTag = "v" + args.versionFromBom.version;
 		if (args.options.dryRun != Boolean.TRUE) {
-			Optional<String> maybeTagSha1 = gitHandler.findTagSha1(args.project,
-					releaseTag);
+			Optional<String> maybeTagSha1 = gitHandler.findTagSha1(args.project, releaseTag);
 			if (maybeTagSha1.isPresent()) {
 				String tagSha1 = maybeTagSha1.get();
 				try {
@@ -127,16 +123,13 @@ public class GenerateReleaseNotesTask
 					repo.git().references().get("tags/" + tagSha1).json();
 				}
 				catch (IOException e) {
-					return ExecutionResult.failure(new IllegalStateException(
-							"Shouldn't create a release if tag " + releaseTag + " (sha1="
-									+ tagSha1 + ") not visible in Github",
-							e));
+					return ExecutionResult.failure(new IllegalStateException("Shouldn't create a release if tag "
+							+ releaseTag + " (sha1=" + tagSha1 + ") not visible in Github", e));
 				}
 			}
 			else {
 				return ExecutionResult.failure(new IllegalStateException(
-						"Attempting to draft release note but tag not found in repository: "
-								+ releaseTag));
+						"Attempting to draft release note but tag not found in repository: " + releaseTag));
 			}
 		}
 
@@ -144,34 +137,26 @@ public class GenerateReleaseNotesTask
 		EnumMap<Type, List<ChangelogEntry>> entries = new EnumMap<>(Type.class);
 
 		String toVersionTag = "v" + args.versionFromBom.version;
-		if (args.options.dryRun == Boolean.TRUE
-				&& !gitHandler.findTagSha1(args.project, toVersionTag).isPresent()) {
+		if (args.options.dryRun == Boolean.TRUE && !gitHandler.findTagSha1(args.project, toVersionTag).isPresent()) {
 			toVersionTag = "HEAD";
 		}
 
 		// eg. 3.2.1 for current 3.2.2
-		String fromVersionTag = args.versionFromBom
-				.computePreviousPatchTag("v", "RELEASE").orElseGet(() -> {
-					Pattern pattern = args.versionFromBom
-							.computePreviousMinorTagPattern("v", "RELEASE")
-							.orElseGet(() -> args.versionFromBom
-									.computePreviousMajorTagPattern("v", "RELEASE"));
-					// eg. v3.2.*.RELEASE or v3.*.*.RELEASE
-					log.info(
-							"Couldn't simply compute previous version of {}, looking through tag list with pattern {}",
-							args.versionFromBom.version, pattern.pattern());
+		String fromVersionTag = args.versionFromBom.computePreviousPatchTag("v", "RELEASE").orElseGet(() -> {
+			Pattern pattern = args.versionFromBom.computePreviousMinorTagPattern("v", "RELEASE")
+					.orElseGet(() -> args.versionFromBom.computePreviousMajorTagPattern("v", "RELEASE"));
+			// eg. v3.2.*.RELEASE or v3.*.*.RELEASE
+			log.info("Couldn't simply compute previous version of {}, looking through tag list with pattern {}",
+					args.versionFromBom.version, pattern.pattern());
 
-					List<String> sortedTags = gitHandler
-							.findTagNamesMatching(args.project, pattern)
-							.collect(Collectors.toList());
-					if (sortedTags.isEmpty()) {
-						throw new IllegalStateException(
-								"Couldn't find a tag that matches pattern "
-										+ pattern.pattern());
-					}
-					sortedTags.forEach(System.out::println);
-					return sortedTags.get(0);
-				});
+			List<String> sortedTags = gitHandler.findTagNamesMatching(args.project, pattern)
+					.collect(Collectors.toList());
+			if (sortedTags.isEmpty()) {
+				throw new IllegalStateException("Couldn't find a tag that matches pattern " + pattern.pattern());
+			}
+			sortedTags.forEach(System.out::println);
+			return sortedTags.get(0);
+		});
 
 		if (Boolean.TRUE == args.options.interactive) {
 			log.info("\nComputed log range is {}..{}", fromVersionTag, toVersionTag);
@@ -189,8 +174,7 @@ public class GenerateReleaseNotesTask
 		log.info("Will fetch the log for range {}..{}", fromVersionTag, toVersionTag);
 
 		// gather commits. we use tags in the format `vVERSION`
-		final List<SimpleCommit> revCommits = gitHandler.commitsBetween(args.project,
-				fromVersionTag, toVersionTag);
+		final List<SimpleCommit> revCommits = gitHandler.commitsBetween(args.project, fromVersionTag, toVersionTag);
 
 		// parse and link to issues if possible, determining type
 		for (SimpleCommit revCommit : revCommits) {
@@ -202,8 +186,7 @@ public class GenerateReleaseNotesTask
 		}
 
 		// generate the notes
-		String notes = generateNotes(args, entries,
-				extractContributorMentions(repo, revCommits));
+		String notes = generateNotes(args, entries, extractContributorMentions(repo, revCommits));
 
 		if (args.options.dryRun != null && args.options.dryRun) {
 			// print out
@@ -220,8 +203,7 @@ public class GenerateReleaseNotesTask
 			JsonObject draftReleaseJson = null;
 			try {
 				// attempt to find gh release with this tag. stop at 2 month old releases
-				Instant oldestReleaseToConsider = ZonedDateTime.now().minusMonths(2)
-						.toInstant();
+				Instant oldestReleaseToConsider = ZonedDateTime.now().minusMonths(2).toInstant();
 				for (Release release : repo.releases().iterate()) {
 					JsonObject releaseJson = release.json();
 					// seems the created release has a wrong tag "untagged-xxxxx", we also
@@ -229,8 +211,8 @@ public class GenerateReleaseNotesTask
 					if (releaseJson.getString("tag_name").equals(releaseTag)
 							|| releaseJson.getString("name").equals(releaseTag)) {
 						if (!releaseJson.getBoolean("draft")) {
-							return ExecutionResult.failure(new IllegalStateException(
-									"Release already exists for tag " + releaseTag));
+							return ExecutionResult
+									.failure(new IllegalStateException("Release already exists for tag " + releaseTag));
 						}
 						else {
 							draftRelease = new Release.Smart(release);
@@ -252,16 +234,14 @@ public class GenerateReleaseNotesTask
 				}
 			}
 			catch (Throwable e) {
-				return ExecutionResult.failure(new IllegalStateException(
-						"Unable to try to match github releases with tag " + releaseTag,
-						e));
+				return ExecutionResult.failure(
+						new IllegalStateException("Unable to try to match github releases with tag " + releaseTag, e));
 			}
 
 			if (draftReleaseJson == null) {
 				// create a draft release for the tag
 				try {
-					Release.Smart release = new Release.Smart(
-							repo.releases().create(releaseTag));
+					Release.Smart release = new Release.Smart(repo.releases().create(releaseTag));
 					release.draft(true);
 					release.tag(releaseTag);
 					release.name(releaseTag);
@@ -279,8 +259,7 @@ public class GenerateReleaseNotesTask
 				// update the existing draft
 				try {
 					// edit the release
-					String oldAndNewNotes = draftReleaseJson.getString("body")
-							+ "\n\n----\nNew draft added "
+					String oldAndNewNotes = draftReleaseJson.getString("body") + "\n\n----\nNew draft added "
 							+ LocalDateTime.now().toString() + "\n----\n" + notes;
 					draftRelease.body(oldAndNewNotes);
 					return ExecutionResult.success();
@@ -295,18 +274,15 @@ public class GenerateReleaseNotesTask
 	/**
 	 * Generate the release notes.
 	 */
-	protected String generateNotes(Arguments args,
-			EnumMap<Type, List<ChangelogEntry>> entries,
+	protected String generateNotes(Arguments args, EnumMap<Type, List<ChangelogEntry>> entries,
 			List<String> contributorGithubMentions) {
 		// TODO use a template? handlebars !
-		StringBuilder notes = new StringBuilder().append(args.projectToRun.name())
-				.append(" `").append(args.versionFromBom.version)
-				.append("` is part of **`").append(args.releaseTrain().version)
+		StringBuilder notes = new StringBuilder().append(args.projectToRun.name()).append(" `")
+				.append(args.versionFromBom.version).append("` is part of **`").append(args.releaseTrain().version)
 				.append("` Release Train**.");
 
 		notes.append("\n\n## :warning: Update considerations and deprecations");
-		for (ChangelogEntry noteworthy : entries.getOrDefault(Type.NOTEWORTHY,
-				Collections.emptyList())) {
+		for (ChangelogEntry noteworthy : entries.getOrDefault(Type.NOTEWORTHY, Collections.emptyList())) {
 			notes.append("\n - ").append(noteworthy.description);
 			for (String issueTitle : noteworthy.associatedIssueLinksAndTitles.values()) {
 				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
@@ -314,8 +290,7 @@ public class GenerateReleaseNotesTask
 		}
 
 		notes.append("\n\n## :sparkles: New features and improvements");
-		for (ChangelogEntry feature : entries.getOrDefault(Type.FEATURE,
-				Collections.emptyList())) {
+		for (ChangelogEntry feature : entries.getOrDefault(Type.FEATURE, Collections.emptyList())) {
 			notes.append("\n - ").append(feature.description);
 			for (String issueTitle : feature.associatedIssueLinksAndTitles.values()) {
 				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
@@ -323,8 +298,7 @@ public class GenerateReleaseNotesTask
 		}
 
 		notes.append("\n\n## :beetle: Bug fixes");
-		for (ChangelogEntry bug : entries.getOrDefault(Type.BUG,
-				Collections.emptyList())) {
+		for (ChangelogEntry bug : entries.getOrDefault(Type.BUG, Collections.emptyList())) {
 			notes.append("\n - ").append(bug.description);
 			for (String issueTitle : bug.associatedIssueLinksAndTitles.values()) {
 				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
@@ -332,8 +306,7 @@ public class GenerateReleaseNotesTask
 		}
 
 		notes.append("\n\n## :book: Documentation, Tests and Build");
-		for (ChangelogEntry misc : entries.getOrDefault(Type.DOC_MISC,
-				Collections.emptyList())) {
+		for (ChangelogEntry misc : entries.getOrDefault(Type.DOC_MISC, Collections.emptyList())) {
 			notes.append("\n - ").append(misc.description);
 			for (String issueTitle : misc.associatedIssueLinksAndTitles.values()) {
 				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
@@ -341,18 +314,15 @@ public class GenerateReleaseNotesTask
 		}
 
 		notes.append("\n\n## **TODO DISPATCH THESE**");
-		for (ChangelogEntry unclassified : entries.getOrDefault(Type.UNCLASSIFIED,
-				Collections.emptyList())) {
+		for (ChangelogEntry unclassified : entries.getOrDefault(Type.UNCLASSIFIED, Collections.emptyList())) {
 			notes.append("\n - ").append(unclassified.description);
-			for (String issueTitle : unclassified.associatedIssueLinksAndTitles
-					.values()) {
+			for (String issueTitle : unclassified.associatedIssueLinksAndTitles.values()) {
 				notes.append("\n\t - ").append(cleanupShortMessage(issueTitle));
 			}
 		}
 
 		// contributors
-		notes.append(
-				"\n\n## :+1: Thanks to the following contributors that also participated to this release\n");
+		notes.append("\n\n## :+1: Thanks to the following contributors that also participated to this release\n");
 		notes.append(String.join(", ", contributorGithubMentions));
 
 		return notes.toString();
@@ -400,8 +370,7 @@ public class GenerateReleaseNotesTask
 		return EnumSet.copyOf(types);
 	}
 
-	protected String commitToGithubMention(RepoCommits commitsClient,
-			SimpleCommit revCommit) {
+	protected String commitToGithubMention(RepoCommits commitsClient, SimpleCommit revCommit) {
 		RepoCommit dumbCommit = commitsClient.get(revCommit.fullSha1);
 		RepoCommit.Smart smartCommit = new RepoCommit.Smart(dumbCommit);
 		try {
@@ -412,17 +381,14 @@ public class GenerateReleaseNotesTask
 			}
 			else if (authorType == JsonValue.ValueType.NULL) {
 				// assume author+committer, look under commit.author.name
-				if (commitJson.containsKey("commit")
-						&& commitJson.getJsonObject("commit").containsKey("author")) {
-					return "@" + commitJson.getJsonObject("commit")
-							.getJsonObject("author").getString("name");
+				if (commitJson.containsKey("commit") && commitJson.getJsonObject("commit").containsKey("author")) {
+					return "@" + commitJson.getJsonObject("commit").getJsonObject("author").getString("name");
 				}
 			}
 			// in case unexpected json, output the "sha", "commit", "author" and
 			// "committer"
-			return "@RAW{\"sha\", " + commitJson.get("sha") + ", \"author\", \""
-					+ commitJson.get("author") + ", \"committer\", \""
-					+ commitJson.get("committer") + ", \"commit\", \""
+			return "@RAW{\"sha\", " + commitJson.get("sha") + ", \"author\", \"" + commitJson.get("author")
+					+ ", \"committer\", \"" + commitJson.get("committer") + ", \"commit\", \""
 					+ commitJson.get("commit") + "}";
 		}
 		catch (IOException e) {
@@ -437,9 +403,8 @@ public class GenerateReleaseNotesTask
 	 */
 	List<String> extractContributorMentions(Repo repo, List<SimpleCommit> revCommits) {
 		RepoCommits commitsClient = repo.commits();
-		return revCommits.stream().map(c -> commitToGithubMention(commitsClient, c))
-				.filter(Objects::nonNull).distinct().sorted(String.CASE_INSENSITIVE_ORDER)
-				.collect(Collectors.toList());
+		return revCommits.stream().map(c -> commitToGithubMention(commitsClient, c)).filter(Objects::nonNull).distinct()
+				.sorted(String.CASE_INSENSITIVE_ORDER).collect(Collectors.toList());
 	}
 
 	/**
@@ -487,8 +452,7 @@ public class GenerateReleaseNotesTask
 	 * The labels and titles are injected in a {@link Set} of labels and {@link Map} of
 	 * hashtag issue links to issue titles.
 	 */
-	protected void fetchIssueLabelsAndTitles(Issues issueClient,
-			Set<Integer> issueNumbers, Set<String> labelsTarget,
+	protected void fetchIssueLabelsAndTitles(Issues issueClient, Set<Integer> issueNumbers, Set<String> labelsTarget,
 			Map<String, String> referencedIssuesTarget) {
 		issueNumbers.forEach(i -> {
 			try {
@@ -496,10 +460,9 @@ public class GenerateReleaseNotesTask
 				// we have everything handy in the JSON
 				Issue issue = issueClient.get(i);
 				JsonObject issueJson = issue.json();
-				issueJson.getJsonArray("labels").forEach(label -> labelsTarget
-						.add(((JsonObject) label).getString("name")));
-				referencedIssuesTarget.put("#" + issueJson.getInt("number"),
-						issueJson.getString("title"));
+				issueJson.getJsonArray("labels")
+						.forEach(label -> labelsTarget.add(((JsonObject) label).getString("name")));
+				referencedIssuesTarget.put("#" + issueJson.getInt("number"), issueJson.getString("title"));
 			}
 			catch (Exception e) {
 				log.warn("Could not fetch issue information for #" + i, e);
@@ -510,20 +473,17 @@ public class GenerateReleaseNotesTask
 	/**
 	 * Extract issue information from the commit and generate the {@link ChangelogEntry}.
 	 */
-	protected ChangelogEntry parseChangeLogEntry(Issues issueClient,
-			SimpleCommit commit) {
+	protected ChangelogEntry parseChangeLogEntry(Issues issueClient, SimpleCommit commit) {
 		String cleanShortMessage = cleanupShortMessage(commit);
 		Set<Integer> issueNumbers = extractIssueNumbers(commit);
 
 		Set<String> labelsTarget = new HashSet<>();
 		Map<String, String> referencedIssuesTarget = new LinkedHashMap<>();
-		fetchIssueLabelsAndTitles(issueClient, issueNumbers, labelsTarget,
-				referencedIssuesTarget);
+		fetchIssueLabelsAndTitles(issueClient, issueNumbers, labelsTarget, referencedIssuesTarget);
 
 		EnumSet<Type> types = extractTypes(labelsTarget, commit.title);
 
-		return new ChangelogEntry(types, commit.abbreviatedSha1, cleanShortMessage,
-				referencedIssuesTarget);
+		return new ChangelogEntry(types, commit.abbreviatedSha1, cleanShortMessage, referencedIssuesTarget);
 	}
 
 	/*
@@ -534,8 +494,7 @@ public class GenerateReleaseNotesTask
 	 * reflecting the PR number in case there has been extensive review/discussion in that
 	 * PR. Both references would be caught by ISSUE_REF pattern below.
 	 */
-	static Pattern SHORT_MESSAGE = Pattern
-			.compile("(?:[a-zA-Z]+ #[0-9]+)?([^\\(]+)(?:\\(#[0-9]+\\))?");
+	static Pattern SHORT_MESSAGE = Pattern.compile("(?:[a-zA-Z]+ #[0-9]+)?([^\\(]+)(?:\\(#[0-9]+\\))?");
 
 	/**
 	 * A {@link Pattern} to find issue/pr numbers in a commit message, by detecting
@@ -607,8 +566,7 @@ public class GenerateReleaseNotesTask
 			}
 			else {
 				this.description = cleanShortMessage + " ("
-						+ String.join(", ", this.associatedIssueLinksAndTitles.keySet())
-						+ ")";
+						+ String.join(", ", this.associatedIssueLinksAndTitles.keySet()) + ")";
 			}
 		}
 

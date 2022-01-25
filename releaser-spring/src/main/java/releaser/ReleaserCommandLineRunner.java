@@ -32,8 +32,8 @@ public class ReleaserCommandLineRunner implements CommandLineRunner {
 
 	private final Parser parser;
 
-	public ReleaserCommandLineRunner(SpringReleaser releaser,
-			ExecutionResultHandler executionResultHandler, Parser parser) {
+	public ReleaserCommandLineRunner(SpringReleaser releaser, ExecutionResultHandler executionResultHandler,
+			Parser parser) {
 		this.releaser = releaser;
 		this.executionResultHandler = executionResultHandler;
 		this.parser = parser;

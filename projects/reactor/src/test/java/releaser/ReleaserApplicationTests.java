@@ -49,13 +49,11 @@ class ReleaserApplicationTests {
 
 	@Test
 	void should_load_generate_release_notes_in_dry_run() {
-		Map<String, DryRunReleaseReleaserTask> beans = context
-				.getBeansOfType(DryRunReleaseReleaserTask.class);
+		Map<String, DryRunReleaseReleaserTask> beans = context.getBeansOfType(DryRunReleaseReleaserTask.class);
 		List<ReleaserTask> inOrder = new LinkedList<>(beans.values());
 		inOrder.sort(AnnotationAwareOrderComparator.INSTANCE);
 
-		assertThat(inOrder).anySatisfy(
-				task -> assertThat(task).isInstanceOf(GenerateReleaseNotesTask.class));
+		assertThat(inOrder).anySatisfy(task -> assertThat(task).isInstanceOf(GenerateReleaseNotesTask.class));
 	}
 
 	@Test
@@ -64,11 +62,9 @@ class ReleaserApplicationTests {
 		List<ReleaserTask> inOrder = new LinkedList<>(beans.values());
 		inOrder.sort(AnnotationAwareOrderComparator.INSTANCE);
 
-		assertThat(inOrder).anySatisfy(task -> assertThat(task)
-				.isInstanceOf(RestartSiteProjectPostReleaseTask.class));
-		assertThat(inOrder).noneSatisfy(
-				task -> assertThat(task).isInstanceOf(PublishDocsReleaseTask.class)
-						.isNotInstanceOf(RestartSiteProjectPostReleaseTask.class));
+		assertThat(inOrder).anySatisfy(task -> assertThat(task).isInstanceOf(RestartSiteProjectPostReleaseTask.class));
+		assertThat(inOrder).noneSatisfy(task -> assertThat(task).isInstanceOf(PublishDocsReleaseTask.class)
+				.isNotInstanceOf(RestartSiteProjectPostReleaseTask.class));
 
 	}
 

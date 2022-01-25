@@ -71,8 +71,7 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("spring-boot-starter-build", "1.0.0"));
 		Projects projects = new Projects(projectVersions);
 
-		then(projects.forNameStartingWith("spring-boot").get(0).version)
-				.isEqualTo("1.0.0");
+		then(projects.forNameStartingWith("spring-boot").get(0).version).isEqualTo("1.0.0");
 	}
 
 	@Test
@@ -82,25 +81,18 @@ public class ProjectsTests {
 		projectVersions.add(build);
 		ProjectVersion boot = new ProjectVersion("spring-boot-starter", "2.0.0-RELEASE");
 		projectVersions.add(boot);
-		ProjectVersion bootDeps = new ProjectVersion("spring-boot-dependencies",
-				"2.0.0.RELEASE");
+		ProjectVersion bootDeps = new ProjectVersion("spring-boot-dependencies", "2.0.0.RELEASE");
 		projectVersions.add(bootDeps);
-		ProjectVersion original = new ProjectVersion("spring-cloud-starter-foo",
-				"3.0.0.BUILD-SNAPSHOT");
+		ProjectVersion original = new ProjectVersion("spring-cloud-starter-foo", "3.0.0.BUILD-SNAPSHOT");
 		projectVersions.add(original);
 		Projects projects = new Projects(projectVersions);
 
-		Projects forRollback = Projects.forRollback(SpringCloudReleaserProperties.get(),
-				projects);
+		Projects forRollback = Projects.forRollback(SpringCloudReleaserProperties.get(), projects);
 
-		then(forRollback.forName("spring-cloud-build").version)
-				.isEqualTo("1.0.1-SNAPSHOT");
-		then(forRollback.forName("spring-boot-starter").version)
-				.isEqualTo("2.0.0-RELEASE");
-		then(forRollback.forName("spring-boot-dependencies").version)
-				.isEqualTo("2.0.0.RELEASE");
-		then(forRollback.forName("spring-cloud-starter-foo").version)
-				.isEqualTo("3.0.0.BUILD-SNAPSHOT");
+		then(forRollback.forName("spring-cloud-build").version).isEqualTo("1.0.1-SNAPSHOT");
+		then(forRollback.forName("spring-boot-starter").version).isEqualTo("2.0.0-RELEASE");
+		then(forRollback.forName("spring-boot-dependencies").version).isEqualTo("2.0.0.RELEASE");
+		then(forRollback.forName("spring-cloud-starter-foo").version).isEqualTo("3.0.0.BUILD-SNAPSHOT");
 	}
 
 	@Test
@@ -149,8 +141,7 @@ public class ProjectsTests {
 	@Test
 	public void should_return_projects_with_bumped_versions() {
 		Set<ProjectVersion> projectVersions = new HashSet<>();
-		projectVersions
-				.add(new ProjectVersion("spring-boot-dependencies", "2.0.0.RELEASE"));
+		projectVersions.add(new ProjectVersion("spring-boot-dependencies", "2.0.0.RELEASE"));
 		projectVersions.add(new ProjectVersion("spring-boot-starter", "2.0.0.RELEASE"));
 		projectVersions.add(new ProjectVersion("foo", "1.0.0.RELEASE"));
 		projectVersions.add(new ProjectVersion("bar", "1.0.1.M1"));
@@ -160,11 +151,9 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("foo4", "Finchley.SR4"));
 		Projects projects = new Projects(projectVersions);
 
-		Projects bumped = projects
-				.postReleaseSnapshotVersion(Collections.singletonList("spring-boot"));
+		Projects bumped = projects.postReleaseSnapshotVersion(Collections.singletonList("spring-boot"));
 
-		then(bumped.forName("spring-boot-dependencies").version)
-				.isEqualTo("2.0.0.RELEASE");
+		then(bumped.forName("spring-boot-dependencies").version).isEqualTo("2.0.0.RELEASE");
 		then(bumped.forName("spring-boot-starter").version).isEqualTo("2.0.0.RELEASE");
 		then(bumped.forName("foo").version).isEqualTo("1.0.1.SNAPSHOT");
 		then(bumped.forName("bar").version).isEqualTo("1.0.1.SNAPSHOT");
@@ -180,9 +169,8 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
 		Projects projects = new Projects(projectVersions);
 
-		thenThrownBy(() -> projects.forFile(this.springCloudReleasePom))
-				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
-						"Project with name [spring-cloud-starter-build] is not present");
+		thenThrownBy(() -> projects.forFile(this.springCloudReleasePom)).isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("Project with name [spring-cloud-starter-build] is not present");
 	}
 
 	@Test
@@ -191,9 +179,8 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
 		Projects projects = new Projects(projectVersions);
 
-		thenThrownBy(() -> projects.forName("spring-cloud-starter-build"))
-				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
-						"Project with name [spring-cloud-starter-build] is not present");
+		thenThrownBy(() -> projects.forName("spring-cloud-starter-build")).isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("Project with name [spring-cloud-starter-build] is not present");
 	}
 
 	@Test
@@ -224,9 +211,8 @@ public class ProjectsTests {
 		projectVersions.add(new ProjectVersion("foo", "1.0.0"));
 		Projects projects = new Projects(projectVersions);
 
-		thenThrownBy(() -> projects.releaseTrain(properties))
-				.isInstanceOf(IllegalStateException.class).hasMessageContaining(
-						"don't contain any of the following release train names");
+		thenThrownBy(() -> projects.releaseTrain(properties)).isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("don't contain any of the following release train names");
 	}
 
 	private File file(String relativePath) {

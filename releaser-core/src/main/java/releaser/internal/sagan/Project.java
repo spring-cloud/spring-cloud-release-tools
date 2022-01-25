@@ -61,14 +61,11 @@ public class Project {
 
 	@Override
 	public String toString() {
-		return "Project{" + "id='" + this.id + '\'' + ", name='" + this.name + '\''
-				+ ", repoUrl='" + this.repoUrl + '\'' + ", siteUrl='" + this.siteUrl
-				+ '\'' + ", category='" + this.category + '\'' + ", stackOverflowTags='"
-				+ this.stackOverflowTags + '\'' + ", projectReleases="
-				+ this.projectReleases + ", stackOverflowTagList="
-				+ this.stackOverflowTagList + ", aggregator=" + this.aggregator
-				+ ", rawBootConfig='" + this.rawBootConfig + '\'' + ", rawOverview='"
-				+ this.rawOverview + '\'' + '}';
+		return "Project{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", repoUrl='" + this.repoUrl
+				+ '\'' + ", siteUrl='" + this.siteUrl + '\'' + ", category='" + this.category + '\''
+				+ ", stackOverflowTags='" + this.stackOverflowTags + '\'' + ", projectReleases=" + this.projectReleases
+				+ ", stackOverflowTagList=" + this.stackOverflowTagList + ", aggregator=" + this.aggregator
+				+ ", rawBootConfig='" + this.rawBootConfig + '\'' + ", rawOverview='" + this.rawOverview + '\'' + '}';
 	}
 
 	static class MostCurrentRelease {

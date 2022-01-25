@@ -34,9 +34,8 @@ public class Repository {
 
 	@Override
 	public String toString() {
-		return "Repository{" + "id='" + this.id + '\'' + ", name='" + this.name + '\''
-				+ ", url='" + this.url + '\'' + ", snapshotsEnabled="
-				+ this.snapshotsEnabled + '}';
+		return "Repository{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", url='" + this.url + '\''
+				+ ", snapshotsEnabled=" + this.snapshotsEnabled + '}';
 	}
 
 }

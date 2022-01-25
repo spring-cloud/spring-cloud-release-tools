@@ -18,35 +18,51 @@ package releaser.internal.sagan;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import org.springframework.core.style.ToStringCreator;
+
 /**
  * @author Marcin Grzejszczak
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReleaseUpdate {
 
-	public String groupId = "";
+	private String version = "";
 
-	public String artifactId = "";
+	private String referenceDocUrl = "";
 
-	public String version = "";
+	private String apiDocUrl = "";
 
-	public String releaseStatus = "";
+	public String getVersion() {
+		return this.version;
+	}
 
-	public String refDocUrl = "";
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-	public String apiDocUrl = "";
+	public String getReferenceDocUrl() {
+		return this.referenceDocUrl;
+	}
 
-	public Boolean current;
+	public void setReferenceDocUrl(String referenceDocUrl) {
+		this.referenceDocUrl = referenceDocUrl;
+	}
 
-	public Repository repository;
+	public String getApiDocUrl() {
+		return this.apiDocUrl;
+	}
+
+	public void setApiDocUrl(String apiDocUrl) {
+		this.apiDocUrl = apiDocUrl;
+	}
 
 	@Override
 	public String toString() {
-		return "ReleaseUpdate{" + "groupId='" + this.groupId + '\'' + ", artifactId='"
-				+ this.artifactId + '\'' + ", version='" + this.version + '\''
-				+ ", releaseStatus='" + this.releaseStatus + '\'' + ", refDocUrl='"
-				+ this.refDocUrl + '\'' + ", apiDocUrl='" + this.apiDocUrl + '\''
-				+ ", repository=" + this.repository + '}';
-	}
+		return new ToStringCreator(this)
+				.append("version", version)
+				.append("referenceDocUrl", referenceDocUrl)
+				.append("apiDocUrl", apiDocUrl)
+				.toString();
 
+	}
 }

@@ -40,8 +40,7 @@ public class ProjectGitHubHandler {
 
 	private final ReleaserProperties properties;
 
-	public ProjectGitHubHandler(ReleaserProperties properties,
-			List<CustomGithubIssues> customGithubIssues) {
+	public ProjectGitHubHandler(ReleaserProperties properties, List<CustomGithubIssues> customGithubIssues) {
 		this.properties = properties;
 		this.githubMilestones = new GithubMilestones(properties);
 		this.githubIssues = new GithubIssues(customGithubIssues);
@@ -54,9 +53,8 @@ public class ProjectGitHubHandler {
 
 	public void closeMilestone(ProjectVersion releaseVersion) {
 		if (!this.properties.getGit().isUpdateGithubMilestones()) {
-			log.info(
-					"Will not update the release train documentation, since the switch to do so "
-							+ "is off. Set [releaser.git.update-github-milestones] to [true] to change that");
+			log.info("Will not update the release train documentation, since the switch to do so "
+					+ "is off. Set [releaser.git.update-github-milestones] to [true] to change that");
 			return;
 		}
 		this.githubMilestones.closeMilestone(releaseVersion);
@@ -64,9 +62,8 @@ public class ProjectGitHubHandler {
 
 	public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
 		if (!this.properties.getGit().isUpdateSpringGuides()) {
-			log.info(
-					"Will not update the release train documentation, since the switch to do so "
-							+ "is off. Set [releaser.git.update-spring-guides] to [true] to change that");
+			log.info("Will not update the release train documentation, since the switch to do so "
+					+ "is off. Set [releaser.git.update-spring-guides] to [true] to change that");
 			return;
 		}
 		this.githubIssues.fileIssueInSpringGuides(projects, version);
@@ -74,9 +71,8 @@ public class ProjectGitHubHandler {
 
 	public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
 		if (!this.properties.getGit().isUpdateStartSpringIo()) {
-			log.info(
-					"Will not update the release train documentation, since the switch to do so "
-							+ "is off. Set [releaser.git.update-start-spring-io] to [true] to change that");
+			log.info("Will not update the release train documentation, since the switch to do so "
+					+ "is off. Set [releaser.git.update-start-spring-io] to [true] to change that");
 			return;
 		}
 		this.githubIssues.fileIssueInStartSpringIo(projects, version);

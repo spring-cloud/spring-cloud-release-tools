@@ -22,8 +22,7 @@ import java.util.regex.Pattern;
 
 class GradleProjectNameExtractor {
 
-	private static final Pattern VERSION_PATTERN = Pattern
-			.compile("^([a-zA-Z0-9]+)Version$");
+	private static final Pattern VERSION_PATTERN = Pattern.compile("^([a-zA-Z0-9]+)Version$");
 
 	String projectName(Map<String, String> substitution, Object key) {
 		String projectName = key.toString();

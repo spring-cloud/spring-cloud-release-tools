@@ -65,23 +65,20 @@ public class ExecutionResult implements Serializable {
 	}
 
 	public static ExecutionResult failure(List<Exception> throwables) {
-		return new ExecutionResult(throwables.stream()
-				.map(ExecutionResult::breakReferenceChain).collect(Collectors.toList()));
+		return new ExecutionResult(
+				throwables.stream().map(ExecutionResult::breakReferenceChain).collect(Collectors.toList()));
 	}
 
 	private static Exception breakReferenceChain(Exception cause) {
-		if (cause instanceof HttpServerErrorException
-				|| cause instanceof HttpClientErrorException) {
+		if (cause instanceof HttpServerErrorException || cause instanceof HttpClientErrorException) {
 			System.out.println("Breaking the reference chain. . . i think");
-			return new RuntimeException(
-					"[Breaking self reference chain] " + cause.toString());
+			return new RuntimeException("[Breaking self reference chain] " + cause.toString());
 		}
 		return cause;
 	}
 
 	public static ExecutionResult unstable(Exception ex) {
-		return new ExecutionResult(ex instanceof BuildUnstableException ? ex
-				: new BuildUnstableException(ex));
+		return new ExecutionResult(ex instanceof BuildUnstableException ? ex : new BuildUnstableException(ex));
 	}
 
 	public static ExecutionResult skipped() {
@@ -110,18 +107,17 @@ public class ExecutionResult implements Serializable {
 	}
 
 	public boolean isUnstable() {
-		return !this.exceptions.isEmpty() && this.exceptions.stream()
-				.allMatch(t -> t instanceof BuildUnstableException);
+		return !this.exceptions.isEmpty()
+				&& this.exceptions.stream().allMatch(t -> t instanceof BuildUnstableException);
 	}
 
 	public String toStringResult() {
-		return isUnstable() ? "UNSTABLE"
-				: isFailure() ? "FAILURE" : isSkipped() ? "SKIPPED" : "SUCCESS";
+		return isUnstable() ? "UNSTABLE" : isFailure() ? "FAILURE" : isSkipped() ? "SKIPPED" : "SUCCESS";
 	}
 
 	public boolean isFailure() {
-		return !this.exceptions.isEmpty() && this.exceptions.stream()
-				.anyMatch(t -> !(t instanceof BuildUnstableException));
+		return !this.exceptions.isEmpty()
+				&& this.exceptions.stream().anyMatch(t -> !(t instanceof BuildUnstableException));
 	}
 
 	public boolean isSuccess() {
@@ -148,8 +144,7 @@ public class ExecutionResult implements Serializable {
 		this.skipped = skipped;
 	}
 
-	private static final class MergedThrowable extends RuntimeException
-			implements Serializable {
+	private static final class MergedThrowable extends RuntimeException implements Serializable {
 
 		private MergedThrowable(List<Exception> throwables) {
 			super("Failed due to the following exceptions " + throwables);
@@ -157,8 +152,7 @@ public class ExecutionResult implements Serializable {
 
 	}
 
-	private static final class MergedUnstableThrowable extends BuildUnstableException
-			implements Serializable {
+	private static final class MergedUnstableThrowable extends BuildUnstableException implements Serializable {
 
 		private MergedUnstableThrowable(List<Exception> throwables) {
 			super("Unstable due to the following exceptions " + throwables);

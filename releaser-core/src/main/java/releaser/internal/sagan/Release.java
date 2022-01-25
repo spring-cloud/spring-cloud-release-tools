@@ -50,14 +50,12 @@ public class Release {
 
 	@Override
 	public String toString() {
-		return "Release{" + "releaseStatus='" + this.releaseStatus + '\''
-				+ ", refDocUrl='" + this.refDocUrl + '\'' + ", apiDocUrl='"
-				+ this.apiDocUrl + '\'' + ", groupId='" + this.groupId + '\''
-				+ ", artifactId='" + this.artifactId + '\'' + ", repository="
-				+ this.repository + ", version='" + this.version + '\'' + ", current="
-				+ this.current + ", generalAvailability=" + this.generalAvailability
-				+ ", preRelease=" + this.preRelease + ", versionDisplayName='"
-				+ this.versionDisplayName + '\'' + ", snapshot=" + this.snapshot + '}';
+		return "Release{" + "releaseStatus='" + this.releaseStatus + '\'' + ", refDocUrl='" + this.refDocUrl + '\''
+				+ ", apiDocUrl='" + this.apiDocUrl + '\'' + ", groupId='" + this.groupId + '\'' + ", artifactId='"
+				+ this.artifactId + '\'' + ", repository=" + this.repository + ", version='" + this.version + '\''
+				+ ", current=" + this.current + ", generalAvailability=" + this.generalAvailability + ", preRelease="
+				+ this.preRelease + ", versionDisplayName='" + this.versionDisplayName + '\'' + ", snapshot="
+				+ this.snapshot + '}';
 	}
 
 }

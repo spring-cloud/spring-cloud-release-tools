@@ -31,8 +31,7 @@ class GithubConfiguration {
 	BeanPostProcessor cachingGithubBeanPostProcessor() {
 		return new BeanPostProcessor() {
 			@Override
-			public Object postProcessAfterInitialization(Object bean, String beanName)
-					throws BeansException {
+			public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 				if (bean instanceof RtGithub) {
 					return new CachingGithub((Github) bean);
 				}

@@ -51,8 +51,8 @@ class GithubMilestones {
 	private final ReleaserProperties properties;
 
 	GithubMilestones(ReleaserProperties properties) {
-		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry()
-				.through(RetryWire.class)), properties);
+		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry().through(RetryWire.class)),
+				properties);
 	}
 
 	GithubMilestones(Github github, ReleaserProperties properties) {
@@ -95,8 +95,7 @@ class GithubMilestones {
 		try {
 			int counter = 0;
 			for (Milestone milestone : milestones) {
-				if (counter++ >= this.properties.getGit()
-						.getNumberOfCheckedMilestones()) {
+				if (counter++ >= this.properties.getGit().getNumberOfCheckedMilestones()) {
 					log.warn(
 							"No matching milestones were found within the provided threshold [{}] of checked milestones",
 							this.properties.getGit().getNumberOfCheckedMilestones());
@@ -104,8 +103,7 @@ class GithubMilestones {
 				}
 				Milestone.Smart smartMilestone = new Milestone.Smart(milestone);
 				String title = milestoneTitle(smartMilestone);
-				if (tagVersion.equals(title)
-						|| numericVersion(tagVersion).equals(title)) {
+				if (tagVersion.equals(title) || numericVersion(tagVersion).equals(title)) {
 					log.info("Found a matching milestone [{}]", smartMilestone.number());
 					return smartMilestone;
 				}
@@ -127,15 +125,13 @@ class GithubMilestones {
 		Assert.hasText(this.properties.getGit().getOauthToken(),
 				"You have to pass Github OAuth token for milestone closing to be operational");
 		String tagVersion = version.version;
-		Milestone.Smart foundMilestone = matchingMilestone(tagVersion,
-				closedMilestones(version));
+		Milestone.Smart foundMilestone = matchingMilestone(tagVersion, closedMilestones(version));
 		String foundUrl = "";
 		if (foundMilestone != null) {
 			try {
 				URL url = foundMilestoneUrl(foundMilestone);
 				log.info("Found a matching milestone with issues URL [{}]", url);
-				foundUrl = url.toString()
-						.replace("https://api.github.com/repos", "https://github.com")
+				foundUrl = url.toString().replace("https://api.github.com/repos", "https://github.com")
 						.replace("milestones", "milestone") + "?closed=1";
 			}
 			catch (IOException e) {
@@ -150,8 +146,7 @@ class GithubMilestones {
 	}
 
 	private String numericVersion(String version) {
-		return version.contains("RELEASE")
-				? version.substring(0, version.lastIndexOf(".")) : "";
+		return version.contains("RELEASE") ? version.substring(0, version.lastIndexOf(".")) : "";
 	}
 
 	String milestoneTitle(Milestone.Smart milestone) throws IOException {
@@ -162,11 +157,9 @@ class GithubMilestones {
 		return milestone.url();
 	}
 
-	private Iterable<Milestone> getMilestones(ProjectVersion version,
-			Map<String, String> map) {
+	private Iterable<Milestone> getMilestones(ProjectVersion version, Map<String, String> map) {
 		try {
-			return this.github.repos()
-					.get(new Coordinates.Simple(org(), version.projectName)).milestones()
+			return this.github.repos().get(new Coordinates.Simple(org(), version.projectName)).milestones()
 					.iterate(map);
 		}
 		catch (AssertionError e) {
