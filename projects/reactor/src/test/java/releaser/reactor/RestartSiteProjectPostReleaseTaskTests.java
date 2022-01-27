@@ -16,6 +16,8 @@
 
 package releaser.reactor;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -51,6 +53,26 @@ class RestartSiteProjectPostReleaseTaskTests {
 		BDDAssertions.then(result.isSuccess()).isTrue();
 		BDDMockito.then(this.cfClient).should()
 				.restartApp(BDDMockito.eq("projectreactor"));
+	}
+
+	@Test
+	void should_fail_if_original_version_is_null() {
+		ProjectToRun p = new ProjectToRun(null,
+				new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "1.0.0")),
+				null, new ReleaserProperties(),
+				BDDMockito.mock(Options.class)) {
+			@Override
+			public String name() {
+				return "reactor-core";
+			}
+		};
+		try {
+			Arguments.forProject(p);
+			fail();
+		}
+		catch (Exception e) {
+			// success
+		}
 	}
 
 	@Test
