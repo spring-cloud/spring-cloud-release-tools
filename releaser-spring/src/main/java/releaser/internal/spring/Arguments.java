@@ -105,6 +105,8 @@ public final class Arguments implements Serializable {
 		this.projects = new Projects(processedProjects.stream()
 				.map(p -> p.newProjectVersion).collect(Collectors.toSet()));
 		this.originalVersion = thisProject.originalVersion;
+		Assert.isTrue(!StringUtils.isEmpty(this.originalVersion),
+				"Original Version must not be empty for project: " + thisProject.name());
 		this.versionFromBom = thisProject.thisProjectVersionFromBom;
 		this.properties = thisProject.thisProjectReleaserProperties;
 		this.options = thisProject.options;
