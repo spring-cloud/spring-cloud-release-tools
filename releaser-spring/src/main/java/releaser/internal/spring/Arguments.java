@@ -87,7 +87,7 @@ public final class Arguments implements Serializable {
 		this.originalVersion = thisProject.originalVersion;
 		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: "
 				+ this.originalVersion);
-		Assert.isTrue(this.originalVersion != null,
+		Assert.isTrue(this.originalVersion != null && this.originalVersion.version != null,
 				"Original Version must not be null for project: " + thisProject.name());
 		this.versionFromBom = currentProjectFromBom;
 		this.properties = thisProject.thisProjectReleaserProperties;
@@ -108,7 +108,7 @@ public final class Arguments implements Serializable {
 		this.originalVersion = thisProject.originalVersion;
 		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: "
 				+ this.originalVersion);
-		Assert.isTrue(this.originalVersion != null,
+		Assert.isTrue(this.originalVersion != null && this.originalVersion.version != null,
 				"Original Version must not be null for project: " + thisProject.name());
 		this.versionFromBom = thisProject.thisProjectVersionFromBom;
 		this.properties = thisProject.thisProjectReleaserProperties;
