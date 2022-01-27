@@ -83,7 +83,7 @@ public final class Arguments implements Serializable {
 
 	private Arguments(ProjectToRun thisProject, Projects projects,
 			ProjectVersion currentProjectFromBom) {
-
+		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: " + thisProject.originalVersion);
 		this.project = thisProject.thisProjectFolder;
 		this.projects = projects;
 		this.originalVersion = thisProject.originalVersion;
@@ -101,6 +101,7 @@ public final class Arguments implements Serializable {
 	// in this case the project will be the BOM
 	private Arguments(ProjectToRun thisProject,
 			List<ProcessedProject> processedProjects) {
+		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: " + thisProject.originalVersion);
 		this.project = thisProject.thisProjectFolder;
 		this.projects = new Projects(processedProjects.stream()
 				.map(p -> p.newProjectVersion).collect(Collectors.toSet()));
