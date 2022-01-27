@@ -18,7 +18,6 @@ package releaser.internal.tasks.release;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import releaser.internal.Releaser;
 import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.DryRunReleaseReleaserTask;
@@ -26,7 +25,9 @@ import releaser.internal.tech.ExecutionResult;
 
 public class BuildProjectReleaseTask implements DryRunReleaseReleaserTask {
 
-	private static final Logger log = LoggerFactory.getLogger(BuildProjectReleaseTask.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(BuildProjectReleaseTask.class);
+
 	/**
 	 * Order of this task. The higher value, the lower order.
 	 */
