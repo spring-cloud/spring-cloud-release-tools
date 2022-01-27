@@ -25,23 +25,21 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
 import releaser.internal.ReleaserProperties;
 import releaser.internal.options.Options;
 import releaser.internal.project.ProcessedProject;
-import releaser.internal.project.ProjectCommandExecutor;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
+
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Arguments for a task.
  */
 public final class Arguments implements Serializable {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(Arguments.class);
+	private static final Logger log = LoggerFactory.getLogger(Arguments.class);
 
 	/**
 	 * Cloned location of the project.
@@ -89,7 +87,8 @@ public final class Arguments implements Serializable {
 		this.project = thisProject.thisProjectFolder;
 		this.projects = projects;
 		this.originalVersion = thisProject.originalVersion;
-		Assert.isTrue(!StringUtils.isEmpty(this.originalVersion), "Original Version must not be empty for project: " + thisProject.name());
+		Assert.isTrue(!StringUtils.isEmpty(this.originalVersion),
+				"Original Version must not be empty for project: " + thisProject.name());
 		this.versionFromBom = currentProjectFromBom;
 		this.properties = thisProject.thisProjectReleaserProperties;
 		this.options = thisProject.options;
