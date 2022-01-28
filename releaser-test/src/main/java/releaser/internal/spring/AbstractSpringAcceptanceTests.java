@@ -77,15 +77,15 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public static Project newProject() {
 		Project project = new Project();
-		project.projectReleases.addAll(
+		project.setReleases(
 				Arrays.asList(release("1.0.0.M8"), release("1.1.0.M8"), release("1.2.0.M8"), release("2.0.0.M8")));
 		return project;
 	}
 
 	public static Release release(String version) {
 		Release release = new Release();
-		release.version = version;
-		release.current = true;
+		release.setVersion(version);
+		release.setCurrent(true);
 		return release;
 	}
 

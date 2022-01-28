@@ -16,8 +16,6 @@
 
 package releaser.internal.sagan;
 
-import java.util.List;
-
 import releaser.internal.ReleaserProperties;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -58,13 +56,13 @@ class SaganConfiguration {
 			}
 
 			@Override
-			public Release deleteRelease(String projectName, String releaseVersion) {
-				return null;
+			public boolean deleteRelease(String projectName, String releaseVersion) {
+				return false;
 			}
 
 			@Override
-			public Project updateRelease(String projectName, List<ReleaseUpdate> releaseUpdate) {
-				return null;
+			public boolean addRelease(String projectName, ReleaseInput releaseInput) {
+				return false;
 			}
 
 			@Override

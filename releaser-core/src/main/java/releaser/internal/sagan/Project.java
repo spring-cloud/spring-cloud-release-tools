@@ -16,10 +16,11 @@
 
 package releaser.internal.sagan;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import org.springframework.core.style.ToStringCreator;
 
 /**
  * @author Marcin Grzejszczak
@@ -27,50 +28,61 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Project {
 
-	public String id;
+	private String name;
 
-	public String name;
+	private String slug;
 
-	public String repoUrl;
+	private String repositoryUrl;
 
-	public String siteUrl;
+	private String status;
 
-	public String category;
+	public List<Release> releases;
 
-	public String stackOverflowTags;
+	public String getName() {
+		return name;
+	}
 
-	public List<Release> projectReleases = new ArrayList<>();
+	public void setName(String name) {
+		this.name = name;
+	}
 
-	public Object projectSamples = new Object();
+	public String getSlug() {
+		return slug;
+	}
 
-	public Object nonMostCurrentReleases = new ArrayList<>();
+	public void setSlug(String slug) {
+		this.slug = slug;
+	}
 
-	public List<String> stackOverflowTagList = new ArrayList<>();
+	public String getRepositoryUrl() {
+		return repositoryUrl;
+	}
 
-	public Object mostCurrentRelease = new MostCurrentRelease();
+	public void setRepositoryUrl(String repositoryUrl) {
+		this.repositoryUrl = repositoryUrl;
+	}
 
-	public Boolean aggregator;
+	public String getStatus() {
+		return status;
+	}
 
-	public String rawBootConfig;
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-	public String rawOverview;
+	public List<Release> getReleases() {
+		return this.releases;
+	}
 
-	public int displayOrder = Integer.MAX_VALUE;
-
-	public boolean topLevelProject = true;
+	public void setReleases(List<Release> releases) {
+		this.releases = releases;
+	}
 
 	@Override
 	public String toString() {
-		return "Project{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", repoUrl='" + this.repoUrl
-				+ '\'' + ", siteUrl='" + this.siteUrl + '\'' + ", category='" + this.category + '\''
-				+ ", stackOverflowTags='" + this.stackOverflowTags + '\'' + ", projectReleases=" + this.projectReleases
-				+ ", stackOverflowTagList=" + this.stackOverflowTagList + ", aggregator=" + this.aggregator
-				+ ", rawBootConfig='" + this.rawBootConfig + '\'' + ", rawOverview='" + this.rawOverview + '\'' + '}';
-	}
-
-	static class MostCurrentRelease {
-
-		public boolean present;
+		return new ToStringCreator(this).append("name", name).append("slug", slug)
+				.append("repositoryUrl", repositoryUrl).append("status", status).append("releases", releases)
+				.toString();
 
 	}
 

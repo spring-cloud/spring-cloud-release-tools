@@ -49,7 +49,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 
 /**
  * @author Marcin Grzejszczak
@@ -70,7 +73,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
+				properties("debugx=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release-with-snapshot/")
 						.bomBranch("vCamden.SR5.BROKEN").expectedVersion("1.1.2.RELEASE").build()),
 				context -> {
@@ -90,7 +93,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debug=true").properties(
+				properties("debugx=true").properties(
 						new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
 								.bomBranch("vGreenwich.SR2").expectedVersion("2.1.2.RELEASE").build()),
 				context -> {
@@ -118,8 +121,9 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					then(releaseNotesTemplate()).doesNotExist();
 					// once for updating GA
 					// second time to update SNAPSHOT
-					BDDMockito.then(saganClient).should(BDDMockito.times(2))
-							.updateRelease(BDDMockito.eq("spring-cloud-consul"), BDDMockito.anyList());
+					BDDMockito.then(saganClient).should(times(2)).addRelease(BDDMockito.eq("spring-cloud-consul"),
+							BDDMockito.any());
+					BDDMockito.then(saganClient).should(times(2)).getProject("spring-cloud-consul");
 					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "2.1.2.BUILD-SNAPSHOT");
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
@@ -141,7 +145,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
+				properties("debugx=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vGreenwich.SR2")
 						.projectName("spring-cloud-build").expectedVersion("2.1.6.RELEASE").build()),
 				context -> {
@@ -170,8 +174,8 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					then(releaseNotesTemplate()).doesNotExist();
 					// once for updating GA
 					// second time to update SNAPSHOT
-					BDDMockito.then(saganClient).should(BDDMockito.times(2))
-							.updateRelease(BDDMockito.eq("spring-cloud-build"), BDDMockito.anyList());
+					BDDMockito.then(saganClient).should(times(2)).addRelease(BDDMockito.eq("spring-cloud-build"),
+							BDDMockito.any());
 					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-build", "2.1.6.BUILD-SNAPSHOT");
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
@@ -192,7 +196,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debug=true").properties(
+				properties("debugx=true").properties(
 						new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
 								.bomBranch("vDalston.RC1").expectedVersion("1.2.0.RC1").build()),
 				context -> {
@@ -218,10 +222,11 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					then(blogTemplate()).doesNotExist();
 					then(tweetTemplate()).doesNotExist();
 					then(releaseNotesTemplate()).doesNotExist();
-					BDDMockito.then(saganClient).should().updateRelease(BDDMockito.eq("spring-cloud-consul"),
-							BDDMockito.anyList());
+					BDDMockito.then(saganClient).should().addRelease(BDDMockito.eq("spring-cloud-consul"),
+							BDDMockito.any());
+					BDDMockito.then(saganClient).should(times(2)).getProject("spring-cloud-consul");
 					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "1.2.0.M8");
-					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "1.2.0.RC1");
+					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "1.2.0.SNAPSHOT");
 					// we update guides only for SR / RELEASE
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
@@ -243,7 +248,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		final File temporaryDestination = this.tmp.newFolder();
 
 		run(this.runner,
-				properties("debug=true").properties(new ArgsBuilder(project, this.tmp)
+				properties("debugx=true").properties(new ArgsBuilder(project, this.tmp)
 						.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vCamden.SR5")
 						.expectedVersion("1.1.2.RELEASE")
 						// just build
@@ -315,7 +320,9 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		@Bean
 		SaganClient testSaganClient() {
 			SaganClient saganClient = BDDMockito.mock(SaganClient.class);
-			BDDMockito.given(saganClient.getProject(anyString())).willReturn(newProject());
+			given(saganClient.getProject(anyString())).willReturn(newProject());
+			given(saganClient.addRelease(anyString(), any())).willReturn(true);
+			given(saganClient.deleteRelease(anyString(), anyString())).willReturn(true);
 			return saganClient;
 		}
 

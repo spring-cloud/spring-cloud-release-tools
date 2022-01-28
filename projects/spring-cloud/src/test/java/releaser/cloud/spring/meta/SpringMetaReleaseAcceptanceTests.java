@@ -54,8 +54,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
 
 /**
  * @author Marcin Grzejszczak
@@ -71,7 +73,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(defaultRunner(),
-				properties("debug=true").properties("test.metarelease=true").properties(
+				properties("debugx=true").properties("test.metarelease=true").properties(
 						metaReleaseArgs(project).bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
@@ -110,7 +112,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(defaultRunner(),
-				properties("debug=true").properties("test.metarelease=true")
+				properties("debugx=true").properties("test.metarelease=true")
 						.properties(metaReleaseArgsForParallel(project).bomBranch("vGreenwich.SR2")
 								.addFixedVersions(edgwareSr10())
 								.metaReleaseGroups("example1,example2",
@@ -156,7 +158,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(defaultRunner(),
-				properties("debug=true").properties("test.metarelease=true").properties(
+				properties("debugx=true").properties("test.metarelease=true").properties(
 						metaReleaseArgs(project).bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
@@ -197,7 +199,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		File temporaryDestination = this.tmp.newFolder();
 
-		run(defaultRunner(), properties("debug=true").properties("test.metarelease=true", "test.mockBuild=true")
+		run(defaultRunner(), properties("debugx=true").properties("test.metarelease=true", "test.mockBuild=true")
 				.properties(metaReleaseArgs(project).bomBranch("Greenwich")
 						.addFixedVersions(consulAndReleaseSnapshots()).updateReleaseTrainWiki(false)
 						.cloneDestinationDirectory(temporaryDestination).projectsToSkip("spring-cloud-consul").build()),
@@ -229,7 +231,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		File temporaryDestination = this.tmp.newFolder();
 
 		run(defaultRunner(),
-				properties("debug=true").properties("test.metarelease=true", "test.mockBuild=true")
+				properties("debugx=true").properties("test.metarelease=true", "test.mockBuild=true")
 						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
 								.addFixedVersions(releaseConsulBuildSnapshots())
 								.cloneDestinationDirectory(temporaryDestination).build()),
@@ -270,7 +272,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		File temporaryDestination = this.tmp.newFolder();
 
 		run(defaultRunner(),
-				properties("debug=true").properties("test.metarelease=true", "test.mockBuild=true")
+				properties("debugx=true").properties("test.metarelease=true", "test.mockBuild=true")
 						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
 								.addFixedVersions(releaseConsulBuildSnapshots())
 								.cloneDestinationDirectory(temporaryDestination).build()),
@@ -309,7 +311,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(failingBuildRunner(), properties("debug=true")
+		run(failingBuildRunner(), properties("debugx=true")
 				.properties("test.metarelease=true", "test.metarelease.failing=true",
 						"releaser.flow.default-enabled=false")
 				.properties(
@@ -393,7 +395,9 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		@Bean
 		SaganClient testSaganClient() {
 			SaganClient saganClient = BDDMockito.mock(SaganClient.class);
-			BDDMockito.given(saganClient.getProject(anyString())).willReturn(newProject());
+			given(saganClient.getProject(anyString())).willReturn(newProject());
+			given(saganClient.addRelease(anyString(), any())).willReturn(true);
+			given(saganClient.deleteRelease(anyString(), anyString())).willReturn(true);
 			return saganClient;
 		}
 
