@@ -24,7 +24,7 @@ import org.springframework.core.style.ToStringCreator;
  * @author Marcin Grzejszczak
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ReleaseUpdate {
+public class ReleaseInput {
 
 	private String version = "";
 
@@ -58,11 +58,9 @@ public class ReleaseUpdate {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this)
-				.append("version", version)
-				.append("referenceDocUrl", referenceDocUrl)
-				.append("apiDocUrl", apiDocUrl)
-				.toString();
+		return new ToStringCreator(this).append("version", version).append("referenceDocUrl", referenceDocUrl)
+				.append("apiDocUrl", apiDocUrl).toString();
 
 	}
+
 }
