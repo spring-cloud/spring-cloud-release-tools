@@ -84,8 +84,7 @@ public final class Arguments implements Serializable {
 		this.project = thisProject.thisProjectFolder;
 		this.projects = projects;
 		this.originalVersion = thisProject.originalVersion;
-		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: "
-				+ this.originalVersion);
+		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: " + this.originalVersion);
 		Assert.isTrue(this.originalVersion != null && this.originalVersion.version != null,
 				"Original Version must not be null for project: " + thisProject.name());
 		this.versionFromBom = currentProjectFromBom;
@@ -97,15 +96,13 @@ public final class Arguments implements Serializable {
 	}
 
 	// in this case the project will be the BOM
-	private Arguments(ProjectToRun thisProject,
-			List<ProcessedProject> processedProjects) {
+	private Arguments(ProjectToRun thisProject, List<ProcessedProject> processedProjects) {
 
 		this.project = thisProject.thisProjectFolder;
 		this.projects = new Projects(
 				processedProjects.stream().map(p -> p.newProjectVersion).collect(Collectors.toSet()));
 		this.originalVersion = thisProject.originalVersion;
-		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: "
-				+ this.originalVersion);
+		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: " + this.originalVersion);
 		Assert.isTrue(this.originalVersion != null && this.originalVersion.version != null,
 				"Original Version must not be null for project: " + thisProject.name());
 		this.versionFromBom = thisProject.thisProjectVersionFromBom;

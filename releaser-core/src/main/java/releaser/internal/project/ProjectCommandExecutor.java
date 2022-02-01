@@ -95,8 +95,7 @@ public class ProjectCommandExecutor {
 			log.info("No HTML files from docs contain unresolved tags");
 		}
 		catch (Exception e) {
-			String message = properties + "\n" + originalVersion + "\n"
-					+ versionFromReleaseTrain + "\n" + projectRoot;
+			String message = properties + "\n" + originalVersion + "\n" + versionFromReleaseTrain + "\n" + projectRoot;
 			throw new IllegalStateException(message, e);
 		}
 	}
