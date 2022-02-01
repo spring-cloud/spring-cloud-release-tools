@@ -222,7 +222,7 @@ public class ProjectCommandExecutorTests {
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
 		thenThrownBy(() -> builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-				.hasMessageContaining("contains a tag that wasn't resolved properly");
+				.hasStackTraceContaining("contains a tag that wasn't resolved properly");
 	}
 
 	@Test
@@ -234,7 +234,7 @@ public class ProjectCommandExecutorTests {
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
 		thenThrownBy(() -> builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
+				.hasStackTraceContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -487,7 +487,7 @@ public class ProjectCommandExecutorTests {
 		};
 
 		thenThrownBy(() -> builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
-				.hasMessageContaining("The process has exited with exit code [1]");
+				.hasStackTraceContaining("The process has exited with exit code [1]");
 	}
 
 	private TestReleaserProcessExecutor testExecutor(String workingDir) {
