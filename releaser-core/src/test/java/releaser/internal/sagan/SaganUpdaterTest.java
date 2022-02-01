@@ -92,8 +92,8 @@ public class SaganUpdaterTest {
 		assertThat(result.isSkipped()).isFalse();
 		assertThat(result.isSuccess()).isTrue();
 
-		then(this.saganClient).should().addRelease(eq("foo"), argThat(withReleaseUpdate("2.2.0-M1",
-				"https://cloud.spring.io/spring-cloud-static/foo/{version}/reference/html/")));
+		then(this.saganClient).should().addRelease(eq("foo"),
+				argThat(withReleaseUpdate("2.2.0-M1", "https://docs.spring.io/foo/docs/{version}/reference/html/")));
 	}
 
 	@Test
@@ -106,8 +106,8 @@ public class SaganUpdaterTest {
 		assertThat(result.isSkipped()).isFalse();
 		assertThat(result.isSuccess()).isTrue();
 
-		then(this.saganClient).should().addRelease(eq("foo"), argThat(withReleaseUpdate("2.2.0-RC1",
-				"https://cloud.spring.io/spring-cloud-static/foo/{version}/reference/html/")));
+		then(this.saganClient).should().addRelease(eq("foo"),
+				argThat(withReleaseUpdate("2.2.0-RC1", "https://docs.spring.io/foo/docs/{version}/reference/html/")));
 	}
 
 	@Test
@@ -220,8 +220,8 @@ public class SaganUpdaterTest {
 		// FIXME: assertThat(result.isSkipped()).isFalse();
 		assertThat(result.isSuccess()).isTrue();
 
-		then(this.saganClient).should().addRelease(eq("foo"),
-				argThat(withReleaseUpdate("2.4.0-SNAPSHOT", "https://cloud.spring.io/foo/reference/html/")));
+		then(this.saganClient).should().addRelease(eq("foo"), argThat(
+				withReleaseUpdate("2.4.0-SNAPSHOT", "https://docs.spring.io/foo/docs/{version}/reference/html/")));
 	}
 
 	@Test
@@ -240,11 +240,11 @@ public class SaganUpdaterTest {
 
 		then(this.saganClient).should().deleteRelease("foo", "2.2.0-RC1");
 		then(this.saganClient).should().deleteRelease("foo", "2.2.0-SNAPSHOT");
-		then(this.saganClient).should().addRelease(eq("foo"), argThat(withReleaseUpdate("2.2.0",
-				"https://cloud.spring.io/spring-cloud-static/foo/{version}/reference/html/")));
-		then(this.saganClient).should().deleteRelease("foo", "2.2.0-SNAPSHOT");
 		then(this.saganClient).should().addRelease(eq("foo"),
-				argThat(withReleaseUpdate("2.2.1-SNAPSHOT", "https://cloud.spring.io/foo/reference/html/")));
+				argThat(withReleaseUpdate("2.2.0", "https://docs.spring.io/foo/docs/{version}/reference/html/")));
+		then(this.saganClient).should().deleteRelease("foo", "2.2.0-SNAPSHOT");
+		then(this.saganClient).should().addRelease(eq("foo"), argThat(
+				withReleaseUpdate("2.2.1-SNAPSHOT", "https://docs.spring.io/foo/docs/{version}/reference/html/")));
 	}
 
 	@Test
@@ -259,8 +259,8 @@ public class SaganUpdaterTest {
 		assertThat(result.isSuccess()).isTrue();
 
 		then(this.saganClient).should(never()).deleteRelease(anyString(), anyString());
-		then(this.saganClient).should().addRelease(eq("foo"),
-				argThat(withReleaseUpdate("2.3.0-SNAPSHOT", "https://cloud.spring.io/foo/2.3.x/reference/html/")));
+		then(this.saganClient).should().addRelease(eq("foo"), argThat(
+				withReleaseUpdate("2.3.0-SNAPSHOT", "https://docs.spring.io/foo/docs/{version}/reference/html/")));
 	}
 
 	private Project projectWithNewRelease(String version) {

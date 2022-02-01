@@ -98,20 +98,24 @@ public class SaganUpdater {
 		if (indexDoc.exists()) {
 			log.debug("Index adoc file exists");
 			String fileText = fileToText(indexDoc);
-			//if (StringUtils.hasText(fileText) && !fileText.equals(project.rawOverview)) {
-			//	log.info("Index adoc content differs from the previously stored, will update it");
-			//	project.rawOverview = fileText;
-			//	shouldUpdate = true;
-			//}
+			// if (StringUtils.hasText(fileText) && !fileText.equals(project.rawOverview))
+			// {
+			// log.info("Index adoc content differs from the previously stored, will
+			// update it");
+			// project.rawOverview = fileText;
+			// shouldUpdate = true;
+			// }
 		}
 		if (bootDoc.exists()) {
 			log.debug("Boot adoc file exists");
 			String fileText = fileToText(bootDoc);
-			//if (StringUtils.hasText(fileText) && !fileText.equals(project.rawBootConfig)) {
-			//	log.info("Boot adoc content differs from the previously stored, will update it");
-			//	project.rawBootConfig = fileText;
-			//	shouldUpdate = true;
-			//}
+			// if (StringUtils.hasText(fileText) &&
+			// !fileText.equals(project.rawBootConfig)) {
+			// log.info("Boot adoc content differs from the previously stored, will update
+			// it");
+			// project.rawBootConfig = fileText;
+			// shouldUpdate = true;
+			// }
 		}
 		if (shouldUpdate) {
 			this.saganClient.patchProject(project);
@@ -240,16 +244,7 @@ public class SaganUpdater {
 	}
 
 	private String newReferenceUrl(String branch, ProjectVersion version) {
-		if (!version.isSnapshot()) {
-			// static/sleuth/{version}/
-			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName + "/{version}/reference/html/";
-		}
-		if (branch.toLowerCase().contains("main")) {
-			// sleuth/
-			return "https://cloud.spring.io/" + version.projectName + "/reference/html/";
-		}
-		// sleuth/1.1.x/
-		return "https://cloud.spring.io/" + version.projectName + "/" + branch + "/reference/html/";
+		return "https://docs.spring.io/" + version.projectName + "/docs/{version}/reference/html/";
 	}
 
 	private String oldReferenceUrl(String branch, ProjectVersion version) {
