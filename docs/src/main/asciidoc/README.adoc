@@ -17,6 +17,9 @@ When importing your project to an IDE please activate the `ide` Maven profile to
 Of course remember that you MUST NOT use Java 1.8 features in the main sources.
 If you do so your app will break during the Maven build.
 
+== Spring Cloud Release Process
+include::/Users/glennrenfro/project/spring-cloud-release-tools/docs/src/main/asciidoc/spring-cloud-release-process.adoc[]
+
 == Contributing
 
 include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/main/docs/src/main/asciidoc/contributing.adoc[]

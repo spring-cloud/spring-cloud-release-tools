@@ -1,0 +1,112 @@
+== Spring Cloud Release Process
+
+This section contains the instructions on releasiong the Spring Cloud project using the Spring Cloud Releaser.
+
+=== Before you get started
+1. Create the Spring Cloud Release project on your local machine. For example:
+
+```bash
+git clone git@github.com:spring-cloud/spring-cloud-release.git
+cd spring-cloud-release
+```
+[start=2]
+. Pull all Spring Cloud projects to your local machine so that if there is a problem during release, you can make the tweaks to the affected project quickly.
+
+=== Spring Cloud Build Releaser Instructions
+
+. Go to the spring-cloud-release project and checkout the `jenkins-releaser-config` branch.  Then pull the latest from the repository.
+```bash
+cd spring-cloud-release
+git checkout jenkins-releaser-config
+git pull origin jenkins-releaser-config
+```
+[start=2]
+. Find the most recent release in the desired release train.  In this document we will use: 2020_0_x.properties
+. Create a copy of that file and set the name of the copy to <name-of-the-release>.properties  (for example: 2020_0_2.properties)
+. Edit this file and update all project versions to their latest release.  
+.. The latest release for each project can be determined by navigating to the individual Github project and checking for commits since the last release, where the last release is marked by a commit from spring-cloud-issues.  If there are commits since the last release, change the value in the properties file.  If there are no commits since the last release (i.e. the last commit is from spring-cloud-issues) then do not increment the value.  
+. Make a note of the projects that did not increment their version number, as those projects will need to be specified later in the “RELEASER_PROJECTS_TO_SKIP” field in the Jenkins project spring-cloud-meta-releaser
+ 
+NOTE: Sometimes the release value for a project will need to be incremented by more than one, 
+for example if there was a release for an individual project due to a CVE and there were commits made after that release.  To determine the new version number, look for the latest version in the commit history from spring-cloud-issues.
+
+[start=6]
+. Commit the change
+. Push the changes back to github.   For example:
+```bash
+git push origin jenkins-releaser-config 
+```
+[start=8]
+. Request that project owners verify versions in the Spring Cloud Slack room by sharing a github link to the 2020_0_x.properties you just pushed.
+. Now go to the `spring-cloud-build-releaser` job on Jenkins
+
+NOTE: The builder project is required to run first because it is required for spring-cloud-function and spring-cloud-stream. All other spring-cloud builds will run after spring-cloud-function and spring-cloud-stream have performed a successful release
+
+[start=10]
+. Click `Build With Parameters` on the left side of page 
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-buildwithparams.png[Build With Params]
+
+[start=11]
+. In the RELEASE_VERSION column enter the  name of the file you created without the properties extension 
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-setreleaseversion.png[Set The Version]
+
+[start=12]
+. Click the “DRY_RUN” option and then click `Build` button as shown below:
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-selectdryrun.png[Set Dry Run]
+[start=13]
+. Once the dry run is successfully complete we need to remove all of the artifacts from the dry run.   
+To do this select the `spring-cloud-purge-worker-artifacts-releaser` job from the list of jobs. 
+. Once the purge work has completed successfully, 
+. Select Rebuild Last option on the left side of the page.
+. Now go to the `spring-cloud-build-releaser` job on Jenkins
+, Select the last build 
+. When build page appears click the `Rebuild` option.
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-selectlastrun.png[Select Last Run]
+
+[start=18]
+. Deselect “DRY_RUN” then click the `Build` button.
+
+=== Full Spring Cloud Release
+
+. Once Spring Cloud Stream and Function projects are released verify that all other builds are succeeding
+. Now go to the `Spring-cloud-meta-releaser` job on Jenkins
+. Click `Build With Parameters` on the left side of page 
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/meta-releaser-buildwithparameters.png[Build With Params]
+
+[start=4]
+. Update RELEASE_VERSION with the current release and corresponds to the release file.  
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/meta-releaser-setreleaseversion.png[Set The Version]
+
+[start=5]
+. Add spring-cloud-build to RELEASER_PROJECTS_TO_SKIP, so it won’t be rebuilt.
+Also any other projects that did not change in the properties files, add it to the RELEASER_PROJECTS_TO_SKIP so they can be excluded.
+. Select Dry Run option
+. Click Build
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-selectdryrun.png[Set Dry Run]
+
+
+TIP: If there is a failure you can launch the build from the failed project.   To do this:
+Click the Rebuild_Last option, then in the START FROM field insert the name of the project.
+Then click the Build.
+
+NOTE: Spring Cloud K8’s Integration tests may time out. Restart the build.
+ Select Rebuild Last option on the left side of the page.
+
+[start=8]
+. Upon a successful "DRY_RUN".   
+. Click "Rebuild Last" option on the left side of the page.
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/meta-releaser-rebuildlast.png[Rebuild Last]
+
+[start=10]
+. When the build page is rendered.
+. Deselect “DRY_RUN” then click the build button.
+. Clear the Start_From field
+. Click Rebuild
