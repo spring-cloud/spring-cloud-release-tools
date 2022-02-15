@@ -25,9 +25,9 @@ import com.jcabi.github.Issue;
 import com.jcabi.github.Repo;
 import com.jcabi.github.Repos;
 import com.jcabi.github.mock.MkGithub;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 import releaser.cloud.SpringCloudReleaserProperties;
@@ -53,7 +53,7 @@ public class SpringCloudGithubIssuesTests {
 
 	Repo repo;
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		this.github = github("spring-guides");
 		this.properties.getGit().setOauthToken("a");
@@ -81,7 +81,7 @@ public class SpringCloudGithubIssuesTests {
 										"2.0.0.BUILD-SNAPSHOT")),
 						new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -133,7 +133,7 @@ public class SpringCloudGithubIssuesTests {
 						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test

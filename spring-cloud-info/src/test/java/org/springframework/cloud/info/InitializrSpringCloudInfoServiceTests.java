@@ -46,7 +46,7 @@ import com.jcabi.immutable.Array;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.cloud.info.exceptions.SpringCloudVersionNotFoundException;
 import org.springframework.core.io.ClassPathResource;

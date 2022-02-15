@@ -19,7 +19,7 @@ package releaser.internal.buildsystem;
 import java.io.File;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.ReleaserProperties;
@@ -36,13 +36,12 @@ public class ProjectPomUpdaterTests {
 	public void should_skip_any_steps_if_there_is_no_pom_xml() {
 		ReleaserProperties properties = SpringCloudReleaserProperties.get();
 		ProjectGitHandler handler = BDDMockito.mock(ProjectGitHandler.class);
-		ProjectPomUpdater updater = new ProjectPomUpdater(properties,
-				Collections.emptyList());
+		ProjectPomUpdater updater = new ProjectPomUpdater(properties, Collections.emptyList());
 
 		updater.updateProjectFromReleaseTrain(new File("target"), new Projects(),
 				new ProjectVersion("foo", "1.0.0.RELEASE"), false);
 
-		BDDMockito.then(handler).shouldHaveZeroInteractions();
+		BDDMockito.then(handler).shouldHaveNoInteractions();
 	}
 
 }

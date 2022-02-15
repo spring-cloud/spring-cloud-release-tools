@@ -23,10 +23,9 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.project.ProjectVersion;
@@ -42,14 +41,14 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class GradleUpdaterTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
+	@TempDir
+	public File tmp;
 
 	File temporaryFolder;
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
-		this.temporaryFolder = this.tmp.newFolder();
+		this.temporaryFolder = new File(tmp, "test.txt");
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 	}
 
@@ -64,16 +63,14 @@ public class GradleUpdaterTests {
 			}
 		};
 		properties.getGradle().setGradlePropsSubstitution(props);
-		Projects projects = new Projects(
-				new ProjectVersion("spring-cloud-contract", "1.0.0"),
+		Projects projects = new Projects(new ProjectVersion("spring-cloud-contract", "1.0.0"),
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		new GradleUpdater().updateProjectFromReleaseTrain(properties, projectRoot,
-				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
+		new GradleUpdater().updateProjectFromReleaseTrain(properties, projectRoot, projects,
+				new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
 
 		then(asString(tmpFile("gradleproject/gradle.properties"))).contains("foo=1.0.0");
-		then(asString(tmpFile("gradleproject/child/gradle.properties")))
-				.contains("bar=2.0.0");
+		then(asString(tmpFile("gradleproject/child/gradle.properties"))).contains("bar=2.0.0");
 	}
 
 	@Test
@@ -87,15 +84,12 @@ public class GradleUpdaterTests {
 			}
 		};
 		properties.getGradle().setGradlePropsSubstitution(props);
-		Projects projects = new Projects(
-				new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
+		Projects projects = new Projects(new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		thenThrownBy(() -> new GradleUpdater().updateProjectFromReleaseTrain(properties,
-				projectRoot, projects,
+		thenThrownBy(() -> new GradleUpdater().updateProjectFromReleaseTrain(properties, projectRoot, projects,
 				new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"), true))
-						.hasMessageContaining(
-								"(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
+						.hasMessageContaining("(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
 	}
 
 	private File file(String relativePath) throws URISyntaxException {

@@ -70,13 +70,11 @@ public class ProjectGitHandler implements Closeable {
 	public void commitAndTagIfApplicable(File project, ProjectVersion version) {
 		GitRepo gitRepo = gitRepo(project);
 		if (version.isSnapshot()) {
-			log.info("Snapshot version [{}] found. Will only commit the changed poms",
-					version);
+			log.info("Snapshot version [{}] found. Will only commit the changed poms", version);
 			gitRepo.commit(MSG);
 		}
 		else {
-			log.info(
-					"NON-snapshot version [{}] found. Will commit the changed poms, tag the version and push the tag",
+			log.info("NON-snapshot version [{}] found. Will commit the changed poms, tag the version and push the tag",
 					version);
 			gitRepo.commit(String.format(PRE_RELEASE_MSG, version.version));
 			String tagName = "v" + version.version;
@@ -87,8 +85,7 @@ public class ProjectGitHandler implements Closeable {
 
 	public void commitAfterBumpingVersions(File project, ProjectVersion bumpedVersion) {
 		if (bumpedVersion.isSnapshot()) {
-			log.info("Snapshot version [{}] found. Will only commit the changed poms",
-					bumpedVersion);
+			log.info("Snapshot version [{}] found. Will only commit the changed poms", bumpedVersion);
 			commit(project, String.format(POST_RELEASE_BUMP_MSG, bumpedVersion));
 		}
 		else {
@@ -120,8 +117,7 @@ public class ProjectGitHandler implements Closeable {
 	}
 
 	public File cloneReleaseTrainDocumentationProject(String branch) {
-		return cloneAndCheckOut(this.properties.getGit().getReleaseTrainDocsUrl(),
-				branch);
+		return cloneAndCheckOut(this.properties.getGit().getReleaseTrainDocsUrl(), branch);
 	}
 
 	public File cloneDocumentationProject() {
@@ -134,8 +130,7 @@ public class ProjectGitHandler implements Closeable {
 				this.properties.getGit().getSpringProjectBranch());
 	}
 
-	private File cloneAndCheckOut(String springProjectUrl,
-			String springProjectUrlBranch) {
+	private File cloneAndCheckOut(String springProjectUrl, String springProjectUrlBranch) {
 		File clonedProject = cloneProject(springProjectUrl);
 		checkout(clonedProject, springProjectUrlBranch);
 		return clonedProject;
@@ -160,8 +155,7 @@ public class ProjectGitHandler implements Closeable {
 		String releaseTrainBranch = this.properties.getGit().getReleaseTrainBranch();
 		if (!StringUtils.isEmpty(releaseTrainBranch)) {
 			if (log.isDebugEnabled()) {
-				log.debug("Checking out configured release train branch {}",
-						releaseTrainBranch);
+				log.debug("Checking out configured release train branch {}", releaseTrainBranch);
 			}
 			if (gitRepo(clonedProject).hasBranch(releaseTrainBranch)) {
 				log.info("Branch [{}] exists. Will check it out", releaseTrainBranch);
@@ -171,8 +165,7 @@ public class ProjectGitHandler implements Closeable {
 		}
 		String version = this.properties.getFixedVersions().get(projectName);
 		if (StringUtils.isEmpty(version)) {
-			throw new IllegalStateException(
-					"You haven't provided a version for project [" + projectName + "]");
+			throw new IllegalStateException("You haven't provided a version for project [" + projectName + "]");
 		}
 		return findAndCheckOutBranchForVersion(clonedProject, new String[] { version });
 	}
@@ -200,11 +193,10 @@ public class ProjectGitHandler implements Closeable {
 			log.debug("Checking versions {} for project [{}]", versions, clonedProject);
 		}
 		String branchToCheckout = Arrays.stream(versions).map(this::branchFromVersion)
-				.map(version -> gitRepo(clonedProject).hasBranch(version) ? version : "")
-				.filter(StringUtils::hasText).findFirst().orElse("main");
+				.map(version -> gitRepo(clonedProject).hasBranch(version) ? version : "").filter(StringUtils::hasText)
+				.findFirst().orElse("main");
 		if ("main".equals(branchToCheckout)) {
-			log.info(
-					"None of the versions {} matches a branch. Assuming that should work with main branch",
+			log.info("None of the versions {} matches a branch. Assuming that should work with main branch",
 					(Object) versions);
 			return clonedProject;
 		}
@@ -221,10 +213,8 @@ public class ProjectGitHandler implements Closeable {
 	 * @param toRef the ref to go to (tag, branch or sha1)
 	 * @return the list of revisions between these two references
 	 */
-	public List<SimpleCommit> commitsBetween(File clonedProject, String fromRef,
-			String toRef) {
-		return gitRepo(clonedProject).log(fromRef, toRef).stream().map(SimpleCommit::new)
-				.collect(Collectors.toList());
+	public List<SimpleCommit> commitsBetween(File clonedProject, String fromRef, String toRef) {
+		return gitRepo(clonedProject).log(fromRef, toRef).stream().map(SimpleCommit::new).collect(Collectors.toList());
 	}
 
 	/**
@@ -234,8 +224,7 @@ public class ProjectGitHandler implements Closeable {
 	 * @return an {@link Optional} that is valued with the sha1, if found
 	 */
 	public Optional<String> findTagSha1(File clonedProject, String tagName) {
-		return gitRepo(clonedProject).findTagIdByName(tagName, false)
-				.map(AnyObjectId::getName);
+		return gitRepo(clonedProject).findTagIdByName(tagName, false).map(AnyObjectId::getName);
 	}
 
 	private String suffixNonHttpRepo(String orgUrl) {
@@ -248,8 +237,7 @@ public class ProjectGitHandler implements Closeable {
 			// retrieve from cache
 			// reset any changes and fetch the latest data
 			File destinationDir = destinationDir();
-			File clonedProject = CACHE.computeIfAbsent(urIish,
-					urIish1 -> gitRepo(destinationDir).cloneProject(urIish));
+			File clonedProject = CACHE.computeIfAbsent(urIish, urIish1 -> gitRepo(destinationDir).cloneProject(urIish));
 			if (clonedProject.exists()) {
 				log.info(
 						"Project has already been cloned. Will try to reset the current branch and fetch the latest changes.");
@@ -309,8 +297,7 @@ public class ProjectGitHandler implements Closeable {
 			// [Camden] -> [Camden.x]
 			return splitVersion[0];
 		}
-		throw new IllegalStateException(
-				"Wrong version [" + version + "]. Can't extract semver pieces of it");
+		throw new IllegalStateException("Wrong version [" + version + "]. Can't extract semver pieces of it");
 
 	}
 
@@ -347,8 +334,7 @@ public class ProjectGitHandler implements Closeable {
 	 * @return a {@link Stream} of the tags whose name match the given {@link Pattern}
 	 */
 	public Stream<String> findTagNamesMatching(File clonedProject, Pattern tagPattern) {
-		return gitRepo(clonedProject).listTags()
-				.filter(tagName -> tagPattern.matcher(tagName).matches());
+		return gitRepo(clonedProject).listTags().filter(tagName -> tagPattern.matcher(tagName).matches());
 	}
 
 }

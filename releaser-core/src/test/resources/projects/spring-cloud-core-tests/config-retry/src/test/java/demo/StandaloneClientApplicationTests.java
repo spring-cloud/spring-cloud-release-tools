@@ -23,8 +23,7 @@ import java.util.concurrent.Executors;
 import apps.ConfigServer;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.aop.framework.Advised;
@@ -55,7 +54,7 @@ public class StandaloneClientApplicationTests {
 	@Autowired
 	private ConfigServicePropertySourceLocator locator;
 
-	@BeforeClass
+	@BeforeEachClass
 	public static void delayConfigServer() {
 		Executors.newSingleThreadExecutor().execute(new Runnable() {
 			@Override

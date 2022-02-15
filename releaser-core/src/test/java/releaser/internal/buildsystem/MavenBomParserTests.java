@@ -20,8 +20,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.git.GitRepoTests;
@@ -38,7 +38,7 @@ public class MavenBomParserTests {
 
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException {
 		this.springCloudReleaseProject = new File(
 				GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
@@ -51,8 +51,7 @@ public class MavenBomParserTests {
 		BomParser parser = new MavenBomParser(this.properties, Collections.emptyList());
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Pom is not present");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining("Pom is not present");
 	}
 
 	@Test
@@ -69,8 +68,7 @@ public class MavenBomParserTests {
 	public void should_throw_exception_when_cloud_pom_is_missing() {
 		BomParser parser = new MavenBomParser(this.properties, Collections.emptyList());
 
-		thenThrownBy(() -> parser.versionsFromBom(new File(".")))
-				.isInstanceOf(IllegalStateException.class)
+		thenThrownBy(() -> parser.versionsFromBom(new File("."))).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
@@ -81,8 +79,7 @@ public class MavenBomParserTests {
 		BomParser parser = new MavenBomParser(this.properties, Collections.emptyList());
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Pom is not present");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining("Pom is not present");
 	}
 
 }

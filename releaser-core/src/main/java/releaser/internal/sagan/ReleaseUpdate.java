@@ -42,11 +42,10 @@ public class ReleaseUpdate {
 
 	@Override
 	public String toString() {
-		return "ReleaseUpdate{" + "groupId='" + this.groupId + '\'' + ", artifactId='"
-				+ this.artifactId + '\'' + ", version='" + this.version + '\''
-				+ ", releaseStatus='" + this.releaseStatus + '\'' + ", refDocUrl='"
-				+ this.refDocUrl + '\'' + ", apiDocUrl='" + this.apiDocUrl + '\''
-				+ ", repository=" + this.repository + '}';
+		return "ReleaseUpdate{" + "groupId='" + this.groupId + '\'' + ", artifactId='" + this.artifactId + '\''
+				+ ", version='" + this.version + '\'' + ", releaseStatus='" + this.releaseStatus + '\''
+				+ ", refDocUrl='" + this.refDocUrl + '\'' + ", apiDocUrl='" + this.apiDocUrl + '\'' + ", repository="
+				+ this.repository + '}';
 	}
 
 }

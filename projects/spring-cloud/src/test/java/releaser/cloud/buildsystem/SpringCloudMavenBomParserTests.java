@@ -22,9 +22,9 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import releaser.cloud.SpringCloudReleaserProperties;
 import releaser.cloud.docs.TestUtils;
@@ -52,7 +52,7 @@ public class SpringCloudMavenBomParserTests {
 
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException, IOException, GitAPIException {
 		this.tmpFolder = this.tmp.newFolder();
 		TestUtils.prepareLocalRepo();

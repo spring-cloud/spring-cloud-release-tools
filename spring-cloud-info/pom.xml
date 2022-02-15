@@ -103,17 +103,17 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>${asciidoctor-maven-plugin.version}</version>
+				<version>2.2.2</version>
 				<dependencies>
 					<dependency>
 						<groupId>io.spring.asciidoctor</groupId>
 						<artifactId>spring-asciidoctor-extensions</artifactId>
-						<version>${spring-asciidoctor-extensions.version}</version>
+						<version>0.6.0</version>
 					</dependency>
 					<dependency>
 						<groupId>org.springframework.restdocs</groupId>
 						<artifactId>spring-restdocs-asciidoctor</artifactId>
-						<version>${spring-rest-docs.version}</version>
+						<version>2.0.6.RELEASE</version>
 					</dependency>
 				</dependencies>
 			</plugin>

@@ -35,8 +35,8 @@ import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 import releaser.internal.ReleaserProperties;
@@ -89,7 +89,7 @@ public abstract class AbstractSpringAcceptanceTests {
 		return release;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		this.temporaryFolder = this.tmp.newFolder();
 		TestUtils.prepareLocalRepo();

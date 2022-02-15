@@ -19,7 +19,7 @@ package releaser.cloud.spring;
 import java.io.File;
 import java.util.Arrays;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import releaser.internal.buildsystem.TestUtils;
 import releaser.internal.spring.AbstractSpringAcceptanceTests;
 
@@ -33,7 +33,7 @@ public class AbstractSpringCloudAcceptanceTests extends AbstractSpringAcceptance
 
 	public File springCloudBuildProject;
 
-	@Before
+	@BeforeEach
 	public void setupCloud() throws Exception {
 		this.temporaryFolder = this.tmp.newFolder();
 		this.springCloudConsulProject = new File(AbstractSpringAcceptanceTests.class

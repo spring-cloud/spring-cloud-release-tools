@@ -26,9 +26,9 @@ import java.util.Collections;
 import javax.validation.constraints.NotNull;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.BDDMockito;
 import releaser.cloud.SpringCloudReleaserProperties;
@@ -63,7 +63,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException, URISyntaxException {
 		this.tmpFolder = this.tmp.newFolder();
 		this.project = new File(SpringCloudCustomProjectDocumentationUpdater.class

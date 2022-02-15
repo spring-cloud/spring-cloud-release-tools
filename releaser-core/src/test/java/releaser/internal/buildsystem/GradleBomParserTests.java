@@ -30,8 +30,7 @@ class GradleBomParserTests {
 
 	@Test
 	void should_read_versions_from_bom_from_properties() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
-				new ArrayList<>()) {
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>()) {
 			@Override
 			public boolean isApplicable(File clonedBom) {
 				return true;
@@ -52,8 +51,7 @@ class GradleBomParserTests {
 
 		VersionsFromBom versionsFromBom = parser.versionsFromBom(new File("."));
 
-		BDDAssertions.then(versionsFromBom.versionForProject("spring-cloud-contract"))
-				.isEqualTo("1.0.0.RELEASE");
+		BDDAssertions.then(versionsFromBom.versionForProject("spring-cloud-contract")).isEqualTo("1.0.0.RELEASE");
 	}
 
 	@Test
@@ -62,8 +60,7 @@ class GradleBomParserTests {
 		gradleSubstitution.put("verifierVersion", "spring-cloud-contract");
 		ReleaserProperties releaserProperties = new ReleaserProperties();
 		releaserProperties.getGradle().setGradlePropsSubstitution(gradleSubstitution);
-		GradleBomParser parser = new GradleBomParser(releaserProperties,
-				new ArrayList<>()) {
+		GradleBomParser parser = new GradleBomParser(releaserProperties, new ArrayList<>()) {
 			@Override
 			public boolean isApplicable(File clonedBom) {
 				return true;
@@ -84,22 +81,19 @@ class GradleBomParserTests {
 
 		VersionsFromBom versionsFromBom = parser.versionsFromBom(new File("."));
 
-		BDDAssertions.then(versionsFromBom.versionForProject("spring-cloud-contract"))
-				.isEqualTo("1.0.0.RELEASE");
+		BDDAssertions.then(versionsFromBom.versionForProject("spring-cloud-contract")).isEqualTo("1.0.0.RELEASE");
 	}
 
 	@Test
 	void should_be_not_applicable_when_no_build_gradle_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
-				new ArrayList<>());
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>());
 
 		BDDAssertions.then(parser.isApplicable(new File("."))).isFalse();
 	}
 
 	@Test
 	void should_be_applicable_when_build_gradle_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
-				new ArrayList<>()) {
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>()) {
 			@Override
 			File file(File clonedBom, String child) {
 				return clonedBom;
@@ -111,8 +105,7 @@ class GradleBomParserTests {
 
 	@Test
 	void should_return_empty_version_when_no_gradle_properties_is_present() {
-		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(),
-				new ArrayList<>());
+		GradleBomParser parser = new GradleBomParser(new ReleaserProperties(), new ArrayList<>());
 
 		VersionsFromBom versionsFromBom = parser.versionsFromBom(new File("."));
 

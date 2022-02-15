@@ -28,8 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 class EmailTemplateGenerator {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(EmailTemplateGenerator.class);
+	private static final Logger log = LoggerFactory.getLogger(EmailTemplateGenerator.class);
 
 	private final Template template;
 
@@ -50,8 +49,7 @@ class EmailTemplateGenerator {
 			return this.emailOutput;
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(
-					"Exception occurred while trying to generate an email template", e);
+			throw new IllegalStateException("Exception occurred while trying to generate an email template", e);
 		}
 	}
 

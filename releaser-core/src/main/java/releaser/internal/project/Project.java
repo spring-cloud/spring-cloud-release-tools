@@ -55,8 +55,7 @@ public class Project {
 		if (this.name != null ? !this.name.equals(project.name) : project.name != null) {
 			return false;
 		}
-		return this.version != null ? this.version.equals(project.version)
-				: project.version == null;
+		return this.version != null ? this.version.equals(project.version) : project.version == null;
 	}
 
 	@Override

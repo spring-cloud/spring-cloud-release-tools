@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import releaser.cloud.spring.AbstractSpringCloudAcceptanceTests;
 import releaser.internal.ReleaserProperties;

@@ -56,12 +56,12 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.FetchResult;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
-import org.eclipse.jgit.transport.OpenSshConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
@@ -109,8 +109,7 @@ class GitRepo {
 	 */
 	File cloneProject(URIish projectUri) {
 		try {
-			log.info("Cloning repo from [{}] to [{}]", projectUri,
-					humanishDestination(projectUri, this.basedir));
+			log.info("Cloning repo from [{}] to [{}]", projectUri, humanishDestination(projectUri, this.basedir));
 			Git git = cloneToBasedir(projectUri, this.basedir);
 			if (git != null) {
 				git.close();
@@ -190,9 +189,8 @@ class GitRepo {
 	 */
 	Optional<ObjectId> findTagIdByName(String tagName, boolean unpeel) {
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
-			return git.tagList().call().stream()
-					.filter(ref -> ref.getName().equals("refs/tags/" + tagName))
-					.findFirst().map(ref -> {
+			return git.tagList().call().stream().filter(ref -> ref.getName().equals("refs/tags/" + tagName)).findFirst()
+					.map(ref -> {
 						if (ref.isPeeled() && unpeel) {
 							return ref.getPeeledObjectId();
 						}
@@ -200,8 +198,7 @@ class GitRepo {
 					});
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(
-					"Unable to fetch git tag id for refs/tags/" + tagName, e);
+			throw new IllegalStateException("Unable to fetch git tag id for refs/tags/" + tagName, e);
 		}
 	}
 
@@ -212,8 +209,7 @@ class GitRepo {
 	 */
 	List<RevCommit> log(String from, String to) {
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
-			final Optional<Ref> fromRevisionOptional = findTagOrBranchHeadRevision(git,
-					from);
+			final Optional<Ref> fromRevisionOptional = findTagOrBranchHeadRevision(git, from);
 			final Optional<Ref> toRevisionOptional = findTagOrBranchHeadRevision(git, to);
 
 			ObjectId fromRevision;
@@ -249,8 +245,7 @@ class GitRepo {
 			return commits;
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(
-					"Unable to fetch git log for " + from + ".." + to, e);
+			throw new IllegalStateException("Unable to fetch git log for " + from + ".." + to, e);
 		}
 	}
 
@@ -279,8 +274,7 @@ class GitRepo {
 				}
 				return d2.compareTo(d1); // more recent first
 			});
-			return allTagsNewestFirst.stream()
-					.map(ref -> Repository.shortenRefName(ref.getName()));
+			return allTagsNewestFirst.stream().map(ref -> Repository.shortenRefName(ref.getName()));
 		}
 		catch (Exception e) {
 			throw new IllegalStateException("Unable to fetch git tags", e);
@@ -290,29 +284,24 @@ class GitRepo {
 	/**
 	 * Look for a tag with the given name, and if not found looks for a branch.
 	 */
-	private Optional<Ref> findTagOrBranchHeadRevision(Git git, String tagOrBranch)
-			throws GitAPIException, IOException {
+	private Optional<Ref> findTagOrBranchHeadRevision(Git git, String tagOrBranch) throws GitAPIException, IOException {
 		if (tagOrBranch.equals("HEAD")) {
 			return Optional.of(git.getRepository().exactRef(Constants.HEAD).getTarget());
 		}
 		final Optional<Ref> tag = git.tagList().call().stream()
-				.filter(ref -> ref.getName().equals("refs/tags/" + tagOrBranch))
-				.findFirst();
+				.filter(ref -> ref.getName().equals("refs/tags/" + tagOrBranch)).findFirst();
 		if (tag.isPresent()) {
 			return tag;
 		}
 
-		return git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call()
-				.stream().filter(ref -> ref.getName().equals("refs/heads/" + tagOrBranch))
-				.findFirst();
+		return git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call().stream()
+				.filter(ref -> ref.getName().equals("refs/heads/" + tagOrBranch)).findFirst();
 	}
 
 	boolean hasBranch(String branch) {
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
-			List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL)
-					.call();
-			boolean present = refs.stream()
-					.anyMatch(ref -> branch.equals(nameOfBranch(ref.getName())));
+			List<Ref> refs = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
+			boolean present = refs.stream().anyMatch(ref -> branch.equals(nameOfBranch(ref.getName())));
 			if (log.isDebugEnabled()) {
 				log.debug("Branch [{}] is present [{}]", branch, present);
 			}
@@ -335,8 +324,7 @@ class GitRepo {
 		log.info("Printing [{}] last commits for branch [{}]", maxCount, currentBranch);
 		Iterable<RevCommit> commits = git.log().setMaxCount(maxCount).call();
 		for (RevCommit commit : commits) {
-			log.info("Name [{}], msg [{}]", commit.getId().name(),
-					commit.getShortMessage());
+			log.info("Name [{}], msg [{}]", commit.getId().name(), commit.getShortMessage());
 		}
 	}
 
@@ -402,9 +390,8 @@ class GitRepo {
 			String id = commit.getId().getName();
 			if (!shortMessage.contains("Update SNAPSHOT to ")) {
 				throw new IllegalStateException(
-						"Won't revert the commit with id [" + id + "] " + "and message ["
-								+ shortMessage + "]. Only commit that updated "
-								+ "snapshot to another version can be reverted");
+						"Won't revert the commit with id [" + id + "] " + "and message [" + shortMessage
+								+ "]. Only commit that updated " + "snapshot to another version can be reverted");
 			}
 			log.debug("The commit to be reverted is [{}]", commit);
 			git.revert().include(commit).call();
@@ -429,10 +416,8 @@ class GitRepo {
 		return ResourceUtils.getFile(project.toURI()).getAbsoluteFile();
 	}
 
-	private Git cloneToBasedir(URIish projectUrl, File destinationFolder)
-			throws GitAPIException {
-		CloneCommand command = this.gitFactory.getCloneCommandByCloneRepository()
-				.setURI(projectUrl.toString() + ".git")
+	private Git cloneToBasedir(URIish projectUrl, File destinationFolder) throws GitAPIException {
+		CloneCommand command = this.gitFactory.getCloneCommandByCloneRepository().setURI(projectUrl.toString() + ".git")
 				.setDirectory(humanishDestination(projectUrl, destinationFolder));
 		try {
 			return command.call();
@@ -500,8 +485,7 @@ class GitRepo {
 	}
 
 	private void trackBranch(CheckoutCommand checkout, String label) {
-		checkout.setCreateBranch(true).setName(label)
-				.setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+		checkout.setCreateBranch(true).setName(label).setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
 				.setStartPoint("origin/" + label);
 	}
 
@@ -513,8 +497,7 @@ class GitRepo {
 		return containsBranch(git, label, null);
 	}
 
-	private boolean containsBranch(Git git, String label,
-			ListBranchCommand.ListMode listMode) throws GitAPIException {
+	private boolean containsBranch(Git git, String label, ListBranchCommand.ListMode listMode) throws GitAPIException {
 		ListBranchCommand command = git.branchList();
 		if (listMode != null) {
 			command.setListMode(listMode);
@@ -564,17 +547,14 @@ class GitRepo {
 					log.info("Successfully connected to an agent");
 				}
 				catch (AgentProxyException e) {
-					log.error(
-							"Exception occurred while trying to connect to agent. Will create"
-									+ "the default JSch connection",
-							e);
+					log.error("Exception occurred while trying to connect to agent. Will create"
+							+ "the default JSch connection", e);
 					return super.createDefaultJSch(fs);
 				}
 				final JSch jsch = super.createDefaultJSch(fs);
 				if (connector != null) {
 					JSch.setConfig("PreferredAuthentications", "publickey,password");
-					IdentityRepository identityRepository = new RemoteIdentityRepository(
-							connector);
+					IdentityRepository identityRepository = new RemoteIdentityRepository(connector);
 					jsch.setIdentityRepository(identityRepository);
 				}
 				return jsch;
@@ -592,8 +572,7 @@ class GitRepo {
 
 		JGitFactory(ReleaserProperties releaserProperties) {
 			if (StringUtils.hasText(releaserProperties.getGit().getUsername())) {
-				log.info(
-						"Passed username and password - will set a custom credentials provider");
+				log.info("Passed username and password - will set a custom credentials provider");
 				this.provider = credentialsProvider(releaserProperties);
 			}
 			else {
@@ -608,8 +587,8 @@ class GitRepo {
 		}
 
 		CredentialsProvider credentialsProvider(ReleaserProperties properties) {
-			return new UsernamePasswordCredentialsProvider(
-					properties.getGit().getUsername(), properties.getGit().getPassword());
+			return new UsernamePasswordCredentialsProvider(properties.getGit().getUsername(),
+					properties.getGit().getPassword());
 		}
 
 		CloneCommand getCloneCommandByCloneRepository() {
@@ -618,8 +597,7 @@ class GitRepo {
 		}
 
 		PushCommand push(Git git) {
-			return git.push().setCredentialsProvider(this.provider)
-					.setTransportConfigCallback(this.callback);
+			return git.push().setCredentialsProvider(this.provider).setTransportConfigCallback(this.callback);
 		}
 
 		Git open(File file) {

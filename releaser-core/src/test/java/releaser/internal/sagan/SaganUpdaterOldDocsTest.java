@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
@@ -51,11 +51,11 @@ public class SaganUpdaterOldDocsTest {
 
 	Projects projects = new Projects();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		Project project = new Project();
-		project.projectReleases.addAll(Arrays.asList(release("1.0.0.RC1"),
-				release("1.1.0.BUILD-SNAPSHOT"), release("2.0.0.M4")));
+		project.projectReleases
+				.addAll(Arrays.asList(release("1.0.0.RC1"), release("1.1.0.BUILD-SNAPSHOT"), release("2.0.0.M4")));
 		BDDMockito.given(this.saganClient.getProject(anyString())).willReturn(project);
 		this.properties.getSagan().setUpdateSagan(true);
 		this.saganUpdater = new SaganUpdater(this.saganClient, this.properties);
@@ -72,44 +72,37 @@ public class SaganUpdaterOldDocsTest {
 	public void should_not_update_sagan_when_switch_is_off() {
 		this.properties.getSagan().setUpdateSagan(false);
 
-		this.saganUpdater.updateSagan(new File("."), "master", version("2.2.0.M1"),
-				version("2.2.0.M1"), projects);
+		this.saganUpdater.updateSagan(new File("."), "master", version("2.2.0.M1"), version("2.2.0.M1"), projects);
 
-		then(this.saganClient).shouldHaveZeroInteractions();
+		then(this.saganClient).shouldHaveNoInteractions();
 	}
 
 	@Test
 	public void should_update_sagan_releases_for_milestone() {
-		this.saganUpdater.updateSagan(new File("."), "master", version("1.0.0.M1"),
-				version("1.0.0.M1"), projects);
+		this.saganUpdater.updateSagan(new File("."), "master", version("1.0.0.M1"), version("1.0.0.M1"), projects);
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.M1",
-						"https://cloud.spring.io/spring-cloud-static/foo/{version}/",
-						"PRERELEASE")));
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
 
 	@Test
 	public void should_update_sagan_releases_for_rc() {
-		this.saganUpdater.updateSagan(new File("."), "master", version("1.0.0.RC1"),
-				version("1.0.0.RC1"), projects);
+		this.saganUpdater.updateSagan(new File("."), "master", version("1.0.0.RC1"), version("1.0.0.RC1"), projects);
 
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RC1",
-						"https://cloud.spring.io/spring-cloud-static/foo/{version}/",
-						"PRERELEASE")));
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/", "PRERELEASE")));
 	}
 
 	@Test
 	public void should_not_update_docs_for_sagan_when_current_version_older() {
-		given(this.saganClient.updateRelease(BDDMockito.anyString(),
-				BDDMockito.anyList())).willReturn(a2_0_0_ReleaseProject());
+		given(this.saganClient.updateRelease(BDDMockito.anyString(), BDDMockito.anyList()))
+				.willReturn(a2_0_0_ReleaseProject());
 
-		this.saganUpdater.updateSagan(new File("."), "master", version("1.0.0.RC1"),
-				version("1.0.0.RC1"), projects);
+		this.saganUpdater.updateSagan(new File("."), "master", version("1.0.0.RC1"), version("1.0.0.RC1"), projects);
 
-		then(this.saganClient).should(BDDMockito.never())
-				.patchProject(BDDMockito.any(Project.class));
+		then(this.saganClient).should(BDDMockito.never()).patchProject(BDDMockito.any(Project.class));
 
 	}
 
@@ -123,13 +116,11 @@ public class SaganUpdaterOldDocsTest {
 	}
 
 	@Test
-	public void should_not_update_docs_for_sagan_when_files_exist_but_content_does_not_differ()
-			throws IOException {
+	public void should_not_update_docs_for_sagan_when_files_exist_but_content_does_not_differ() throws IOException {
 		Project project = a2_0_0_ReleaseProject();
 		project.rawOverview = "new overview";
 		project.rawBootConfig = "new boot";
-		given(this.saganClient.updateRelease(BDDMockito.anyString(),
-				BDDMockito.anyList())).willReturn(project);
+		given(this.saganClient.updateRelease(BDDMockito.anyString(), BDDMockito.anyList())).willReturn(project);
 
 		Path tmp = Files.createTempDirectory("releaser-test");
 		createFile(tmp, "sagan-index.adoc", "new overview");
@@ -141,18 +132,16 @@ public class SaganUpdaterOldDocsTest {
 			}
 		};
 
-		saganUpdater.updateSagan(new File("."), "master", version("3.0.0.RC1"),
-				version("3.0.0.RC1"), projects);
+		saganUpdater.updateSagan(new File("."), "master", version("3.0.0.RC1"), version("3.0.0.RC1"), projects);
 
-		then(this.saganClient).should(BDDMockito.never())
-				.patchProject(BDDMockito.any(Project.class));
+		then(this.saganClient).should(BDDMockito.never()).patchProject(BDDMockito.any(Project.class));
 	}
 
 	@Test
 	public void should_update_docs_for_sagan_when_current_version_newer_and_only_overview_adoc_exists()
 			throws IOException {
-		given(this.saganClient.updateRelease(BDDMockito.anyString(),
-				BDDMockito.anyList())).willReturn(a2_0_0_ReleaseProject());
+		given(this.saganClient.updateRelease(BDDMockito.anyString(), BDDMockito.anyList()))
+				.willReturn(a2_0_0_ReleaseProject());
 
 		Path tmp = Files.createTempDirectory("releaser-test");
 		createFile(tmp, "sagan-index.adoc", "new text");
@@ -163,18 +152,16 @@ public class SaganUpdaterOldDocsTest {
 			}
 		};
 
-		saganUpdater.updateSagan(new File("."), "master", version("3.0.0.RC1"),
-				version("3.0.0.RC1"), projects);
+		saganUpdater.updateSagan(new File("."), "master", version("3.0.0.RC1"), version("3.0.0.RC1"), projects);
 
-		then(this.saganClient).should().patchProject(
-				BDDMockito.argThat(argument -> "new text".equals(argument.rawOverview)));
+		then(this.saganClient).should()
+				.patchProject(BDDMockito.argThat(argument -> "new text".equals(argument.rawOverview)));
 	}
 
 	@Test
-	public void should_update_docs_for_sagan_when_current_version_newer_and_only_boot_adoc_exists()
-			throws IOException {
-		given(this.saganClient.updateRelease(BDDMockito.anyString(),
-				BDDMockito.anyList())).willReturn(a2_0_0_ReleaseProject());
+	public void should_update_docs_for_sagan_when_current_version_newer_and_only_boot_adoc_exists() throws IOException {
+		given(this.saganClient.updateRelease(BDDMockito.anyString(), BDDMockito.anyList()))
+				.willReturn(a2_0_0_ReleaseProject());
 
 		Path tmp = Files.createTempDirectory("releaser-test");
 		createFile(tmp, "sagan-boot.adoc", "new text");
@@ -185,11 +172,10 @@ public class SaganUpdaterOldDocsTest {
 			}
 		};
 
-		saganUpdater.updateSagan(new File("."), "master", version("3.0.0.RC1"),
-				version("3.0.0.RC1"), projects);
+		saganUpdater.updateSagan(new File("."), "master", version("3.0.0.RC1"), version("3.0.0.RC1"), projects);
 
-		then(this.saganClient).should().patchProject(BDDMockito
-				.argThat(argument -> "new text".equals(argument.rawBootConfig)));
+		then(this.saganClient).should()
+				.patchProject(BDDMockito.argThat(argument -> "new text".equals(argument.rawBootConfig)));
 	}
 
 	private void createFile(Path tmp, String filename, String text) throws IOException {
@@ -206,52 +192,44 @@ public class SaganUpdaterOldDocsTest {
 	public void should_update_sagan_from_main() {
 		ProjectVersion projectVersion = version("1.0.0.BUILD-SNAPSHOT");
 
-		this.saganUpdater.updateSagan(new File("."), "main", projectVersion,
-				projectVersion, projects);
+		this.saganUpdater.updateSagan(new File("."), "main", projectVersion, projectVersion, projects);
 
-		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
-				BDDMockito.argThat(withReleaseUpdate("1.0.0.BUILD-SNAPSHOT",
-						"https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"), BDDMockito.argThat(
+				withReleaseUpdate("1.0.0.BUILD-SNAPSHOT", "https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
 	@Test
 	public void should_update_sagan_from_release_version() {
 		ProjectVersion projectVersion = version("1.0.0.RELEASE");
 
-		this.saganUpdater.updateSagan(new File("."), "main", projectVersion,
-				projectVersion, projects);
+		this.saganUpdater.updateSagan(new File("."), "main", projectVersion, projectVersion, projects);
 
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.RC1");
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
 		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
 				BDDMockito.argThat(withReleaseUpdate("1.0.0.RELEASE",
-						"https://cloud.spring.io/spring-cloud-static/foo/{version}/",
-						"GENERAL_AVAILABILITY")));
+						"https://cloud.spring.io/spring-cloud-static/foo/{version}/", "GENERAL_AVAILABILITY")));
 		then(this.saganClient).should().deleteRelease("foo", "1.0.0.BUILD-SNAPSHOT");
-		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
-				BDDMockito.argThat(withReleaseUpdate("1.0.1.BUILD-SNAPSHOT",
-						"https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"), BDDMockito.argThat(
+				withReleaseUpdate("1.0.1.BUILD-SNAPSHOT", "https://cloud.spring.io/foo/foo.html", "SNAPSHOT")));
 	}
 
 	@Test
 	public void should_update_sagan_from_non_main() {
 		ProjectVersion projectVersion = version("1.1.0.BUILD-SNAPSHOT");
 
-		this.saganUpdater.updateSagan(new File("."), "1.1.x", projectVersion,
-				projectVersion, projects);
+		this.saganUpdater.updateSagan(new File("."), "1.1.x", projectVersion, projectVersion, projects);
 
 		then(this.saganClient).should(never()).deleteRelease(anyString(), anyString());
-		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"),
-				BDDMockito.argThat(withReleaseUpdate("1.1.0.BUILD-SNAPSHOT",
-						"https://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
+		then(this.saganClient).should().updateRelease(BDDMockito.eq("foo"), BDDMockito
+				.argThat(withReleaseUpdate("1.1.0.BUILD-SNAPSHOT", "https://cloud.spring.io/foo/1.1.x/", "SNAPSHOT")));
 	}
 
-	private ArgumentMatcher<List<ReleaseUpdate>> withReleaseUpdate(final String version,
-			final String refDocUrl, final String releaseStatus) {
+	private ArgumentMatcher<List<ReleaseUpdate>> withReleaseUpdate(final String version, final String refDocUrl,
+			final String releaseStatus) {
 		return argument -> {
 			ReleaseUpdate item = argument.get(0);
-			return "foo".equals(item.artifactId)
-					&& releaseStatus.equals(item.releaseStatus)
+			return "foo".equals(item.artifactId) && releaseStatus.equals(item.releaseStatus)
 					&& version.equals(item.version) && refDocUrl.equals(item.apiDocUrl)
 					&& refDocUrl.equals(item.refDocUrl) && item.current;
 		};

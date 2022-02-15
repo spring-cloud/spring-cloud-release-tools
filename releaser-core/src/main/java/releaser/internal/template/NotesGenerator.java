@@ -37,13 +37,12 @@ class NotesGenerator {
 	}
 
 	Set<Notes> fromProjects(Projects projects) {
-		return projects.stream().filter(projectVersion -> !projectVersion.projectName
-				.toLowerCase().contains("boot")).map(projectVersion -> {
+		return projects.stream().filter(projectVersion -> !projectVersion.projectName.toLowerCase().contains("boot"))
+				.map(projectVersion -> {
 					String name = projectVersion.projectName;
 					String version = projectVersion.version;
 					String closedMilestoneUrl = this.handler.milestoneUrl(projectVersion);
-					String convertedName = Arrays.stream(name.split("-"))
-							.map(StringUtils::capitalize)
+					String convertedName = Arrays.stream(name.split("-")).map(StringUtils::capitalize)
 							.collect(Collectors.joining(" "));
 					return new Notes(convertedName, version, closedMilestoneUrl);
 				}).collect(Collectors.toSet());
@@ -90,8 +89,7 @@ class Notes {
 		if (this.name != null ? !this.name.equals(notes.name) : notes.name != null) {
 			return false;
 		}
-		return this.version != null ? this.version.equals(notes.version)
-				: notes.version == null;
+		return this.version != null ? this.version.equals(notes.version) : notes.version == null;
 	}
 
 	@Override

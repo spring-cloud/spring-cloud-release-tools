@@ -55,18 +55,16 @@ public class GradleUpdater {
 	 * @param versionFromBom - version for the project from Spring Cloud Release
 	 * @param assertVersions - should snapshots / milestone / rc presence be asserted
 	 */
-	public void updateProjectFromReleaseTrain(ReleaserProperties properties,
-			File projectRoot, Projects projects, ProjectVersion versionFromBom,
-			boolean assertVersions) {
-		processAllGradleProps(properties, projectRoot, projects, versionFromBom,
-				assertVersions);
+	public void updateProjectFromReleaseTrain(ReleaserProperties properties, File projectRoot, Projects projects,
+			ProjectVersion versionFromBom, boolean assertVersions) {
+		processAllGradleProps(properties, projectRoot, projects, versionFromBom, assertVersions);
 	}
 
-	private void processAllGradleProps(ReleaserProperties properties, File projectRoot,
-			Projects projects, ProjectVersion versionFromBom, boolean assertVersions) {
+	private void processAllGradleProps(ReleaserProperties properties, File projectRoot, Projects projects,
+			ProjectVersion versionFromBom, boolean assertVersions) {
 		try {
-			Files.walkFileTree(projectRoot.toPath(), new GradlePropertiesWalker(
-					properties, projects, versionFromBom, assertVersions));
+			Files.walkFileTree(projectRoot.toPath(),
+					new GradlePropertiesWalker(properties, projects, versionFromBom, assertVersions));
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);
@@ -89,15 +87,13 @@ public class GradleUpdater {
 
 		private final GradleProjectNameExtractor extractor = new GradleProjectNameExtractor();
 
-		private GradlePropertiesWalker(ReleaserProperties properties, Projects projects,
-				ProjectVersion versionFromBom, boolean assertVersions) {
+		private GradlePropertiesWalker(ReleaserProperties properties, Projects projects, ProjectVersion versionFromBom,
+				boolean assertVersions) {
 			this.properties = properties;
 			this.projects = projects;
-			List<Pattern> unacceptableVersionPatterns = versionFromBom
-					.unacceptableVersionPatterns();
+			List<Pattern> unacceptableVersionPatterns = versionFromBom.unacceptableVersionPatterns();
 			this.unacceptableVersionPatterns = unacceptableVersionPatterns;
-			this.skipVersionAssert = !assertVersions
-					|| unacceptableVersionPatterns.isEmpty();
+			this.skipVersionAssert = !assertVersions || unacceptableVersionPatterns.isEmpty();
 			this.assertVersions = assertVersions;
 		}
 
@@ -106,20 +102,15 @@ public class GradleUpdater {
 			File file = path.toFile();
 			if (GRADLE_PROPERTIES.equals(file.getName())) {
 				if (pathIgnored(file)) {
-					log.debug(
-							"Ignoring file [{}] since it's on a list of patterns to ignore",
-							file);
+					log.debug("Ignoring file [{}] since it's on a list of patterns to ignore", file);
 					return FileVisitResult.CONTINUE;
 				}
 				String parentName = file.getParentFile().getName();
-				log.info("Will process the file [{}] and update its gradle properties",
-						file);
+				log.info("Will process the file [{}] and update its gradle properties", file);
 				final String fileContents = asString(path);
-				final AtomicReference<String> changedString = new AtomicReference<>(
-						fileContents);
+				final AtomicReference<String> changedString = new AtomicReference<>(fileContents);
 				Properties props = loadProps(file);
-				final Map<String, String> substitution = this.properties.getGradle()
-						.getGradlePropsSubstitution();
+				final Map<String, String> substitution = this.properties.getGradle().getGradlePropsSubstitution();
 				props.forEach((key, value1) -> {
 					String projectName = projectName(parentName, substitution, key);
 					if (!this.projects.containsProject(projectName)) {
@@ -130,10 +121,8 @@ public class GradleUpdater {
 					}
 					ProjectVersion value = this.projects.forName(projectName);
 					if (!value.version.equalsIgnoreCase(value1.toString())) {
-						log.info("Replacing [{}->{}] with [{}->{}]", key, value1, key,
-								value);
-						changedString.set(changedString.get().replace(key + "=" + value1,
-								key + "=" + value));
+						log.info("Replacing [{}->{}] with [{}->{}]", key, value1, key, value);
+						changedString.set(changedString.get().replace(key + "=" + value1, key + "=" + value));
 					}
 				});
 				storeString(path, changedString.get());
@@ -142,8 +131,7 @@ public class GradleUpdater {
 			return FileVisitResult.CONTINUE;
 		}
 
-		private String projectName(String parentName, Map<String, String> substitution,
-				Object key) {
+		private String projectName(String parentName, Map<String, String> substitution, Object key) {
 			// version -> current project version
 			if (key.equals("version")) {
 				return parentName;
@@ -155,21 +143,18 @@ public class GradleUpdater {
 			if (this.assertVersions && !this.skipVersionAssert) {
 				log.debug(
 						"Update should check if no wrong versions remained in the gradle prop. List of wrong patterns: {}",
-						this.unacceptableVersionPatterns.stream().map(Pattern::pattern)
-								.collect(Collectors.toList()));
+						this.unacceptableVersionPatterns.stream().map(Pattern::pattern).collect(Collectors.toList()));
 				Scanner scanner = new Scanner(asString(path));
 				int lineNumber = 0;
 				while (scanner.hasNextLine()) {
 					String line = scanner.nextLine();
 					lineNumber++;
 					Pattern matchingPattern = this.unacceptableVersionPatterns.stream()
-							.filter(pattern -> pattern.matcher(line).matches())
-							.findFirst().orElse(null);
+							.filter(pattern -> pattern.matcher(line).matches()).findFirst().orElse(null);
 					if (matchingPattern != null) {
-						throw new IllegalStateException("The file [" + path
-								+ "] matches the [ " + matchingPattern.pattern()
-								+ "] pattern in line number [" + lineNumber + "]\n\n"
-								+ line);
+						throw new IllegalStateException(
+								"The file [" + path + "] matches the [ " + matchingPattern.pattern()
+										+ "] pattern in line number [" + lineNumber + "]\n\n" + line);
 					}
 				}
 				log.info("No invalid versions remained in the gradle properties");
@@ -178,8 +163,8 @@ public class GradleUpdater {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.assertVersions && this.properties.getGradle()
-					.getIgnoredGradleRegex().stream().anyMatch(path::matches);
+			return this.assertVersions
+					&& this.properties.getGradle().getIgnoredGradleRegex().stream().anyMatch(path::matches);
 		}
 
 		private Properties loadProps(File file) {

@@ -23,8 +23,8 @@ import java.net.URISyntaxException;
 
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import releaser.internal.git.GitRepoTests;
 import releaser.internal.tech.PomReader;
 
@@ -44,14 +44,12 @@ public class PomReaderTests {
 
 	File licenseFile;
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException {
-		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release")
-				.toURI();
+		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
 		this.springCloudReleaseProject = new File(scRelease);
 		this.springCloudReleaseProjectPom = new File(scRelease.getPath(), "pom.xml");
-		this.empty = new File(
-				GitRepoTests.class.getResource("/projects/project/empty.xml").toURI());
+		this.empty = new File(GitRepoTests.class.getResource("/projects/project/empty.xml").toURI());
 		this.licenseFile = new File(scRelease.getPath(), "LICENSE.txt");
 	}
 
@@ -78,16 +76,14 @@ public class PomReaderTests {
 
 	@Test
 	public void should_throw_exception_when_file_is_invalid() {
-		thenThrownBy(() -> PomReader.readPom(this.licenseFile))
-				.hasMessageStartingWith("Failed to read file: ")
+		thenThrownBy(() -> PomReader.readPom(this.licenseFile)).hasMessageStartingWith("Failed to read file: ")
 				.hasCauseInstanceOf(XmlPullParserException.class);
 	}
 
 	@Test
 	public void should_throw_exception_when_file_is_empty() {
 		thenThrownBy(() -> PomReader.readPom(this.empty)).hasMessageStartingWith("File [")
-				.hasMessageContaining("] is empty")
-				.hasCauseInstanceOf(EOFException.class);
+				.hasMessageContaining("] is empty").hasCauseInstanceOf(EOFException.class);
 	}
 
 }

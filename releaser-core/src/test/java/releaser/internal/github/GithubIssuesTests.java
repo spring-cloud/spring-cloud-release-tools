@@ -16,6 +16,7 @@
 
 package releaser.internal.github;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -23,32 +24,30 @@ import com.jcabi.github.Github;
 import com.jcabi.github.Repo;
 import com.jcabi.github.Repos;
 import com.jcabi.github.mock.MkGithub;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 /**
  * @author Marcin Grzejszczak
  */
+@ExtendWith(OutputCaptureExtension.class)
 public class GithubIssuesTests {
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
-
-	@Rule
-	public OutputCapture capture = new OutputCapture();
+	@TempDir
+	public File folder;
 
 	MkGithub github;
 
 	Repo repo;
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		this.github = github("spring-guides");
 		this.repo = createGettingStartedGuides(this.github);
@@ -73,7 +72,7 @@ public class GithubIssuesTests {
 						new ProjectVersion("spring-cloud-build", "2.0.0.BUILD-SNAPSHOT")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -82,17 +81,15 @@ public class GithubIssuesTests {
 		GithubIssues issues = new GithubIssues(Collections.emptyList());
 
 		issues.fileIssueInSpringGuides(
-				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
-						new ProjectVersion("bar", "2.0.0.RELEASE"),
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"), new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.RELEASE"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test
-	public void should_not_do_anything_for_non_release_train_version_when_updating_startspringio()
-			throws IOException {
+	public void should_not_do_anything_for_non_release_train_version_when_updating_startspringio() throws IOException {
 		setupStartSpringIo();
 		Github github = BDDMockito.mock(Github.class);
 		GithubIssues issues = new GithubIssues(Collections.emptyList());
@@ -102,28 +99,25 @@ public class GithubIssuesTests {
 						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test
-	public void should_not_do_anything_if_not_applicable_when_updating_startspringio()
-			throws IOException {
+	public void should_not_do_anything_if_not_applicable_when_updating_startspringio() throws IOException {
 		setupStartSpringIo();
 		Github github = BDDMockito.mock(Github.class);
 		GithubIssues issues = new GithubIssues(Collections.emptyList());
 
 		issues.fileIssueInStartSpringIo(
-				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
-						new ProjectVersion("bar", "2.0.0.RELEASE"),
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"), new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.RELEASE"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	private Repo createGettingStartedGuides(MkGithub github) throws IOException {
-		return github.repos()
-				.create(new Repos.RepoCreate("getting-started-guides", false));
+		return github.repos().create(new Repos.RepoCreate("getting-started-guides", false));
 	}
 
 	private Repo createStartSpringIo(MkGithub github) throws IOException {

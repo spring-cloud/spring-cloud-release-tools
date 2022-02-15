@@ -19,7 +19,7 @@ package releaser.internal.spring;
 /**
  * @author Marcin Grzejszczak
  */
-// @RunWith(MockitoJUnitRunner.class)
+// @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")
 public class OptionsProcessorTests {
 
@@ -45,7 +45,7 @@ public class OptionsProcessorTests {
  * Consumer<Args> function) { return new Task(name, shortName, header, description,
  * function); }
  *
- * @Before public void setup() { this.optionsProcessor = new
+ * @BeforeEach public void setup() { this.optionsProcessor = new
  * OptionsProcessor(this.releaser, new ReleaserProperties(), this.tasks); Task.stepSkipper
  * = () -> false; }
  *

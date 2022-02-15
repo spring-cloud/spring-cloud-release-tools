@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.Project;
@@ -34,8 +34,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 public class VersionsFromBomTests {
 
 	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects())
-			.retrieveFromBom();
+			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects()).retrieveFromBom();
 
 	@Test
 	public void should_return_true_when_project_is_on_the_list() {
@@ -79,95 +78,65 @@ public class VersionsFromBomTests {
 
 	@Test
 	public void should_update_projects_for_spring_cloud_release() {
-		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-cloud",
-				"3.0.0");
+		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-cloud", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-cloud")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-release"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-starter"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-release")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("3.0.0");
 
 		versionsFromBom = mixedVersions().setVersion("spring-cloud-release", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-cloud")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-release"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-starter"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-release")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("3.0.0");
 
-		versionsFromBom = mixedVersions().setVersion("spring-cloud-release",
-				"Greenwich.SR8");
+		versionsFromBom = mixedVersions().setVersion("spring-cloud-release", "Greenwich.SR8");
 
-		then(versionsFromBom.versionForProject("spring-cloud"))
-				.isEqualTo("Greenwich.SR8");
-		then(versionsFromBom.versionForProject("spring-cloud-release"))
-				.isEqualTo("Greenwich.SR8");
-		then(versionsFromBom.versionForProject("spring-cloud-starter"))
-				.isEqualTo("Greenwich.SR8");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud")).isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-release")).isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.SR8");
 
-		versionsFromBom = mixedVersions().setVersion("spring-cloud-dependencies",
-				"Greenwich.SR8");
+		versionsFromBom = mixedVersions().setVersion("spring-cloud-dependencies", "Greenwich.SR8");
 
-		then(versionsFromBom.versionForProject("spring-cloud"))
-				.isEqualTo("Greenwich.SR8");
-		then(versionsFromBom.versionForProject("spring-cloud-release"))
-				.isEqualTo("Greenwich.SR8");
-		then(versionsFromBom.versionForProject("spring-cloud-starter"))
-				.isEqualTo("Greenwich.SR8");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud")).isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-release")).isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.SR8");
 	}
 
 	@Test
 	public void should_update_projects_for_custom_bom_only() {
-		VersionsFromBom versionsFromBom = mixedVersions(customBom())
-				.setVersion("spring-cloud", "3.0.0");
+		VersionsFromBom versionsFromBom = mixedVersions(customBom()).setVersion("spring-cloud", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-cloud")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-stream-starters"))
-				.isEqualTo("Fishtown.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-stream-starters")).isEqualTo("Fishtown.RELEASE");
 		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEmpty();
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.RELEASE");
 
-		versionsFromBom = mixedVersions(customBom())
-				.setVersion("spring-cloud-stream-starters", "Fishtown.SR4");
+		versionsFromBom = mixedVersions(customBom()).setVersion("spring-cloud-stream-starters", "Fishtown.SR4");
 
 		then(versionsFromBom.versionForProject("spring-cloud")).isEmpty();
-		then(versionsFromBom.versionForProject("spring-cloud-stream-starters"))
-				.isEqualTo("Fishtown.SR4");
+		then(versionsFromBom.versionForProject("spring-cloud-stream-starters")).isEqualTo("Fishtown.SR4");
 		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEmpty();
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.RELEASE");
 
-		versionsFromBom = mixedVersions(customBom()).setVersion("spring-cloud-release",
-				"Greenwich.SR8");
+		versionsFromBom = mixedVersions(customBom()).setVersion("spring-cloud-release", "Greenwich.SR8");
 
-		then(versionsFromBom.versionForProject("spring-cloud-release"))
-				.isEqualTo("Greenwich.SR8");
-		then(versionsFromBom.versionForProject("spring-cloud-stream-starters"))
-				.isEqualTo("Fishtown.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-release")).isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-stream-starters")).isEqualTo("Fishtown.RELEASE");
 		then(versionsFromBom.versionForProject("spring-cloud")).isEmpty();
 		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEmpty();
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.RELEASE");
 
-		versionsFromBom = mixedVersions(customBom())
-				.setVersion("spring-cloud-dependencies", "Greenwich.SR8");
+		versionsFromBom = mixedVersions(customBom()).setVersion("spring-cloud-dependencies", "Greenwich.SR8");
 
 		then(versionsFromBom.versionForProject("spring-cloud")).isEmpty();
-		then(versionsFromBom.versionForProject("spring-cloud-stream-starters"))
-				.isEqualTo("Fishtown.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-stream-starters")).isEqualTo("Fishtown.RELEASE");
 		then(versionsFromBom.versionForProject("spring-cloud-starter")).isEmpty();
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.SR8");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.SR8");
 	}
 
 	@Test
@@ -178,22 +147,18 @@ public class VersionsFromBomTests {
 	}
 
 	private VersionsFromBom mixedVersions() {
-		return new VersionsFromBomBuilder()
-				.releaserProperties(SpringCloudReleaserProperties.get())
+		return new VersionsFromBomBuilder().releaserProperties(SpringCloudReleaserProperties.get())
 				.parsers(Collections.emptyList()).projects(mixedProjects()).merged();
 	}
 
 	private VersionsFromBom mixedVersions(ReleaserProperties properties) {
-		return new VersionsFromBomBuilder().releaserProperties(properties)
-				.projects(mixedProjects()).retrieveFromBom();
+		return new VersionsFromBomBuilder().releaserProperties(properties).projects(mixedProjects()).retrieveFromBom();
 	}
 
 	private ReleaserProperties customBom() {
 		ReleaserProperties properties = SpringCloudReleaserProperties.get();
-		properties.getMetaRelease()
-				.setReleaseTrainDependencyNames(Collections.emptyList());
-		properties.getMetaRelease()
-				.setReleaseTrainProjectName("spring-cloud-stream-starters");
+		properties.getMetaRelease().setReleaseTrainDependencyNames(Collections.emptyList());
+		properties.getMetaRelease().setReleaseTrainProjectName("spring-cloud-stream-starters");
 		properties.getPom().setThisTrainBom("spring-cloud-stream-dependencies");
 		return properties;
 	}

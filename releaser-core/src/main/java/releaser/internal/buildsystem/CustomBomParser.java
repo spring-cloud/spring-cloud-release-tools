@@ -28,8 +28,7 @@ import releaser.internal.project.Project;
  */
 public interface CustomBomParser {
 
-	CustomBomParser NO_OP = (thisProjectRoot,
-			properties) -> VersionsFromBom.EMPTY_VERSION;
+	CustomBomParser NO_OP = (thisProjectRoot, properties) -> VersionsFromBom.EMPTY_VERSION;
 
 	/**
 	 * When parsing a part of the BOM pom, one can add custom logic to perform project
@@ -48,8 +47,7 @@ public interface CustomBomParser {
 	 * @param version - version of the project
 	 * @return - a new collection with the modified versions from bom
 	 */
-	default Set<Project> setVersion(Set<Project> projects, String projectName,
-			String version) {
+	default Set<Project> setVersion(Set<Project> projects, String projectName, String version) {
 		return new LinkedHashSet<>(projects);
 	}
 

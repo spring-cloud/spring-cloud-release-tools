@@ -31,10 +31,9 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.URIish;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import releaser.internal.buildsystem.TestUtils;
 
 import static org.assertj.core.api.Assertions.fail;
@@ -46,8 +45,8 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class GitRepoTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
+	@TempDir
+	public File tmp;
 
 	File springCloudReleaseProject;
 
@@ -55,9 +54,9 @@ public class GitRepoTests {
 
 	GitRepo gitRepo;
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException, URISyntaxException {
-		this.tmpFolder = this.tmp.newFolder();
+		this.tmpFolder = new File(tmp, "test");
 		this.springCloudReleaseProject = new File(
 				GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 		TestUtils.prepareLocalRepo();
@@ -74,8 +73,8 @@ public class GitRepoTests {
 
 	@Test
 	public void should_throw_exception_when_there_is_no_repo() {
-		thenThrownBy(() -> this.gitRepo.cloneProject(
-				new URIish(GitRepoTests.class.getResource("/projects/").toURI().toURL())))
+		thenThrownBy(() -> this.gitRepo
+				.cloneProject(new URIish(GitRepoTests.class.getResource("/projects/").toURI().toURL())))
 						.isInstanceOf(IllegalStateException.class)
 						.hasMessageContaining("Exception occurred while cloning repo");
 	}
@@ -97,8 +96,7 @@ public class GitRepoTests {
 
 		File pom = new File(new File(this.tmpFolder, uri.getHumanishName()), "pom.xml");
 		then(pom).exists();
-		then(Files.lines(pom.toPath())
-				.anyMatch(s -> s.contains("<version>Camden.SR3</version>"))).isTrue();
+		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.SR3</version>"))).isTrue();
 	}
 
 	@Test
@@ -109,9 +107,7 @@ public class GitRepoTests {
 
 		File pom = new File(new File(this.tmpFolder, uri.getHumanishName()), "pom.xml");
 		then(pom).exists();
-		then(Files.lines(pom.toPath())
-				.anyMatch(s -> s.contains("<version>Camden.BUILD-SNAPSHOT</version>")))
-						.isTrue();
+		then(Files.lines(pom.toPath()).anyMatch(s -> s.contains("<version>Camden.BUILD-SNAPSHOT</version>"))).isTrue();
 	}
 
 	@Test
@@ -131,8 +127,7 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_throw_an_exception_when_checking_out_nonexisting_branch()
-			throws IOException {
+	public void should_throw_an_exception_when_checking_out_nonexisting_branch() throws IOException {
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		try {
@@ -190,14 +185,12 @@ public class GitRepoTests {
 	private void tagIsPresent(Git git, String tag) throws GitAPIException {
 		List<Ref> refs = git.tagList().call();
 		System.out.println("All tags" + refs);
-		then(refs.stream().anyMatch(ref -> ref.getName().startsWith("refs/tags/" + tag)))
-				.isTrue();
+		then(refs.stream().anyMatch(ref -> ref.getName().startsWith("refs/tags/" + tag))).isTrue();
 	}
 
 	@Test
 	public void should_push_changes_to_master_branch() throws Exception {
-		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
-				this.springCloudReleaseProject);
+		File origin = GitTestUtils.clonedProject(new File(tmp, "test1"), this.springCloudReleaseProject);
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
@@ -214,8 +207,7 @@ public class GitRepoTests {
 
 	@Test
 	public void should_push_changes_to_current_branch() throws Exception {
-		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
-				this.springCloudReleaseProject);
+		File origin = GitTestUtils.clonedProject(new File(tmp, "test2"), this.springCloudReleaseProject);
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
@@ -232,8 +224,7 @@ public class GitRepoTests {
 
 	@Test
 	public void should_return_the_branch_name() throws Exception {
-		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
-				this.springCloudReleaseProject);
+		File origin = GitTestUtils.clonedProject(new File(tmp, "test3"), this.springCloudReleaseProject);
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
@@ -246,8 +237,7 @@ public class GitRepoTests {
 
 	@Test
 	public void should_push_a_tag_to_new_branch_in_origin() throws Exception {
-		File origin = GitTestUtils.clonedProject(this.tmp.newFolder(),
-				this.springCloudReleaseProject);
+		File origin = GitTestUtils.clonedProject(new File(tmp, "test4"), this.springCloudReleaseProject);
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
@@ -297,8 +287,7 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_not_revert_changes_when_commit_message_is_not_related_to_updating_snapshots()
-			throws Exception {
+	public void should_not_revert_changes_when_commit_message_is_not_related_to_updating_snapshots() throws Exception {
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 

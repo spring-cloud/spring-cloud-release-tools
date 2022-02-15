@@ -19,7 +19,7 @@ package releaser.cloud.spring.meta;
 import java.io.File;
 import java.util.Arrays;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import releaser.internal.spring.meta.AbstractSpringMetaReleaseAcceptanceTests;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -31,7 +31,7 @@ public class AbstractSpringCloudMetaAcceptanceTests
 
 	public File springCloudBuildProject;
 
-	@Before
+	@BeforeEach
 	public void setupCloud() throws Exception {
 		this.springCloudConsulProject = new File(
 				AbstractSpringCloudMetaAcceptanceTests.class

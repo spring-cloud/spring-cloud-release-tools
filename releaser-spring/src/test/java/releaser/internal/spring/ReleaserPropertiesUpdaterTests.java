@@ -20,7 +20,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.ReleaserPropertiesUpdater;
 

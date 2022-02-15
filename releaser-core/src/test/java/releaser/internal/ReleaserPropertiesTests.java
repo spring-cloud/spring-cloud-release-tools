@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -72,13 +72,10 @@ public class ReleaserPropertiesTests {
 		BDDAssertions.then(properties.getWorkingDir()).isEqualTo("foo");
 		BDDAssertions.then(properties.getFixedVersions()).isEqualTo(map());
 		BDDAssertions.then(properties.getMaven().getBuildCommand()).isEqualTo("foo2");
-		BDDAssertions.then(properties.getGradle().getIgnoredGradleRegex())
-				.isEqualTo(Arrays.asList("foo3", "foo4"));
-		BDDAssertions.then(properties.getMetaRelease().getProjectsToSkip())
-				.isEqualTo(Arrays.asList("foo5", "foo6"));
+		BDDAssertions.then(properties.getGradle().getIgnoredGradleRegex()).isEqualTo(Arrays.asList("foo3", "foo4"));
+		BDDAssertions.then(properties.getMetaRelease().getProjectsToSkip()).isEqualTo(Arrays.asList("foo5", "foo6"));
 		BDDAssertions.then(properties.getGit().getPassword()).isEqualTo("foo7");
-		BDDAssertions.then(properties.getPom().getIgnoredPomRegex())
-				.isEqualTo(Arrays.asList("foo8", "foo9"));
+		BDDAssertions.then(properties.getPom().getIgnoredPomRegex()).isEqualTo(Arrays.asList("foo8", "foo9"));
 		BDDAssertions.then(properties.getSagan().getBaseUrl()).isEqualTo("foo10");
 	}
 

@@ -19,7 +19,7 @@ package releaser.internal.docs;
 import java.util.List;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
@@ -30,8 +30,7 @@ public class RowTests {
 
 	@Test
 	public void should_convert_projects_to_rows_for_last_ga() {
-		Projects projects = new Projects(
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
+		Projects projects = new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
 				new ProjectVersion("sc-release", "2.0.1.RELEASE"));
 
 		List<Row> rows = Row.fromProjects(projects, true);
@@ -50,8 +49,7 @@ public class RowTests {
 
 	@Test
 	public void should_convert_projects_to_rows_for_current_ga() {
-		Projects projects = new Projects(
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
+		Projects projects = new Projects(new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
 				new ProjectVersion("sc-release", "2.0.1.RELEASE"));
 
 		List<Row> rows = Row.fromProjects(projects, false);
