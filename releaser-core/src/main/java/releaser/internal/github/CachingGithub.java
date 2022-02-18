@@ -181,6 +181,11 @@ class CachingRepos implements Repos, Closeable {
 	}
 
 	@Override
+	public boolean exists(Coordinates coords) throws IOException {
+		return this.delegate.exists(coords);
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		return this.delegate.equals(o);
 	}
