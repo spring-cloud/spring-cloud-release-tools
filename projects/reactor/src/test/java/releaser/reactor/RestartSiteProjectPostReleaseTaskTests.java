@@ -51,14 +51,12 @@ class RestartSiteProjectPostReleaseTaskTests {
 		ExecutionResult result = task.runTask(arguments);
 
 		BDDAssertions.then(result.isSuccess()).isTrue();
-		BDDMockito.then(this.cfClient).should()
-				.restartApp(BDDMockito.eq("projectreactor"));
+		BDDMockito.then(this.cfClient).should().restartApp(BDDMockito.eq("projectreactor"));
 	}
 
 	@Test
 	void should_fail_if_original_version_is_null() {
-		ProjectToRun p = new ProjectToRun(null,
-				new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "1.0.0")),
+		ProjectToRun p = new ProjectToRun(null, new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "1.0.0")),
 				null, new ReleaserProperties(), BDDMockito.mock(Options.class)) {
 			@Override
 			public String name() {
@@ -85,10 +83,8 @@ class RestartSiteProjectPostReleaseTaskTests {
 	}
 
 	private ProjectToRun reactorCoreProject() {
-		return new ProjectToRun(null,
-				new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "1.0.0")),
-				new ProjectVersion("foo", "1.0.0"), new ReleaserProperties(),
-				BDDMockito.mock(Options.class)) {
+		return new ProjectToRun(null, new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "1.0.0")),
+				new ProjectVersion("foo", "1.0.0"), new ReleaserProperties(), BDDMockito.mock(Options.class)) {
 			@Override
 			public String name() {
 				return "reactor-core";
@@ -97,10 +93,8 @@ class RestartSiteProjectPostReleaseTaskTests {
 	}
 
 	private ProjectToRun nonReactorCoreProject() {
-		return new ProjectToRun(null,
-				new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "1.0.0")),
-				new ProjectVersion("foo", "1.0.0"), new ReleaserProperties(),
-				BDDMockito.mock(Options.class)) {
+		return new ProjectToRun(null, new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "1.0.0")),
+				new ProjectVersion("foo", "1.0.0"), new ReleaserProperties(), BDDMockito.mock(Options.class)) {
 			@Override
 			public String name() {
 				return "whatever";

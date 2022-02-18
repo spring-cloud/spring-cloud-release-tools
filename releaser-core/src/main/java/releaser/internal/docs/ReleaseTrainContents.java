@@ -39,8 +39,7 @@ public class ReleaseTrainContents {
 			return false;
 		}
 		ReleaseTrainContents contents = (ReleaseTrainContents) o;
-		return Objects.equals(this.title, contents.title)
-				&& Objects.equals(this.rows, contents.rows);
+		return Objects.equals(this.title, contents.title) && Objects.equals(this.rows, contents.rows);
 	}
 
 	@Override

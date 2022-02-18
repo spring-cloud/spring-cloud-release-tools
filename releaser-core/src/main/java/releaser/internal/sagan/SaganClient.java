@@ -16,8 +16,6 @@
 
 package releaser.internal.sagan;
 
-import java.util.List;
-
 /**
  * @author Marcin Grzejszczak
  */
@@ -27,9 +25,9 @@ public interface SaganClient {
 
 	Release getRelease(String projectName, String releaseVersion);
 
-	Release deleteRelease(String projectName, String releaseVersion);
+	boolean deleteRelease(String projectName, String releaseVersion);
 
-	Project updateRelease(String projectName, List<ReleaseUpdate> releaseUpdate);
+	boolean addRelease(String projectName, ReleaseInput releaseInput);
 
 	Project patchProject(Project project);
 

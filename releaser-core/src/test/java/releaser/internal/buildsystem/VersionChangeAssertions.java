@@ -54,12 +54,10 @@ class VersionChangeAssert extends AbstractAssert<VersionChangeAssert, ListOfChan
 		super(actual, VersionChangeAssert.class);
 	}
 
-	VersionChangeAssert newParentVersionIsEqualTo(String groupId, String artifactId,
-			String newVersion) {
+	VersionChangeAssert newParentVersionIsEqualTo(String groupId, String artifactId, String newVersion) {
 		boolean matches = false;
 		for (VersionChange change : this.actual.changes) {
-			if (newVersion.equals(change.getNewVersion())
-					&& groupId.equals(change.getGroupId())
+			if (newVersion.equals(change.getNewVersion()) && groupId.equals(change.getGroupId())
 					&& artifactId.equals(change.getArtifactId())) {
 				matches = true;
 				break;

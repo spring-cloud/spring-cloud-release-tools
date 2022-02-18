@@ -46,8 +46,7 @@ public class TrainPostReleaseCompositeTask implements CompositeReleaserTask {
 	 */
 	public static final int ORDER = -50;
 
-	private static final Logger log = LoggerFactory
-			.getLogger(TrainPostReleaseCompositeTask.class);
+	private static final Logger log = LoggerFactory.getLogger(TrainPostReleaseCompositeTask.class);
 
 	private final ApplicationContext context;
 
@@ -81,12 +80,11 @@ public class TrainPostReleaseCompositeTask implements CompositeReleaserTask {
 	public ExecutionResult runTask(Arguments args) {
 		Map<String, TrainPostReleaseReleaserTask> trainPostReleaseReleaserTasks = this.context
 				.getBeansOfType(TrainPostReleaseReleaserTask.class);
-		List<ReleaserTask> values = new LinkedList<>(
-				trainPostReleaseReleaserTasks.values());
+		List<ReleaserTask> values = new LinkedList<>(trainPostReleaseReleaserTasks.values());
 		values.sort(AnnotationAwareOrderComparator.INSTANCE);
 		log.info("Found the following post release tasks {}", values);
-		return flowRunner().runPostReleaseTrainTasks(args.options, args.properties,
-				this.name(), new TasksToRun(values));
+		return flowRunner().runPostReleaseTrainTasks(args.options, args.properties, this.name(),
+				new TasksToRun(values));
 	}
 
 	@Override

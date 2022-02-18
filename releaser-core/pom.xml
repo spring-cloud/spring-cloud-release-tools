@@ -115,9 +115,13 @@
 			<version>${awaitility.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>sagan</groupId>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.spring.sagan</groupId>
 			<artifactId>sagan-site</artifactId>
 			<classifier>stubs</classifier>
 			<version>${sagan-site.version}</version>

@@ -44,49 +44,44 @@ public class PropertyVersionChangerTests {
 
 	@Test
 	public void should_set_version_when_project_matches_property_name() throws Exception {
-		PropertyVersionChanger changer = new PropertyVersionChanger(model(), versions(),
-				null, null, this.propertyStorer);
+		PropertyVersionChanger changer = new PropertyVersionChanger(model(), versions(), null, null,
+				this.propertyStorer);
 
 		changer.apply(null);
 
-		then(this.propertyStorer).should().setPropertyVersionIfApplicable(
-				project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT"));
+		then(this.propertyStorer).should()
+				.setPropertyVersionIfApplicable(project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT"));
 	}
 
 	@Test
-	public void should_not_set_version_when_project_doesnt_match_property_name()
-			throws Exception {
-		PropertyVersionChanger changer = new PropertyVersionChanger(nonMatchingModel(),
-				versions(), null, null, this.propertyStorer);
+	public void should_not_set_version_when_project_doesnt_match_property_name() throws Exception {
+		PropertyVersionChanger changer = new PropertyVersionChanger(nonMatchingModel(), versions(), null, null,
+				this.propertyStorer);
 
 		changer.apply(null);
 
-		then(this.propertyStorer).should(never())
-				.setPropertyVersionIfApplicable(any(Project.class));
+		then(this.propertyStorer).should(never()).setPropertyVersionIfApplicable(any(Project.class));
 	}
 
 	@Test
-	public void should_not_set_version_when_project_matches_property_name_and_versions_are_the_same()
-			throws Exception {
-		PropertyVersionChanger changer = new PropertyVersionChanger(modelWithSameValues(),
-				versions(), null, null, this.propertyStorer);
+	public void should_not_set_version_when_project_matches_property_name_and_versions_are_the_same() throws Exception {
+		PropertyVersionChanger changer = new PropertyVersionChanger(modelWithSameValues(), versions(), null, null,
+				this.propertyStorer);
 
 		changer.apply(null);
 
-		then(this.propertyStorer).should(never())
-				.setPropertyVersionIfApplicable(any(Project.class));
+		then(this.propertyStorer).should(never()).setPropertyVersionIfApplicable(any(Project.class));
 	}
 
 	VersionsFromBom versions() {
-		return new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties())
-				.projects(allProjects()).retrieveFromBom();
+		return new VersionsFromBomBuilder().releaserProperties(new ReleaserProperties()).projects(allProjects())
+				.retrieveFromBom();
 	}
 
 	@SuppressWarnings("unchecked")
 	private Set<Project> allProjects() {
-		return new HashSet<>(Arrays.asList(
-				new Project[] { project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
-						project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT") }));
+		return new HashSet<>(Arrays.asList(new Project[] { project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT") }));
 	}
 
 	Project project(String name, String value) {

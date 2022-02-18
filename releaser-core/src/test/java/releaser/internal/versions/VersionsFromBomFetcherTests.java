@@ -49,17 +49,13 @@ class VersionsFromBomFetcherTests {
 	}
 
 	@Test
-	void should_return_false_when_current_version_is_not_present_in_the_bom()
-			throws URISyntaxException {
-		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-non-existant",
-				"1.0.0.RELEASE");
-		URI initilizrUri = VersionsFromBomFetcherTests.class
-				.getResource("/raw/initializr.yml").toURI();
+	void should_return_false_when_current_version_is_not_present_in_the_bom() throws URISyntaxException {
+		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-non-existant", "1.0.0.RELEASE");
+		URI initilizrUri = VersionsFromBomFetcherTests.class.getResource("/raw/initializr.yml").toURI();
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setUpdateSpringGuides(true);
 		properties.getVersions().setAllVersionsFileUrl(initilizrUri.toString());
-		properties.getGit().setReleaseTrainBomUrl(
-				file("/projects/spring-cloud-release/").toURI().toString());
+		properties.getGit().setReleaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties, updater);
 
@@ -70,8 +66,7 @@ class VersionsFromBomFetcherTests {
 
 	@Test
 	void should_return_false_when_current_version_is_not_ga() {
-		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
-				"1.0.0.BUILD-SNAPSHOT");
+		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setUpdateSpringGuides(true);
 		ProjectPomUpdater updater = new ProjectPomUpdater(properties, new ArrayList<>());
@@ -84,15 +79,13 @@ class VersionsFromBomFetcherTests {
 
 	@Test
 	void should_return_false_when_exception_occurs_while_fetching_version_info() {
-		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract",
-				"1.0.0.BUILD-SNAPSHOT");
+		ProjectVersion projectVersion = new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setUpdateSpringGuides(true);
 		VersionsFetcher versionsFetcher = new VersionsFetcher(properties,
 				new ProjectPomUpdater(properties, new ArrayList<>()) {
 					@Override
-					public Projects retrieveVersionsFromReleaseTrainBom(String branch,
-							boolean updateFixedVersions) {
+					public Projects retrieveVersionsFromReleaseTrainBom(String branch, boolean updateFixedVersions) {
 						throw new IllegalStateException("BOOM!");
 					}
 				});
@@ -103,8 +96,7 @@ class VersionsFromBomFetcherTests {
 	}
 
 	private File localFile(String relativePath) throws URISyntaxException {
-		return new File(
-				VersionsFromBomFetcherTests.class.getResource(relativePath).toURI());
+		return new File(VersionsFromBomFetcherTests.class.getResource(relativePath).toURI());
 	}
 
 	private File file(String relativePath) {

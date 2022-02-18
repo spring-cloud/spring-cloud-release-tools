@@ -41,8 +41,7 @@ class CompositeTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	MetaReleaseDryRunCompositeTask metaReleaseDryRunCompositeTask(
-			ApplicationContext context) {
+	MetaReleaseDryRunCompositeTask metaReleaseDryRunCompositeTask(ApplicationContext context) {
 		return new MetaReleaseDryRunCompositeTask(context);
 	}
 
@@ -60,8 +59,7 @@ class CompositeTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	TrainPostReleaseCompositeTask trainPostReleaseCompositeTask(
-			ApplicationContext context) {
+	TrainPostReleaseCompositeTask trainPostReleaseCompositeTask(ApplicationContext context) {
 		return new TrainPostReleaseCompositeTask(context);
 	}
 

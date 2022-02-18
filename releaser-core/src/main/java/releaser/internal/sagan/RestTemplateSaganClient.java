@@ -17,6 +17,7 @@
 package releaser.internal.sagan;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -36,8 +37,7 @@ import org.springframework.web.client.RestTemplate;
  */
 class RestTemplateSaganClient implements SaganClient {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(RestTemplateSaganClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestTemplateSaganClient.class);
 
 	private final RestTemplate restTemplate;
 
@@ -50,56 +50,91 @@ class RestTemplateSaganClient implements SaganClient {
 
 	@Override
 	public Project getProject(String projectName) {
-		return this.restTemplate.getForObject(
-				this.baseUrl + "/project_metadata/{projectName}", Project.class,
-				projectName);
-	}
+		HttpHeaders headers = new HttpHeaders();
+		headers.put("Accept", Collections.singletonList("application/hal+json"));
+		Project project = this.restTemplate.exchange(this.baseUrl + "/api/projects/{projectName}", HttpMethod.GET,
+				new HttpEntity<>(headers), Project.class, projectName).getBody();
+		if (project == null) {
+			return null;
+		}
 
-	@Override
-	public Release getRelease(String projectName, String releaseVersion) {
-		return this.restTemplate.getForObject(
-				this.baseUrl
-						+ "/project_metadata/{projectName}/releases/{releaseVersion}",
-				Release.class, projectName, releaseVersion);
-	}
-
-	@Override
-	public Release deleteRelease(String projectName, String releaseVersion) {
-		ResponseEntity<Release> entity = this.restTemplate.exchange(
-				this.baseUrl
-						+ "/project_metadata/{projectName}/releases/{releaseVersion}",
-				HttpMethod.DELETE, new HttpEntity<>(""), Release.class, projectName,
-				releaseVersion);
-		Release release = entity.getBody();
-		log.info("Response from Sagan\n\n[{}] \n with body [{}]", entity, release);
-		return release;
-	}
-
-	@Override
-	public Project updateRelease(String projectName, List<ReleaseUpdate> releaseUpdates) {
-		RequestEntity<List<ReleaseUpdate>> request = RequestEntity
-				.put(URI.create(
-						this.baseUrl + "/project_metadata/" + projectName + "/releases"))
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
-				.body(releaseUpdates);
-		ResponseEntity<Project> entity = this.restTemplate.exchange(request,
-				Project.class);
-		Project project = entity.getBody();
-		log.info("Response from Sagan\n\n[{}] \n with body [{}]", entity, project);
+		EmbeddedProjectReleases body = this.restTemplate.exchange(this.baseUrl + "/api/projects/{projectName}/releases",
+				HttpMethod.GET, new HttpEntity<>(headers), EmbeddedProjectReleases.class, projectName).getBody();
+		project.setReleases(body._embedded.releases);
 		return project;
 	}
 
 	@Override
+	public Release getRelease(String projectName, String releaseVersion) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.put("Accept", Collections.singletonList("application/hal+json"));
+		return this.restTemplate.exchange(this.baseUrl + "/api/projects/{projectName}/releases/{releaseVersion}",
+				HttpMethod.GET, new HttpEntity<>(headers), Release.class, projectName, releaseVersion).getBody();
+	}
+
+	@Override
+	public boolean deleteRelease(String projectName, String releaseVersion) {
+		ResponseEntity<Release> entity = this.restTemplate.exchange(
+				this.baseUrl + "/api/projects/{projectName}/releases/{releaseVersion}", HttpMethod.DELETE,
+				new HttpEntity<>(""), Release.class, projectName, releaseVersion);
+		boolean deleted = entity.getStatusCode().is2xxSuccessful();
+		log.info("Response from Sagan\n\n[{}] \n with status [{}]", entity, entity.getStatusCode());
+		return deleted;
+	}
+
+	@Override
+	public boolean addRelease(String projectName, ReleaseInput releaseInput) {
+		RequestEntity<ReleaseInput> request = RequestEntity
+				.post(URI.create(this.baseUrl + "/api/projects/" + projectName + "/releases"))
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE).body(releaseInput);
+		ResponseEntity<Project> entity = this.restTemplate.exchange(request, Project.class);
+		boolean added = entity.getStatusCode().is2xxSuccessful();
+		log.info("Response from Sagan\n\n[{}]", entity);
+		return added;
+	}
+
+	@Override
 	public Project patchProject(Project project) {
-		RequestEntity<Project> request = RequestEntity
-				.patch(URI.create(this.baseUrl + "/project_metadata/" + project.id))
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
-				.body(project);
-		ResponseEntity<Project> entity = this.restTemplate.exchange(request,
-				Project.class);
-		Project updatedProject = entity.getBody();
-		log.info("Response from Sagan\n\n[{}] \n with body [{}]", entity, updatedProject);
-		return updatedProject;
+		// RequestEntity<Project> request = RequestEntity
+		// .patch(URI.create(this.baseUrl + "/project_metadata/" + project.getSlug()))
+		// .header(HttpHeaders.CONTENT_TYPE,
+		// MediaType.APPLICATION_JSON_UTF8_VALUE).body(project);
+		// ResponseEntity<Project> entity = this.restTemplate.exchange(request,
+		// Project.class);
+		// Project updatedProject = entity.getBody();
+		// log.info("Response from Sagan\n\n[{}] \n with body [{}]", entity,
+		// updatedProject);
+		// return updatedProject;
+		// FIXME: no api yet https://github.com/spring-io/sagan/issues/1052
+		return null;
+	}
+
+	private static class EmbeddedProjectReleases {
+
+		private ProjectReleases _embedded;
+
+		public ProjectReleases get_embedded() {
+			return this._embedded;
+		}
+
+		public void set_embedded(ProjectReleases _embedded) {
+			this._embedded = _embedded;
+		}
+
+	}
+
+	private static class ProjectReleases {
+
+		private List<Release> releases;
+
+		public List<Release> getReleases() {
+			return this.releases;
+		}
+
+		public void setReleases(List<Release> releases) {
+			this.releases = releases;
+		}
+
 	}
 
 }

@@ -28,8 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 class TwitterTemplateGenerator {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(TwitterTemplateGenerator.class);
+	private static final Logger log = LoggerFactory.getLogger(TwitterTemplateGenerator.class);
 
 	private final Template template;
 
@@ -50,8 +49,7 @@ class TwitterTemplateGenerator {
 			return this.output;
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(
-					"Exception occurred while trying to generate a twitter template", e);
+			throw new IllegalStateException("Exception occurred while trying to generate a twitter template", e);
 		}
 	}
 

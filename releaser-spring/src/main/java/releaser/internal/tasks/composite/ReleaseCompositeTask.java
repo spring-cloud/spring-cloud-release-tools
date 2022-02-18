@@ -82,23 +82,18 @@ public class ReleaseCompositeTask implements CompositeReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		Map<String, ReleaseReleaserTask> releaseTasks = this.context
-				.getBeansOfType(ReleaseReleaserTask.class);
+		Map<String, ReleaseReleaserTask> releaseTasks = this.context.getBeansOfType(ReleaseReleaserTask.class);
 		Map<String, ProjectPostReleaseReleaserTask> projectPostReleaseTasks = this.context
 				.getBeansOfType(ProjectPostReleaseReleaserTask.class);
-		Collection<ReleaserTask> allReleaseTasks = new LinkedList<>(
-				releaseTasks.values());
+		Collection<ReleaserTask> allReleaseTasks = new LinkedList<>(releaseTasks.values());
 		allReleaseTasks.addAll(projectPostReleaseTasks.values());
 		List<ReleaserTask> values = new LinkedList<>(allReleaseTasks);
 		values.sort(AnnotationAwareOrderComparator.INSTANCE);
-		log.info(
-				"For project [{}], found the following release and project post release tasks {}",
-				args.project.getName(),
-				values.stream().map(r -> r.getClass().getSimpleName())
+		log.info("For project [{}], found the following release and project post release tasks {}",
+				args.project.getName(), values.stream().map(r -> r.getClass().getSimpleName())
 						.collect(Collectors.toCollection(LinkedList::new)));
-		return flowRunner().runReleaseTasks(args.options, args.properties,
-				new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier(
-						args.originalVersion.projectName, () -> args.projectToRun)),
+		return flowRunner().runReleaseTasks(args.options, args.properties, new ProjectsToRun(
+				new ProjectToRun.ProjectToRunSupplier(args.originalVersion.projectName, () -> args.projectToRun)),
 				new TasksToRun(values));
 	}
 

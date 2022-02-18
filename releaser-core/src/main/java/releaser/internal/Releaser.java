@@ -69,12 +69,9 @@ public class Releaser {
 
 	private ReleaserProperties releaserProperties;
 
-	public Releaser(ReleaserProperties releaserProperties,
-			ProjectPomUpdater projectPomUpdater,
-			ProjectCommandExecutor projectCommandExecutor,
-			ProjectGitHandler projectGitHandler,
-			ProjectGitHubHandler projectGitHubHandler,
-			TemplateGenerator templateGenerator, GradleUpdater gradleUpdater,
+	public Releaser(ReleaserProperties releaserProperties, ProjectPomUpdater projectPomUpdater,
+			ProjectCommandExecutor projectCommandExecutor, ProjectGitHandler projectGitHandler,
+			ProjectGitHubHandler projectGitHubHandler, TemplateGenerator templateGenerator, GradleUpdater gradleUpdater,
 			SaganUpdater saganUpdater, DocumentationUpdater documentationUpdater,
 			PostReleaseActions postReleaseActions) {
 		this.releaserProperties = releaserProperties;
@@ -101,56 +98,51 @@ public class Releaser {
 		return this.projectPomUpdater.fixedVersions();
 	}
 
-	public ExecutionResult updateProjectFromBom(File project, Projects versions,
-			ProjectVersion versionFromBom) {
+	public ExecutionResult updateProjectFromBom(File project, Projects versions, ProjectVersion versionFromBom) {
 		return updateProjectFromBom(project, versions, versionFromBom, ASSERT_SNAPSHOTS);
 	}
 
-	private ExecutionResult updateProjectFromBom(File project, Projects versions,
-			ProjectVersion versionFromBom, boolean assertSnapshots) {
+	private ExecutionResult updateProjectFromBom(File project, Projects versions, ProjectVersion versionFromBom,
+			boolean assertSnapshots) {
 		log.info("Will update the project with versions [{}]", versions);
-		ReleaserProperties updatedProperties = new ReleaserPropertiesUpdater()
-				.updateProperties(this.releaserProperties, project);
-		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions,
-				versionFromBom, assertSnapshots);
-		this.gradleUpdater.updateProjectFromReleaseTrain(updatedProperties, project,
-				versions, versionFromBom, assertSnapshots);
+		ReleaserProperties updatedProperties = new ReleaserPropertiesUpdater().updateProperties(this.releaserProperties,
+				project);
+		this.projectPomUpdater.updateProjectFromReleaseTrain(project, versions, versionFromBom, assertSnapshots);
+		this.gradleUpdater.updateProjectFromReleaseTrain(updatedProperties, project, versions, versionFromBom,
+				assertSnapshots);
 		ProjectVersion changedVersion = new ProjectVersion(project);
 		log.info("\n\nProject was successfully updated to [{}]", changedVersion.version);
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult buildProject(ReleaserProperties properties,
-			ProjectVersion originalVersion, ProjectVersion versionFromBom) {
+	public ExecutionResult buildProject(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion versionFromBom) {
 		this.projectCommandExecutor.build(properties, originalVersion, versionFromBom);
 		log.info("\nProject was successfully built");
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult commitAndPushTags(File project,
-			ProjectVersion changedVersion) {
+	public ExecutionResult commitAndPushTags(File project, ProjectVersion changedVersion) {
 		this.projectGitHandler.commitAndTagIfApplicable(project, changedVersion);
 		log.info("\nCommit was made and tag was pushed successfully");
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult deploy(ReleaserProperties properties,
-			ProjectVersion originalVersion, ProjectVersion versionFromBom) {
+	public ExecutionResult deploy(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion versionFromBom) {
 		this.projectCommandExecutor.deploy(properties, originalVersion, versionFromBom);
 		log.info("\nThe artifact was deployed successfully");
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult publishDocs(ReleaserProperties properties,
-			ProjectVersion originalVersion, ProjectVersion changedVersion) {
-		this.projectCommandExecutor.publishDocs(properties, originalVersion,
-				changedVersion);
+	public ExecutionResult publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion changedVersion) {
+		this.projectCommandExecutor.publishDocs(properties, originalVersion, changedVersion);
 		log.info("\nThe docs were published successfully");
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult rollbackReleaseVersion(File project, Projects projects,
-			ProjectVersion scReleaseVersion) {
+	public ExecutionResult rollbackReleaseVersion(File project, Projects projects, ProjectVersion scReleaseVersion) {
 		if (scReleaseVersion.isSnapshot()) {
 			log.info("\nWon't rollback a snapshot version");
 			return ExecutionResult.skipped();
@@ -158,34 +150,29 @@ public class Releaser {
 		this.projectGitHandler.revertChangesIfApplicable(project, scReleaseVersion);
 		ProjectVersion originalVersion = originalVersion(project);
 		log.info("Original project version is [{}]", originalVersion);
-		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease())
-				&& originalVersion.isSnapshot()) {
+		if ((scReleaseVersion.isRelease() || scReleaseVersion.isServiceRelease()) && originalVersion.isSnapshot()) {
 			updateBumpedVersions(project, projects, originalVersion);
 		}
 		else {
-			log.info(
-					"\nSuccessfully reverted the commit and came back to snapshot versions");
+			log.info("\nSuccessfully reverted the commit and came back to snapshot versions");
 		}
 		return ExecutionResult.success();
 	}
 
-	private ExecutionResult updateBumpedVersions(File project, Projects projects,
-			ProjectVersion originalVersion) {
+	private ExecutionResult updateBumpedVersions(File project, Projects projects, ProjectVersion originalVersion) {
 		Projects newProjects = Projects.forRollback(releaserProperties, projects);
 		ProjectVersion bumpedProject = bumpProject(originalVersion, newProjects);
 		log.info("Will bump versions \n{}", newProjects);
-		updateProjectFromBom(project, newProjects, originalVersion,
-				SKIP_SNAPSHOT_ASSERTION);
+		updateProjectFromBom(project, newProjects, originalVersion, SKIP_SNAPSHOT_ASSERTION);
 		this.projectGitHandler.commitAfterBumpingVersions(project, bumpedProject);
 		log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 		return ExecutionResult.success();
 	}
 
-	private ProjectVersion bumpProject(ProjectVersion originalVersion,
-			Projects newProjects) {
+	private ProjectVersion bumpProject(ProjectVersion originalVersion, Projects newProjects) {
 		return newProjects.containsProject(originalVersion.projectName)
-				? newProjects.forName(originalVersion.projectName) : new ProjectVersion(
-						originalVersion.projectName, originalVersion.bumpedVersion());
+				? newProjects.forName(originalVersion.projectName)
+				: new ProjectVersion(originalVersion.projectName, originalVersion.bumpedVersion());
 	}
 
 	ProjectVersion originalVersion(File project) {
@@ -214,10 +201,8 @@ public class Releaser {
 	}
 
 	public ExecutionResult createEmail(ProjectVersion releaseVersion, Projects projects) {
-		Assert.notNull(releaseVersion,
-				"You must provide a release version for your project");
-		Assert.notNull(releaseVersion.version,
-				"You must provide a release version for your project");
+		Assert.notNull(releaseVersion, "You must provide a release version for your project");
+		Assert.notNull(releaseVersion.version, "You must provide a release version for your project");
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create email template for a SNAPSHOT version");
 			return ExecutionResult.skipped();
@@ -229,13 +214,11 @@ public class Releaser {
 				return ExecutionResult.success();
 			}
 			else {
-				return ExecutionResult.unstable(
-						new BuildUnstableException("Failed to create an email template"));
+				return ExecutionResult.unstable(new BuildUnstableException("Failed to create an email template"));
 			}
 		}
 		catch (Exception ex) {
-			return ExecutionResult.unstable(
-					new BuildUnstableException("Failed to create an email template", ex));
+			return ExecutionResult.unstable(new BuildUnstableException("Failed to create an email template", ex));
 		}
 	}
 
@@ -251,53 +234,44 @@ public class Releaser {
 				return ExecutionResult.success();
 			}
 			else {
-				return ExecutionResult.unstable(
-						new BuildUnstableException("Failed to create a blog template"));
+				return ExecutionResult.unstable(new BuildUnstableException("Failed to create a blog template"));
 			}
 		}
 		catch (Exception ex) {
-			return ExecutionResult.unstable(
-					new BuildUnstableException("Failed to create a blog template", ex));
+			return ExecutionResult.unstable(new BuildUnstableException("Failed to create a blog template", ex));
 		}
 	}
 
-	public ExecutionResult updateSpringGuides(ProjectVersion releaseVersion,
-			Projects projects, List<ProcessedProject> processedProjects) {
+	public ExecutionResult updateSpringGuides(ProjectVersion releaseVersion, Projects projects,
+			List<ProcessedProject> processedProjects) {
 		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
-			log.info(
-					"\nWon't update Spring Guides for a non Release / Service Release version");
+			log.info("\nWon't update Spring Guides for a non Release / Service Release version");
 			return ExecutionResult.skipped();
 		}
-		Exception springGuidesException = createIssueInSpringGuides(releaseVersion,
-				projects);
+		Exception springGuidesException = createIssueInSpringGuides(releaseVersion, projects);
 		Exception deployGuidesException = deployGuides(processedProjects);
 		if (springGuidesException != null || deployGuidesException != null) {
-			return ExecutionResult.unstable(new BuildUnstableException(
-					"Failed to update Spring Guides. Spring Guides updated successfully ["
-							+ (springGuidesException != null)
-							+ "] deployed guides successfully ["
+			return ExecutionResult.unstable(
+					new BuildUnstableException("Failed to update Spring Guides. Spring Guides updated successfully ["
+							+ (springGuidesException != null) + "] deployed guides successfully ["
 							+ (deployGuidesException != null) + "]"));
 		}
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult updateStartSpringIo(ProjectVersion releaseVersion,
-			Projects projects) {
+	public ExecutionResult updateStartSpringIo(ProjectVersion releaseVersion, Projects projects) {
 		if (!(releaseVersion.isRelease() || releaseVersion.isServiceRelease())) {
-			log.info(
-					"\nWon't update start.spring.io for a non Release / Service Release version");
+			log.info("\nWon't update start.spring.io for a non Release / Service Release version");
 			return ExecutionResult.skipped();
 		}
 		Exception exception = createIssueInStartSpringIo(releaseVersion, projects);
 		if (exception != null) {
-			return ExecutionResult.unstable(
-					new BuildUnstableException("Failed to update start.spring.io"));
+			return ExecutionResult.unstable(new BuildUnstableException("Failed to update start.spring.io"));
 		}
 		return ExecutionResult.success();
 	}
 
-	private Exception createIssueInSpringGuides(ProjectVersion releaseVersion,
-			Projects projects) {
+	private Exception createIssueInSpringGuides(ProjectVersion releaseVersion, Projects projects) {
 		try {
 			this.projectGitHubHandler.createIssueInSpringGuides(projects, releaseVersion);
 			log.info("\nSuccessfully created an issue in Spring Guides");
@@ -309,18 +283,15 @@ public class Releaser {
 		}
 	}
 
-	private Exception createIssueInStartSpringIo(ProjectVersion releaseVersion,
-			Projects projects) {
+	private Exception createIssueInStartSpringIo(ProjectVersion releaseVersion, Projects projects) {
 		try {
-			this.projectGitHubHandler.createIssueInStartSpringIo(projects,
-					releaseVersion);
+			this.projectGitHubHandler.createIssueInStartSpringIo(projects, releaseVersion);
 			log.info("\nSuccessfully created an issue in start.spring.io");
 			return null;
 		}
 		catch (Exception ex) {
 			log.error("Failed to update start.spring.io repo", ex);
-			return new BuildUnstableException("Failed to update start.spring.io repo",
-					ex);
+			return new BuildUnstableException("Failed to update start.spring.io repo", ex);
 		}
 	}
 
@@ -348,18 +319,15 @@ public class Releaser {
 				return ExecutionResult.success();
 			}
 			else {
-				return ExecutionResult.unstable(
-						new BuildUnstableException("Failed to create a tweet template"));
+				return ExecutionResult.unstable(new BuildUnstableException("Failed to create a tweet template"));
 			}
 		}
 		catch (Exception ex) {
-			return ExecutionResult.unstable(
-					new BuildUnstableException("Failed to create a tweet template", ex));
+			return ExecutionResult.unstable(new BuildUnstableException("Failed to create a tweet template", ex));
 		}
 	}
 
-	public ExecutionResult createReleaseNotes(ProjectVersion releaseVersion,
-			Projects projects) {
+	public ExecutionResult createReleaseNotes(ProjectVersion releaseVersion, Projects projects) {
 		if (releaseVersion.isSnapshot()) {
 			log.info("\nWon't create release notes for a SNAPSHOT version");
 			return ExecutionResult.skipped();
@@ -370,18 +338,15 @@ public class Releaser {
 			return ExecutionResult.success();
 		}
 		catch (Exception ex) {
-			return ExecutionResult.unstable(
-					new BuildUnstableException("Failed to create release notes", ex));
+			return ExecutionResult.unstable(new BuildUnstableException("Failed to create release notes", ex));
 		}
 	}
 
-	public ExecutionResult updateSagan(File project, ProjectVersion releaseVersion,
-			Projects projects) {
+	public ExecutionResult updateSagan(File project, ProjectVersion releaseVersion, Projects projects) {
 		String currentBranch = this.projectGitHandler.currentBranch(project);
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		try {
-			return this.saganUpdater.updateSagan(project, currentBranch, originalVersion,
-					releaseVersion, projects);
+			return this.saganUpdater.updateSagan(project, currentBranch, originalVersion, releaseVersion, projects);
 		}
 		catch (Exception ex) {
 			return ExecutionResult.unstable(new BuildUnstableException(ex));

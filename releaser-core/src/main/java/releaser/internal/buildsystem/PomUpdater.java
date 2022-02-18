@@ -75,13 +75,10 @@ class PomUpdater {
 		}
 		String artifactId = artifactId(model);
 		if (!versionsFromBom.shouldBeUpdated(artifactId)) {
-			log.info(
-					"Skipping project [{}] since it's not on the list of projects to update",
-					model.getArtifactId());
+			log.info("Skipping project [{}] since it's not on the list of projects to update", model.getArtifactId());
 			return false;
 		}
-		log.info("Project [{}] will have its dependencies updated",
-				model.getArtifactId());
+		log.info("Project [{}] will have its dependencies updated", model.getArtifactId());
 		return true;
 	}
 
@@ -95,8 +92,7 @@ class PomUpdater {
 			return false;
 		}
 		boolean plugins = model.getBuild().getPlugins().stream()
-				.filter(plugin -> "maven-deploy-plugin"
-						.equalsIgnoreCase(plugin.getArtifactId()))
+				.filter(plugin -> "maven-deploy-plugin".equalsIgnoreCase(plugin.getArtifactId()))
 				.map(this::skipFromConfiguration).findFirst().orElse(false);
 		if (plugins) {
 			return true;
@@ -105,8 +101,7 @@ class PomUpdater {
 			return false;
 		}
 		return model.getBuild().getPluginManagement().getPlugins().stream()
-				.filter(plugin -> "maven-deploy-plugin"
-						.equalsIgnoreCase(plugin.getArtifactId()))
+				.filter(plugin -> "maven-deploy-plugin".equalsIgnoreCase(plugin.getArtifactId()))
 				.map(this::skipFromConfiguration).findFirst().orElse(false);
 	}
 
@@ -131,8 +126,7 @@ class PomUpdater {
 		if (!parent) {
 			return model.getArtifactId();
 		}
-		return model.getArtifactId().substring(0,
-				model.getArtifactId().indexOf("-parent"));
+		return model.getArtifactId().substring(0, model.getArtifactId().indexOf("-parent"));
 	}
 
 	ModelWrapper readModel(File pom) {
@@ -146,14 +140,11 @@ class PomUpdater {
 	 * @param versionsFromBom - versions to update
 	 * @return updated model
 	 */
-	ModelWrapper updateModel(ModelWrapper rootPom, File pom,
-			VersionsFromBom versionsFromBom) {
+	ModelWrapper updateModel(ModelWrapper rootPom, File pom, VersionsFromBom versionsFromBom) {
 		Model model = PomReader.readPom(pom);
 		List<VersionChange> sourceChanges = new ArrayList<>();
-		sourceChanges = updateParentIfPossible(rootPom, versionsFromBom, model,
-				sourceChanges);
-		sourceChanges = updateVersionIfPossible(rootPom, versionsFromBom, model,
-				sourceChanges);
+		sourceChanges = updateParentIfPossible(rootPom, versionsFromBom, model, sourceChanges);
+		sourceChanges = updateVersionIfPossible(rootPom, versionsFromBom, model, sourceChanges);
 		return new ModelWrapper(model, sourceChanges, versionsFromBom, pom);
 	}
 
@@ -162,8 +153,7 @@ class PomUpdater {
 	 * changes in the model.
 	 * @return - the pom file
 	 */
-	File overwritePomIfDirty(ModelWrapper updatedPomModel,
-			VersionsFromBom versionsFromBom, File pom) {
+	File overwritePomIfDirty(ModelWrapper updatedPomModel, VersionsFromBom versionsFromBom, File pom) {
 		if (updatedPomModel.isDirty()) {
 			log.debug("There were changes in the pom so file will be overridden");
 			this.pomWriter.write(updatedPomModel, versionsFromBom, pom);
@@ -172,9 +162,8 @@ class PomUpdater {
 		return pom;
 	}
 
-	private List<VersionChange> updateParentIfPossible(ModelWrapper wrapper,
-			VersionsFromBom versionsFromBom, Model model,
-			List<VersionChange> sourceChanges) {
+	private List<VersionChange> updateParentIfPossible(ModelWrapper wrapper, VersionsFromBom versionsFromBom,
+			Model model, List<VersionChange> sourceChanges) {
 		String rootProjectName = wrapper.projectName();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		if (model.getParent() == null || isEmpty(model.getParent().getVersion())) {
@@ -183,8 +172,7 @@ class PomUpdater {
 		}
 		String parentGroupId = model.getParent().getGroupId();
 		String parentArtifactId = model.getParent().getArtifactId();
-		log.debug("Searching for a version of parent [{}:{}]", parentGroupId,
-				parentArtifactId);
+		log.debug("Searching for a version of parent [{}:{}]", parentGroupId, parentArtifactId);
 		String oldVersion = model.getParent().getVersion();
 		String version = versionsFromBom.versionForProject(parentArtifactId);
 		log.debug("Found version is [{}]", version);
@@ -193,38 +181,32 @@ class PomUpdater {
 				version = versionsFromBom.versionForProject(rootProjectName);
 			}
 			else {
-				log.warn("There is no info on the [{}:{}] version", parentGroupId,
-						parentArtifactId);
+				log.warn("There is no info on the [{}:{}] version", parentGroupId, parentArtifactId);
 				return changes;
 			}
 		}
 		if (oldVersion.equals(version)) {
-			log.debug(
-					"Won't update the version of parent [{}:{}] since you're already using the proper one",
+			log.debug("Won't update the version of parent [{}:{}] since you're already using the proper one",
 					parentGroupId, parentArtifactId);
 			return changes;
 		}
-		log.info("Setting version of parent [{}] to [{}] for module [{}]",
-				parentArtifactId, version, model.getArtifactId());
+		log.info("Setting version of parent [{}] to [{}] for module [{}]", parentArtifactId, version,
+				model.getArtifactId());
 		if (hasText(version)) {
-			changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion,
-					version));
+			changes.add(new VersionChange(parentGroupId, parentArtifactId, oldVersion, version));
 		}
 		return changes;
 	}
 
-	private List<VersionChange> updateVersionIfPossible(ModelWrapper wrapper,
-			VersionsFromBom versionsFromBom, Model model,
-			List<VersionChange> sourceChanges) {
+	private List<VersionChange> updateVersionIfPossible(ModelWrapper wrapper, VersionsFromBom versionsFromBom,
+			Model model, List<VersionChange> sourceChanges) {
 		String rootProjectName = wrapper.projectName();
 		String rootProjectGroupId = wrapper.groupId();
 		List<VersionChange> changes = new ArrayList<>(sourceChanges);
 		String groupId = groupId(model);
 		String artifactId = model.getArtifactId();
-		if (model.getGroupId() != null
-				&& !model.getGroupId().equals(rootProjectGroupId)) {
-			log.info(
-					"Will not update project [{}] since its group id [{}] is not equal the parent group id [{}]",
+		if (model.getGroupId() != null && !model.getGroupId().equals(rootProjectGroupId)) {
+			log.info("Will not update project [{}] since its group id [{}] is not equal the parent group id [{}]",
 					model.getArtifactId(), model.getGroupId(), rootProjectGroupId);
 			return changes;
 		}
@@ -233,15 +215,13 @@ class PomUpdater {
 		String version = versionsFromBom.versionForProject(rootProjectName);
 		log.debug("Found version is [{}]", version);
 		if (isEmpty(version) || isEmpty(model.getVersion())) {
-			log.debug(
-					"There was no version set for project [{}], skipping version setting for module [{}]",
+			log.debug("There was no version set for project [{}], skipping version setting for module [{}]",
 					rootProjectName, model.getArtifactId());
 			return changes;
 		}
 		if (oldVersion.equals(version)) {
-			log.debug(
-					"Won't update the version of module [{}]:[{}] since you're already using the proper one",
-					groupId, artifactId);
+			log.debug("Won't update the version of module [{}]:[{}] since you're already using the proper one", groupId,
+					artifactId);
 			return changes;
 		}
 		log.info("Setting [{}] version to [{}]", artifactId, version);
@@ -271,8 +251,7 @@ class ModelWrapper {
 
 	final File rootFile;
 
-	ModelWrapper(Model model, List<VersionChange> sourceChanges,
-			VersionsFromBom versionsFromBom, File rootFile) {
+	ModelWrapper(Model model, List<VersionChange> sourceChanges, VersionsFromBom versionsFromBom, File rootFile) {
 		this.model = model;
 		this.versionsFromBom = versionsFromBom;
 		this.sourceChanges.addAll(sourceChanges);
@@ -303,8 +282,7 @@ class ModelWrapper {
 	}
 
 	boolean isDirty() {
-		return !this.sourceChanges.isEmpty()
-				|| this.versionsFromBom.shouldSetProperty(this.model.getProperties());
+		return !this.sourceChanges.isEmpty() || this.versionsFromBom.shouldSetProperty(this.model.getProperties());
 	}
 
 }
@@ -322,17 +300,13 @@ class PomWriter {
 			LoggerToMavenLog loggerToMavenLog = new LoggerToMavenLog(PomWriter.log);
 			versionChangerFactory.setLog(loggerToMavenLog);
 			versionChangerFactory.setModel(wrapper.model);
-			log.info(
-					"Applying version / parent / plugin / project changes to the pom [{}]",
-					pom);
-			VersionChanger changer = versionChangerFactory.newVersionChanger(true, true,
-					true, true);
+			log.info("Applying version / parent / plugin / project changes to the pom [{}]", pom);
+			VersionChanger changer = versionChangerFactory.newVersionChanger(true, true, true, true);
 			for (VersionChange versionChange : wrapper.sourceChanges) {
 				changer.apply(versionChange);
 			}
 			log.debug("Applying properties changes to the pom [{}]", pom);
-			new PropertyVersionChanger(wrapper, versionsFromBom, parsedPom,
-					loggerToMavenLog).apply(null);
+			new PropertyVersionChanger(wrapper, versionsFromBom, parsedPom, loggerToMavenLog).apply(null);
 			try (BufferedWriter bw = new BufferedWriter(new FileWriter(pom))) {
 				bw.write(input.toString());
 			}
@@ -370,15 +344,15 @@ class PropertyVersionChanger extends AbstractVersionChanger {
 
 	private final PropertyStorer propertyStorer;
 
-	PropertyVersionChanger(ModelWrapper wrapper, VersionsFromBom versionsFromBom,
-			ModifiedPomXMLEventReader pom, Log log) {
+	PropertyVersionChanger(ModelWrapper wrapper, VersionsFromBom versionsFromBom, ModifiedPomXMLEventReader pom,
+			Log log) {
 		super(wrapper.model, pom, log);
 		this.versionsFromBom = versionsFromBom;
 		this.propertyStorer = new PropertyStorer(log, pom);
 	}
 
-	PropertyVersionChanger(ModelWrapper wrapper, VersionsFromBom versionsFromBom,
-			ModifiedPomXMLEventReader pom, Log log, PropertyStorer propertyStorer) {
+	PropertyVersionChanger(ModelWrapper wrapper, VersionsFromBom versionsFromBom, ModifiedPomXMLEventReader pom,
+			Log log, PropertyStorer propertyStorer) {
 		super(wrapper.model, pom, log);
 		this.versionsFromBom = versionsFromBom;
 		this.propertyStorer = propertyStorer;
@@ -417,8 +391,7 @@ class PropertyStorer {
 	void setPropertyVersionIfApplicable(Project project) {
 		String propertyName = propertyName(project);
 		if (setPropertyVersion(propertyName, project.version)) {
-			this.log.info("Updating property [" + propertyName + "] to version ["
-					+ project.version + "]");
+			this.log.info("Updating property [" + propertyName + "] to version [" + project.version + "]");
 		}
 	}
 
@@ -429,8 +402,7 @@ class PropertyStorer {
 	private boolean setPropertyVersion(String propertyName, String version) {
 		try {
 			if (StringUtils.isEmpty(version)) {
-				this.log.warn(
-						"Version for [" + propertyName + "] is empty. Will not set it");
+				this.log.warn("Version for [" + propertyName + "] is empty. Will not set it");
 				return false;
 			}
 			return PomHelper.setPropertyVersion(this.pom, null, propertyName, version);

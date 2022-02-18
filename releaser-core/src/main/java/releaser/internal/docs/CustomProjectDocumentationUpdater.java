@@ -32,14 +32,14 @@ public interface CustomProjectDocumentationUpdater {
 	CustomProjectDocumentationUpdater NO_OP = new CustomProjectDocumentationUpdater() {
 
 		@Override
-		public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
-				ProjectVersion currentProject, Projects projects, String bomBranch) {
+		public File updateDocsRepoForReleaseTrain(File clonedDocumentationProject, ProjectVersion currentProject,
+				Projects projects, String bomBranch) {
 			return clonedDocumentationProject;
 		}
 
 		@Override
-		public File updateDocsRepoForSingleProject(File clonedDocumentationProject,
-				ProjectVersion currentProject, Projects projects) {
+		public File updateDocsRepoForSingleProject(File clonedDocumentationProject, ProjectVersion currentProject,
+				Projects projects) {
 			return clonedDocumentationProject;
 		}
 	};
@@ -53,8 +53,8 @@ public interface CustomProjectDocumentationUpdater {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	File updateDocsRepoForReleaseTrain(File clonedDocumentationProject,
-			ProjectVersion currentProject, Projects projects, String bomBranch);
+	File updateDocsRepoForReleaseTrain(File clonedDocumentationProject, ProjectVersion currentProject,
+			Projects projects, String bomBranch);
 
 	/**
 	 * Updates the documentation repository for a single project.
@@ -64,7 +64,7 @@ public interface CustomProjectDocumentationUpdater {
 	 * @return {@link File cloned temporary directory} - {@code null} if wrong version is
 	 * used
 	 */
-	File updateDocsRepoForSingleProject(File clonedDocumentationProject,
-			ProjectVersion currentProject, Projects projects);
+	File updateDocsRepoForSingleProject(File clonedDocumentationProject, ProjectVersion currentProject,
+			Projects projects);
 
 }

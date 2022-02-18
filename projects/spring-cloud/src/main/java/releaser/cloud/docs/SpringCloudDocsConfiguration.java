@@ -26,10 +26,9 @@ import org.springframework.context.annotation.Configuration;
 class SpringCloudDocsConfiguration {
 
 	@Bean
-	SpringCloudCustomProjectDocumentationUpdater springCloudCustomProjectDocumentationUpdater(
-			ProjectGitHandler handler, ReleaserProperties releaserProperties) {
-		return new SpringCloudCustomProjectDocumentationUpdater(handler,
-				releaserProperties);
+	SpringCloudCustomProjectDocumentationUpdater springCloudCustomProjectDocumentationUpdater(ProjectGitHandler handler,
+			ReleaserProperties releaserProperties) {
+		return new SpringCloudCustomProjectDocumentationUpdater(handler, releaserProperties);
 	}
 
 }

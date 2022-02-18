@@ -62,25 +62,20 @@ public class PomUpdateAcceptanceTests {
 		ReleaserProperties releaserProperties = releaserProperties();
 		releaserProperties.getFixedVersions().put("checkstyle", "100.0.0.RELEASE");
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
 
-		projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
-				projects.forFile(project), true);
+		projectPomUpdater.updateProjectFromReleaseTrain(project, projects, projects.forFile(project), true);
 
 		then(this.temporaryFolder).exists();
 		Model rootPom = PomReader.readPom(tmpFile("/spring-cloud-sleuth/pom.xml"));
-		Model depsPom = PomReader.readPom(
-				tmpFile("/spring-cloud-sleuth/spring-cloud-sleuth-dependencies/pom.xml"));
-		Model corePom = PomReader.readPom(
-				tmpFile("/spring-cloud-sleuth/spring-cloud-sleuth-core/pom.xml"));
+		Model depsPom = PomReader.readPom(tmpFile("/spring-cloud-sleuth/spring-cloud-sleuth-dependencies/pom.xml"));
+		Model corePom = PomReader.readPom(tmpFile("/spring-cloud-sleuth/spring-cloud-sleuth-core/pom.xml"));
 		Model zipkinStreamPom = PomReader.readPom(tmpFile(
 				"/spring-cloud-sleuth/spring-cloud-sleuth-samples/spring-cloud-sleuth-sample-zipkin-stream/pom.xml"));
 		then(rootPom.getVersion()).isEqualTo("1.2.0.BUILD-SNAPSHOT");
-		then(rootPom.getProperties())
-				.containsEntry("spring-cloud-commons.version", "1.2.0.BUILD-SNAPSHOT")
+		then(rootPom.getProperties()).containsEntry("spring-cloud-commons.version", "1.2.0.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud-stream.version", "Chelsea.BUILD-SNAPSHOT")
 				.containsEntry("spring-cloud-netflix.version", "1.3.0.BUILD-SNAPSHOT")
 				.containsEntry("checkstyle.version", "100.0.0.RELEASE");
@@ -95,23 +90,20 @@ public class PomUpdateAcceptanceTests {
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		projects.add(new ProjectVersion("spring-cloud-sleuth-samples", "0.0.5.RELEASE"));
 		File project = new File(this.temporaryFolder,
 				"/spring-cloud-sleuth-with-unmatched-property/spring-cloud-sleuth-samples");
 		addBuildSnapshotToChildPom(project);
 
-		projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
-				projects.forFile(project), true);
+		projectPomUpdater.updateProjectFromReleaseTrain(project, projects, projects.forFile(project), true);
 	}
 
 	private void addBuildSnapshotToChildPom(File project) throws IOException {
 		File childPom = new File(project, "pom.xml");
 		String text = new String(Files.readAllBytes(childPom.toPath()));
-		Files.write(childPom.toPath(),
-				text.replaceAll("1.19.2", "1.19.2.BUILD-SNAPSHOT").getBytes());
+		Files.write(childPom.toPath(), text.replaceAll("1.19.2", "1.19.2.BUILD-SNAPSHOT").getBytes());
 	}
 
 	@Test
@@ -119,15 +111,13 @@ public class PomUpdateAcceptanceTests {
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
-		File project = new File(this.temporaryFolder,
-				"/spring-cloud-sleuth-with-unmatched-property");
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-unmatched-property");
 
 		BDDAssertions
-				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
-						project, projects, projects.forFile(project), true))
+				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
+						projects.forFile(project), true))
 				.hasMessageContaining("<version>0.3.1.BUILD-SNAPSHOT</version>");
 	}
 
@@ -136,18 +126,15 @@ public class PomUpdateAcceptanceTests {
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
-		projects.removeIf(projectVersion -> projectVersion.projectName
-				.contains("spring-cloud-build"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.contains("spring-cloud-build"));
 		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.RELEASE"));
-		File project = new File(this.temporaryFolder,
-				"/spring-cloud-sleuth-with-milestone-dep");
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-milestone-dep");
 
 		BDDAssertions
-				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
-						project, projects, projects.forFile(project), true))
+				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
+						projects.forFile(project), true))
 				.hasMessageContaining("<zipkin.version>1.19.2-M2</zipkin.version>");
 	}
 
@@ -156,15 +143,13 @@ public class PomUpdateAcceptanceTests {
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		Projects projects = projects(projectPomUpdater);
-		File project = new File(this.temporaryFolder,
-				"/spring-cloud-sleuth-with-milestone-dep");
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-milestone-dep");
 
 		BDDAssertions
-				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
-						project, projects, projects.forFile(project), true))
+				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
+						projects.forFile(project), true))
 				.hasMessageContaining("<zipkin.version>1.19.2-M2</zipkin.version>");
 	}
 
@@ -173,35 +158,26 @@ public class PomUpdateAcceptanceTests {
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		Projects projects = projects(projectPomUpdater);
-		File project = new File(this.temporaryFolder,
-				"/spring-cloud-sleuth-with-ignored-line");
+		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth-with-ignored-line");
 
-		projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
-				projects.forFile(project), true);
+		projectPomUpdater.updateProjectFromReleaseTrain(project, projects, projects.forFile(project), true);
 	}
 
 	private Projects projects(ProjectPomUpdater projectPomUpdater) {
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
-		projects.removeIf(
-				projectVersion -> projectVersion.projectName.equals("spring-cloud"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.equals("spring-cloud"));
 		projects.add(new ProjectVersion("spring-cloud", "Camden.RC1"));
-		projects.removeIf(projectVersion -> projectVersion.projectName
-				.equals("spring-cloud-dependencies"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.equals("spring-cloud-dependencies"));
 		projects.add(new ProjectVersion("spring-cloud-dependencies", "Camden.RC1"));
-		projects.removeIf(projectVersion -> projectVersion.projectName
-				.equals("spring-cloud-starter"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.equals("spring-cloud-starter"));
 		projects.add(new ProjectVersion("spring-cloud-starter", "Camden.RC1"));
-		projects.removeIf(projectVersion -> projectVersion.projectName
-				.equals("spring-cloud-starter-build"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.equals("spring-cloud-starter-build"));
 		projects.add(new ProjectVersion("spring-cloud-starter-build", "Camden.RC1"));
-		projects.removeIf(projectVersion -> projectVersion.projectName
-				.equals("spring-cloud-release"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.equals("spring-cloud-release"));
 		projects.add(new ProjectVersion("spring-cloud-release", "Camden.RC1"));
-		projects.removeIf(projectVersion -> projectVersion.projectName
-				.contains("spring-cloud-build"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.contains("spring-cloud-build"));
 		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.RELEASE"));
 		return projects;
 	}
@@ -211,26 +187,21 @@ public class PomUpdateAcceptanceTests {
 			throws Exception {
 		ReleaserProperties releaserProperties = branchReleaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
-		projects.removeIf(projectVersion -> projectVersion.projectName
-				.contains("spring-cloud-build"));
+		projects.removeIf(projectVersion -> projectVersion.projectName.contains("spring-cloud-build"));
 		projects.add(new ProjectVersion("spring-cloud-build", "1.4.2.BUILD-SNAPSHOT"));
 		File project = new File(this.temporaryFolder, "/spring-cloud-sleuth");
 
-		BDDAssertions
-				.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(
-						project, projects, projects.forFile(project), true))
-				.hasMessageContaining("BUILD-SNAPSHOT</version>");
+		BDDAssertions.thenThrownBy(() -> projectPomUpdater.updateProjectFromReleaseTrain(project, projects,
+				projects.forFile(project), true)).hasMessageContaining("BUILD-SNAPSHOT</version>");
 	}
 
 	@Test
 	public void should_not_update_a_project_that_is_not_on_the_list() throws Exception {
 		ReleaserProperties releaserProperties = releaserProperties();
 		ProjectPomUpdater projectPomUpdater = new ProjectPomUpdater(releaserProperties,
-				Collections
-						.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
+				Collections.singletonList(MavenBomParserAccessor.maven(releaserProperties)));
 		File beforeProcessing = pom("/projects/project/");
 		Projects projects = projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 		File project = tmpFile("/project/");
@@ -245,8 +216,7 @@ public class PomUpdateAcceptanceTests {
 
 	private ReleaserProperties releaserProperties() throws URISyntaxException {
 		ReleaserProperties releaserProperties = SpringCloudReleaserProperties.get();
-		releaserProperties.getGit().setReleaseTrainBomUrl(
-				file("/projects/spring-cloud-release/").toURI().toString());
+		releaserProperties.getGit().setReleaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 		return releaserProperties;
 	}
 
@@ -265,10 +235,7 @@ public class PomUpdateAcceptanceTests {
 	}
 
 	private File pom(String relativePath) throws URISyntaxException {
-		return new File(
-				new File(
-						PomUpdateAcceptanceTests.class.getResource(relativePath).toURI()),
-				"pom.xml");
+		return new File(new File(PomUpdateAcceptanceTests.class.getResource(relativePath).toURI()), "pom.xml");
 	}
 
 	private String asString(File file) throws IOException {

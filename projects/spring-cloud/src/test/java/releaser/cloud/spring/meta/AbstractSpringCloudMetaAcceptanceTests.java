@@ -24,8 +24,7 @@ import releaser.internal.spring.meta.AbstractSpringMetaReleaseAcceptanceTests;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
-public class AbstractSpringCloudMetaAcceptanceTests
-		extends AbstractSpringMetaReleaseAcceptanceTests {
+public class AbstractSpringCloudMetaAcceptanceTests extends AbstractSpringMetaReleaseAcceptanceTests {
 
 	public File springCloudConsulProject;
 
@@ -34,11 +33,9 @@ public class AbstractSpringCloudMetaAcceptanceTests
 	@Before
 	public void setupCloud() throws Exception {
 		this.springCloudConsulProject = new File(
-				AbstractSpringCloudMetaAcceptanceTests.class
-						.getResource("/projects/spring-cloud-consul").toURI());
+				AbstractSpringCloudMetaAcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
 		this.springCloudBuildProject = new File(
-				AbstractSpringCloudMetaAcceptanceTests.class
-						.getResource("/projects/spring-cloud-build").toURI());
+				AbstractSpringCloudMetaAcceptanceTests.class.getResource("/projects/spring-cloud-build").toURI());
 	}
 
 	public void consulPomParentVersionIsEqualTo(File project, String expected) {
@@ -48,12 +45,9 @@ public class AbstractSpringCloudMetaAcceptanceTests
 	public void thenAllDryRunStepsWereExecutedForEachProject(
 			NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler) {
 		nonAssertingTestProjectGitHandler.clonedProjects.stream()
-				.filter(f -> !f.getName().contains("angel")
-						&& !f.getName().equals("spring-cloud"))
-				.forEach(project -> {
-					then(Arrays.asList("spring-cloud-starter-build",
-							"spring-cloud-consul"))
-									.contains(pom(project).getArtifactId());
+				.filter(f -> !f.getName().contains("angel") && !f.getName().equals("spring-cloud")).forEach(project -> {
+					then(Arrays.asList("spring-cloud-starter-build", "spring-cloud-consul"))
+							.contains(pom(project).getArtifactId());
 					then(new File("/tmp/executed_build")).exists();
 					then(new File("/tmp/executed_deploy")).doesNotExist();
 					then(new File("/tmp/executed_docs")).doesNotExist();

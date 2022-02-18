@@ -42,8 +42,7 @@ public class VersionsFromBomBuilder {
 		return this;
 	}
 
-	public VersionsFromBomBuilder releaserProperties(
-			ReleaserProperties releaserProperties) {
+	public VersionsFromBomBuilder releaserProperties(ReleaserProperties releaserProperties) {
 		this.releaserProperties = releaserProperties;
 		return this;
 	}
@@ -68,8 +67,7 @@ public class VersionsFromBomBuilder {
 		if (!this.projects.isEmpty()) {
 			return new VersionsFromBom(this.releaserProperties, bomParser, this.projects);
 		}
-		return new VersionsFromBom(this.releaserProperties, bomParser,
-				this.versionsFromBom);
+		return new VersionsFromBom(this.releaserProperties, bomParser, this.versionsFromBom);
 	}
 
 	public VersionsFromBom retrieveFromBom() {
@@ -77,13 +75,11 @@ public class VersionsFromBomBuilder {
 		CustomBomParser bomParser = parser();
 		VersionsFromBom versionsFromBom = versionsFromBom(bomParser);
 		VersionsFromBom customParsing = customParsing(thisProjectRoot);
-		return new VersionsFromBom(this.releaserProperties, bomParser, versionsFromBom,
-				customParsing);
+		return new VersionsFromBom(this.releaserProperties, bomParser, versionsFromBom, customParsing);
 	}
 
 	private File thisProjectRoot() {
-		return this.thisProjectRoot != null ? this.thisProjectRoot
-				: new File(this.releaserProperties.getWorkingDir());
+		return this.thisProjectRoot != null ? this.thisProjectRoot : new File(this.releaserProperties.getWorkingDir());
 	}
 
 	private CustomBomParser parser() {
@@ -95,20 +91,16 @@ public class VersionsFromBomBuilder {
 			return new VersionsFromBom(this.releaserProperties, bomParser, this.projects);
 		}
 		else if (this.versionsFromBom.length != 0) {
-			return new VersionsFromBom(this.releaserProperties, bomParser,
-					this.versionsFromBom);
+			return new VersionsFromBom(this.releaserProperties, bomParser, this.versionsFromBom);
 		}
 		return new VersionsFromBom(this.releaserProperties, bomParser);
 	}
 
 	private VersionsFromBom customParsing(File thisProjectRoot) {
-		return this.parsers.stream()
-				.map(p -> p.parseBom(thisProjectRoot, this.releaserProperties))
-				.reduce((versionsFromBom,
-						versionsFromBom2) -> new VersionsFromBomBuilder()
-								.parsers(this.parsers).thisProjectRoot(thisProjectRoot)
-								.releaserProperties(this.releaserProperties)
-								.projects(versionsFromBom, versionsFromBom2).merged())
+		return this.parsers.stream().map(p -> p.parseBom(thisProjectRoot, this.releaserProperties))
+				.reduce((versionsFromBom, versionsFromBom2) -> new VersionsFromBomBuilder().parsers(this.parsers)
+						.thisProjectRoot(thisProjectRoot).releaserProperties(this.releaserProperties)
+						.projects(versionsFromBom, versionsFromBom2).merged())
 				.orElse(VersionsFromBom.EMPTY_VERSION);
 	}
 

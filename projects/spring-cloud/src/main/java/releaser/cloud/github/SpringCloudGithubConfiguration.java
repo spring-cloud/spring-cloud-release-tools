@@ -25,8 +25,7 @@ import org.springframework.context.annotation.Configuration;
 class SpringCloudGithubConfiguration {
 
 	@Bean
-	SpringCloudGithubIssues springCloudGithubIssues(
-			ReleaserProperties releaserProperties) {
+	SpringCloudGithubIssues springCloudGithubIssues(ReleaserProperties releaserProperties) {
 		return new SpringCloudGithubIssues(releaserProperties);
 	}
 

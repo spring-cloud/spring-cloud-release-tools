@@ -31,15 +31,13 @@ public final class TestUtils {
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-wiki");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-release");
-		prepareLocalRepo("target/test-classes/projects/",
-				"spring-cloud-release-with-snapshot");
+		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-release-with-snapshot");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-consul");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-build");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-static-angel");
 	}
 
-	private static void prepareLocalRepo(String buildDir, String repoPath)
-			throws IOException {
+	private static void prepareLocalRepo(String buildDir, String repoPath) throws IOException {
 		File dotGit = new File(buildDir + repoPath + "/.git");
 		File git = new File(buildDir + repoPath + "/git");
 		if (git.exists()) {

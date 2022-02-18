@@ -33,17 +33,13 @@ public class DocumentationUpdater {
 
 	private final ReleaseTrainContentsUpdater releaseTrainContentsUpdater;
 
-	public DocumentationUpdater(ProjectGitHandler gitHandler,
-			ReleaserProperties properties, TemplateGenerator templateGenerator,
-			List<CustomProjectDocumentationUpdater> updaters) {
-		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(properties,
-				gitHandler, updaters);
-		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(properties,
-				gitHandler, templateGenerator);
+	public DocumentationUpdater(ProjectGitHandler gitHandler, ReleaserProperties properties,
+			TemplateGenerator templateGenerator, List<CustomProjectDocumentationUpdater> updaters) {
+		this.projectDocumentationUpdater = new ProjectDocumentationUpdater(properties, gitHandler, updaters);
+		this.releaseTrainContentsUpdater = new ReleaseTrainContentsUpdater(properties, gitHandler, templateGenerator);
 	}
 
-	DocumentationUpdater(ProjectDocumentationUpdater updater,
-			ReleaseTrainContentsUpdater contentsUpdater) {
+	DocumentationUpdater(ProjectDocumentationUpdater updater, ReleaseTrainContentsUpdater contentsUpdater) {
 		this.projectDocumentationUpdater = updater;
 		this.releaseTrainContentsUpdater = contentsUpdater;
 	}

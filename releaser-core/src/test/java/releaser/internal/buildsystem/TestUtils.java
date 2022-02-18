@@ -36,8 +36,7 @@ public final class TestUtils {
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-static");
 	}
 
-	private static void prepareLocalRepo(String buildDir, String repoPath)
-			throws IOException {
+	private static void prepareLocalRepo(String buildDir, String repoPath) throws IOException {
 		File dotGit = new File(buildDir + repoPath + "/.git");
 		File git = new File(buildDir + repoPath + "/git");
 		if (git.exists()) {

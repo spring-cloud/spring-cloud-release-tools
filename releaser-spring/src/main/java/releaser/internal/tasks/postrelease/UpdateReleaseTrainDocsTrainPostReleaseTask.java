@@ -21,8 +21,7 @@ import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
 import releaser.internal.tech.ExecutionResult;
 
-public class UpdateReleaseTrainDocsTrainPostReleaseTask
-		implements TrainPostReleaseReleaserTask {
+public class UpdateReleaseTrainDocsTrainPostReleaseTask implements TrainPostReleaseReleaserTask {
 
 	/**
 	 * Order of this task. The higher value, the lower order.

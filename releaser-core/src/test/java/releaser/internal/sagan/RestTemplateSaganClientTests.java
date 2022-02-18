@@ -17,8 +17,6 @@
 package releaser.internal.sagan;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -44,7 +42,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = RestTemplateSaganClientTests.Config.class)
-@AutoConfigureStubRunner(ids = "sagan:sagan-site")
+@AutoConfigureStubRunner(ids = "io.spring.sagan:sagan-site")
 public class RestTemplateSaganClientTests {
 
 	@Value("${stubrunner.runningstubs.sagan-site.port}")
@@ -64,139 +62,53 @@ public class RestTemplateSaganClientTests {
 	}
 
 	@Test
-	@Ignore("2 stubs point to the same endpoint")
 	public void should_get_a_project() {
-		Project project = this.client.getProject("spring-framework");
+		Project project = this.client.getProject("spring-boot");
 
-		then(project.id).isEqualTo("spring-framework");
-		then(project.name).isEqualTo("Spring Framework");
-		then(project.repoUrl)
-				.isEqualTo("https://github.com/spring-projects/spring-framework");
-		then(project.siteUrl).isEqualTo("https://projects.spring.io/spring-framework");
-		then(project.category).isEqualTo("active");
-		then(project.stackOverflowTags).isNotBlank();
-		then(project.stackOverflowTagList).isNotEmpty();
-		then(project.aggregator).isFalse();
-		then(project.projectReleases).isNotEmpty();
-		Release release = project.projectReleases.get(0);
-		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo(
-				"http://docs.spring.io/spring/docs/5.0.0.RC4/spring-framework-reference/");
-		then(release.apiDocUrl)
-				.isEqualTo("http://docs.spring.io/spring/docs/5.0.0.RC4/javadoc-api/");
-		then(release.groupId).isEqualTo("org.springframework");
-		then(release.artifactId).isEqualTo("spring-context");
-		then(release.repository.id).isEqualTo("spring-milestones");
-		then(release.repository.name).isEqualTo("Spring Milestones");
-		then(release.repository.url).isEqualTo("https://repo.spring.io/libs-milestone");
-		then(release.repository.snapshotsEnabled).isFalse();
-		then(release.version).isEqualTo("5.0.0.RC4");
-		then(release.current).isFalse();
-		then(release.generalAvailability).isFalse();
-		then(release.preRelease).isTrue();
-		then(release.versionDisplayName).isEqualTo("5.0.0 RC4");
-		then(release.snapshot).isFalse();
+		then(project.getSlug()).isEqualTo("spring-boot");
+		then(project.getName()).isEqualTo("Spring Boot");
+		then(project.getRepositoryUrl()).isEqualTo("https://github.com/spring-projects/spring-boot");
+		then(project.getStatus()).isEqualTo("ACTIVE");
+		then(project.getReleases()).isNotEmpty();
+		Release release = project.getReleases().get(0);
+		then(release.getStatus()).isEqualTo("PRERELEASE");
+		then(release.getReferenceDocUrl())
+				.isEqualTo("https://docs.spring.io/spring-boot/docs/2.4.0-M1/reference/html/");
+		then(release.getApiDocUrl()).isEqualTo("https://docs.spring.io/spring-boot/docs/2.4.0-M1/api/");
+		then(release.getVersion()).isEqualTo("2.4.0-M1");
 	}
 
 	@Test
 	public void should_get_a_release() {
-		Release release = this.client.getRelease("spring-framework", "5.0.0.RC4");
+		Release release = this.client.getRelease("spring-boot", "2.3.0.RELEASE");
 
-		then(release.releaseStatus).isEqualTo("PRERELEASE");
-		then(release.refDocUrl).isEqualTo(
-				"http://docs.spring.io/spring/docs/{version}/spring-framework-reference/");
-		then(release.apiDocUrl)
-				.isEqualTo("http://docs.spring.io/spring/docs/{version}/javadoc-api/");
-		then(release.groupId).isEqualTo("org.springframework");
-		then(release.artifactId).isEqualTo("spring-context");
-		then(release.repository.id).isEqualTo("spring-milestones");
-		then(release.repository.name).isEqualTo("Spring Milestones");
-		then(release.repository.url).isEqualTo("https://repo.spring.io/libs-milestone");
-		then(release.repository.snapshotsEnabled).isFalse();
-		then(release.version).isEqualTo("5.0.0.RC4");
-		then(release.current).isFalse();
-		then(release.generalAvailability).isFalse();
-		then(release.preRelease).isTrue();
-		then(release.versionDisplayName).isEqualTo("5.0.0 RC4");
-		then(release.snapshot).isFalse();
+		then(release.getStatus()).isEqualTo("GENERAL_AVAILABILITY");
+		then(release.getReferenceDocUrl()).isEqualTo("https://docs.spring.io/spring-boot/docs/current/reference/html/");
+		then(release.getApiDocUrl()).isEqualTo("https://docs.spring.io/spring-boot/docs/current/api/");
+		then(release.getVersion()).isEqualTo("2.3.0.RELEASE");
 	}
 
 	@Test
 	public void should_delete_a_release() {
-		Release release = this.client.deleteRelease("spring-framework", "5.0.0.RC4");
+		boolean deleted = this.client.deleteRelease("spring-boot", "2.3.0.RELEASE");
 
-		then(release).isNotNull();
-		then(release.releaseStatus).isEqualTo("PRERELEASE");
+		then(deleted).isTrue();
 	}
 
 	@Test
 	public void should_update_a_release() {
-		Repository snapshots = snapshots();
-		Repository milestone = milestone();
 
-		ReleaseUpdate firstRelease = new ReleaseUpdate();
-		firstRelease.groupId = "org.springframework";
-		firstRelease.artifactId = "spring-context";
-		firstRelease.version = "1.2.8.RELEASE";
-		firstRelease.releaseStatus = "PRERELEASE";
-		firstRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
-		firstRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
-		firstRelease.repository = milestone;
+		ReleaseInput releaseInput = new ReleaseInput();
+		releaseInput.setVersion("2.2.0.RELEASE");
+		releaseInput.setReferenceDocUrl("https://docs.spring.io/spring-boot/docs/{version}/reference/html/");
+		releaseInput.setApiDocUrl("https://docs.spring.io/spring-boot/docs/{version}/api/");
 
-		ReleaseUpdate secondRelease = new ReleaseUpdate();
-		secondRelease.groupId = "org.springframework";
-		secondRelease.artifactId = "spring-context";
-		secondRelease.version = "5.0.0.BUILD-SNAPSHOT";
-		secondRelease.releaseStatus = "SNAPSHOT";
-		secondRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/";
-		secondRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
-		secondRelease.repository = snapshots;
-
-		ReleaseUpdate thirdRelease = new ReleaseUpdate();
-		thirdRelease.groupId = "org.springframework";
-		thirdRelease.artifactId = "spring-context";
-		thirdRelease.version = "4.3.12.BUILD-SNAPSHOT";
-		thirdRelease.releaseStatus = "SNAPSHOT";
-		thirdRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
-		thirdRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
-		thirdRelease.repository = snapshots;
-
-		ReleaseUpdate fourthRelease = new ReleaseUpdate();
-		fourthRelease.groupId = "org.springframework";
-		fourthRelease.artifactId = "spring-context";
-		fourthRelease.version = "4.3.11.RELEASE";
-		fourthRelease.releaseStatus = "GENERAL_AVAILABILITY";
-		fourthRelease.current = true;
-		fourthRelease.refDocUrl = "http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/";
-		fourthRelease.apiDocUrl = "http://docs.spring.io/spring/docs/current/javadoc-api/";
-
-		ReleaseUpdate fithRelease = new ReleaseUpdate();
-		fithRelease.groupId = "org.springframework";
-		fithRelease.artifactId = "spring-context";
-		fithRelease.version = "4.2.9.RELEASE";
-		fithRelease.releaseStatus = "GENERAL_AVAILABILITY";
-		fithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
-		fithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
-
-		ReleaseUpdate sithRelease = new ReleaseUpdate();
-		sithRelease.groupId = "org.springframework";
-		sithRelease.artifactId = "spring-context";
-		sithRelease.version = "3.2.18.RELEASE";
-		sithRelease.releaseStatus = "GENERAL_AVAILABILITY";
-		sithRelease.refDocUrl = "http://docs.spring.io/spring/docs/{version}/spring-framework-reference/htmlsingle/";
-		sithRelease.apiDocUrl = "http://docs.spring.io/spring/docs/{version}/javadoc-api/";
-
-		List<ReleaseUpdate> updates = Arrays.asList(firstRelease, secondRelease,
-				thirdRelease, fourthRelease, fithRelease, sithRelease);
-
-		Project project = this.client.updateRelease("spring-framework", updates);
-
-		then(project.id).isEqualTo("spring-framework");
-		then(project.name).isEqualTo("Spring Framework");
-		then(project.projectReleases).hasSize(7);
+		boolean added = this.client.addRelease("spring-boot", releaseInput);
+		then(added).isTrue();
 	}
 
 	@Test
+	@Ignore("no api yet https://github.com/spring-io/sagan/issues/1052")
 	public void should_patch_a_project() throws IOException {
 		String projectJson = "{\n  \"id\" : \"spring-framework\",\n  "
 				+ "\"rawBootConfig\" : \"rawBootConfig\",\n  \"rawOverview\" : \"rawOverview\",\n  "
@@ -207,10 +119,10 @@ public class RestTemplateSaganClientTests {
 
 		Project patchedProject = this.client.patchProject(project);
 
-		then(patchedProject.id).isEqualTo("spring-framework");
-		then(patchedProject.name).isEqualTo("Spring Framework");
-		then(patchedProject.rawBootConfig).isEqualTo("rawBootConfig");
-		then(patchedProject.rawOverview).isEqualTo("rawOverview");
+		// then(patchedProject.id).isEqualTo("spring-framework");
+		// then(patchedProject.name).isEqualTo("Spring Framework");
+		// then(patchedProject.rawBootConfig).isEqualTo("rawBootConfig");
+		// then(patchedProject.rawOverview).isEqualTo("rawOverview");
 	}
 
 	private Repository milestone() {
@@ -237,8 +149,7 @@ public class RestTemplateSaganClientTests {
 	}
 
 	private RestTemplate restTemplate(ReleaserProperties properties) {
-		return new RestTemplateBuilder()
-				.basicAuthentication(properties.getGit().getOauthToken(), "").build();
+		return new RestTemplateBuilder().basicAuthentication(properties.getGit().getOauthToken(), "").build();
 	}
 
 	@Configuration

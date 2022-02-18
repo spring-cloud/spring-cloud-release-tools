@@ -22,8 +22,7 @@ package org.springframework.cloud.info.exceptions;
 public class SpringCloudVersionNotFoundException extends Exception {
 
 	public SpringCloudVersionNotFoundException(String springBootVersion) {
-		super("Spring Cloud version not found for Spring Boot Version "
-				+ springBootVersion);
+		super("Spring Cloud version not found for Spring Boot Version " + springBootVersion);
 	}
 
 	public SpringCloudVersionNotFoundException(Exception e) {

@@ -42,7 +42,7 @@ import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganUpdater;
 import releaser.internal.template.TemplateGenerator;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -55,7 +55,7 @@ import static org.mockito.Mockito.never;
 public class ReleaserTests {
 
 	@Rule
-	public OutputCapture outputCapture = new OutputCapture();
+	public OutputCaptureRule outputCapture = new OutputCaptureRule();
 
 	@Mock
 	ProjectPomUpdater projectPomUpdater;
@@ -93,9 +93,8 @@ public class ReleaserTests {
 	}
 
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
-		return new Releaser(SpringCloudReleaserProperties.get(), this.projectPomUpdater,
-				this.projectCommandExecutor, this.projectGitHandler,
-				this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
+		return new Releaser(SpringCloudReleaserProperties.get(), this.projectPomUpdater, this.projectCommandExecutor,
+				this.projectGitHandler, this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
 				this.saganUpdater, this.documentationUpdater, this.postReleaseActions) {
 			@Override
 			ProjectVersion originalVersion(File project) {
@@ -105,71 +104,60 @@ public class ReleaserTests {
 	}
 
 	Releaser releaser() {
-		return new Releaser(new ReleaserProperties(), this.projectPomUpdater,
-				this.projectCommandExecutor, this.projectGitHandler,
-				this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
+		return new Releaser(new ReleaserProperties(), this.projectPomUpdater, this.projectCommandExecutor,
+				this.projectGitHandler, this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
 				this.saganUpdater, this.documentationUpdater, this.postReleaseActions);
 	}
 
 	@Test
 	public void should_not_bump_versions_for_original_release_project() {
-		releaser(() -> new ProjectVersion("original", "1.0.0.RELEASE"))
-				.rollbackReleaseVersion(this.pom,
-						new Projects(new ProjectVersion("changed", "1.0.0.RELEASE")),
-						new ProjectVersion("changed", "1.0.0.RELEASE"));
+		releaser(() -> new ProjectVersion("original", "1.0.0.RELEASE")).rollbackReleaseVersion(this.pom,
+				new Projects(new ProjectVersion("changed", "1.0.0.RELEASE")),
+				new ProjectVersion("changed", "1.0.0.RELEASE"));
 
-		BDDAssertions.then(this.outputCapture.toString()).contains(
-				"Successfully reverted the commit and came back to snapshot versions");
-		then(this.projectGitHandler).should(never())
-				.commitAfterBumpingVersions(any(File.class), any(ProjectVersion.class));
+		BDDAssertions.then(this.outputCapture.toString())
+				.contains("Successfully reverted the commit and came back to snapshot versions");
+		then(this.projectGitHandler).should(never()).commitAfterBumpingVersions(any(File.class),
+				any(ProjectVersion.class));
 	}
 
 	@Test
 	public void should_not_bump_versions_for_original_snapshot_project_and_current_snapshot() {
-		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
-				.rollbackReleaseVersion(this.pom,
-						new Projects(
-								new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT")),
-						new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT"));
+		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")).rollbackReleaseVersion(this.pom,
+				new Projects(new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT")),
+				new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT"));
 
-		BDDAssertions.then(this.outputCapture.toString())
-				.contains("Won't rollback a snapshot version");
-		then(this.projectGitHandler).should(never())
-				.commitAfterBumpingVersions(any(File.class), any(ProjectVersion.class));
+		BDDAssertions.then(this.outputCapture.toString()).contains("Won't rollback a snapshot version");
+		then(this.projectGitHandler).should(never()).commitAfterBumpingVersions(any(File.class),
+				any(ProjectVersion.class));
 	}
 
 	@Test
 	public void should_bump_versions_for_original_snapshot_project() {
 		ProjectVersion scReleaseVersion = new ProjectVersion("changed", "1.0.0.RELEASE");
-		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
-				.rollbackReleaseVersion(this.pom, new Projects(
-						new ProjectVersion("changed", "1.0.0.RELEASE"),
+		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")).rollbackReleaseVersion(this.pom,
+				new Projects(new ProjectVersion("changed", "1.0.0.RELEASE"),
 						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE"),
 						new ProjectVersion("spring-boot-starter", "3.0.0.RELEASE")),
-						scReleaseVersion);
+				scReleaseVersion);
 
-		BDDAssertions.then(this.outputCapture.toString())
-				.contains("Project was successfully updated")
+		BDDAssertions.then(this.outputCapture.toString()).contains("Project was successfully updated")
 				.contains("Successfully reverted the commit and bumped snapshot versions")
-				.contains("spring-boot-starter=>3.0.0.RELEASE")
-				.contains("spring-cloud-build=>2.0.1.SNAPSHOT")
+				.contains("spring-boot-starter=>3.0.0.RELEASE").contains("spring-cloud-build=>2.0.1.SNAPSHOT")
 				.contains("changed=>1.0.1.SNAPSHOT");
 	}
 
 	@Test
 	public void should_not_generate_email_for_snapshot_version() {
-		releaser().createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"),
-				projects());
+		releaser().createEmail(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"), projects());
 
 		then(this.templateGenerator).should(never()).email(any(Projects.class));
 	}
 
 	@Test
 	public void should_generate_email_for_release_version() {
-		BDDMockito.given(this.templateGenerator.email(projects()))
-				.willReturn(new File("."));
-		releaser().createEmail(new ProjectVersion("original", "1.0.0.RELEASE"),
-				projects());
+		BDDMockito.given(this.templateGenerator.email(projects())).willReturn(new File("."));
+		releaser().createEmail(new ProjectVersion("original", "1.0.0.RELEASE"), projects());
 
 		then(this.templateGenerator).should().email(any(Projects.class));
 	}
@@ -178,20 +166,17 @@ public class ReleaserTests {
 	public void should_not_close_milestone_for_snapshots() {
 		releaser().closeMilestone(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(this.projectGitHubHandler).should(never())
-				.closeMilestone(any(ProjectVersion.class));
+		then(this.projectGitHubHandler).should(never()).closeMilestone(any(ProjectVersion.class));
 	}
 
 	@Test
 	public void should_not_rollback_for_snapshots() {
-		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"))
-				.rollbackReleaseVersion(null,
-						new Projects(
-								new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")),
-						new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
+		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")).rollbackReleaseVersion(null,
+				new Projects(new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")),
+				new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(this.projectGitHandler).should(never())
-				.revertChangesIfApplicable(any(File.class), any(ProjectVersion.class));
+		then(this.projectGitHandler).should(never()).revertChangesIfApplicable(any(File.class),
+				any(ProjectVersion.class));
 	}
 
 	Projects projects() {

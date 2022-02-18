@@ -40,8 +40,7 @@ public class Projects extends HashSet<ProjectVersion> {
 
 	@SuppressWarnings("unchecked")
 	public Projects(ProjectVersion... versions) {
-		addAll(new HashSet<>(Arrays.stream(versions).filter(Objects::nonNull)
-				.collect(Collectors.toList())));
+		addAll(new HashSet<>(Arrays.stream(versions).filter(Objects::nonNull).collect(Collectors.toList())));
 	}
 
 	public Projects(List<ProjectVersion> versions) {
@@ -62,36 +61,31 @@ public class Projects extends HashSet<ProjectVersion> {
 		});
 		Projects newProjects = new Projects(foundProjectsToSkip);
 		foundProjectsToBump.forEach(projectVersion -> newProjects
-				.add(new ProjectVersion(projectVersion.projectName,
-						projectVersion.postReleaseSnapshotVersion())));
+				.add(new ProjectVersion(projectVersion.projectName, projectVersion.postReleaseSnapshotVersion())));
 		newProjects.addAll(foundProjectsToSkip);
 		return newProjects;
 	}
 
-	private static IllegalStateException exception(Projects projects,
-			String projectName) {
-		return new IllegalStateException("Project with name [" + projectName
-				+ "] is not present in the list of projects [" + projects.asList()
-				+ "] . " + additionalErrorMessage(projectName));
+	private static IllegalStateException exception(Projects projects, String projectName) {
+		return new IllegalStateException(
+				"Project with name [" + projectName + "] is not present in the list of projects [" + projects.asList()
+						+ "] . " + additionalErrorMessage(projectName));
 	}
 
 	private static String additionalErrorMessage(String projectName) {
-		return "Either put it in the BOM or set it via the [--releaser.fixed-versions["
-				+ projectName + "]=1.0.0.RELEASE] property";
+		return "Either put it in the BOM or set it via the [--releaser.fixed-versions[" + projectName
+				+ "]=1.0.0.RELEASE] property";
 	}
 
 	public ProjectVersion releaseTrain(ReleaserProperties properties) {
 		return stream()
-				.filter(version -> version.projectName
-						.equals(properties.getMetaRelease().getReleaseTrainProjectName())
-						|| properties.getMetaRelease().getReleaseTrainDependencyNames()
-								.contains(version.projectName))
+				.filter(version -> version.projectName.equals(properties.getMetaRelease().getReleaseTrainProjectName())
+						|| properties.getMetaRelease().getReleaseTrainDependencyNames().contains(version.projectName))
 				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("Projects " + this
-						+ " don't contain any of the following release train names ["
-						+ properties.getMetaRelease().getReleaseTrainProjectName()
-						+ "] or "
-						+ properties.getMetaRelease().getReleaseTrainDependencyNames()));
+				.orElseThrow(() -> new IllegalStateException(
+						"Projects " + this + " don't contain any of the following release train names ["
+								+ properties.getMetaRelease().getReleaseTrainProjectName() + "] or "
+								+ properties.getMetaRelease().getReleaseTrainDependencyNames()));
 	}
 
 	@Override
@@ -110,8 +104,7 @@ public class Projects extends HashSet<ProjectVersion> {
 	public Projects postReleaseSnapshotVersion(List<String> projectsToSkip) {
 		Projects projects = this.stream().filter(v -> projectsToSkip(projectsToSkip, v))
 				.collect(Collectors.toCollection(Projects::new));
-		Projects bumped = this.stream().map(
-				v -> new ProjectVersion(v.projectName, v.postReleaseSnapshotVersion()))
+		Projects bumped = this.stream().map(v -> new ProjectVersion(v.projectName, v.postReleaseSnapshotVersion()))
 				.collect(Collectors.toCollection(Projects::new));
 		Projects merged = new Projects(projects);
 		merged.addAll(bumped);
@@ -129,26 +122,21 @@ public class Projects extends HashSet<ProjectVersion> {
 
 	public ProjectVersion forFile(File projectRoot) {
 		final ProjectVersion thisProject = new ProjectVersion(projectRoot);
-		return this.stream()
-				.filter(projectVersion -> projectVersion.projectName
-						.equals(thisProject.projectName))
+		return this.stream().filter(projectVersion -> projectVersion.projectName.equals(thisProject.projectName))
 				.findFirst().orElseThrow(() -> exception(this, thisProject.projectName));
 	}
 
 	public ProjectVersion forName(String projectName) {
-		return this.stream()
-				.filter(projectVersion -> projectVersion.projectName.equals(projectName))
-				.findFirst().orElseThrow(() -> exception(this, projectName));
+		return this.stream().filter(projectVersion -> projectVersion.projectName.equals(projectName)).findFirst()
+				.orElseThrow(() -> exception(this, projectName));
 	}
 
 	public boolean containsProject(String projectName) {
-		return this.stream().anyMatch(
-				projectVersion -> projectVersion.projectName.equals(projectName));
+		return this.stream().anyMatch(projectVersion -> projectVersion.projectName.equals(projectName));
 	}
 
 	public List<ProjectVersion> forNameStartingWith(String projectName) {
-		return this.stream().filter(
-				projectVersion -> projectVersion.projectName.startsWith(projectName))
+		return this.stream().filter(projectVersion -> projectVersion.projectName.startsWith(projectName))
 				.collect(Collectors.toList());
 	}
 
@@ -162,14 +150,13 @@ public class Projects extends HashSet<ProjectVersion> {
 	}
 
 	public Set<Project> asProjects() {
-		return this.stream().map(projectVersion -> new Project(projectVersion.projectName,
-				projectVersion.version)).collect(Collectors.toSet());
+		return this.stream().map(projectVersion -> new Project(projectVersion.projectName, projectVersion.version))
+				.collect(Collectors.toSet());
 	}
 
 	@Override
 	public String toString() {
-		return stream().map(v -> "[" + v.projectName + "=>" + v.version + "]")
-				.collect(Collectors.joining("\n"));
+		return stream().map(v -> "[" + v.projectName + "=>" + v.version + "]").collect(Collectors.joining("\n"));
 	}
 
 }

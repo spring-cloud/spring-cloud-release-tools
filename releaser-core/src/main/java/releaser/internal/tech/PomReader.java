@@ -60,11 +60,9 @@ public final class PomReader {
 		}
 		catch (XmlPullParserException | IOException e) {
 			if (file.isFile() && fileText.length() == 0) {
-				throw new IllegalStateException(
-						"File [" + pom.getAbsolutePath() + "] is empty", e);
+				throw new IllegalStateException("File [" + pom.getAbsolutePath() + "] is empty", e);
 			}
-			throw new IllegalStateException(
-					"Failed to read file: " + pom.getAbsolutePath(), e);
+			throw new IllegalStateException("Failed to read file: " + pom.getAbsolutePath(), e);
 		}
 	}
 

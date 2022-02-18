@@ -46,8 +46,7 @@ import releaser.internal.project.Projects;
  */
 public class ProjectPomUpdater implements Closeable {
 
-	private static final List<String> IGNORED_SNAPSHOT_LINE_PATTERNS = Arrays.asList(
-			"^.*replace=.*$",
+	private static final List<String> IGNORED_SNAPSHOT_LINE_PATTERNS = Arrays.asList("^.*replace=.*$",
 			// issue [#80]
 			"^[\\s]*<!--.*-->.*$");
 
@@ -79,8 +78,7 @@ public class ProjectPomUpdater implements Closeable {
 	 * @return projects retrieved from the release train bom
 	 */
 	public Projects retrieveVersionsFromReleaseTrainBom() {
-		return retrieveVersionsFromReleaseTrainBom(this.properties.getPom().getBranch(),
-				UPDATE_FIXED_VERSIONS);
+		return retrieveVersionsFromReleaseTrainBom(this.properties.getPom().getBranch(), UPDATE_FIXED_VERSIONS);
 	}
 
 	/**
@@ -92,12 +90,10 @@ public class ProjectPomUpdater implements Closeable {
 	 * @return projects retrieved from the release train bom
 	 */
 	// TODO: I don't like this flag but don't have a better idea
-	public Projects retrieveVersionsFromReleaseTrainBom(String branch,
-			boolean updateFixedVersions) {
+	public Projects retrieveVersionsFromReleaseTrainBom(String branch, boolean updateFixedVersions) {
 		VersionsFromBom versionsFromBom = cachedVersionFromBom(branch);
 		if (updateFixedVersions) {
-			log.info("Will update the following versions manually [{}]",
-					this.properties.getFixedVersions());
+			log.info("Will update the following versions manually [{}]", this.properties.getFixedVersions());
 			this.properties.getFixedVersions().forEach(versionsFromBom::setVersion);
 		}
 		log.info("Retrieved the following versions\n{}", versionsFromBom);
@@ -121,14 +117,12 @@ public class ProjectPomUpdater implements Closeable {
 	 */
 	public Projects fixedVersions() {
 		Set<Project> projects = this.properties.getFixedVersions().entrySet().stream()
-				.map(entry -> new Project(entry.getKey(), entry.getValue()))
-				.collect(Collectors.toSet());
+				.map(entry -> new Project(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
 		if (log.isDebugEnabled()) {
 			log.debug("Will apply the following fixed versions {}", projects);
 		}
 		return new VersionsFromBomBuilder().releaserProperties(this.properties)
-				.parsers(compositeBomParser().customBomParsers()).projects(projects)
-				.merged().toProjectVersions();
+				.parsers(compositeBomParser().customBomParsers()).projects(projects).merged().toProjectVersions();
 	}
 
 	/**
@@ -143,9 +137,8 @@ public class ProjectPomUpdater implements Closeable {
 	 */
 	public void updateProjectFromReleaseTrain(File projectRoot, Projects projects,
 			ProjectVersion versionFromReleaseTrain, boolean assertVersions) {
-		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-				.thisProjectRoot(projectRoot).releaserProperties(this.properties)
-				.projects(projects.asProjects()).merged();
+		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().thisProjectRoot(projectRoot)
+				.releaserProperties(this.properties).projects(projects.asProjects()).merged();
 		if (!this.pomUpdater.shouldProjectBeUpdated(projectRoot, versionsFromBom)) {
 			log.debug("Skipping project updating");
 			return;
@@ -153,16 +146,16 @@ public class ProjectPomUpdater implements Closeable {
 		updatePoms(projectRoot, versionsFromBom, versionFromReleaseTrain, assertVersions);
 	}
 
-	private void updatePoms(File projectRoot, VersionsFromBom projects,
-			ProjectVersion versionFromScRelease, boolean assertVersions) {
+	private void updatePoms(File projectRoot, VersionsFromBom projects, ProjectVersion versionFromScRelease,
+			boolean assertVersions) {
 		File rootPom = new File(projectRoot, "pom.xml");
 		if (!rootPom.exists()) {
 			log.info("No pom.xml present, skipping!");
 			return;
 		}
 		ModelWrapper rootPomModel = this.pomUpdater.readModel(rootPom);
-		processAllPoms(projectRoot, new PomWalker(rootPomModel, projects, this.pomUpdater,
-				this.properties, versionFromScRelease, assertVersions));
+		processAllPoms(projectRoot, new PomWalker(rootPomModel, projects, this.pomUpdater, this.properties,
+				versionFromScRelease, assertVersions));
 	}
 
 	private void processAllPoms(File projectRoot, PomWalker pomWalker) {
@@ -197,18 +190,15 @@ public class ProjectPomUpdater implements Closeable {
 
 		private final List<Pattern> unacceptableVersionPatterns;
 
-		private PomWalker(ModelWrapper rootPom, VersionsFromBom projects,
-				PomUpdater pomUpdater, ReleaserProperties properties,
-				ProjectVersion versionFromScRelease, boolean assertVersions) {
+		private PomWalker(ModelWrapper rootPom, VersionsFromBom projects, PomUpdater pomUpdater,
+				ReleaserProperties properties, ProjectVersion versionFromScRelease, boolean assertVersions) {
 			this.rootPom = rootPom;
 			this.versionsFromBom = projects;
 			this.pomUpdater = pomUpdater;
 			this.properties = properties;
-			List<Pattern> unacceptableVersionPatterns = versionFromScRelease
-					.unacceptableVersionPatterns();
+			List<Pattern> unacceptableVersionPatterns = versionFromScRelease.unacceptableVersionPatterns();
 			this.unacceptableVersionPatterns = unacceptableVersionPatterns;
-			this.skipVersionAssert = !assertVersions
-					|| unacceptableVersionPatterns.isEmpty();
+			this.skipVersionAssert = !assertVersions || unacceptableVersionPatterns.isEmpty();
 			this.assertVersions = assertVersions;
 		}
 
@@ -217,28 +207,21 @@ public class ProjectPomUpdater implements Closeable {
 			File file = path.toFile();
 			if (POM_XML.equals(file.getName())) {
 				if (pathIgnored(file)) {
-					log.debug(
-							"Ignoring file [{}] since it's on a list of patterns to ignore",
-							file);
+					log.debug("Ignoring file [{}] since it's on a list of patterns to ignore", file);
 					return FileVisitResult.CONTINUE;
 				}
-				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file,
-						this.versionsFromBom);
+				ModelWrapper model = this.pomUpdater.updateModel(this.rootPom, file, this.versionsFromBom);
 				this.pomUpdater.overwritePomIfDirty(model, this.versionsFromBom, file);
-				if (this.assertVersions && !this.skipVersionAssert
-						&& !this.pomUpdater.hasSkipDeployment(model.model)) {
-					log.debug(
-							"Update is a non-snapshot one. Checking if no snapshot versions remained in the pom");
+				if (this.assertVersions && !this.skipVersionAssert && !this.pomUpdater.hasSkipDeployment(model.model)) {
+					log.debug("Update is a non-snapshot one. Checking if no snapshot versions remained in the pom");
 					String text = asString(path);
 					Scanner scanner = new Scanner(text);
 					int lineNumber = 0;
 					while (scanner.hasNextLine()) {
 						String line = scanner.nextLine();
 						lineNumber++;
-						Pattern matchingPattern = this.unacceptableVersionPatterns
-								.stream()
-								.filter(pattern -> IGNORED_SNAPSHOT_LINE_PATTERNS.stream()
-										.noneMatch(line::matches)
+						Pattern matchingPattern = this.unacceptableVersionPatterns.stream()
+								.filter(pattern -> IGNORED_SNAPSHOT_LINE_PATTERNS.stream().noneMatch(line::matches)
 										&& !line.contains(SPECIAL_LINE_IGNORING_COMMENT)
 										&& pattern.matcher(line).lookingAt())
 								.findFirst().orElse(null);
@@ -246,10 +229,9 @@ public class ProjectPomUpdater implements Closeable {
 							if (log.isDebugEnabled()) {
 								log.debug("File text \n" + text);
 							}
-							throw new IllegalStateException("The file [" + path
-									+ "] matches the [ " + matchingPattern.pattern()
-									+ "] pattern in line number [" + lineNumber + "]\n\n"
-									+ line);
+							throw new IllegalStateException(
+									"The file [" + path + "] matches the [ " + matchingPattern.pattern()
+											+ "] pattern in line number [" + lineNumber + "]\n\n" + line);
 						}
 					}
 					log.info("No invalid versions remained in the pom");
@@ -260,8 +242,8 @@ public class ProjectPomUpdater implements Closeable {
 
 		private boolean pathIgnored(File file) {
 			String path = file.getPath();
-			return this.assertVersions && this.properties.getPom().getIgnoredPomRegex()
-					.stream().anyMatch(path::matches);
+			return this.assertVersions
+					&& this.properties.getPom().getIgnoredPomRegex().stream().anyMatch(path::matches);
 		}
 
 		private String asString(Path path) {

@@ -41,13 +41,11 @@ import org.springframework.util.StringUtils;
  */
 public class ReleaserPropertiesUpdater implements Closeable {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ReleaserPropertiesUpdater.class);
+	private static final Logger log = LoggerFactory.getLogger(ReleaserPropertiesUpdater.class);
 
 	private static final Map<File, ReleaserProperties> CACHE = new ConcurrentHashMap<>();
 
-	public ReleaserProperties updateProperties(ReleaserProperties properties,
-			File clonedProjectFromOrg) {
+	public ReleaserProperties updateProperties(ReleaserProperties properties, File clonedProjectFromOrg) {
 		return CACHE.computeIfAbsent(clonedProjectFromOrg, file -> {
 			ReleaserProperties props = updatePropertiesFromFile(properties.copy(), file);
 			props.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
@@ -56,8 +54,7 @@ public class ReleaserPropertiesUpdater implements Closeable {
 		});
 	}
 
-	private ReleaserProperties updatePropertiesFromFile(ReleaserProperties copy,
-			File clonedProjectFromOrg) {
+	private ReleaserProperties updatePropertiesFromFile(ReleaserProperties copy, File clonedProjectFromOrg) {
 		File releaserConfig = releaserConfig(clonedProjectFromOrg);
 		if (releaserConfig.exists()) {
 			try {
@@ -66,11 +63,8 @@ public class ReleaserPropertiesUpdater implements Closeable {
 				Properties properties = yamlProcessor.getObject();
 				ReleaserProperties releaserProperties = new Binder(
 						new MapConfigurationPropertySource(properties.entrySet().stream()
-								.collect(Collectors.toMap(e -> e.getKey().toString(),
-										e -> e.getValue().toString()))))
-												.bind("releaser",
-														ReleaserProperties.class)
-												.get();
+								.collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()))))
+										.bind("releaser", ReleaserProperties.class).get();
 				log.info("config/releaser.yml found. Will update the current properties");
 				overrideProperties(releaserProperties, copy);
 			}
@@ -79,17 +73,14 @@ public class ReleaserPropertiesUpdater implements Closeable {
 			}
 		}
 		else {
-			log.info(
-					"No config/releaser.yml found. Will NOT update the current properties");
+			log.info("No config/releaser.yml found. Will NOT update the current properties");
 		}
-		log.info("Updating working directory to [{}]",
-				clonedProjectFromOrg.getAbsolutePath());
+		log.info("Updating working directory to [{}]", clonedProjectFromOrg.getAbsolutePath());
 		copy.setWorkingDir(clonedProjectFromOrg.getAbsolutePath());
 		return copy;
 	}
 
-	private void overrideProperties(ReleaserProperties fromProject,
-			ReleaserProperties copy) {
+	private void overrideProperties(ReleaserProperties fromProject, ReleaserProperties copy) {
 		overrideCommandIfPresent(fromProject.getMaven(), copy.getMaven());
 		overrideCommandIfPresent(fromProject.getGradle(), copy.getGradle());
 		overrideMapIfPresent(() -> fromProject.getGradle().getGradlePropsSubstitution(),
@@ -101,45 +92,36 @@ public class ReleaserPropertiesUpdater implements Closeable {
 
 	private void overrideCommandIfPresent(ReleaserProperties.Command fromProject,
 			ReleaserProperties.Command commandCopy) {
-		overrideStringIfPresent(fromProject::getBuildCommand,
-				commandCopy::setBuildCommand);
-		overrideStringIfPresent(fromProject::getDeployCommand,
-				commandCopy::setDeployCommand);
+		overrideStringIfPresent(fromProject::getBuildCommand, commandCopy::setBuildCommand);
+		overrideStringIfPresent(fromProject::getDeployCommand, commandCopy::setDeployCommand);
 		overrideStringIfPresent(fromProject::getGenerateReleaseTrainDocsCommand,
 				commandCopy::setGenerateReleaseTrainDocsCommand);
-		overrideStringIfPresent(fromProject::getPublishDocsCommand,
-				commandCopy::setPublishDocsCommand);
-		overrideStringIfPresent(fromProject::getDeployGuidesCommand,
-				commandCopy::setDeployGuidesCommand);
-		overrideStringIfPresent(fromProject::getSystemProperties,
-				commandCopy::setSystemProperties);
+		overrideStringIfPresent(fromProject::getPublishDocsCommand, commandCopy::setPublishDocsCommand);
+		overrideStringIfPresent(fromProject::getDeployGuidesCommand, commandCopy::setDeployGuidesCommand);
+		overrideStringIfPresent(fromProject::getSystemProperties, commandCopy::setSystemProperties);
 	}
 
-	private void overrideStringIfPresent(Supplier<String> predicate,
-			Consumer<String> consumer) {
+	private void overrideStringIfPresent(Supplier<String> predicate, Consumer<String> consumer) {
 		if (StringUtils.hasText(predicate.get())) {
 			consumer.accept(predicate.get());
 		}
 	}
 
-	private void overrideArrayIfPresent(Supplier<String[]> predicate,
-			Consumer<String[]> consumer) {
+	private void overrideArrayIfPresent(Supplier<String[]> predicate, Consumer<String[]> consumer) {
 		String[] strings = predicate.get();
 		if (strings.length > 0) {
 			consumer.accept(strings);
 		}
 	}
 
-	private void overrideMapIfPresent(Supplier<Map<String, String>> predicate,
-			Consumer<Map<String, String>> consumer) {
+	private void overrideMapIfPresent(Supplier<Map<String, String>> predicate, Consumer<Map<String, String>> consumer) {
 		Map<String, String> strings = predicate.get();
 		if (!strings.isEmpty()) {
 			consumer.accept(strings);
 		}
 	}
 
-	private void overrideListIfPresent(Supplier<List<String>> predicate,
-			Consumer<List<String>> consumer) {
+	private void overrideListIfPresent(Supplier<List<String>> predicate, Consumer<List<String>> consumer) {
 		List<String> strings = predicate.get();
 		if (!strings.isEmpty()) {
 			consumer.accept(strings);

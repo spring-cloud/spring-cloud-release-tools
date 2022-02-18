@@ -31,7 +31,7 @@ import org.mockito.BDDMockito;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 /**
  * @author Marcin Grzejszczak
@@ -42,7 +42,7 @@ public class GithubIssuesTests {
 	public TemporaryFolder folder = new TemporaryFolder();
 
 	@Rule
-	public OutputCapture capture = new OutputCapture();
+	public OutputCaptureRule capture = new OutputCaptureRule();
 
 	MkGithub github;
 
@@ -73,7 +73,7 @@ public class GithubIssuesTests {
 						new ProjectVersion("spring-cloud-build", "2.0.0.BUILD-SNAPSHOT")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -82,17 +82,15 @@ public class GithubIssuesTests {
 		GithubIssues issues = new GithubIssues(Collections.emptyList());
 
 		issues.fileIssueInSpringGuides(
-				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
-						new ProjectVersion("bar", "2.0.0.RELEASE"),
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"), new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.RELEASE"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test
-	public void should_not_do_anything_for_non_release_train_version_when_updating_startspringio()
-			throws IOException {
+	public void should_not_do_anything_for_non_release_train_version_when_updating_startspringio() throws IOException {
 		setupStartSpringIo();
 		Github github = BDDMockito.mock(Github.class);
 		GithubIssues issues = new GithubIssues(Collections.emptyList());
@@ -102,28 +100,25 @@ public class GithubIssuesTests {
 						new ProjectVersion("spring-cloud-build", "2.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.BUILD-SNAPSHOT"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	@Test
-	public void should_not_do_anything_if_not_applicable_when_updating_startspringio()
-			throws IOException {
+	public void should_not_do_anything_if_not_applicable_when_updating_startspringio() throws IOException {
 		setupStartSpringIo();
 		Github github = BDDMockito.mock(Github.class);
 		GithubIssues issues = new GithubIssues(Collections.emptyList());
 
 		issues.fileIssueInStartSpringIo(
-				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"),
-						new ProjectVersion("bar", "2.0.0.RELEASE"),
+				new Projects(new ProjectVersion("foo", "1.0.0.RELEASE"), new ProjectVersion("bar", "2.0.0.RELEASE"),
 						new ProjectVersion("baz", "3.0.0.RELEASE")),
 				new ProjectVersion("sc-release", "Edgware.RELEASE"));
 
-		BDDMockito.then(github).shouldHaveZeroInteractions();
+		BDDMockito.then(github).shouldHaveNoInteractions();
 	}
 
 	private Repo createGettingStartedGuides(MkGithub github) throws IOException {
-		return github.repos()
-				.create(new Repos.RepoCreate("getting-started-guides", false));
+		return github.repos().create(new Repos.RepoCreate("getting-started-guides", false));
 	}
 
 	private Repo createStartSpringIo(MkGithub github) throws IOException {

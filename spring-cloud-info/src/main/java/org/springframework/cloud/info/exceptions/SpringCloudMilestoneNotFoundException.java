@@ -22,8 +22,7 @@ package org.springframework.cloud.info.exceptions;
 public class SpringCloudMilestoneNotFoundException extends Exception {
 
 	public SpringCloudMilestoneNotFoundException(String name) {
-		super("Spring Cloud milestone " + name
-				+ " was not found in Spring Cloud Release");
+		super("Spring Cloud milestone " + name + " was not found in Spring Cloud Release");
 	}
 
 }

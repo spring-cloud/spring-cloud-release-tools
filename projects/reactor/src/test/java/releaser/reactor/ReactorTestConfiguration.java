@@ -46,14 +46,13 @@ import org.springframework.context.annotation.Profile;
 public class ReactorTestConfiguration {
 
 	@Bean
-	RestartSiteProjectPostReleaseTask restartSiteProjectPostReleaseTask(Releaser releaser,
-			CfClient cfClient, @Value("${cf.reactorAppName}") String reactorAppName) {
+	RestartSiteProjectPostReleaseTask restartSiteProjectPostReleaseTask(Releaser releaser, CfClient cfClient,
+			@Value("${cf.reactorAppName}") String reactorAppName) {
 		return new RestartSiteProjectPostReleaseTask(releaser, cfClient, reactorAppName);
 	}
 
 	@Bean
-	GenerateReleaseNotesTask releaseNotesTask(Github github,
-			ProjectGitHandler gitHandler) {
+	GenerateReleaseNotesTask releaseNotesTask(Github github, ProjectGitHandler gitHandler) {
 		return new GenerateReleaseNotesTask(github, gitHandler);
 	}
 
