@@ -39,8 +39,7 @@ import org.springframework.util.StringUtils;
 // TODO: [SPRING-CLOUD]
 class ReleaseTrainContentsUpdater {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ReleaseTrainContentsUpdater.class);
+	private static final Logger log = LoggerFactory.getLogger(ReleaseTrainContentsUpdater.class);
 
 	private final ReleaseTrainContentsGitHandler handler;
 
@@ -63,45 +62,33 @@ class ReleaseTrainContentsUpdater {
 	 * @param projects - set of project with versions to assert against
 	 */
 	File updateReleaseTrainWiki(Projects projects) {
-		if (!this.properties.getGit().isUpdateReleaseTrainWiki()
-				|| !this.properties.getMetaRelease().isEnabled()) {
-			log.info(
-					"Will not clone and update the release train wiki, since the switch to do so "
-							+ "is off or it's not a meta-release. Set [releaser.git.update-release-train-wiki] to [true] to change that");
+		if (!this.properties.getGit().isUpdateReleaseTrainWiki() || !this.properties.getMetaRelease().isEnabled()) {
+			log.info("Will not clone and update the release train wiki, since the switch to do so "
+					+ "is off or it's not a meta-release. Set [releaser.git.update-release-train-wiki] to [true] to change that");
 			return null;
 		}
 		File releaseTrainWiki = this.handler.cloneReleaseTrainWiki();
 		ProjectVersion releaseTrain = projects.releaseTrain(this.properties);
 		// When using calver this need to be a major plus minor (ie if the release is
 		// 2020.0.1, the name of the wiki page is 2020.0)
-		String releaseTrainName = releaseTrain.isCalver() ? releaseTrain.majorAndMinor()
-				: releaseTrain.major();
+		String releaseTrainName = releaseTrain.isCalver() ? releaseTrain.majorAndMinor() : releaseTrain.major();
 		String wikiPagePrefix = this.properties.getGit().getReleaseTrainWikiPagePrefix();
-		String releaseTrainDocFileName = releaseTrainDocFileName(releaseTrainName,
-				wikiPagePrefix);
-		log.info("Reading the file [{}] for the current release train",
-				releaseTrainDocFileName);
-		File releaseTrainDocFile = releaseTrainDocFile(releaseTrainWiki,
-				releaseTrainDocFileName);
-		String releaseVersionFromCurrentFile = this.parser
-				.latestReleaseTrainFromWiki(releaseTrainDocFile);
-		log.info("Latest release train version in the file is [{}]",
-				releaseVersionFromCurrentFile);
-		if (!isThisReleaseTrainVersionNewer(releaseTrain,
-				releaseVersionFromCurrentFile)) {
-			log.info(
-					"Current release train version [{}] is not "
-							+ "newer than the version taken from the wiki [{}]",
+		String releaseTrainDocFileName = releaseTrainDocFileName(releaseTrainName, wikiPagePrefix);
+		log.info("Reading the file [{}] for the current release train", releaseTrainDocFileName);
+		File releaseTrainDocFile = releaseTrainDocFile(releaseTrainWiki, releaseTrainDocFileName);
+		String releaseVersionFromCurrentFile = this.parser.latestReleaseTrainFromWiki(releaseTrainDocFile);
+		log.info("Latest release train version in the file is [{}]", releaseVersionFromCurrentFile);
+		if (!isThisReleaseTrainVersionNewer(releaseTrain, releaseVersionFromCurrentFile)) {
+			log.info("Current release train version [{}] is not " + "newer than the version taken from the wiki [{}]",
 					releaseTrain.version, releaseVersionFromCurrentFile);
 			return releaseTrainWiki;
 		}
-		return generateNewWikiEntry(projects, releaseTrainWiki, releaseTrain,
-				releaseTrainName, releaseTrainDocFile, releaseVersionFromCurrentFile);
+		return generateNewWikiEntry(projects, releaseTrainWiki, releaseTrain, releaseTrainName, releaseTrainDocFile,
+				releaseVersionFromCurrentFile);
 	}
 
-	private File generateNewWikiEntry(Projects projects, File releaseTrainWiki,
-			ProjectVersion releaseTrain, String releaseTrainName,
-			File releaseTrainDocFile, String releaseVersionFromCurrentFile) {
+	private File generateNewWikiEntry(Projects projects, File releaseTrainWiki, ProjectVersion releaseTrain,
+			String releaseTrainName, File releaseTrainDocFile, String releaseVersionFromCurrentFile) {
 		File releaseNotes = this.templateGenerator.releaseNotes(projects);
 		try {
 			List<String> lines = Files.readAllLines(releaseTrainDocFile.toPath());
@@ -111,53 +98,43 @@ class ReleaseTrainContentsUpdater {
 					break;
 				}
 			}
-			return insertNewWikiContentBeforeTheLatestRelease(releaseTrainWiki,
-					releaseTrain, releaseTrainName, releaseTrainDocFile, releaseNotes,
-					lines, lineIndex);
+			return insertNewWikiContentBeforeTheLatestRelease(releaseTrainWiki, releaseTrain, releaseTrainName,
+					releaseTrainDocFile, releaseNotes, lines, lineIndex);
 		}
 		catch (IOException ex) {
 			throw new IllegalStateException(ex);
 		}
 	}
 
-	private File insertNewWikiContentBeforeTheLatestRelease(File releaseTrainWiki,
-			ProjectVersion releaseTrain, String releaseTrainName,
-			File releaseTrainDocFile, File releaseNotes, List<String> lines,
-			int lineIndex) throws IOException {
-		String newContent = new StringJoiner("\n")
-				.add(String.join("\n", lines.subList(0, lineIndex))).add("\n")
+	private File insertNewWikiContentBeforeTheLatestRelease(File releaseTrainWiki, ProjectVersion releaseTrain,
+			String releaseTrainName, File releaseTrainDocFile, File releaseNotes, List<String> lines, int lineIndex)
+			throws IOException {
+		String newContent = new StringJoiner("\n").add(String.join("\n", lines.subList(0, lineIndex))).add("\n")
 				.add(new String(Files.readAllBytes(releaseNotes.toPath())))
-				.add(String.join("\n", lines.subList(lineIndex, lines.size())))
-				.toString();
+				.add(String.join("\n", lines.subList(lineIndex, lines.size()))).toString();
 		Files.write(releaseTrainDocFile.toPath(), newContent.getBytes());
-		log.info("Successfully stored new wiki contents for release train [{}]",
-				releaseTrainName);
+		log.info("Successfully stored new wiki contents for release train [{}]", releaseTrainName);
 		this.handler.commitAndPushChanges(releaseTrainWiki, releaseTrain);
 		return releaseTrainWiki;
 	}
 
-	private String releaseTrainDocFileName(String releaseTrainName,
-			String wikiPagePrefix) {
-		return new StringJoiner("-").add(wikiPagePrefix).add(releaseTrainName)
-				.add("Release-Notes.md").toString();
+	private String releaseTrainDocFileName(String releaseTrainName, String wikiPagePrefix) {
+		return new StringJoiner("-").add(wikiPagePrefix).add(releaseTrainName).add("Release-Notes.md").toString();
 	}
 
-	private boolean isThisReleaseTrainVersionNewer(ProjectVersion releaseTrain,
-			String releaseVersionFromCurrentFile) {
+	private boolean isThisReleaseTrainVersionNewer(ProjectVersion releaseTrain, String releaseVersionFromCurrentFile) {
 		if (StringUtils.hasText(releaseVersionFromCurrentFile)) {
 			return releaseTrain.compareToReleaseTrain(releaseVersionFromCurrentFile) > 0;
 		}
 		return true;
 	}
 
-	private File releaseTrainDocFile(File releaseTrainWiki,
-			String releaseTrainDocFileName) {
+	private File releaseTrainDocFile(File releaseTrainWiki, String releaseTrainDocFileName) {
 		File releaseTrainDocFile = new File(releaseTrainWiki, releaseTrainDocFileName);
 		if (!releaseTrainDocFile.exists()) {
 			try {
 				if (!releaseTrainDocFile.createNewFile()) {
-					throw new IllegalStateException(
-							"Failed to create releae train doc file");
+					throw new IllegalStateException("Failed to create releae train doc file");
 				}
 			}
 			catch (IOException e) {
@@ -171,8 +148,7 @@ class ReleaseTrainContentsUpdater {
 
 class ReleaseTrainContentsGitHandler {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ReleaseTrainContentsGitHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(ReleaseTrainContentsGitHandler.class);
 
 	private static final String PROJECT_PAGE_UPDATED_COMMIT_MSG = "Updating project page to release train [%s]";
 
@@ -188,8 +164,7 @@ class ReleaseTrainContentsGitHandler {
 
 	void commitAndPushChanges(File repo, ProjectVersion releaseTrain) {
 		log.debug("Committing and pushing changes");
-		this.handler.commit(repo,
-				String.format(PROJECT_PAGE_UPDATED_COMMIT_MSG, releaseTrain.version));
+		this.handler.commit(repo, String.format(PROJECT_PAGE_UPDATED_COMMIT_MSG, releaseTrain.version));
 		this.handler.pushCurrentBranch(repo);
 	}
 
@@ -197,8 +172,7 @@ class ReleaseTrainContentsGitHandler {
 
 class ReleaseTrainContentsParser {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ReleaseTrainContentsParser.class);
+	private static final Logger log = LoggerFactory.getLogger(ReleaseTrainContentsParser.class);
 
 	ReleaseTrainContents parseProjectPage(File rawHtml) {
 		try {
@@ -230,9 +204,8 @@ class ReleaseTrainContentsParser {
 			return Files.readAllLines(rawMd.toPath()).stream()
 					// We want to find only headers like # Finchley.RELEASE and not any
 					// custom headers
-					.filter(s -> s.trim().startsWith("#") && s.contains("."))
-					.map(s -> s.substring(1).trim()).filter(ProjectVersion::isValid)
-					.findFirst().orElse("");
+					.filter(s -> s.trim().startsWith("#") && s.contains(".")).map(s -> s.substring(1).trim())
+					.filter(ProjectVersion::isValid).findFirst().orElse("");
 		}
 		catch (IOException e) {
 			throw new IllegalStateException(e);

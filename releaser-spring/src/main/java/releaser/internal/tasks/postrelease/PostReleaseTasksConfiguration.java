@@ -26,8 +26,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnDefaultFlowEnabled
-@ConditionalOnProperty(value = "releaser.skip-post-release-tasks", havingValue = "false",
-		matchIfMissing = true)
+@ConditionalOnProperty(value = "releaser.skip-post-release-tasks", havingValue = "false", matchIfMissing = true)
 class PostReleaseTasksConfiguration {
 
 	@Bean
@@ -40,24 +39,21 @@ class PostReleaseTasksConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.template.enabled")
-	CreateTemplatesTrainPostReleaseTask createTemplatesTrainPostReleaseTask(
-			Releaser releaser) {
+	CreateTemplatesTrainPostReleaseTask createTemplatesTrainPostReleaseTask(Releaser releaser) {
 		return new CreateTemplatesTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.run-updated-samples")
-	RunUpdatedSamplesTrainPostReleaseTask runUpdatedSamplesTrainPostReleaseTask(
-			Releaser releaser) {
+	RunUpdatedSamplesTrainPostReleaseTask runUpdatedSamplesTrainPostReleaseTask(Releaser releaser) {
 		return new RunUpdatedSamplesTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-all-test-samples")
-	UpdateAllTestSamplesTrainPostReleaseTask updateAllTestSamplesTrainPostReleaseTask(
-			Releaser releaser) {
+	UpdateAllTestSamplesTrainPostReleaseTask updateAllTestSamplesTrainPostReleaseTask(Releaser releaser) {
 		return new UpdateAllTestSamplesTrainPostReleaseTask(releaser);
 	}
 
@@ -71,32 +67,28 @@ class PostReleaseTasksConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-release-train-docs")
-	UpdateReleaseTrainDocsTrainPostReleaseTask updateReleaseTrainDocsTrainPostReleaseTask(
-			Releaser releaser) {
+	UpdateReleaseTrainDocsTrainPostReleaseTask updateReleaseTrainDocsTrainPostReleaseTask(Releaser releaser) {
 		return new UpdateReleaseTrainDocsTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.git.update-release-train-wiki")
-	UpdateReleaseTrainWikiTrainPostReleaseTask updateReleaseTrainWikiTrainPostReleaseTask(
-			Releaser releaser) {
+	UpdateReleaseTrainWikiTrainPostReleaseTask updateReleaseTrainWikiTrainPostReleaseTask(Releaser releaser) {
 		return new UpdateReleaseTrainWikiTrainPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.sagan.update-sagan")
-	UpdateSaganProjectPostReleaseTask updateSaganProjectPostReleaseTask(
-			Releaser releaser) {
+	UpdateSaganProjectPostReleaseTask updateSaganProjectPostReleaseTask(Releaser releaser) {
 		return new UpdateSaganProjectPostReleaseTask(releaser);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("releaser.sagan.update-start-spring-io")
-	UpdateStartSpringIoTrainPostReleaseTask updateStartSpringIoTrainPostReleaseTask(
-			Releaser releaser) {
+	UpdateStartSpringIoTrainPostReleaseTask updateStartSpringIoTrainPostReleaseTask(Releaser releaser) {
 		return new UpdateStartSpringIoTrainPostReleaseTask(releaser);
 	}
 

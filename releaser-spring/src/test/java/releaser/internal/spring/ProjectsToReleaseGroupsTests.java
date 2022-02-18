@@ -33,8 +33,7 @@ class ProjectsToReleaseGroupsTests {
 		properties.getMetaRelease().setReleaseGroups(Arrays.asList("c,d", "e,f,g"));
 		ProjectsToRun projectsToRun = projectsToRun();
 
-		List<ReleaseGroup> groups = new ProjectsToReleaseGroups(properties)
-				.toReleaseGroup(projectsToRun);
+		List<ReleaseGroup> groups = new ProjectsToReleaseGroups(properties).toReleaseGroup(projectsToRun);
 
 		BDDAssertions.then(groups).hasSize(5);
 		BDDAssertions.then(projectNames(0, groups)).containsExactly("a");
@@ -45,8 +44,7 @@ class ProjectsToReleaseGroupsTests {
 	}
 
 	private List<String> projectNames(int index, List<ReleaseGroup> groups) {
-		return groups.get(index).projectsToRun.stream()
-				.map(ProjectToRun.ProjectToRunSupplier::projectName)
+		return groups.get(index).projectsToRun.stream().map(ProjectToRun.ProjectToRunSupplier::projectName)
 				.collect(Collectors.toCollection(LinkedList::new));
 	}
 

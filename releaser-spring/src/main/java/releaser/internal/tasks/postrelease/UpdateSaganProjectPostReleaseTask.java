@@ -56,8 +56,7 @@ public class UpdateSaganProjectPostReleaseTask implements ProjectPostReleaseRele
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return this.releaser.updateSagan(args.project, args.versionFromBom,
-				args.projects);
+		return this.releaser.updateSagan(args.project, args.versionFromBom, args.projects);
 	}
 
 	@Override

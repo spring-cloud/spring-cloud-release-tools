@@ -47,16 +47,14 @@ class SpringCloudGithubIssues implements CustomGithubIssues {
 	public void fileIssueInSpringGuides(Projects projects, ProjectVersion version) {
 		String user = "spring-guides";
 		String repo = "getting-started-guides";
-		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(),
-				guidesIssueText(projects));
+		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(), guidesIssueText(projects));
 	}
 
 	@Override
 	public void fileIssueInStartSpringIo(Projects projects, ProjectVersion version) {
 		String user = "spring-io";
 		String repo = "start.spring.io";
-		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(),
-				startSpringIoIssueText(projects));
+		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(), startSpringIoIssueText(projects));
 	}
 
 	private String issueTitle() {
@@ -72,21 +70,18 @@ class SpringCloudGithubIssues implements CustomGithubIssues {
 	}
 
 	private String startSpringIoIssueText(Projects projects) {
-		String springBootVersion = projects.containsProject("spring-boot")
-				? projects.forName("spring-boot").version : "";
-		return "Release train ["
-				+ this.properties.getMetaRelease().getReleaseTrainProjectName()
-				+ "] in version [" + parsedVersion()
-				+ "] released with the Spring Boot version [`" + springBootVersion + "`]";
+		String springBootVersion = projects.containsProject("spring-boot") ? projects.forName("spring-boot").version
+				: "";
+		return "Release train [" + this.properties.getMetaRelease().getReleaseTrainProjectName() + "] in version ["
+				+ parsedVersion() + "] released with the Spring Boot version [`" + springBootVersion + "`]";
 	}
 
 	private String guidesIssueText(Projects projects) {
 		StringBuilder builder = new StringBuilder().append("Release train [")
-				.append(this.properties.getMetaRelease().getReleaseTrainProjectName())
-				.append("] in version [").append(parsedVersion())
-				.append("] released with the following projects:").append("\n\n");
-		projects.forEach(project -> builder.append(project.projectName).append(" : ")
-				.append("`").append(project.version).append("`").append("\n"));
+				.append(this.properties.getMetaRelease().getReleaseTrainProjectName()).append("] in version [")
+				.append(parsedVersion()).append("] released with the following projects:").append("\n\n");
+		projects.forEach(project -> builder.append(project.projectName).append(" : ").append("`")
+				.append(project.version).append("`").append("\n"));
 		return builder.toString();
 	}
 

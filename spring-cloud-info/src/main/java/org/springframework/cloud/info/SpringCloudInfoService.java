@@ -29,18 +29,15 @@ import org.springframework.cloud.info.exceptions.SpringCloudVersionNotFoundExcep
  */
 public interface SpringCloudInfoService {
 
-	SpringCloudVersion getSpringCloudVersion(String bootVersion)
-			throws SpringCloudVersionNotFoundException;
+	SpringCloudVersion getSpringCloudVersion(String bootVersion) throws SpringCloudVersionNotFoundException;
 
 	Collection<String> getSpringCloudVersions() throws IOException;
 
-	Map<String, String> getReleaseVersions(String bomVersion)
-			throws SpringCloudVersionNotFoundException, IOException;
+	Map<String, String> getReleaseVersions(String bomVersion) throws SpringCloudVersionNotFoundException, IOException;
 
 	Collection<String> getMilestones() throws IOException;
 
-	Milestone getMilestoneDueDate(String name)
-			throws SpringCloudMilestoneNotFoundException, IOException;
+	Milestone getMilestoneDueDate(String name) throws SpringCloudMilestoneNotFoundException, IOException;
 
 	class Milestone {
 

@@ -64,16 +64,14 @@ public class GradleUpdaterTests {
 			}
 		};
 		properties.getGradle().setGradlePropsSubstitution(props);
-		Projects projects = new Projects(
-				new ProjectVersion("spring-cloud-contract", "1.0.0"),
+		Projects projects = new Projects(new ProjectVersion("spring-cloud-contract", "1.0.0"),
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		new GradleUpdater().updateProjectFromReleaseTrain(properties, projectRoot,
-				projects, new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
+		new GradleUpdater().updateProjectFromReleaseTrain(properties, projectRoot, projects,
+				new ProjectVersion("spring-cloud-contract", "1.0.0"), true);
 
 		then(asString(tmpFile("gradleproject/gradle.properties"))).contains("foo=1.0.0");
-		then(asString(tmpFile("gradleproject/child/gradle.properties")))
-				.contains("bar=2.0.0");
+		then(asString(tmpFile("gradleproject/child/gradle.properties"))).contains("bar=2.0.0");
 	}
 
 	@Test
@@ -87,15 +85,12 @@ public class GradleUpdaterTests {
 			}
 		};
 		properties.getGradle().setGradlePropsSubstitution(props);
-		Projects projects = new Projects(
-				new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
+		Projects projects = new Projects(new ProjectVersion("spring-cloud-contract", "1.0.0.BUILD-SNAPSHOT"),
 				new ProjectVersion("spring-cloud-sleuth", "2.0.0"));
 
-		thenThrownBy(() -> new GradleUpdater().updateProjectFromReleaseTrain(properties,
-				projectRoot, projects,
+		thenThrownBy(() -> new GradleUpdater().updateProjectFromReleaseTrain(properties, projectRoot, projects,
 				new ProjectVersion("spring-cloud-contract", "1.0.0.RELEASE"), true))
-						.hasMessageContaining(
-								"(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
+						.hasMessageContaining("(BUILD-)?SNAPSHOT.*$] pattern in line number [1]");
 	}
 
 	private File file(String relativePath) throws URISyntaxException {

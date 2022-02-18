@@ -71,8 +71,8 @@ public class OptionsBuilder {
 	}
 
 	public Options options() {
-		return new Options(this.metaRelease, this.fullRelease, this.interactive,
-				this.dryRun, this.taskNames, this.startFrom, this.range);
+		return new Options(this.metaRelease, this.fullRelease, this.interactive, this.dryRun, this.taskNames,
+				this.startFrom, this.range);
 	}
 
 }

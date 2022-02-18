@@ -60,8 +60,7 @@ public class VersionsFetcher implements Closeable {
 
 	private final ReleaserProperties properties;
 
-	public VersionsFetcher(ReleaserProperties properties,
-			ProjectPomUpdater projectPomUpdater) {
+	public VersionsFetcher(ReleaserProperties properties, ProjectPomUpdater projectPomUpdater) {
 		this.properties = properties;
 		this.projectPomUpdater = projectPomUpdater;
 		this.toPropertiesConverter = new ToPropertiesConverter(new RawGithubRetriever());
@@ -75,8 +74,7 @@ public class VersionsFetcher implements Closeable {
 	public boolean isLatestGa(ProjectVersion version) {
 		if (!version.isReleaseOrServiceRelease()) {
 			if (log.isDebugEnabled()) {
-				log.debug("Version [" + version.toString()
-						+ "] is non GA, will not fetch any versions.");
+				log.debug("Version [" + version.toString() + "] is non GA, will not fetch any versions.");
 			}
 			return false;
 		}
@@ -86,55 +84,44 @@ public class VersionsFetcher implements Closeable {
 			return false;
 		}
 		String latestVersionsUrl = this.properties.getVersions().getAllVersionsFileUrl();
-		InitializrProperties initializrProperties = this.toPropertiesConverter
-				.toProperties(latestVersionsUrl);
+		InitializrProperties initializrProperties = this.toPropertiesConverter.toProperties(latestVersionsUrl);
 		if (initializrProperties == null) {
 			return false;
 		}
 		ProjectVersion bomVersion = latestBomVersion();
 		if (bomVersion == null) {
-			log.info("No BOM mapping with name [{}] found",
-					this.properties.getVersions().getBomName());
+			log.info("No BOM mapping with name [{}] found", this.properties.getVersions().getBomName());
 			return false;
 		}
 		Projects projectVersions = null;
 		try {
-			projectVersions = this.projectPomUpdater.retrieveVersionsFromReleaseTrainBom(
-					"v" + bomVersion.toString(), false);
+			projectVersions = this.projectPomUpdater.retrieveVersionsFromReleaseTrainBom("v" + bomVersion.toString(),
+					false);
 		}
 		catch (Exception ex) {
-			log.error(
-					"Failed to check the project versions. Will return that the project is not GA",
-					ex);
+			log.error("Failed to check the project versions. Will return that the project is not GA", ex);
 			return false;
 		}
 		boolean containsProject = projectVersions.containsProject(version.projectName);
 		if (containsProject) {
 			return bomVersion.compareTo(projectVersions.forName(version.projectName)) > 0;
 		}
-		log.info("The project [" + version.projectName
-				+ "] is not present in the BOM with projects [" + projectVersions.stream()
-						.map(v -> v.projectName).collect(Collectors.joining(", "))
-				+ "]");
+		log.info("The project [" + version.projectName + "] is not present in the BOM with projects ["
+				+ projectVersions.stream().map(v -> v.projectName).collect(Collectors.joining(", ")) + "]");
 		return false;
 	}
 
 	private ProjectVersion latestBomVersion() {
 		String latestVersionsUrl = this.properties.getVersions().getAllVersionsFileUrl();
-		InitializrProperties initializrProperties = this.toPropertiesConverter
-				.toProperties(latestVersionsUrl);
+		InitializrProperties initializrProperties = this.toPropertiesConverter.toProperties(latestVersionsUrl);
 		if (initializrProperties == null) {
 			return null;
 		}
 		ProjectVersion springCloudVersion = initializrProperties.getEnv().getBoms()
-				.getOrDefault(
-						this.properties.getVersions().getBomName(), new BillOfMaterials())
-				.getMappings().stream()
-				.map(mapping -> new ProjectVersion(
-						this.properties.getVersions().getBomName(), mapping.getVersion()))
-				.filter(ProjectVersion::isReleaseOrServiceRelease)
-				.max(ProjectVersion::compareTo).orElse(new ProjectVersion(
-						this.properties.getVersions().getBomName(), ""));
+				.getOrDefault(this.properties.getVersions().getBomName(), new BillOfMaterials()).getMappings().stream()
+				.map(mapping -> new ProjectVersion(this.properties.getVersions().getBomName(), mapping.getVersion()))
+				.filter(ProjectVersion::isReleaseOrServiceRelease).max(ProjectVersion::compareTo)
+				.orElse(new ProjectVersion(this.properties.getVersions().getBomName(), ""));
 		log.info("Latest BOM version is [{}]", springCloudVersion.version);
 		return springCloudVersion;
 	}
@@ -154,14 +141,13 @@ class RawGithubRetriever {
 		try {
 			URL url = new URL(stringUrl);
 			URLConnection con = url.openConnection();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-					con.getInputStream(), StandardCharsets.UTF_8))) {
+			try (BufferedReader reader = new BufferedReader(
+					new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
 				return reader.lines().collect(Collectors.joining("\n"));
 			}
 		}
 		catch (IOException e) {
-			LOG.warn("Exception occurred while trying to fetch the URL [" + stringUrl
-					+ "] contents");
+			LOG.warn("Exception occurred while trying to fetch the URL [" + stringUrl + "] contents");
 			return null;
 		}
 	}
@@ -185,16 +171,12 @@ class ToPropertiesConverter implements Closeable {
 				return null;
 			}
 			YamlPropertiesFactoryBean yamlProcessor = new YamlPropertiesFactoryBean();
-			yamlProcessor.setResources(new InputStreamResource(new ByteArrayInputStream(
-					retrievedFile.getBytes(StandardCharsets.UTF_8))));
+			yamlProcessor.setResources(
+					new InputStreamResource(new ByteArrayInputStream(retrievedFile.getBytes(StandardCharsets.UTF_8))));
 			Properties properties = yamlProcessor.getObject();
-			return new Binder(
-					new MapConfigurationPropertySource(properties.entrySet().stream()
-							.collect(Collectors.toMap(e -> e.getKey().toString(),
-									e -> e.getValue().toString()))))
-											.bind("initializr",
-													InitializrProperties.class)
-											.get();
+			return new Binder(new MapConfigurationPropertySource(properties.entrySet().stream()
+					.collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()))))
+							.bind("initializr", InitializrProperties.class).get();
 		});
 	}
 

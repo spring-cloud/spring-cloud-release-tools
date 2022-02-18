@@ -31,8 +31,7 @@ import releaser.internal.project.Projects;
  */
 class ProjectDocumentationUpdater {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ProjectDocumentationUpdater.class);
+	private static final Logger log = LoggerFactory.getLogger(ProjectDocumentationUpdater.class);
 
 	private final ProjectGitHandler gitHandler;
 
@@ -40,8 +39,7 @@ class ProjectDocumentationUpdater {
 
 	private final ReleaserProperties properties;
 
-	ProjectDocumentationUpdater(ReleaserProperties properties,
-			ProjectGitHandler gitHandler,
+	ProjectDocumentationUpdater(ReleaserProperties properties, ProjectGitHandler gitHandler,
 			List<CustomProjectDocumentationUpdater> updaters) {
 		this.gitHandler = gitHandler;
 		this.properties = properties;
@@ -50,44 +48,38 @@ class ProjectDocumentationUpdater {
 
 	// Not needed any more cause all projects publish to docs.spring.io
 	@Deprecated
-	public File updateDocsRepo(Projects projects, ProjectVersion currentProject,
-			String bomBranch) {
+	public File updateDocsRepo(Projects projects, ProjectVersion currentProject, String bomBranch) {
 		if (!shouldUpdate(currentProject)) {
 			return null;
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
 		log.debug("Cloning the doc project to [{}]", documentationProject);
-		CustomProjectDocumentationUpdater updater = this.updaters.isEmpty()
-				? CustomProjectDocumentationUpdater.NO_OP : this.updaters.get(0);
-		return updater.updateDocsRepoForReleaseTrain(documentationProject, currentProject,
-				projects, bomBranch);
+		CustomProjectDocumentationUpdater updater = this.updaters.isEmpty() ? CustomProjectDocumentationUpdater.NO_OP
+				: this.updaters.get(0);
+		return updater.updateDocsRepoForReleaseTrain(documentationProject, currentProject, projects, bomBranch);
 	}
 
 	// Not needed any more cause all projects publish to docs.spring.io
 	@Deprecated
-	public File updateDocsRepoForSingleProject(Projects projects,
-			ProjectVersion currentProject) {
+	public File updateDocsRepoForSingleProject(Projects projects, ProjectVersion currentProject) {
 		if (!shouldUpdate(currentProject)) {
 			return null;
 		}
 		File documentationProject = this.gitHandler.cloneDocumentationProject();
 		log.debug("Cloning the doc project to [{}]", documentationProject);
-		CustomProjectDocumentationUpdater updater = this.updaters.isEmpty()
-				? CustomProjectDocumentationUpdater.NO_OP : this.updaters.get(0);
-		return updater.updateDocsRepoForSingleProject(documentationProject,
-				currentProject, projects);
+		CustomProjectDocumentationUpdater updater = this.updaters.isEmpty() ? CustomProjectDocumentationUpdater.NO_OP
+				: this.updaters.get(0);
+		return updater.updateDocsRepoForSingleProject(documentationProject, currentProject, projects);
 	}
 
 	private boolean shouldUpdate(ProjectVersion currentProject) {
 		if (!this.properties.getGit().isUpdateDocumentationRepo()) {
-			log.info(
-					"Will not update documentation repository, since the switch to do so "
-							+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
+			log.info("Will not update documentation repository, since the switch to do so "
+					+ "is off. Set [releaser.git.update-documentation-repo] to [true] to change that");
 			return false;
 		}
 		if (!currentProject.isReleaseOrServiceRelease()) {
-			log.info(
-					"Will not update documentation repository for non release or service release [{}]",
+			log.info("Will not update documentation repository for non release or service release [{}]",
 					currentProject.version);
 			return false;
 		}

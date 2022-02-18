@@ -37,8 +37,7 @@ public class SpringBootAndCloudVersion {
 
 	private String springCloudVersion;
 
-	public SpringBootAndCloudVersion(String bootStartVersion,
-			boolean statVersionInclusive, String bootEndVersion,
+	public SpringBootAndCloudVersion(String bootStartVersion, boolean statVersionInclusive, String bootEndVersion,
 			boolean endVersionInclusive, String springCloudVersion) {
 		this.bootEndVersion = bootEndVersion;
 		this.comparableBootEndVersion = new ComparableVersion(bootEndVersion);
@@ -80,10 +79,8 @@ public class SpringBootAndCloudVersion {
 	boolean matchesSpringBootVersion(ComparableVersion versionToCheck) {
 		int startVersionComparison = comparableBootStartVersion.compareTo(versionToCheck);
 		int endVersionComparison = versionToCheck.compareTo(comparableBootEndVersion);
-		return ((startVersionInclusive && startVersionComparison == 0)
-				|| startVersionComparison <= -1)
-				&& ((endVersionInclusive && endVersionComparison == 0)
-						|| endVersionComparison <= -1);
+		return ((startVersionInclusive && startVersionComparison == 0) || startVersionComparison <= -1)
+				&& ((endVersionInclusive && endVersionComparison == 0) || endVersionComparison <= -1);
 	}
 
 }

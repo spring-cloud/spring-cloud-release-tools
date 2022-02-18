@@ -51,8 +51,7 @@ public class MavenBomParserTests {
 		BomParser parser = new MavenBomParser(this.properties, Collections.emptyList());
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Pom is not present");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining("Pom is not present");
 	}
 
 	@Test
@@ -69,8 +68,7 @@ public class MavenBomParserTests {
 	public void should_throw_exception_when_cloud_pom_is_missing() {
 		BomParser parser = new MavenBomParser(this.properties, Collections.emptyList());
 
-		thenThrownBy(() -> parser.versionsFromBom(new File(".")))
-				.isInstanceOf(IllegalStateException.class)
+		thenThrownBy(() -> parser.versionsFromBom(new File("."))).isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining("Pom is not present");
 	}
 
@@ -81,8 +79,7 @@ public class MavenBomParserTests {
 		BomParser parser = new MavenBomParser(this.properties, Collections.emptyList());
 
 		thenThrownBy(() -> parser.versionsFromBom(this.springCloudReleaseProject))
-				.isInstanceOf(IllegalStateException.class)
-				.hasMessageContaining("Pom is not present");
+				.isInstanceOf(IllegalStateException.class).hasMessageContaining("Pom is not present");
 	}
 
 }

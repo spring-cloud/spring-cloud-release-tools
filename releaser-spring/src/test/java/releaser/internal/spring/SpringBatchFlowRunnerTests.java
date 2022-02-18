@@ -48,52 +48,42 @@ class SpringBatchFlowRunnerTests {
 	ReleaserProperties releaserProperties = new ReleaserProperties();
 
 	@Test
-	void should_not_fail_the_release_when_project_post_release_task_fails(
-			@Autowired SpringBatchFlowRunner runner) {
+	void should_not_fail_the_release_when_project_post_release_task_fails(@Autowired SpringBatchFlowRunner runner) {
 		Options options = new OptionsBuilder().interactive(false).options();
 		ProjectsToRun projectsToRun = projectsToRun(options, releaserProperties);
 		TasksToRun tasks = new TasksToRun(new MyProjectPostReleaseTask());
 
-		ExecutionResult executionResult = runner.runReleaseTasks(options,
-				releaserProperties, projectsToRun, tasks);
+		ExecutionResult executionResult = runner.runReleaseTasks(options, releaserProperties, projectsToRun, tasks);
 
 		BDDAssertions.then(executionResult.isUnstable()).isTrue();
 	}
 
 	@Test
-	void should_execute_post_train_tasks_when_such_property_is_set(
-			@Autowired SpringBatchFlowRunner runner,
+	void should_execute_post_train_tasks_when_such_property_is_set(@Autowired SpringBatchFlowRunner runner,
 			@Autowired ProjectsToRunFactory factory) {
-		Options options = new OptionsBuilder().interactive(false).metaRelease(true)
-				.options();
+		Options options = new OptionsBuilder().interactive(false).metaRelease(true).options();
 		releaserProperties.setPostReleaseTasksOnly(true);
 		releaserProperties.getMetaRelease().setReleaseTrainProjectName("foo");
 		ProjectsToRun projectsToRun = projectsToRun(options, releaserProperties);
-		BDDMockito.given(factory.postReleaseTrain(BDDMockito.any()))
-				.willReturn(projectsToRun);
+		BDDMockito.given(factory.postReleaseTrain(BDDMockito.any())).willReturn(projectsToRun);
 		TasksToRun tasks = new TasksToRun(new MyPostTrainReleaseTask());
 
-		ExecutionResult executionResult = runner.runReleaseTasks(options,
-				releaserProperties, projectsToRun, tasks);
+		ExecutionResult executionResult = runner.runReleaseTasks(options, releaserProperties, projectsToRun, tasks);
 
 		BDDAssertions.then(executionResult.isSkipped()).isTrue();
 
-		executionResult = runner.runPostReleaseTrainTasks(options, releaserProperties,
-				"post-release", tasks);
+		executionResult = runner.runPostReleaseTrainTasks(options, releaserProperties, "post-release", tasks);
 
 		BDDAssertions.then(executionResult.isSuccess()).isTrue();
 	}
 
-	private ProjectsToRun projectsToRun(Options options,
-			ReleaserProperties releaserProperties) {
-		return new ProjectsToRun(new ProjectToRun.ProjectToRunSupplier("test",
-				() -> projectToRun(options, releaserProperties)));
+	private ProjectsToRun projectsToRun(Options options, ReleaserProperties releaserProperties) {
+		return new ProjectsToRun(
+				new ProjectToRun.ProjectToRunSupplier("test", () -> projectToRun(options, releaserProperties)));
 	}
 
-	private ProjectToRun projectToRun(Options options,
-			ReleaserProperties releaserProperties) {
-		return new ProjectToRun(new File("."),
-				new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "0.0.1")),
+	private ProjectToRun projectToRun(Options options, ReleaserProperties releaserProperties) {
+		return new ProjectToRun(new File("."), new ProjectsFromBom(new Projects(), new ProjectVersion("foo", "0.0.1")),
 				new ProjectVersion("foo", "0.0.1"), releaserProperties, options);
 	}
 
@@ -139,9 +129,8 @@ class MyProjectPostReleaseTask implements ProjectPostReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return ExecutionResult.unstable(
-				HttpServerErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "foo",
-						new HttpHeaders(), "".getBytes(), Charset.defaultCharset()));
+		return ExecutionResult.unstable(HttpServerErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "foo",
+				new HttpHeaders(), "".getBytes(), Charset.defaultCharset()));
 	}
 
 	@Override

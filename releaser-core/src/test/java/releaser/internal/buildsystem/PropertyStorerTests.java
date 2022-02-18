@@ -51,8 +51,7 @@ public class PropertyStorerTests {
 	}
 
 	private String containsWarnMsgAboutEmptyVersion() {
-		return BDDMockito
-				.argThat(argument -> argument.contains("is empty. Will not set it"));
+		return BDDMockito.argThat(argument -> argument.contains("is empty. Will not set it"));
 	}
 
 }

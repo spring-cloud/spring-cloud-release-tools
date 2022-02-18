@@ -36,8 +36,7 @@ public class MetaReleaseDryRunCompositeTask implements CompositeReleaserTask {
 	 */
 	public static final int ORDER = -70;
 
-	private static final Logger log = LoggerFactory
-			.getLogger(MetaReleaseDryRunCompositeTask.class);
+	private static final Logger log = LoggerFactory.getLogger(MetaReleaseDryRunCompositeTask.class);
 
 	private final ApplicationContext context;
 

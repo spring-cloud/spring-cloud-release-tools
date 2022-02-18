@@ -87,8 +87,7 @@ public class ReleaserProperties implements Serializable {
 	private MetaRelease metaRelease = new MetaRelease();
 
 	public String getWorkingDir() {
-		return StringUtils.hasText(this.workingDir) ? this.workingDir
-				: System.getProperty("user.dir");
+		return StringUtils.hasText(this.workingDir) ? this.workingDir : System.getProperty("user.dir");
 	}
 
 	public void setWorkingDir(String workingDir) {
@@ -201,10 +200,9 @@ public class ReleaserProperties implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git="
-				+ this.git + ", pom=" + this.pom + ", maven=" + this.maven + ", gradle="
-				+ this.gradle + ", sagan=" + this.sagan + ", fixedVersions="
-				+ this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
+		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git + ", pom="
+				+ this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan=" + this.sagan
+				+ ", fixedVersions=" + this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
 				+ this.template + ", versions=" + this.versions + '}';
 	}
 
@@ -362,8 +360,7 @@ public class ReleaserProperties implements Serializable {
 			return this.releaseTrainDependencyNames;
 		}
 
-		public void setReleaseTrainDependencyNames(
-				List<String> releaseTrainDependencyNames) {
+		public void setReleaseTrainDependencyNames(List<String> releaseTrainDependencyNames) {
 			this.releaseTrainDependencyNames = releaseTrainDependencyNames;
 		}
 
@@ -401,12 +398,10 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "MetaRelease{" + "enabled=" + enabled + ", releaseTrainProjectName='"
-					+ releaseTrainProjectName + '\'' + ", releaseTrainDependencyNames="
-					+ releaseTrainDependencyNames + ", gitOrgUrl='" + gitOrgUrl + '\''
-					+ ", projectsToSkip=" + projectsToSkip + ", releaseGroups="
-					+ releaseGroups + ", releaseGroupTimeoutInMinutes="
-					+ releaseGroupTimeoutInMinutes + ", releaseGroupThreadCount="
+			return "MetaRelease{" + "enabled=" + enabled + ", releaseTrainProjectName='" + releaseTrainProjectName
+					+ '\'' + ", releaseTrainDependencyNames=" + releaseTrainDependencyNames + ", gitOrgUrl='"
+					+ gitOrgUrl + '\'' + ", projectsToSkip=" + projectsToSkip + ", releaseGroups=" + releaseGroups
+					+ ", releaseGroupTimeoutInMinutes=" + releaseGroupTimeoutInMinutes + ", releaseGroupThreadCount="
 					+ releaseGroupThreadCount + '}';
 		}
 
@@ -823,21 +818,16 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Git{" + "releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\''
-					+ ", documentationUrl='" + this.documentationUrl + '\''
-					+ ", documentationBranch='" + this.documentationBranch + '\''
-					+ ", releaseTrainBranch='" + this.releaseTrainBranch + '\''
-					+ ", releaseTrainWikiUrl='" + this.releaseTrainWikiUrl + '\''
-					+ ", updateDocumentationRepo=" + this.updateDocumentationRepo
-					+ ", springProjectUrl=" + this.springProjectUrl
-					+ ", springProjectBranch=" + this.springProjectBranch
-					+ ", releaseTrainWikiPagePrefix=" + this.releaseTrainWikiPagePrefix
-					+ ", cloneDestinationDir='" + this.cloneDestinationDir + '\''
-					+ ", fetchVersionsFromGit=" + this.fetchVersionsFromGit
-					+ ", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones
-					+ ", updateSpringGuides=" + this.updateSpringGuides
-					+ ", updateSpringProject=" + this.updateSpringProject
-					+ ", sampleUrlsSize=" + this.allTestSampleUrls.size() + '}';
+			return "Git{" + "releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\'' + ", documentationUrl='"
+					+ this.documentationUrl + '\'' + ", documentationBranch='" + this.documentationBranch + '\''
+					+ ", releaseTrainBranch='" + this.releaseTrainBranch + '\'' + ", releaseTrainWikiUrl='"
+					+ this.releaseTrainWikiUrl + '\'' + ", updateDocumentationRepo=" + this.updateDocumentationRepo
+					+ ", springProjectUrl=" + this.springProjectUrl + ", springProjectBranch="
+					+ this.springProjectBranch + ", releaseTrainWikiPagePrefix=" + this.releaseTrainWikiPagePrefix
+					+ ", cloneDestinationDir='" + this.cloneDestinationDir + '\'' + ", fetchVersionsFromGit="
+					+ this.fetchVersionsFromGit + ", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones
+					+ ", updateSpringGuides=" + this.updateSpringGuides + ", updateSpringProject="
+					+ this.updateSpringProject + ", sampleUrlsSize=" + this.allTestSampleUrls.size() + '}';
 		}
 
 	}
@@ -918,11 +908,10 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Pom{" + "branch='" + this.branch + '\''
-					+ ", pomWithBootStarterParent='" + this.pomWithBootStarterParent
-					+ '\'' + ", thisTrainBom='" + this.thisTrainBom + '\''
-					+ ", bomVersionPattern='" + this.bomVersionPattern + '\''
-					+ ", ignoredPomRegex=" + this.ignoredPomRegex + '}';
+			return "Pom{" + "branch='" + this.branch + '\'' + ", pomWithBootStarterParent='"
+					+ this.pomWithBootStarterParent + '\'' + ", thisTrainBom='" + this.thisTrainBom + '\''
+					+ ", bomVersionPattern='" + this.bomVersionPattern + '\'' + ", ignoredPomRegex="
+					+ this.ignoredPomRegex + '}';
 		}
 
 	}
@@ -1039,8 +1028,7 @@ public class ReleaserProperties implements Serializable {
 		}
 
 		@Override
-		public void setGenerateReleaseTrainDocsCommand(
-				String generateReleaseTrainDocsCommand) {
+		public void setGenerateReleaseTrainDocsCommand(String generateReleaseTrainDocsCommand) {
 			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
 		}
 
@@ -1056,12 +1044,10 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Maven{" + "buildCommand='" + this.buildCommand + '\''
-					+ ", deployCommand='" + this.deployCommand + '\''
-					+ ", publishDocsCommand=" + this.publishDocsCommand
-					+ "generateReleaseTrainDocsCommand='"
-					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes="
-					+ this.waitTimeInMinutes + '}';
+			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='" + this.deployCommand
+					+ '\'' + ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
+					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes=" + this.waitTimeInMinutes
+					+ '}';
 		}
 
 	}
@@ -1173,8 +1159,7 @@ public class ReleaserProperties implements Serializable {
 		}
 
 		@Override
-		public void setGenerateReleaseTrainDocsCommand(
-				String generateReleaseTrainDocsCommand) {
+		public void setGenerateReleaseTrainDocsCommand(String generateReleaseTrainDocsCommand) {
 			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
 		}
 
@@ -1190,12 +1175,10 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Bash{" + "buildCommand='" + this.buildCommand + '\''
-					+ ", deployCommand='" + this.deployCommand + '\''
-					+ ", publishDocsCommand=" + this.publishDocsCommand
-					+ "generateReleaseTrainDocsCommand='"
-					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes="
-					+ this.waitTimeInMinutes + '}';
+			return "Bash{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='" + this.deployCommand
+					+ '\'' + ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
+					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes=" + this.waitTimeInMinutes
+					+ '}';
 		}
 
 	}
@@ -1328,8 +1311,7 @@ public class ReleaserProperties implements Serializable {
 		}
 
 		@Override
-		public void setGenerateReleaseTrainDocsCommand(
-				String generateReleaseTrainDocsCommand) {
+		public void setGenerateReleaseTrainDocsCommand(String generateReleaseTrainDocsCommand) {
 			this.generateReleaseTrainDocsCommand = generateReleaseTrainDocsCommand;
 		}
 
@@ -1347,8 +1329,7 @@ public class ReleaserProperties implements Serializable {
 			return this.gradlePropsSubstitution;
 		}
 
-		public void setGradlePropsSubstitution(
-				Map<String, String> gradlePropsSubstitution) {
+		public void setGradlePropsSubstitution(Map<String, String> gradlePropsSubstitution) {
 			this.gradlePropsSubstitution = gradlePropsSubstitution;
 		}
 
@@ -1364,15 +1345,13 @@ public class ReleaserProperties implements Serializable {
 		public String toString() {
 			return new StringJoiner(", ", Gradle.class.getSimpleName() + "[", "]")
 					.add("gradlePropsSubstitution=" + gradlePropsSubstitution)
-					.add("ignoredGradleRegex=" + ignoredGradleRegex)
-					.add("buildCommand='" + buildCommand + "'")
+					.add("ignoredGradleRegex=" + ignoredGradleRegex).add("buildCommand='" + buildCommand + "'")
 					.add("deployCommand='" + deployCommand + "'")
 					.add("deployGuidesCommand='" + deployGuidesCommand + "'")
 					.add("publishDocsCommand=" + publishDocsCommand)
-					.add("generateReleaseTrainDocsCommand='"
-							+ generateReleaseTrainDocsCommand + "'")
-					.add("systemProperties='" + systemProperties + "'")
-					.add("waitTimeInMinutes=" + waitTimeInMinutes).toString();
+					.add("generateReleaseTrainDocsCommand='" + generateReleaseTrainDocsCommand + "'")
+					.add("systemProperties='" + systemProperties + "'").add("waitTimeInMinutes=" + waitTimeInMinutes)
+					.toString();
 		}
 
 	}
@@ -1519,8 +1498,8 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Versions{" + "allVersionsFileUrl='" + this.allVersionsFileUrl + '\''
-					+ ", bomName='" + this.bomName + '\'' + '}';
+			return "Versions{" + "allVersionsFileUrl='" + this.allVersionsFileUrl + '\'' + ", bomName='" + this.bomName
+					+ '\'' + '}';
 		}
 
 	}

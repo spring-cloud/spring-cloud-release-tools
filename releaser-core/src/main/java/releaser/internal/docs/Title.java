@@ -36,8 +36,7 @@ public class Title {
 		this.currentSnapshotTrainName = row[initialIndex + 2].trim();
 	}
 
-	Title(String lastGaTrainName, String currentGaTrainName,
-			String currentSnapshotTrainName) {
+	Title(String lastGaTrainName, String currentGaTrainName, String currentSnapshotTrainName) {
 		this.lastGaTrainName = lastGaTrainName.trim();
 		this.currentGaTrainName = currentGaTrainName.trim();
 		this.currentSnapshotTrainName = currentSnapshotTrainName.trim();
@@ -54,14 +53,12 @@ public class Title {
 		Title title = (Title) o;
 		return Objects.equals(this.lastGaTrainName, title.lastGaTrainName)
 				&& Objects.equals(this.currentGaTrainName, title.currentGaTrainName)
-				&& Objects.equals(this.currentSnapshotTrainName,
-						title.currentSnapshotTrainName);
+				&& Objects.equals(this.currentSnapshotTrainName, title.currentSnapshotTrainName);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.lastGaTrainName, this.currentGaTrainName,
-				this.currentSnapshotTrainName);
+		return Objects.hash(this.lastGaTrainName, this.currentGaTrainName, this.currentSnapshotTrainName);
 	}
 
 	public String getLastGaTrainName() {

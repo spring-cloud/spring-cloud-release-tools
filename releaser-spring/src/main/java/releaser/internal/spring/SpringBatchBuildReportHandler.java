@@ -39,8 +39,7 @@ import org.springframework.util.StringUtils;
 
 class SpringBatchBuildReportHandler implements BuildReportHandler {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(SpringBatchExecutionResultHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(SpringBatchExecutionResultHandler.class);
 
 	private final JobExplorer jobExplorer;
 
@@ -52,34 +51,27 @@ class SpringBatchBuildReportHandler implements BuildReportHandler {
 	public void reportBuildSummary() {
 		List<String> jobNames = this.jobExplorer.getJobNames();
 		List<JobExecution> sortedJobExecutions = jobNames.stream()
-				.flatMap(name -> this.jobExplorer.findJobInstancesByJobName(name, 0, 100)
-						.stream())
-				.flatMap(instance -> this.jobExplorer.getJobExecutions(instance).stream())
-				.filter(j -> !j.isRunning())
-				.sorted(Comparator.comparing(JobExecution::getCreateTime))
-				.collect(Collectors.toList());
-		List<StepExecution> stepContexts = sortedJobExecutions.stream()
-				.flatMap(j -> j.getStepExecutions().stream())
+				.flatMap(name -> this.jobExplorer.findJobInstancesByJobName(name, 0, 100).stream())
+				.flatMap(instance -> this.jobExplorer.getJobExecutions(instance).stream()).filter(j -> !j.isRunning())
+				.sorted(Comparator.comparing(JobExecution::getCreateTime)).collect(Collectors.toList());
+		List<StepExecution> stepContexts = sortedJobExecutions.stream().flatMap(j -> j.getStepExecutions().stream())
 				.collect(Collectors.toCollection(LinkedList::new));
 		printTable(buildTable(stepContexts));
 	}
 
 	private List<Table> buildTable(List<StepExecution> stepContexts) {
 		return stepContexts.stream().map(step -> {
-			String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-					.format(step.getStartTime());
-			long millis = ChronoUnit.MILLIS.between(step.getStartTime().toInstant(),
-					step.getEndTime().toInstant());
+			String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(step.getStartTime());
+			long millis = ChronoUnit.MILLIS.between(step.getStartTime().toInstant(), step.getEndTime().toInstant());
 			ExecutionContext context = step.getExecutionContext();
 			ExecutionResultReport entity = (ExecutionResultReport) context.get("entity");
 			if (entity == null) {
 				return null;
 			}
-			String projectName = TrainPostReleaseReleaserTask.class
-					.isAssignableFrom(entity.getReleaserTaskType()) ? "postRelease"
-							: entity.getProjectName();
-			return new Table(date, time(millis), projectName, entity.getShortName(),
-					entity.getDescription(), entity.getState(), entity.getExceptions());
+			String projectName = TrainPostReleaseReleaserTask.class.isAssignableFrom(entity.getReleaserTaskType())
+					? "postRelease" : entity.getProjectName();
+			return new Table(date, time(millis), projectName, entity.getShortName(), entity.getDescription(),
+					entity.getState(), entity.getExceptions());
 		}).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedList::new));
 	}
 
@@ -96,23 +88,20 @@ class SpringBatchBuildReportHandler implements BuildReportHandler {
 	}
 
 	private void printTable(List<Table> table) {
-		String string = "\n\n***** BUILD REPORT *****\n\n"
-				+ FlipTableConverters.fromIterable(table, Table.class)
+		String string = "\n\n***** BUILD REPORT *****\n\n" + FlipTableConverters.fromIterable(table, Table.class)
 				+ "\n\n***** BUILD REPORT *****\n\n";
-		List<Table> brokenTasks = table.stream()
-				.filter(table1 -> StringUtils.hasText(table1.thrownException))
+		List<Table> brokenTasks = table.stream().filter(table1 -> StringUtils.hasText(table1.thrownException))
 				.collect(Collectors.toList());
 		if (!brokenTasks.isEmpty()) {
-			String brokenBuilds = "\n\n[BUILD UNSTABLE] The following release tasks are failing!\n\n"
-					+ brokenTasks.stream().map(table1 -> String.format(
+			String brokenBuilds = "\n\n[BUILD UNSTABLE] The following release tasks are failing!\n\n" + brokenTasks
+					.stream()
+					.map(table1 -> String.format(
 							"***** Project / Task : <%s/%s> ***** \nTask Description <%s>\nException Stacktrace \n\n%s",
-							table1.projectName, table1.taskCaption,
-							table1.taskDescription,
-							table1.exceptions + "\n" + table1.exceptions.stream()
-									.map(Throwable::getStackTrace).flatMap(Arrays::stream)
-									.map(StackTraceElement::toString)
-									.collect(Collectors.joining("\n"))))
-							.collect(Collectors.joining("\n\n"));
+							table1.projectName, table1.taskCaption, table1.taskDescription,
+							table1.exceptions + "\n"
+									+ table1.exceptions.stream().map(Throwable::getStackTrace).flatMap(Arrays::stream)
+											.map(StackTraceElement::toString).collect(Collectors.joining("\n"))))
+					.collect(Collectors.joining("\n\n"));
 			log.warn(string + brokenBuilds);
 		}
 		else {
@@ -138,9 +127,8 @@ class SpringBatchBuildReportHandler implements BuildReportHandler {
 
 		List<Throwable> exceptions;
 
-		Table(String creationTime, String executionTime, String projectName,
-				String taskCaption, String taskDescription, String taskState,
-				List<Throwable> exceptions) {
+		Table(String creationTime, String executionTime, String projectName, String taskCaption, String taskDescription,
+				String taskState, List<Throwable> exceptions) {
 			this.creationTime = creationTime;
 			this.executionTime = executionTime;
 			this.projectName = projectName;

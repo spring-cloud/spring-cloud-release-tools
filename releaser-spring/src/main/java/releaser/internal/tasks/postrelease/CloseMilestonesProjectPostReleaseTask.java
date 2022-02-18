@@ -21,8 +21,7 @@ import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.ProjectPostReleaseReleaserTask;
 import releaser.internal.tech.ExecutionResult;
 
-public class CloseMilestonesProjectPostReleaseTask
-		implements ProjectPostReleaseReleaserTask {
+public class CloseMilestonesProjectPostReleaseTask implements ProjectPostReleaseReleaserTask {
 
 	/**
 	 * Order of this task. The higher value, the lower order.

@@ -56,15 +56,13 @@ public class VersionsFromBom {
 		this.parser = parser;
 	}
 
-	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser,
-			Set<Project> projects) {
+	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser, Set<Project> projects) {
 		this.properties = releaserProperties;
 		this.parser = parser;
 		projects.forEach(project -> setVersion(project.name, project.version));
 	}
 
-	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser,
-			VersionsFromBom... projects) {
+	VersionsFromBom(ReleaserProperties releaserProperties, CustomBomParser parser, VersionsFromBom... projects) {
 		this.properties = releaserProperties;
 		this.parser = parser;
 		Arrays.stream(projects).forEach(p -> this.projects.addAll(p.projects));
@@ -84,23 +82,20 @@ public class VersionsFromBom {
 	}
 
 	public String versionForProject(String projectName) {
-		return this.projects.stream().filter(project -> nameMatches(projectName, project))
-				.findFirst().orElse(Project.EMPTY_PROJECT).version;
+		return this.projects.stream().filter(project -> nameMatches(projectName, project)).findFirst()
+				.orElse(Project.EMPTY_PROJECT).version;
 	}
 
 	public boolean shouldBeUpdated(String projectName) {
-		return this.projects.stream()
-				.anyMatch(project -> nameMatches(projectName, project));
+		return this.projects.stream().anyMatch(project -> nameMatches(projectName, project));
 	}
 
 	public boolean shouldSetProperty(Properties properties) {
-		return this.projects.stream()
-				.anyMatch(project -> properties.containsKey(project.name + ".version"));
+		return this.projects.stream().anyMatch(project -> properties.containsKey(project.name + ".version"));
 	}
 
 	public Projects toProjectVersions() {
-		return this.projects.stream()
-				.map(project -> new ProjectVersion(project.name, project.version))
+		return this.projects.stream().map(project -> new ProjectVersion(project.name, project.version))
 				.collect(Collectors.toCollection(Projects::new));
 	}
 
@@ -114,23 +109,18 @@ public class VersionsFromBom {
 		}
 		boolean parent = matchesNameWithSuffix(projectName, "-parent", project);
 		boolean bomArtifactId = comparisonOfBomArtifactAndParent(projectName, project);
-		return !bomArtifactId && (parent
-				|| matchesNameWithSuffix(projectName, "-dependencies", project));
+		return !bomArtifactId && (parent || matchesNameWithSuffix(projectName, "-dependencies", project));
 	}
 
-	private boolean comparisonOfBomArtifactAndParent(String projectName,
-			Project project) {
-		return artifactOrParent(projectName, project.name)
-				|| artifactOrParent(project.name, projectName);
+	private boolean comparisonOfBomArtifactAndParent(String projectName, Project project) {
+		return artifactOrParent(projectName, project.name) || artifactOrParent(project.name, projectName);
 	}
 
 	private boolean artifactOrParent(String projectName, String otherProjectName) {
-		return projectName.equals(dependenciesArtifactId())
-				&& otherProjectName.equals(dependenciesParentArtifactId());
+		return projectName.equals(dependenciesArtifactId()) && otherProjectName.equals(dependenciesParentArtifactId());
 	}
 
-	private boolean matchesNameWithSuffix(String projectName, String suffix,
-			Project project) {
+	private boolean matchesNameWithSuffix(String projectName, String suffix, Project project) {
 		boolean containsSuffix = projectName.endsWith(suffix);
 		if (!containsSuffix) {
 			return false;
@@ -157,8 +147,7 @@ public class VersionsFromBom {
 	}
 
 	private List<String> bomVersionProjectNames() {
-		List<String> names = new ArrayList<>(
-				this.properties.getMetaRelease().getReleaseTrainDependencyNames());
+		List<String> names = new ArrayList<>(this.properties.getMetaRelease().getReleaseTrainDependencyNames());
 		names.add(this.properties.getMetaRelease().getReleaseTrainProjectName());
 		return names;
 	}
@@ -184,8 +173,7 @@ public class VersionsFromBom {
 
 	@Override
 	public String toString() {
-		return "Projects=\n\t" + this.projects.stream().map(Object::toString)
-				.collect(Collectors.joining("\n\t"));
+		return "Projects=\n\t" + this.projects.stream().map(Object::toString).collect(Collectors.joining("\n\t"));
 	}
 
 }

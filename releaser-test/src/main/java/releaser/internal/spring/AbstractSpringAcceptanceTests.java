@@ -77,15 +77,15 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public static Project newProject() {
 		Project project = new Project();
-		project.projectReleases.addAll(Arrays.asList(release("1.0.0.M8"),
-				release("1.1.0.M8"), release("1.2.0.M8"), release("2.0.0.M8")));
+		project.setReleases(
+				Arrays.asList(release("1.0.0.M8"), release("1.1.0.M8"), release("1.2.0.M8"), release("2.0.0.M8")));
 		return project;
 	}
 
 	public static Release release(String version) {
 		Release release = new Release();
-		release.version = version;
-		release.current = true;
+		release.setVersion(version);
+		release.setCurrent(true);
 		return release;
 	}
 
@@ -114,13 +114,11 @@ public abstract class AbstractSpringAcceptanceTests {
 	}
 
 	public void thenRunUpdatedTestsWereCalled(PostReleaseActions postReleaseActions) {
-		BDDMockito.then(postReleaseActions).should()
-				.runUpdatedTests(BDDMockito.any(Projects.class));
+		BDDMockito.then(postReleaseActions).should().runUpdatedTests(BDDMockito.any(Projects.class));
 	}
 
 	public void thenRunUpdatedTestsWereNotCalled(PostReleaseActions postReleaseActions) {
-		BDDMockito.then(postReleaseActions).should(BDDMockito.never())
-				.runUpdatedTests(BDDMockito.any(Projects.class));
+		BDDMockito.then(postReleaseActions).should(BDDMockito.never()).runUpdatedTests(BDDMockito.any(Projects.class));
 	}
 
 	public Iterable<RevCommit> listOfCommits(File project) throws GitAPIException {
@@ -146,10 +144,8 @@ public abstract class AbstractSpringAcceptanceTests {
 		}
 	}
 
-	public void tagIsPresentInOrigin(File origin, String expectedTag)
-			throws GitAPIException {
-		then(GitTestUtils.openGitProject(origin).tagList().call().iterator().next()
-				.getName()).endsWith(expectedTag);
+	public void tagIsPresentInOrigin(File origin, String expectedTag) throws GitAPIException {
+		then(GitTestUtils.openGitProject(origin).tagList().call().iterator().next().getName()).endsWith(expectedTag);
 	}
 
 	public Model pom(File dir) {
@@ -197,8 +193,7 @@ public abstract class AbstractSpringAcceptanceTests {
 	}
 
 	public File file(String relativePath) throws URISyntaxException {
-		return new File(
-				AbstractSpringAcceptanceTests.class.getResource(relativePath).toURI());
+		return new File(AbstractSpringAcceptanceTests.class.getResource(relativePath).toURI());
 	}
 
 	public String text(File file) throws IOException {
@@ -221,13 +216,12 @@ public abstract class AbstractSpringAcceptanceTests {
 	}
 
 	public Git clonedProject(NonAssertingTestProjectGitHandler handler, String name) {
-		return GitTestUtils.openGitProject(handler.clonedProjects.stream()
-				.filter(file -> file.getName().equals(name)).findFirst().get());
+		return GitTestUtils.openGitProject(
+				handler.clonedProjects.stream().filter(file -> file.getName().equals(name)).findFirst().get());
 	}
 
 	public void thenUpdateReleaseTrainDocsWasCalled(PostReleaseActions actions) {
-		BDDMockito.then(actions).should()
-				.generateReleaseTrainDocumentation(BDDMockito.any(Projects.class));
+		BDDMockito.then(actions).should().generateReleaseTrainDocumentation(BDDMockito.any(Projects.class));
 	}
 
 	public void thenUpdateReleaseTrainDocsWasNotCalled(PostReleaseActions actions) {
@@ -241,8 +235,7 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public void run(SpringApplicationBuilder application, Props properties,
 			CatchingConsumer<ConfigurableApplicationContext> consumer) {
-		try (ConfigurableApplicationContext context = application.build()
-				.run(properties.toCommandLineProps())) {
+		try (ConfigurableApplicationContext context = application.build().run(properties.toCommandLineProps())) {
 			consumer.accept(context);
 		}
 		catch (Exception e) {
@@ -262,8 +255,7 @@ public abstract class AbstractSpringAcceptanceTests {
 
 		public Set<File> clonedProjects = new HashSet<>();
 
-		public NonAssertingTestProjectGitHandler(ReleaserProperties properties,
-				Consumer<File> docsConsumer) {
+		public NonAssertingTestProjectGitHandler(ReleaserProperties properties, Consumer<File> docsConsumer) {
 			super(properties);
 			this.docsConsumer = docsConsumer;
 		}
@@ -306,8 +298,7 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	}
 
-	public static class TestExecutionResultHandler
-			extends SpringBatchExecutionResultHandler {
+	public static class TestExecutionResultHandler extends SpringBatchExecutionResultHandler {
 
 		public boolean exitedSuccessOrUnstable;
 
@@ -333,16 +324,12 @@ public abstract class AbstractSpringAcceptanceTests {
 	public static class DefaultTestConfiguration {
 
 		@Bean
-		SpringBatchFlowRunner mySpringBatchFlowRunner(
-				StepBuilderFactory stepBuilderFactory,
-				JobBuilderFactory jobBuilderFactory,
-				ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
-				FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier,
-				ConfigurableApplicationContext context,
+		SpringBatchFlowRunner mySpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory,
+				JobBuilderFactory jobBuilderFactory, ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
+				FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier, ConfigurableApplicationContext context,
 				ReleaserProperties releaserProperties, BuildReportHandler reportHandler) {
-			return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory,
-					projectsToRunFactory, jobLauncher, flowRunnerTaskExecutorSupplier,
-					context, releaserProperties, reportHandler) {
+			return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory, projectsToRunFactory, jobLauncher,
+					flowRunnerTaskExecutorSupplier, context, releaserProperties, reportHandler) {
 				@Override
 				Decision decide(Options options, ReleaserTask task) {
 					return Decision.CONTINUE;
@@ -362,8 +349,7 @@ public abstract class AbstractSpringAcceptanceTests {
 		}
 
 		@Bean
-		TestExecutionResultHandler testExecutionResultHandler(
-				BuildReportHandler buildReportHandler,
+		TestExecutionResultHandler testExecutionResultHandler(BuildReportHandler buildReportHandler,
 				ConfigurableApplicationContext context) {
 			return new TestExecutionResultHandler(buildReportHandler, context);
 		}
@@ -384,8 +370,7 @@ public abstract class AbstractSpringAcceptanceTests {
 		}
 
 		public String[] toCommandLineProps() {
-			return this.args.stream().map(s -> "--" + s).collect(Collectors.toList())
-					.toArray(new String[0]);
+			return this.args.stream().map(s -> "--" + s).collect(Collectors.toList()).toArray(new String[0]);
 		}
 
 	}

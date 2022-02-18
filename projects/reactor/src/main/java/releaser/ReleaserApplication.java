@@ -27,8 +27,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ReleaserApplication extends ReleaserCommandLineRunner {
 
-	public ReleaserApplication(SpringReleaser releaser,
-			ExecutionResultHandler executionResultHandler, Parser parser) {
+	public ReleaserApplication(SpringReleaser releaser, ExecutionResultHandler executionResultHandler, Parser parser) {
 		super(releaser, executionResultHandler, parser);
 	}
 

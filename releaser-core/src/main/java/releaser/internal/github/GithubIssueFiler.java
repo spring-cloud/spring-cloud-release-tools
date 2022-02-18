@@ -47,8 +47,8 @@ public class GithubIssueFiler {
 	private final ReleaserProperties properties;
 
 	public GithubIssueFiler(ReleaserProperties properties) {
-		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry()
-				.through(RetryWire.class)), properties);
+		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry().through(RetryWire.class)),
+				properties);
 	}
 
 	public GithubIssueFiler(Github github, ReleaserProperties properties) {
@@ -56,22 +56,20 @@ public class GithubIssueFiler {
 		this.properties = properties;
 	}
 
-	public void fileAGitHubIssue(String user, String repo, ProjectVersion version,
-			String issueTitle, String issueText) {
+	public void fileAGitHubIssue(String user, String repo, ProjectVersion version, String issueTitle,
+			String issueText) {
 		Assert.hasText(this.properties.getGit().getOauthToken(),
 				"You have to pass Github OAuth token for milestone closing to be operational");
 		// do this only for RELEASE & SR
 		if (version.isSnapshot()) {
-			log.info(
-					"Github issue creation will occur only for non snapshot versions. Your version is [{}]",
+			log.info("Github issue creation will occur only for non snapshot versions. Your version is [{}]",
 					parsedVersion());
 			return;
 		}
 		fileAGithubIssue(user, repo, issueTitle, issueText);
 	}
 
-	private void fileAGithubIssue(String user, String repo, String issueTitle,
-			String issueText) {
+	private void fileAGithubIssue(String user, String repo, String issueTitle, String issueText) {
 		Repo ghRepo = this.github.repos().get(new Coordinates.Simple(user, repo));
 		// check if the issue is not already there
 		boolean issueAlreadyFiled = issueAlreadyFiled(ghRepo, issueTitle);
@@ -81,9 +79,7 @@ public class GithubIssueFiler {
 		}
 		try {
 			int number = ghRepo.issues().create(issueTitle, issueText).number();
-			log.info(
-					"Successfully created an issue with "
-							+ "title [{}] for the [{}/{}] GitHub repository" + number,
+			log.info("Successfully created an issue with " + "title [{}] for the [{}/{}] GitHub repository" + number,
 					issueTitle, user, repo);
 		}
 		catch (IOException e) {

@@ -36,7 +36,7 @@ import releaser.internal.PomUpdateAcceptanceTests;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
 
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -51,7 +51,7 @@ public class ProjectCommandExecutorTests {
 	public TemporaryFolder tmp = new TemporaryFolder();
 
 	@Rule
-	public OutputCapture outputCapture = new OutputCapture();
+	public OutputCaptureRule outputCapture = new OutputCaptureRule();
 
 	File temporaryFolder;
 
@@ -80,32 +80,26 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("resolved.log");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("resolved.log");
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_path_is_provided_explicitly()
-			throws Exception {
+	public void should_successfully_execute_a_command_when_path_is_provided_explicitly() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setBuildCommand("ls -al");
 		properties.setWorkingDir(new File("/foo/bar").getAbsolutePath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
+		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
 				tmpFile("/builder/resolved").getPath());
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("resolved.log");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("resolved.log");
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_milestone_version()
-			throws Exception {
+	public void should_successfully_execute_a_build_command_for_milestone_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -117,8 +111,7 @@ public class ProjectCommandExecutorTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_rc_version()
-			throws Exception {
+	public void should_successfully_execute_a_build_command_for_rc_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -126,13 +119,11 @@ public class ProjectCommandExecutorTests {
 
 		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.RC1"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo")
-				.doesNotContain("-Pguides");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo").doesNotContain("-Pguides");
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_release_version()
-			throws Exception {
+	public void should_successfully_execute_a_build_command_for_release_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -144,8 +135,7 @@ public class ProjectCommandExecutorTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_build_command_for_sr_version()
-			throws Exception {
+	public void should_successfully_execute_a_build_command_for_sr_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setBuildCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -157,19 +147,16 @@ public class ProjectCommandExecutorTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present()
-			throws Exception {
+	public void should_successfully_execute_a_command_when_system_props_placeholder_is_present() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setBuildCommand("echo {{systemProps}}");
 		properties.getBash().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("-Dhello=world -Dfoo=bar");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("-Dhello=world -Dfoo=bar");
 	}
 
 	@Test
@@ -180,8 +167,7 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
@@ -195,11 +181,9 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("hello=world foo=bar");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("hello=world foo=bar");
 	}
 
 	@Test
@@ -211,11 +195,9 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("-Dhello=world -Dfoo=bar bar");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("-Dhello=world -Dfoo=bar bar");
 	}
 
 	@Test
@@ -227,11 +209,9 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("bar -Dhello=world -Dfoo=bar");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("bar -Dhello=world -Dfoo=bar");
 	}
 
 	@Test
@@ -241,9 +221,8 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
-						"contains a tag that wasn't resolved properly");
+		thenThrownBy(() -> builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasStackTraceContaining("contains a tag that wasn't resolved properly");
 	}
 
 	@Test
@@ -254,9 +233,8 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
-						"Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasStackTraceContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -266,16 +244,13 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("resolved.log");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("resolved.log");
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_milestone_version()
-			throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_milestone_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -283,90 +258,76 @@ public class ProjectCommandExecutorTests {
 
 		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.M1"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo")
-				.doesNotContain("-Pguides");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo").doesNotContain("-Pguides");
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_milestone_version_for_maven()
-			throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_milestone_version_for_maven() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		new ReleaserProcessExecutor(properties.getWorkingDir())
-				.runCommand(new String[] { "touch", "pom.xml" }, 1);
+		new ReleaserProcessExecutor(properties.getWorkingDir()).runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
 		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.M1"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pmilestone").doesNotContain("-Pguides");
-	}
-
-	@Test
-	public void should_successfully_execute_a_deploy_command_for_rc_version()
-			throws Exception {
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash().setDeployCommand("echo foo");
-		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		ProjectCommandExecutor builder = projectBuilder(properties);
-
-		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.RC1"));
-
-		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo")
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo -Pmilestone")
 				.doesNotContain("-Pguides");
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_rc_version_for_maven()
-			throws Exception {
-		ReleaserProperties properties = new ReleaserProperties();
-		properties.getMaven().setDeployCommand("echo foo");
-		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		new ReleaserProcessExecutor(properties.getWorkingDir())
-				.runCommand(new String[] { "touch", "pom.xml" }, 1);
-		ProjectCommandExecutor builder = projectBuilder(properties);
-
-		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.RC1"));
-
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pmilestone").doesNotContain("-Pguides");
-	}
-
-	@Test
-	public void should_successfully_execute_a_deploy_command_for_release_version()
-			throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_rc_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(properties, original(),
-				new ProjectVersion("foo", "1.0.0.RELEASE"));
+		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.RC1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo").doesNotContain("-Pguides");
+	}
+
+	@Test
+	public void should_successfully_execute_a_deploy_command_for_rc_version_for_maven() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getMaven().setDeployCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		new ReleaserProcessExecutor(properties.getWorkingDir()).runCommand(new String[] { "touch", "pom.xml" }, 1);
+		ProjectCommandExecutor builder = projectBuilder(properties);
+
+		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.RC1"));
+
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo -Pmilestone")
+				.doesNotContain("-Pguides");
+	}
+
+	@Test
+	public void should_successfully_execute_a_deploy_command_for_release_version() throws Exception {
+		ReleaserProperties properties = new ReleaserProperties();
+		properties.getBash().setDeployCommand("echo foo");
+		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
+		ProjectCommandExecutor builder = projectBuilder(properties);
+
+		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo");
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_release_version_for_maven()
-			throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_release_version_for_maven() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getMaven().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
-		new ReleaserProcessExecutor(properties.getWorkingDir())
-				.runCommand(new String[] { "touch", "pom.xml" }, 1);
+		new ReleaserProcessExecutor(properties.getWorkingDir()).runCommand(new String[] { "touch", "pom.xml" }, 1);
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(properties, original(),
-				new ProjectVersion("foo", "1.0.0.RELEASE"));
+		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.RELEASE"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("foo -Pcentral");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo -Pcentral");
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_for_sr_version()
-			throws Exception {
+	public void should_successfully_execute_a_deploy_command_for_sr_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setDeployCommand("echo foo");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -378,19 +339,16 @@ public class ProjectCommandExecutorTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_deploy_command_with_sys_props_placeholder()
-			throws Exception {
+	public void should_successfully_execute_a_deploy_command_with_sys_props_placeholder() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setDeployCommand("echo \"{{systemProps}}\"");
 		properties.getBash().setSystemProperties("-Dhello=hello-world");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("-Dhello=hello-world");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("-Dhello=hello-world");
 	}
 
 	@Test
@@ -402,11 +360,9 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		builder.deploy(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
+		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("-Dhello=hello-world");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("-Dhello=hello-world");
 	}
 
 	@Test
@@ -417,16 +373,14 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.deploy(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
-						"Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
 	public void should_successfully_execute_a_publish_docs_command() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash().setPublishDocsCommand(
-				"ls -al && echo {{version}} {{oldVersion}} {{nextVersion}}");
+		properties.getBash().setPublishDocsCommand("ls -al && echo {{version}} {{oldVersion}} {{nextVersion}}");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
 		ProjectCommandExecutor builder = new ProjectCommandExecutor() {
@@ -436,8 +390,7 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		builder.publishDocs(properties, original(),
-				new ProjectVersion("foo", "1.0.0.RELEASE"));
+		builder.publishDocs(properties, original(), new ProjectVersion("foo", "1.0.0.RELEASE"));
 
 		then(asString(tmpFile("/builder/resolved/resolved.log")))
 				.contains("1.0.0.RELEASE 0.100.0.BUILD-SNAPSHOT 1.0.1.RELEASE");
@@ -445,11 +398,9 @@ public class ProjectCommandExecutorTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder()
-			throws Exception {
+	public void should_successfully_execute_a_publish_docs_command_with_sys_props_placeholder() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getBash().setPublishDocsCommand(
-				"echo {{systemProps}} 1 && echo {{systemProps}} 2");
+		properties.getBash().setPublishDocsCommand("echo {{systemProps}} 1 && echo {{systemProps}} 2");
 		properties.getBash().setSystemProperties("-Dhello=world -Dfoo=bar");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
 		TestReleaserProcessExecutor executor = testExecutor(properties.getWorkingDir());
@@ -460,8 +411,7 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		builder.publishDocs(properties, original(),
-				new ProjectVersion("foo", "Finchley.RELEASE"));
+		builder.publishDocs(properties, original(), new ProjectVersion("foo", "Finchley.RELEASE"));
 
 		String s = asString(tmpFile("/builder/resolved/resolved.log"));
 		System.out.println("====> " + s);
@@ -470,8 +420,7 @@ public class ProjectCommandExecutorTests {
 	}
 
 	@Test
-	public void should_successfully_execute_a_publish_docs_command_and_substitute_the_version()
-			throws Exception {
+	public void should_successfully_execute_a_publish_docs_command_and_substitute_the_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setPublishDocsCommand("echo '{{version}}'");
 		properties.setWorkingDir(tmpFile("/builder/resolved").getPath());
@@ -483,16 +432,13 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		builder.publishDocs(properties, original(),
-				new ProjectVersion("foo", "1.1.0.RELEASE"));
+		builder.publishDocs(properties, original(), new ProjectVersion("foo", "1.1.0.RELEASE"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("1.1.0.RELEASE");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("1.1.0.RELEASE");
 	}
 
 	@Test
-	public void should_successfully_execute_an_update_docs_command_and_substitute_the_version()
-			throws Exception {
+	public void should_successfully_execute_an_update_docs_command_and_substitute_the_version() throws Exception {
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getBash().setGenerateReleaseTrainDocsCommand("echo '{{version}}'");
 		File resolved = tmpFile("/builder/resolved");
@@ -505,11 +451,9 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		builder.generateReleaseTrainDocs(properties, "1.1.0.RELEASE",
-				resolved.getAbsolutePath());
+		builder.generateReleaseTrainDocs(properties, "1.1.0.RELEASE", resolved.getAbsolutePath());
 
-		then(asString(tmpFile("/builder/resolved/resolved.log")))
-				.contains("1.1.0.RELEASE");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("1.1.0.RELEASE");
 	}
 
 	@Test
@@ -520,9 +464,8 @@ public class ProjectCommandExecutorTests {
 		properties.setWorkingDir(tmpFile("/builder/unresolved").getPath());
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
-		thenThrownBy(() -> builder.publishDocs(properties, original(),
-				new ProjectVersion("foo", "1.0.0.RELEASE"))).hasMessageContaining(
-						"Process waiting time of [0] minutes exceeded");
+		thenThrownBy(() -> builder.publishDocs(properties, original(), new ProjectVersion("foo", "1.0.0.RELEASE")))
+				.hasMessageContaining("Process waiting time of [0] minutes exceeded");
 	}
 
 	@Test
@@ -543,9 +486,8 @@ public class ProjectCommandExecutorTests {
 			}
 		};
 
-		thenThrownBy(() -> builder.build(properties, original(),
-				new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"))).hasMessageContaining(
-						"The process has exited with exit code [1]");
+		thenThrownBy(() -> builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT")))
+				.hasStackTraceContaining("The process has exited with exit code [1]");
 	}
 
 	private TestReleaserProcessExecutor testExecutor(String workingDir) {
@@ -579,14 +521,12 @@ public class ProjectCommandExecutorTests {
 		@Override
 		ProcessExecutor processExecutor(String[] commands, String workingDir) {
 			this.counter++;
-			final ProcessExecutor processExecutor = super.processExecutor(commands,
-					workingDir);
+			final ProcessExecutor processExecutor = super.processExecutor(commands, workingDir);
 
 			File tempFile = tmpFile("/builder/resolved/resolved.log");
 			try {
 				tempFile.createNewFile();
-				OutputStream fos = new BufferedOutputStream(
-						new FileOutputStream(tempFile));
+				OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile));
 
 				return processExecutor
 						// use redirectOutputAlsoTo to avoid overriding all output

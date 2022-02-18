@@ -48,8 +48,7 @@ import org.springframework.util.StringUtils;
  */
 public class ProjectCommandExecutor {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ProjectCommandExecutor.class);
+	private static final Logger log = LoggerFactory.getLogger(ProjectCommandExecutor.class);
 
 	private static final String VERSION_MUSTACHE = "{{version}}";
 
@@ -59,8 +58,7 @@ public class ProjectCommandExecutor {
 
 	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain) {
-		build(properties, originalVersion, versionFromReleaseTrain,
-				properties.getWorkingDir());
+		build(properties, originalVersion, versionFromReleaseTrain, properties.getWorkingDir());
 	}
 
 	public String version(ReleaserProperties properties) {
@@ -73,8 +71,7 @@ public class ProjectCommandExecutor {
 				new CommandPicker(properties, properties.getWorkingDir()).groupId());
 	}
 
-	private String executeCommandWithOutput(ReleaserProperties properties,
-			String command) {
+	private String executeCommandWithOutput(ReleaserProperties properties, String command) {
 		try {
 			String projectRoot = properties.getWorkingDir();
 			String[] commands = command.split(" ");
@@ -91,27 +88,22 @@ public class ProjectCommandExecutor {
 	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain, String projectRoot) {
 		try {
-			String command = new CommandPicker(properties, projectRoot)
-					.buildCommand(versionFromReleaseTrain);
-			String[] commands = replaceAllPlaceHolders(originalVersion,
-					versionFromReleaseTrain, command).split(" ");
+			String command = new CommandPicker(properties, projectRoot).buildCommand(versionFromReleaseTrain);
+			String[] commands = replaceAllPlaceHolders(originalVersion, versionFromReleaseTrain, command).split(" ");
 			runCommand(properties, projectRoot, commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
 			log.info("No HTML files from docs contain unresolved tags");
 		}
 		catch (Exception e) {
-			String message = properties + "\n" + originalVersion + "\n"
-					+ versionFromReleaseTrain + "\n" + projectRoot;
+			String message = properties + "\n" + originalVersion + "\n" + versionFromReleaseTrain + "\n" + projectRoot;
 			throw new IllegalStateException(message, e);
 		}
 	}
 
-	public void generateReleaseTrainDocs(ReleaserProperties properties, String version,
-			String projectRoot) {
+	public void generateReleaseTrainDocs(ReleaserProperties properties, String version, String projectRoot) {
 		try {
 			String updatedCommand = new CommandPicker(properties, projectRoot)
-					.generateReleaseTrainDocsCommand(
-							new ProjectVersion(new File(projectRoot)))
+					.generateReleaseTrainDocsCommand(new ProjectVersion(new File(projectRoot)))
 					.replace(VERSION_MUSTACHE, version);
 			runCommand(properties, projectRoot, updatedCommand.split(" "));
 			assertNoHtmlFilesInDocsContainUnresolvedTags(properties.getWorkingDir());
@@ -135,25 +127,20 @@ public class ProjectCommandExecutor {
 		}
 	}
 
-	public void deploy(ReleaserProperties properties, ProjectVersion originalVersion,
-			ProjectVersion version) {
+	public void deploy(ReleaserProperties properties, ProjectVersion originalVersion, ProjectVersion version) {
 		doDeploy(properties, originalVersion, version,
-				new CommandPicker(properties, properties.getWorkingDir())
-						.deployCommand(version));
+				new CommandPicker(properties, properties.getWorkingDir()).deployCommand(version));
 	}
 
-	public void deployGuides(ReleaserProperties properties,
-			ProjectVersion originalVersion, ProjectVersion version) {
+	public void deployGuides(ReleaserProperties properties, ProjectVersion originalVersion, ProjectVersion version) {
 		doDeploy(properties, originalVersion, version,
-				new CommandPicker(properties, properties.getWorkingDir())
-						.deployGuidesCommand(version));
+				new CommandPicker(properties, properties.getWorkingDir()).deployGuidesCommand(version));
 	}
 
-	private void doDeploy(ReleaserProperties properties, ProjectVersion originalVersion,
-			ProjectVersion changedVersion, String command) {
+	private void doDeploy(ReleaserProperties properties, ProjectVersion originalVersion, ProjectVersion changedVersion,
+			String command) {
 		try {
-			String replacedCommand = replaceAllPlaceHolders(originalVersion,
-					changedVersion, command);
+			String replacedCommand = replaceAllPlaceHolders(originalVersion, changedVersion, command);
 			String[] commands = replacedCommand.split(" ");
 			runCommand(properties, commands);
 			log.info("The project has successfully been deployed");
@@ -167,21 +154,16 @@ public class ProjectCommandExecutor {
 		runCommand(properties, properties.getWorkingDir(), commands);
 	}
 
-	private void runCommand(ReleaserProperties properties, String projectRoot,
-			String[] commands) {
+	private void runCommand(ReleaserProperties properties, String projectRoot, String[] commands) {
 		String[] substitutedCommands = substituteSystemProps(properties, commands);
-		long waitTimeInMinutes = new CommandPicker(properties, projectRoot)
-				.waitTimeInMinutes();
+		long waitTimeInMinutes = new CommandPicker(properties, projectRoot).waitTimeInMinutes();
 		executor(projectRoot).runCommand(substitutedCommands, waitTimeInMinutes);
 	}
 
-	private String captureCommandOutput(ReleaserProperties properties, String projectRoot,
-			String[] commands) {
+	private String captureCommandOutput(ReleaserProperties properties, String projectRoot, String[] commands) {
 		String[] substitutedCommands = substituteSystemProps(properties, commands);
-		long waitTimeInMinutes = new CommandPicker(properties, projectRoot)
-				.waitTimeInMinutes();
-		return executor(projectRoot).runCommandWithOutput(substitutedCommands,
-				waitTimeInMinutes);
+		long waitTimeInMinutes = new CommandPicker(properties, projectRoot).waitTimeInMinutes();
+		return executor(projectRoot).runCommandWithOutput(substitutedCommands, waitTimeInMinutes);
 	}
 
 	ReleaserProcessExecutor executor(String workDir) {
@@ -191,15 +173,11 @@ public class ProjectCommandExecutor {
 	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion changedVersion) {
 		try {
-			String providedCommand = new CommandPicker(properties)
-					.publishDocsCommand(changedVersion);
-			log.info("Executing command(s) for publishing docs " + providedCommand + " / "
-					+ properties);
-			String[] providedCommands = StringUtils
-					.delimitedListToStringArray(providedCommand, "&&");
+			String providedCommand = new CommandPicker(properties).publishDocsCommand(changedVersion);
+			log.info("Executing command(s) for publishing docs " + providedCommand + " / " + properties);
+			String[] providedCommands = StringUtils.delimitedListToStringArray(providedCommand, "&&");
 			for (String command : providedCommands) {
-				command = replaceAllPlaceHolders(originalVersion, changedVersion,
-						command.trim());
+				command = replaceAllPlaceHolders(originalVersion, changedVersion, command.trim());
 				String[] commands = command.split(" ");
 				runCommand(properties, commands);
 			}
@@ -210,8 +188,8 @@ public class ProjectCommandExecutor {
 		}
 	}
 
-	private String replaceAllPlaceHolders(ProjectVersion originalVersion,
-			ProjectVersion changedVersion, String command) {
+	private String replaceAllPlaceHolders(ProjectVersion originalVersion, ProjectVersion changedVersion,
+			String command) {
 		return command.replace(VERSION_MUSTACHE, changedVersion.version)
 				.replace(NEXT_VERSION_MUSTACHE, changedVersion.bumpedVersion())
 				.replace(OLD_VERSION_MUSTACHE, originalVersion.version);
@@ -221,24 +199,18 @@ public class ProjectCommandExecutor {
 	 * We need to insert the system properties as a list of -Dkey=value entries instead of
 	 * just pasting the String that contains these values.
 	 */
-	private String[] substituteSystemProps(ReleaserProperties properties,
-			String... commands) {
+	private String[] substituteSystemProps(ReleaserProperties properties, String... commands) {
 		String systemProperties = new CommandPicker(properties).systemProperties();
-		String systemPropertiesPlaceholder = new CommandPicker(properties)
-				.systemPropertiesPlaceholder();
+		String systemPropertiesPlaceholder = new CommandPicker(properties).systemPropertiesPlaceholder();
 		boolean containsSystemProps = systemProperties.contains("-D");
-		String[] splitSystemProps = StringUtils
-				.delimitedListToStringArray(systemProperties, "-D");
+		String[] splitSystemProps = StringUtils.delimitedListToStringArray(systemProperties, "-D");
 		// first element might be empty even though the second one contains values
 		if (splitSystemProps.length > 1) {
 			splitSystemProps = StringUtils.isEmpty(splitSystemProps[0])
-					? Arrays.copyOfRange(splitSystemProps, 1, splitSystemProps.length)
-					: splitSystemProps;
+					? Arrays.copyOfRange(splitSystemProps, 1, splitSystemProps.length) : splitSystemProps;
 		}
-		String[] systemPropsWithPrefix = containsSystemProps ? Arrays
-				.stream(splitSystemProps).map(s -> "-D" + s.trim())
-				.collect(Collectors.toList()).toArray(new String[splitSystemProps.length])
-				: splitSystemProps;
+		String[] systemPropsWithPrefix = containsSystemProps ? Arrays.stream(splitSystemProps).map(s -> "-D" + s.trim())
+				.collect(Collectors.toList()).toArray(new String[splitSystemProps.length]) : splitSystemProps;
 		final AtomicInteger index = new AtomicInteger(-1);
 		for (int i = 0; i < commands.length; i++) {
 			if (commands[i].contains(systemPropertiesPlaceholder)) {
@@ -249,8 +221,7 @@ public class ProjectCommandExecutor {
 		return toCommandList(systemPropsWithPrefix, index, commands);
 	}
 
-	private String[] toCommandList(String[] systemPropsWithPrefix, AtomicInteger index,
-			String[] commands) {
+	private String[] toCommandList(String[] systemPropsWithPrefix, AtomicInteger index, String[] commands) {
 		List<String> commandsList = new ArrayList<>(Arrays.asList(commands));
 		List<String> systemPropsList = Arrays.asList(systemPropsWithPrefix);
 		if (index.get() != -1) {
@@ -273,8 +244,7 @@ public class ProjectCommandExecutor {
 
 class ReleaserProcessExecutor {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ReleaserProcessExecutor.class);
+	private static final Logger log = LoggerFactory.getLogger(ReleaserProcessExecutor.class);
 
 	private static String[] OS_OPERATORS = { "|", "<", ">", "||", "&&" };
 
@@ -294,17 +264,15 @@ class ReleaserProcessExecutor {
 
 	private ProcessResult doRunCommand(String[] commands, long waitTimeInMinutes) {
 		String workingDir = this.workingDir;
-		log.info("Will run the command from [{}] and wait for result for [{}] minutes",
-				workingDir, waitTimeInMinutes);
+		log.info("Will run the command from [{}] and wait for result for [{}] minutes", workingDir, waitTimeInMinutes);
 
 		try {
-			ProcessExecutor processExecutor = processExecutor(commands, workingDir)
-					.timeout(waitTimeInMinutes, TimeUnit.MINUTES);
+			ProcessExecutor processExecutor = processExecutor(commands, workingDir).timeout(waitTimeInMinutes,
+					TimeUnit.MINUTES);
 			final ProcessResult processResult = doExecute(processExecutor);
 			int processExitValue = processResult.getExitValue();
 			if (processExitValue != 0) {
-				throw new IllegalStateException("The process has exited with exit code ["
-						+ processExitValue + "]");
+				throw new IllegalStateException("The process has exited with exit code [" + processExitValue + "]");
 			}
 			return processResult;
 		}
@@ -312,10 +280,8 @@ class ReleaserProcessExecutor {
 			throw new IllegalStateException("Process execution failed", e);
 		}
 		catch (TimeoutException e) {
-			log.error("The command hasn't managed to finish in [{}] minutes",
-					waitTimeInMinutes);
-			throw new IllegalStateException("Process waiting time of ["
-					+ waitTimeInMinutes + "] minutes exceeded", e);
+			log.error("The command hasn't managed to finish in [{}] minutes", waitTimeInMinutes);
+			throw new IllegalStateException("Process waiting time of [" + waitTimeInMinutes + "] minutes exceeded", e);
 		}
 	}
 
@@ -331,15 +297,13 @@ class ReleaserProcessExecutor {
 			commandsToRun = commandToExecute(lastArg);
 		}
 		log.info("Will run the command [{}]", Arrays.toString(commandsToRun));
-		return new ProcessExecutor().command(commandsToRun).destroyOnExit()
-				.readOutput(true)
+		return new ProcessExecutor().command(commandsToRun).destroyOnExit().readOutput(true)
 				// releaser.commands logger should be configured to redirect
 				// only to a file (with additivity=false). ideally the root logger should
 				// append to same file on top of whatever root appender, so that file
 				// contains the most output
 				.redirectOutputAlsoTo(Slf4jStream.of("releaser.commands").asInfo())
-				.redirectErrorAlsoTo(Slf4jStream.of("releaser.commands").asWarn())
-				.directory(new File(workingDir));
+				.redirectErrorAlsoTo(Slf4jStream.of("releaser.commands").asWarn()).directory(new File(workingDir));
 	}
 
 	String[] commandToExecute(String lastArg) {
@@ -389,12 +353,10 @@ class CommandPicker {
 
 	public String publishDocsCommand(ProjectVersion version) {
 		if (projectType == ProjectType.GRADLE) {
-			return mavenCommandWithSystemProps(
-					releaserProperties.getGradle().getPublishDocsCommand(), version);
+			return mavenCommandWithSystemProps(releaserProperties.getGradle().getPublishDocsCommand(), version);
 		}
 		else if (projectType == ProjectType.MAVEN) {
-			return mavenCommandWithSystemProps(
-					releaserProperties.getMaven().getPublishDocsCommand(), version);
+			return mavenCommandWithSystemProps(releaserProperties.getMaven().getPublishDocsCommand(), version);
 		}
 		return releaserProperties.getBash().getPublishDocsCommand();
 	}
@@ -411,12 +373,10 @@ class CommandPicker {
 
 	String buildCommand(ProjectVersion version) {
 		if (projectType == ProjectType.GRADLE) {
-			return gradleCommandWithSystemProps(
-					releaserProperties.getGradle().getBuildCommand());
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getBuildCommand());
 		}
 		else if (projectType == ProjectType.MAVEN) {
-			return mavenCommandWithSystemProps(
-					releaserProperties.getMaven().getBuildCommand(), version);
+			return mavenCommandWithSystemProps(releaserProperties.getMaven().getBuildCommand(), version);
 		}
 		return bashCommandWithSystemProps(releaserProperties.getBash().getBuildCommand());
 	}
@@ -426,9 +386,8 @@ class CommandPicker {
 		if (projectType == ProjectType.GRADLE) {
 			return "./gradlew properties | grep version: | awk '{print $2}'";
 		}
-		return "./mvnw -q" + " -Dexec.executable=\"echo\""
-				+ " -Dexec.args=\"\\${project.version}\"" + " --non-recursive"
-				+ " org.codehaus.mojo:exec-maven-plugin:1.3.1:exec | tail -1";
+		return "./mvnw -q" + " -Dexec.executable=\"echo\"" + " -Dexec.args=\"\\${project.version}\""
+				+ " --non-recursive" + " org.codehaus.mojo:exec-maven-plugin:1.3.1:exec | tail -1";
 	}
 
 	String groupId() {
@@ -436,50 +395,40 @@ class CommandPicker {
 		if (projectType == ProjectType.GRADLE) {
 			return "./gradlew groupId -q | tail -1";
 		}
-		return "./mvnw -q" + " -Dexec.executable=\"echo\""
-				+ " -Dexec.args=\"\\${project.groupId}\"" + " --non-recursive"
-				+ " org.codehaus.mojo:exec-maven-plugin:1.3.1:exec | tail -1";
+		return "./mvnw -q" + " -Dexec.executable=\"echo\"" + " -Dexec.args=\"\\${project.groupId}\""
+				+ " --non-recursive" + " org.codehaus.mojo:exec-maven-plugin:1.3.1:exec | tail -1";
 	}
 
 	String generateReleaseTrainDocsCommand(ProjectVersion version) {
 		if (projectType == ProjectType.GRADLE) {
-			return gradleCommandWithSystemProps(
-					releaserProperties.getGradle().getGenerateReleaseTrainDocsCommand());
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getGenerateReleaseTrainDocsCommand());
 		}
 		else if (projectType == ProjectType.MAVEN) {
-			return mavenCommandWithSystemProps(
-					releaserProperties.getMaven().getGenerateReleaseTrainDocsCommand(),
+			return mavenCommandWithSystemProps(releaserProperties.getMaven().getGenerateReleaseTrainDocsCommand(),
 					version);
 		}
-		return bashCommandWithSystemProps(
-				releaserProperties.getBash().getGenerateReleaseTrainDocsCommand());
+		return bashCommandWithSystemProps(releaserProperties.getBash().getGenerateReleaseTrainDocsCommand());
 	}
 
 	String deployCommand(ProjectVersion version) {
 		if (projectType == ProjectType.GRADLE) {
-			return gradleCommandWithSystemProps(
-					releaserProperties.getGradle().getDeployCommand());
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getDeployCommand());
 		}
 		else if (projectType == ProjectType.MAVEN) {
-			return mavenCommandWithSystemProps(
-					releaserProperties.getMaven().getDeployCommand(), version);
+			return mavenCommandWithSystemProps(releaserProperties.getMaven().getDeployCommand(), version);
 		}
-		return bashCommandWithSystemProps(
-				releaserProperties.getBash().getDeployCommand());
+		return bashCommandWithSystemProps(releaserProperties.getBash().getDeployCommand());
 	}
 
 	String deployGuidesCommand(ProjectVersion version) {
 		if (projectType == ProjectType.GRADLE) {
-			return gradleCommandWithSystemProps(
-					releaserProperties.getGradle().getDeployGuidesCommand());
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getDeployGuidesCommand());
 		}
 		else if (projectType == ProjectType.MAVEN) {
-			return mavenCommandWithSystemProps(
-					releaserProperties.getMaven().getDeployGuidesCommand(), version,
+			return mavenCommandWithSystemProps(releaserProperties.getMaven().getDeployGuidesCommand(), version,
 					MavenProfile.GUIDES, MavenProfile.INTEGRATION);
 		}
-		return bashCommandWithSystemProps(
-				releaserProperties.getBash().getDeployGuidesCommand());
+		return bashCommandWithSystemProps(releaserProperties.getBash().getDeployGuidesCommand());
 	}
 
 	long waitTimeInMinutes() {
@@ -499,13 +448,11 @@ class CommandPicker {
 		return command + " " + ReleaserProperties.Gradle.SYSTEM_PROPS_PLACEHOLDER;
 	}
 
-	private String mavenCommandWithSystemProps(String command, ProjectVersion version,
-			MavenProfile... profiles) {
+	private String mavenCommandWithSystemProps(String command, ProjectVersion version, MavenProfile... profiles) {
 		if (command.contains(ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER)) {
 			return appendMavenProfile(command, version, profiles);
 		}
-		return appendMavenProfile(command, version, profiles) + " "
-				+ ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
+		return appendMavenProfile(command, version, profiles) + " " + ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
 	}
 
 	private String bashCommandWithSystemProps(String command) {
@@ -515,22 +462,18 @@ class CommandPicker {
 		return command + " " + ReleaserProperties.Maven.SYSTEM_PROPS_PLACEHOLDER;
 	}
 
-	private String appendMavenProfile(String command, ProjectVersion version,
-			MavenProfile... profiles) {
+	private String appendMavenProfile(String command, ProjectVersion version, MavenProfile... profiles) {
 		String trimmedCommand = command.trim();
 		if (version.isMilestone() || version.isRc()) {
 			log.info("Adding the milestone profile to the Maven build");
-			return withProfile(trimmedCommand, MavenProfile.MILESTONE.asMavenProfile(),
-					profiles);
+			return withProfile(trimmedCommand, MavenProfile.MILESTONE.asMavenProfile(), profiles);
 		}
 		else if (version.isRelease() || version.isServiceRelease()) {
 			log.info("Adding the central profile to the Maven build");
-			return withProfile(trimmedCommand, MavenProfile.CENTRAL.asMavenProfile(),
-					profiles);
+			return withProfile(trimmedCommand, MavenProfile.CENTRAL.asMavenProfile(), profiles);
 		}
 		else {
-			log.info("The version [" + version.toString()
-					+ "] is a snapshot one - will not add any profiles");
+			log.info("The version [" + version.toString() + "] is a snapshot one - will not add any profiles");
 		}
 		return trimmedCommand;
 	}
@@ -548,8 +491,7 @@ class CommandPicker {
 	}
 
 	private String profilesToString(MavenProfile... profiles) {
-		return Arrays.stream(profiles).map(profile -> "-P" + profile)
-				.collect(Collectors.joining(" "));
+		return Arrays.stream(profiles).map(profile -> "-P" + profile).collect(Collectors.joining(" "));
 	}
 
 	private enum ProjectType {
@@ -602,10 +544,8 @@ class HtmlFileWalker extends SimpleFileVisitor<Path> {
 	@Override
 	public FileVisitResult visitFile(Path path, BasicFileAttributes attr) {
 		File file = path.toFile();
-		if (file.getName().endsWith(HTML_EXTENSION)
-				&& asString(file).contains("Unresolved")) {
-			throw new IllegalStateException(
-					"File [" + file + "] contains a tag that wasn't resolved properly");
+		if (file.getName().endsWith(HTML_EXTENSION) && asString(file).contains("Unresolved")) {
+			throw new IllegalStateException("File [" + file + "] contains a tag that wasn't resolved properly");
 		}
 		return FileVisitResult.CONTINUE;
 	}

@@ -33,8 +33,7 @@ class GradleBomParser implements BomParser {
 
 	private final GradleProjectNameExtractor extractor = new GradleProjectNameExtractor();
 
-	GradleBomParser(ReleaserProperties releaserProperties,
-			List<CustomBomParser> customParsers) {
+	GradleBomParser(ReleaserProperties releaserProperties, List<CustomBomParser> customParsers) {
 		this.properties = releaserProperties;
 		this.customParsers = customParsers;
 	}
@@ -55,11 +54,9 @@ class GradleBomParser implements BomParser {
 			return VersionsFromBom.EMPTY_VERSION;
 		}
 		Properties properties = loadProps(gradleProperties);
-		final Map<String, String> substitution = this.properties.getGradle()
-				.getGradlePropsSubstitution();
-		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-				.thisProjectRoot(thisProjectRoot).releaserProperties(this.properties)
-				.parsers(this.customParsers).retrieveFromBom();
+		final Map<String, String> substitution = this.properties.getGradle().getGradlePropsSubstitution();
+		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().thisProjectRoot(thisProjectRoot)
+				.releaserProperties(this.properties).parsers(this.customParsers).retrieveFromBom();
 		properties.forEach((key, value) -> {
 			String projectName = this.extractor.projectName(substitution, key);
 			versionsFromBom.setVersion(projectName, value.toString());

@@ -32,17 +32,13 @@ public class SpringCloudReleaserProperties {
 
 	public static ReleaserProperties get() {
 		try {
-			File releaserConfig = new File(SpringCloudReleaserProperties.class
-					.getResource("/application.yml").toURI());
+			File releaserConfig = new File(SpringCloudReleaserProperties.class.getResource("/application.yml").toURI());
 			YamlPropertiesFactoryBean yamlProcessor = new YamlPropertiesFactoryBean();
 			yamlProcessor.setResources(new FileSystemResource(releaserConfig));
 			Properties properties = yamlProcessor.getObject();
-			ReleaserProperties releaserProperties = new Binder(
-					new MapConfigurationPropertySource(properties.entrySet().stream()
-							.collect(Collectors.toMap(e -> e.getKey().toString(),
-									e -> e.getValue().toString()))))
-											.bind("releaser", ReleaserProperties.class)
-											.get();
+			ReleaserProperties releaserProperties = new Binder(new MapConfigurationPropertySource(properties.entrySet()
+					.stream().collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()))))
+							.bind("releaser", ReleaserProperties.class).get();
 			return releaserProperties;
 		}
 		catch (URISyntaxException e) {
