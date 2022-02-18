@@ -33,7 +33,6 @@
 		<spring-cloud-bom.version>Hoxton.SR6</spring-cloud-bom.version>
 		<jcabi-github.version>1.1.2</jcabi-github.version>
 		<jsch-agent.version>0.0.9</jsch-agent.version>
-		<hibernate-validator.version>5.4.1.Final</hibernate-validator.version>
 		<org.eclipse.jgit-version>5.1.3.201810200350-r</org.eclipse.jgit-version>
 		<!-- Versions plugin uses this version -->
 		<maven-model.version>3.6.3</maven-model.version>
