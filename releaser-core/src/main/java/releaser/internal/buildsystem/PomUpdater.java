@@ -328,7 +328,7 @@ class PomWriter {
 		try {
 			XMLInputFactory inputFactory = XMLInputFactory2.newInstance();
 			inputFactory.setProperty(XMLInputFactory2.P_PRESERVE_LOCATION, Boolean.TRUE);
-			newPom = new ModifiedPomXMLEventReader(input, inputFactory);
+			newPom = new ModifiedPomXMLEventReader(input, inputFactory, null);
 		}
 		catch (XMLStreamException e) {
 			log.error("Exception occurred while trying to parse pom", e);
