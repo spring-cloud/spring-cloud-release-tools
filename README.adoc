@@ -7,7 +7,7 @@ Edit the files in the src/main/asciidoc/ directory instead.
 :jdkversion: 1.8
 :org: spring-cloud
 :repo: spring-cloud-release-tools
-:branch: master
+:branch: main
 
 image::https://github.com/{org}/{repo}/workflows/Build/badge.svg?style=svg["Build",link="https://github.com/{org}/{repo}/actions"]
 
@@ -18,8 +18,9 @@ That's why this tool makes it easy to automate the release / dependency update p
 
 === Releasing through Jenkins
 
-NOTE: Whenever a release process is broken, Jenkins marks it with a red ball and breaks the build.
-Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow ball and marks the build as unstable.
+NOTE: Whenever a release process is broken, Jenkins marks it with a red 'X' and breaks the build.
+Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow exclamation and marks the build as unstable.
+
 
 ==== Releasing a Single Project
 
@@ -58,19 +59,19 @@ IMPORTANT: If you're doing a e.g. `M1` release, remember to not have any snapsho
 
 Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], which the following image shows:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasers.png[Releaser view]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/releasers.png[Releaser view]
 
 . Pick the proper releaser project (for example, `spring-cloud-build-releaser`).
 The following image shows the settings for this example:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/scBuildReleaser.png[Spring Cloud Build Releaser - build with parameters]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/scBuildReleaser.png[Spring Cloud Build Releaser - build with parameters]
 
 . Next, click `Build with parameters`.
 The following image shows the UI for doing so:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningScBuildReleaser.png[Updated `RELEASER_POM_BRANCH`]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/runningScBuildReleaser.png[Updated `RELEASER_POM_BRANCH`]
 
-Pick from which branch you would like the project (for example, `spring-cloud-build` - defaults to `master`) to be built and update the `RELEASER_POM_BRANCH` to point to the checked-out branch of Spring Cloud Release (for example, `springCloudBuildRelease`).
+Pick from which branch you would like the project (for example, `spring-cloud-build` - defaults to `main`) to be built and update the `RELEASER_POM_BRANCH` to point to the checked-out branch of Spring Cloud Release (for example, `springCloudBuildRelease`).
 You can pick whether you want to perform only post-release tasks or the whole release.
 
 . Finally, click `Build`.
@@ -142,15 +143,15 @@ $ git add greenwich_sr2.properties && git commit -m "Added Greenwich.SR2 propert
 
 Since the project is prepared, go to Jenkins and select the https://jenkins.spring.io/view/Spring%20Cloud/view/Releaser/[Releaser view], as the following image shows:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/releasersForMetaRelease.png[Releaser view]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/releasersForMetaRelease.png[Releaser view]
 
 . Pick the proper meta-releaser project (for example, `spring-cloud-meta-releaser`), as the following image shows:
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/springCloudMetaRelease.png[Spring Cloud Meta Releaser - build with parameters]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/springCloudMetaRelease.png[Spring Cloud Meta Releaser - build with parameters]
 
 . Next, click `Build with parameters`.
 
-image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/master/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Spring Cloud Meta Releaser view]
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/main/docs/src/main/asciidoc/images/runningSpringCloudMetaReleaser.png[Spring Cloud Meta Releaser view]
 
 You have quite a few options to pick, but the most important one is to set the value of the `RELEASE_VERSION` to the given release train version (for example, `Greenwich.SR2`).
 Continue updating the rest of the fields if necessary and read the field descriptions and this documentation for more information.
@@ -197,7 +198,7 @@ All the tasks are opt in, so if you do opt in for everything you'll get:
 
 - Uses the fixed versions to clone and check out each project (e.g. `spring-cloud-sleuth: 2.1.0.RELEASE`)
 - From the version analyzes the branch and checks it out. E.g.
-** for `spring-cloud-release`'s `Finchley.RELEASE` version will resolve either `Finchley` branch or will fallback to `master` if there's no `Finchley` branch.
+** for `spring-cloud-release`'s `Finchley.RELEASE` version will resolve either `Finchley` branch or will fallback to `main` if there's no `Finchley` branch.
 ** for `spring-cloud-sleuth`'s `2.1.0.RELEASE` version will resolve `2.1.x` branch
 - Performs the release tasks per each project
 - Performs the post release tasks at the end of the release
@@ -604,7 +605,7 @@ Below you can find a table with all the releaser options.
 |releaser.meta-release.release-train-dependency-names |  | All the names of dependencies that should be updated with the release train project version.
 |releaser.meta-release.release-train-project-name |  | Name of the release train project.
 |releaser.pom.bom-version-pattern |  | The pattern to match a version property in a BOM. Remember to catch the dependency name in a group. E.g. "^(spring-cloud-.*)\\.version$".
-|releaser.pom.branch | master | Which branch of release train BOM should be checked out. Defaults to {@code master}.
+|releaser.pom.branch | main | Which branch of release train BOM should be checked out. Defaults to {@code main}.
 |releaser.pom.ignored-pom-regex | ^.*\.git/.*$ | List of regular expressions of ignored poms. Defaults to test projects and samples.
 |releaser.pom.pom-with-boot-starter-parent |  | Subfolder of the pom that contains the {@code spring-boot-starer-parent} dependency.
 |releaser.pom.this-train-bom |  | Subfolder of the pom that contains the versions for the release train.
@@ -652,7 +653,7 @@ IMPORTANT: For the meta-releaser to work we assume that the path to the configur
 
 ==== Specifying A Branch
 
-By deafult the releaser will default to using the `master` branch of `spring-cloud-release`.
+By deafult the releaser will default to using the `main` branch of `spring-cloud-release`.
 If you would like to use another branch you can specify it using the `releaser.pom.branch` property.
 
 [source,bash]
@@ -721,7 +722,7 @@ If you know what you're doing and want to skip snapshot / milestone version chec
 
 == Building
 
-:jdkversion: 1.8
+:jdkversion: 17
 
 === Basic Compile and Test
 
@@ -747,23 +748,9 @@ the `.mvn` configuration, so if you find you have to do it to make a
 build succeed, please raise a ticket to get the settings added to
 source control.
 
-For hints on how to build the project look in `.travis.yml` if there
-is one. There should be a "script" and maybe "install" command. Also
-look at the "services" section to see if any services need to be
-running locally (e.g. mongo or rabbit).  Ignore the git-related bits
-that you might find in "before_install" since they're related to setting git
-credentials and you already have those.
+The projects that require middleware (i.e. Redis) for testing generally
+require that a local instance of [Docker](https://www.docker.com/get-started) is installed and running.
 
-The projects that require middleware generally include a
-`docker-compose.yml`, so consider using
-https://docs.docker.com/compose/[Docker Compose] to run the middeware servers
-in Docker containers. See the README in the
-https://github.com/spring-cloud-samples/scripts[scripts demo
-repository] for specific instructions about the common cases of mongo,
-rabbit and redis.
-
-NOTE: If all else fails, build with the command from `.travis.yml` (usually
-`./mvnw install`).
 
 === Documentation
 
@@ -820,6 +807,120 @@ Java 1.7 is used for main sources and Java 1.8 is used for tests.
 When importing your project to an IDE please activate the `ide` Maven profile to turn on Java 1.8 for both main and test sources.
 Of course remember that you MUST NOT use Java 1.8 features in the main sources.
 If you do so your app will break during the Maven build.
+
+== Spring Cloud Release Process
+== Spring Cloud Release Process
+
+This section contains the instructions on releasiong the Spring Cloud project using the Spring Cloud Releaser.
+
+=== Before you get started
+1. Create the Spring Cloud Release project on your local machine. For example:
+
+```bash
+git clone git@github.com:spring-cloud/spring-cloud-release.git
+cd spring-cloud-release
+```
+[start=2]
+. Pull all Spring Cloud projects to your local machine so that if there is a problem during release, you can make the tweaks to the affected project quickly.
+
+=== Spring Cloud Build Releaser Instructions
+
+. Go to the spring-cloud-release project and checkout the `jenkins-releaser-config` branch.  Then pull the latest from the repository.
+```bash
+cd spring-cloud-release
+git checkout jenkins-releaser-config
+git pull origin jenkins-releaser-config
+```
+[start=2]
+. Find the most recent release in the desired release train.  In this document we will use: 2020_0_x.properties
+. Create a copy of that file and set the name of the copy to <name-of-the-release>.properties  (for example: 2020_0_2.properties)
+. Edit this file and update all project versions to their latest release.
+.. The latest release for each project can be determined by navigating to the individual Github project and checking for commits since the last release, where the last release is marked by a commit from spring-cloud-issues.  If there are commits since the last release, change the value in the properties file.  If there are no commits since the last release (i.e. the last commit is from spring-cloud-issues) then do not increment the value.
+. Make a note of the projects that did not increment their version number, as those projects will need to be specified later in the “RELEASER_PROJECTS_TO_SKIP” field in the Jenkins project spring-cloud-meta-releaser
+
+NOTE: Sometimes the release value for a project will need to be incremented by more than one,
+for example if there was a release for an individual project due to a CVE and there were commits made after that release.  To determine the new version number, look for the latest version in the commit history from spring-cloud-issues.
+
+[start=6]
+. Commit the change
+. Push the changes back to github.   For example:
+```bash
+git push origin jenkins-releaser-config
+```
+[start=8]
+. Request that project owners verify versions in the Spring Cloud Slack room by sharing a github link to the 2020_0_x.properties you just pushed.
+. Now go to the `spring-cloud-build-releaser` job on Jenkins
+
+NOTE: The builder project is required to run first because it is required for spring-cloud-function and spring-cloud-stream. All other spring-cloud builds will run after spring-cloud-function and spring-cloud-stream have performed a successful release
+
+[start=10]
+. Click `Build With Parameters` on the left side of page
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-buildwithparams.png[Build With Params]
+
+[start=11]
+. In the RELEASE_VERSION column enter the  name of the file you created without the properties extension
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-setreleaseversion.png[Set The Version]
+
+[start=12]
+. Click the “DRY_RUN” option and then click `Build` button as shown below:
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-selectdryrun.png[Set Dry Run]
+[start=13]
+. Once the dry run is successfully complete we need to remove all of the artifacts from the dry run.
+To do this select the `spring-cloud-purge-worker-artifacts-releaser` job from the list of jobs.
+. Once the purge work has completed successfully,
+. Select Rebuild Last option on the left side of the page.
+. Now go to the `spring-cloud-build-releaser` job on Jenkins
+, Select the last build
+. When build page appears click the `Rebuild` option.
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-selectlastrun.png[Select Last Run]
+
+[start=18]
+. Deselect “DRY_RUN” then click the `Build` button.
+
+=== Full Spring Cloud Release
+
+. Once Spring Cloud Stream and Function projects are released verify that all other builds are succeeding
+. Now go to the `Spring-cloud-meta-releaser` job on Jenkins
+. Click `Build With Parameters` on the left side of page
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/meta-releaser-buildwithparameters.png[Build With Params]
+
+[start=4]
+. Update RELEASE_VERSION with the current release and corresponds to the release file.
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/meta-releaser-setreleaseversion.png[Set The Version]
+
+[start=5]
+. Add spring-cloud-build to RELEASER_PROJECTS_TO_SKIP, so it won’t be rebuilt.
+Also any other projects that did not change in the properties files, add it to the RELEASER_PROJECTS_TO_SKIP so they can be excluded.
+. Select Dry Run option
+. Click Build
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/build-releaser-selectdryrun.png[Set Dry Run]
+
+
+TIP: If there is a failure you can launch the build from the failed project.   To do this:
+Click the Rebuild_Last option, then in the START FROM field insert the name of the project.
+Then click the Build.
+
+NOTE: Spring Cloud K8’s Integration tests may time out. Restart the build.
+ Select Rebuild Last option on the left side of the page.
+
+[start=8]
+. Upon a successful "DRY_RUN".
+. Click "Rebuild Last" option on the left side of the page.
+
+image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools/RELEASE-DOC-UPDATE/docs/src/main/asciidoc/images/meta-releaser-rebuildlast.png[Rebuild Last]
+
+[start=10]
+. When the build page is rendered.
+. Deselect “DRY_RUN” then click the build button.
+. Clear the Start_From field
+. Click Rebuild
 
 == Contributing
 
@@ -1002,3 +1103,53 @@ Go to `File` -> `Settings` -> `Other settings` -> `Checkstyle`. There click on t
 - `checkstyle.additional.suppressions.file` - this variable corresponds to suppressions in your local project. E.g. you're working on `spring-cloud-contract`. Then point to the `project-root/src/checkstyle/checkstyle-suppressions.xml` folder. Example for `spring-cloud-contract` would be: `/home/username/spring-cloud-contract/src/checkstyle/checkstyle-suppressions.xml`.
 
 IMPORTANT: Remember to set the `Scan Scope` to `All sources` since we apply checkstyle rules for production and test sources.
+
+=== Duplicate Finder
+
+Spring Cloud Build brings along the  `basepom:duplicate-finder-maven-plugin`, that enables flagging duplicate and conflicting classes and resources on the java classpath.
+
+==== Duplicate Finder configuration
+
+Duplicate finder is *enabled by default* and will run in the `verify` phase of your Maven build, but it will only take effect in your project if you add the `duplicate-finder-maven-plugin` to the `build` section of the projecst's `pom.xml`.
+
+.pom.xml
+[source,xml]
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.basepom.maven</groupId>
+            <artifactId>duplicate-finder-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+----
+
+For other properties, we have set defaults as listed in the https://github.com/basepom/duplicate-finder-maven-plugin/wiki[plugin documentation].
+
+You can easily override them but setting the value of the selected property prefixed with `duplicate-finder-maven-plugin`. For example, set `duplicate-finder-maven-plugin.skip` to `true` in order to skip duplicates check in your build.
+
+If you need to add `ignoredClassPatterns` or `ignoredResourcePatterns` to your setup, make sure to add them in the plugin configuration section of your project:
+
+[source,xml]
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.basepom.maven</groupId>
+            <artifactId>duplicate-finder-maven-plugin</artifactId>
+            <configuration>
+                <ignoredClassPatterns>
+				    <ignoredClassPattern>org.joda.time.base.BaseDateTime</ignoredClassPattern>
+					<ignoredClassPattern>.*module-info</ignoredClassPattern>
+				</ignoredClassPatterns>
+                <ignoredResourcePatterns>
+                    <ignoredResourcePattern>changelog.txt</ignoredResourcePattern>
+                </ignoredResourcePatterns>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+
+----
