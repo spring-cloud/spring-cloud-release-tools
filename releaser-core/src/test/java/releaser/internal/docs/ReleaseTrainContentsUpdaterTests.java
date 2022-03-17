@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,9 @@ import java.util.Collections;
 
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
@@ -45,9 +44,6 @@ import org.springframework.util.FileSystemUtils;
  */
 public class ReleaseTrainContentsUpdaterTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	ProjectGitHubHandler projectGitHubHandler = new ProjectGitHubHandler(this.properties, Collections.emptyList()) {
@@ -57,9 +53,9 @@ public class ReleaseTrainContentsUpdaterTests {
 		}
 	};
 
-	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties);
-
 	TemplateGenerator templateGenerator = new TemplateGenerator(this.properties, this.projectGitHubHandler);
+
+	ProjectGitHandler projectGitHandler = new ProjectGitHandler(this.properties);
 
 	ReleaseTrainContentsUpdater updater = new ReleaseTrainContentsUpdater(this.properties, this.projectGitHandler,
 			this.templateGenerator);
@@ -68,11 +64,11 @@ public class ReleaseTrainContentsUpdaterTests {
 
 	File wikiRepo;
 
+	@TempDir
 	File temporaryFolder;
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
-		this.temporaryFolder = this.tmp.newFolder();
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects"), this.temporaryFolder);
 		this.springCloudRepo = new File(this.temporaryFolder, "spring-cloud/");

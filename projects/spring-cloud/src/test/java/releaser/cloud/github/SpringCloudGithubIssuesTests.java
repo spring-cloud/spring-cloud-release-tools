@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@ import com.jcabi.github.Issue;
 import com.jcabi.github.Repo;
 import com.jcabi.github.Repos;
 import com.jcabi.github.mock.MkGithub;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import releaser.cloud.SpringCloudReleaserProperties;
 import releaser.internal.ReleaserProperties;
@@ -44,16 +42,13 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class SpringCloudGithubIssuesTests {
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
-
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	MkGithub github;
 
 	Repo repo;
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		this.github = github("spring-guides");
 		this.properties.getGit().setOauthToken("a");

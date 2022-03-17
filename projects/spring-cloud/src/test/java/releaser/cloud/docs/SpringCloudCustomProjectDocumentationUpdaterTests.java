@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,9 @@ import java.util.Collections;
 import javax.validation.constraints.NotNull;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.cloud.SpringCloudReleaserProperties;
 import releaser.cloud.github.SpringCloudGithubIssuesAccessor;
@@ -48,11 +47,9 @@ import org.springframework.util.FileSystemUtils;
  */
 public class SpringCloudCustomProjectDocumentationUpdaterTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
 	File project;
 
+	@TempDir
 	File tmpFolder;
 
 	ProjectGitHandler handler;
@@ -63,9 +60,8 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException, URISyntaxException {
-		this.tmpFolder = this.tmp.newFolder();
 		this.project = new File(SpringCloudCustomProjectDocumentationUpdater.class
 				.getResource("/projects/spring-cloud-static").toURI());
 		TestUtils.prepareLocalRepo();

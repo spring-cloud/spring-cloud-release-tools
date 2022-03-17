@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import java.util.Arrays;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import releaser.cloud.SpringCloudReleaserProperties;
 import releaser.cloud.docs.TestUtils;
@@ -43,18 +45,15 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class SpringCloudMavenBomParserTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
+	@TempDir
 	File tmpFolder;
 
 	File springCloudReleaseProject;
 
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException, IOException, GitAPIException {
-		this.tmpFolder = this.tmp.newFolder();
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects"), this.tmpFolder);
 		this.springCloudReleaseProject = new File(this.tmpFolder, "/spring-cloud-release");

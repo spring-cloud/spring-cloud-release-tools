@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import java.net.URISyntaxException;
 
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import releaser.internal.git.GitRepoTests;
 import releaser.internal.tech.PomReader;
 
@@ -44,7 +44,7 @@ public class PomReaderTests {
 
 	File licenseFile;
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException {
 		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
 		this.springCloudReleaseProject = new File(scRelease);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,14 @@ import java.util.Set;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.maven.model.Model;
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.git.GitRepoTests;
 import releaser.internal.project.Project;
 import releaser.internal.tech.PomReader;
 
-import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.util.FileSystemUtils;
 
 /**
@@ -43,23 +41,17 @@ import org.springframework.util.FileSystemUtils;
  */
 public class PomUpdaterTests {
 
-	@Rule
-	public OutputCaptureRule capture = new OutputCaptureRule();
-
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
 	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
 			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects())
 			.parsers(Collections.emptyList()).retrieveFromBom();
 
 	PomUpdater pomUpdater = new PomUpdater();
 
+	@TempDir
 	File temporaryFolder;
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
-		this.temporaryFolder = this.tmp.newFolder();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 	}
 

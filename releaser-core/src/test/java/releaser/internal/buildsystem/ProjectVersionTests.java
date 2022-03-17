@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import releaser.internal.git.GitRepoTests;
 import releaser.internal.project.ProjectVersion;
 
@@ -40,7 +40,7 @@ public class ProjectVersionTests {
 
 	File springCloudContract;
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException {
 		URI scRelease = GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI();
 		URI scContract = GitRepoTests.class.getResource("/projects/spring-cloud-contract").toURI();
