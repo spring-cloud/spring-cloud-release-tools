@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.git.GitRepoTests;
@@ -38,7 +38,7 @@ public class MavenBomParserTests {
 
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException {
 		this.springCloudReleaseProject = new File(
 				GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,17 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.boot.test.system.OutputCaptureRule;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 /**
  * @author Marcin Grzejszczak
  */
+@ExtendWith(OutputCaptureExtension.class)
 public class SpringCloudGhPagesParserTests {
-
-	@Rule
-	public OutputCaptureRule capture = new OutputCaptureRule();
 
 	File rawHtml = new File(
 			SpringCloudGhPagesParserTests.class.getResource("/raw/spring-cloud-gh-pages-index.html").toURI());
@@ -71,11 +70,11 @@ public class SpringCloudGhPagesParserTests {
 	}
 
 	@Test
-	public void should_not_parse_the_components_table_when_markers_are_not_found() {
+	public void should_not_parse_the_components_table_when_markers_are_not_found(CapturedOutput capturedOutput) {
 		ReleaseTrainContents contents = new ReleaseTrainContentsParser().parseProjectPage(this.wrongHtml);
 
 		BDDAssertions.then(contents).isNull();
-		BDDAssertions.then(this.capture.toString()).contains("The page is missing the components table markers");
+		BDDAssertions.then(capturedOutput.toString()).contains("The page is missing the components table markers");
 	}
 
 }

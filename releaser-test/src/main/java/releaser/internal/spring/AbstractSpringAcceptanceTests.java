@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,9 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestPomReader;
@@ -68,9 +67,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public abstract class AbstractSpringAcceptanceTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
+	@TempDir
 	public File temporaryFolder;
 
 	public TestPomReader testPomReader = new TestPomReader();
@@ -89,15 +86,14 @@ public abstract class AbstractSpringAcceptanceTests {
 		return release;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
-		this.temporaryFolder = this.tmp.newFolder();
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 		clean();
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() throws Exception {
 		clean();
 	}
@@ -200,8 +196,8 @@ public abstract class AbstractSpringAcceptanceTests {
 		return new String(Files.readAllBytes(file.toPath()));
 	}
 
-	public File cloneToTemporaryDirectory(File project) throws IOException {
-		return GitTestUtils.clonedProject(this.tmp.newFolder(), project);
+	public File cloneToTemporaryDirectory(File tempDir, File project) throws IOException {
+		return GitTestUtils.clonedProject(tempDir, project);
 	}
 
 	public void checkoutReleaseTrainBranch(String fileToRepo, String branch)
@@ -358,7 +354,7 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public class Props {
 
-		private List<String> args = new LinkedList<>();
+		private final List<String> args = new LinkedList<>();
 
 		public Props(String... args) {
 			properties(args);

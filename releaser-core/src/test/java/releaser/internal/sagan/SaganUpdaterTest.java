@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
@@ -56,7 +56,7 @@ public class SaganUpdaterTest {
 
 	private Project project;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		project = new Project();
 		project.setReleases(Arrays.asList(release("2.2.0-RC1"), release("2.3.0-SNAPSHOT"), release("2.2.0-M4")));

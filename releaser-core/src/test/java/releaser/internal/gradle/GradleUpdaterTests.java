@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.project.ProjectVersion;
@@ -42,14 +41,11 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class GradleUpdaterTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
+	@TempDir
 	File temporaryFolder;
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
-		this.temporaryFolder = this.tmp.newFolder();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 	}
 

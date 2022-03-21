@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +25,18 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import releaser.internal.PomUpdateAcceptanceTests;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
 
-import org.springframework.boot.test.system.OutputCaptureRule;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -45,20 +45,15 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 /**
  * @author Marcin Grzejszczak
  */
+@ExtendWith(OutputCaptureExtension.class)
 public class ProjectCommandExecutorTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
-	@Rule
-	public OutputCaptureRule outputCapture = new OutputCaptureRule();
-
+	@TempDir
 	File temporaryFolder;
 
-	@Before
+	@BeforeEach
 	public void checkOs() throws Exception {
-		Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
-		this.temporaryFolder = this.tmp.newFolder();
+		Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects"), this.temporaryFolder);
 	}

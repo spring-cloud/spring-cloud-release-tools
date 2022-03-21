@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,10 @@ import org.assertj.core.api.BDDAssertions;
 import org.awaitility.Awaitility;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.PomUpdateAcceptanceTests;
@@ -60,9 +59,7 @@ import org.springframework.util.LinkedMultiValueMap;
  */
 public class PostReleaseActionsTests {
 
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
-
+	@TempDir
 	File temporaryFolder;
 
 	GradleUpdater gradleUpdater = BDDMockito.mock(GradleUpdater.class);
@@ -114,9 +111,8 @@ public class PostReleaseActionsTests {
 		return new VersionsFetcher(properties, updater);
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
-		this.temporaryFolder = this.tmp.newFolder();
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 	}
@@ -200,7 +196,7 @@ public class PostReleaseActionsTests {
 		BDDAssertions.then(this.cloned).isNull();
 	}
 
-	@Ignore("flakey on circle")
+	@Disabled("flakey on circle")
 	@Test
 	public void should_update_project_and_run_tests_and_release_train_docs_generation_is_called() {
 		this.properties.getMetaRelease().setEnabled(true);
