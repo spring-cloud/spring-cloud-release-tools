@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,32 +38,40 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractSpringAcceptanceTests {
 
-	public ArgsBuilder metaReleaseArgs(File project) throws Exception {
-		return new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
-				.projectsToSkip("spring-boot", "spring-cloud-build", "spring-cloud-commons", "spring-cloud-stream",
-						"spring-cloud-task", "spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus",
-						"spring-cloud-config", "spring-cloud-netflix", "spring-cloud-cloudfoundry",
-						"spring-cloud-gateway", "spring-cloud-security", "spring-cloud-zookeeper",
-						"spring-cloud-sleuth", "spring-cloud-contract", "spring-cloud-vault")
-				.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
-				.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
-				.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
-				.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
-				.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
+	public ArgsBuilder metaReleaseArgs(File project, File tempDirTestSamplesProject, File tempDirReleaseTrainDocs,
+			File tempDirSpringCloud, File tempDirReleaseTrainWiki, File tempDirAllTestSample) throws Exception {
+		return new ArgsBuilder(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs, tempDirSpringCloud,
+				tempDirReleaseTrainWiki, tempDirAllTestSample)
+						.releaseTrainUrl("/projects/spring-cloud-release/")
+						.projectsToSkip("spring-boot", "spring-cloud-build", "spring-cloud-commons",
+								"spring-cloud-stream", "spring-cloud-task", "spring-cloud-function", "spring-cloud-aws",
+								"spring-cloud-bus", "spring-cloud-config", "spring-cloud-netflix",
+								"spring-cloud-cloudfoundry", "spring-cloud-gateway", "spring-cloud-security",
+								"spring-cloud-zookeeper", "spring-cloud-sleuth", "spring-cloud-contract",
+								"spring-cloud-vault")
+						.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
+						.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
+						.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
+						.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
+						.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 	}
 
-	public ArgsBuilder metaReleaseArgsForParallel(File project) throws Exception {
-		return new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
-				.projectsToSkip("spring-boot", "spring-cloud-commons", "spring-cloud-stream", "spring-cloud-task",
-						"spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus", "spring-cloud-config",
-						"spring-cloud-netflix", "spring-cloud-cloudfoundry", "spring-cloud-gateway",
-						"spring-cloud-security", "spring-cloud-zookeeper", "spring-cloud-sleuth",
-						"spring-cloud-contract", "spring-cloud-vault")
-				.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
-				.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
-				.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
-				.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
-				.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
+	public ArgsBuilder metaReleaseArgsForParallel(File project, File tempDirTestSamplesProject,
+			File tempDirReleaseTrainDocs, File tempDirSpringCloud, File tempDirReleaseTrainWiki,
+			File tempDirAllTestSample) throws Exception {
+		return new ArgsBuilder(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs, tempDirSpringCloud,
+				tempDirReleaseTrainWiki, tempDirAllTestSample)
+						.releaseTrainUrl("/projects/spring-cloud-release/")
+						.projectsToSkip("spring-boot", "spring-cloud-commons", "spring-cloud-stream",
+								"spring-cloud-task", "spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus",
+								"spring-cloud-config", "spring-cloud-netflix", "spring-cloud-cloudfoundry",
+								"spring-cloud-gateway", "spring-cloud-security", "spring-cloud-zookeeper",
+								"spring-cloud-sleuth", "spring-cloud-contract", "spring-cloud-vault")
+						.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
+						.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
+						.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
+						.gitOrgUrl("file://" + this.temporaryFolder.getAbsolutePath())
+						.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 	}
 
 	public Map<String, String> edgwareSr10() {
