@@ -36,8 +36,7 @@ class BuildsystemConfiguration {
 		return new MavenBomParser(releaserProperties, customBomParsers(customBomParsers));
 	}
 
-	private List<CustomBomParser> customBomParsers(
-			List<CustomBomParser> customBomParsers) {
+	private List<CustomBomParser> customBomParsers(List<CustomBomParser> customBomParsers) {
 		return customBomParsers == null ? new ArrayList<>() : customBomParsers;
 	}
 
@@ -45,14 +44,12 @@ class BuildsystemConfiguration {
 	@ConditionalOnMissingBean
 	BomParser gradleBomParser(ReleaserProperties releaserProperties,
 			@Autowired(required = false) List<CustomBomParser> customBomParsers) {
-		return new GradleBomParser(releaserProperties,
-				customBomParsers(customBomParsers));
+		return new GradleBomParser(releaserProperties, customBomParsers(customBomParsers));
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	ProjectPomUpdater pomUpdater(ReleaserProperties releaserProperties,
-			List<BomParser> bomParsers) {
+	ProjectPomUpdater pomUpdater(ReleaserProperties releaserProperties, List<BomParser> bomParsers) {
 		return new ProjectPomUpdater(releaserProperties, bomParsers);
 	}
 

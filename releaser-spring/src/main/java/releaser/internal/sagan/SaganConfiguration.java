@@ -16,8 +16,6 @@
 
 package releaser.internal.sagan;
 
-import java.util.List;
-
 import releaser.internal.ReleaserProperties;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -44,8 +42,7 @@ class SaganConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "false",
-			matchIfMissing = true)
+	@ConditionalOnProperty(value = "releaser.sagan.update-sagan", havingValue = "false", matchIfMissing = true)
 	SaganClient noOpSaganClient() {
 		return new SaganClient() {
 			@Override
@@ -59,14 +56,13 @@ class SaganConfiguration {
 			}
 
 			@Override
-			public Release deleteRelease(String projectName, String releaseVersion) {
-				return null;
+			public boolean deleteRelease(String projectName, String releaseVersion) {
+				return false;
 			}
 
 			@Override
-			public Project updateRelease(String projectName,
-					List<ReleaseUpdate> releaseUpdate) {
-				return null;
+			public boolean addRelease(String projectName, ReleaseInput releaseInput) {
+				return false;
 			}
 
 			@Override
@@ -81,8 +77,7 @@ class SaganConfiguration {
 				"In order to connect to Sagan you need to pass the Github OAuth token. "
 						+ "You can do it via the [--releaser.git.oauth-token=...] "
 						+ "command line argument or an env variable [export RELEASER_GIT_OAUTH_TOKEN=...].");
-		return new RestTemplateBuilder()
-				.basicAuthentication(properties.getGit().getOauthToken(), "").build();
+		return new RestTemplateBuilder().basicAuthentication(properties.getGit().getOauthToken(), "").build();
 	}
 
 }

@@ -51,8 +51,7 @@ class OptionsParser implements Parser {
 
 	private final ConfigurableApplicationContext context;
 
-	OptionsParser(List<ReleaserTask> allTasks,
-			List<SingleProjectReleaserTask> singleProjectReleaserTasks,
+	OptionsParser(List<ReleaserTask> allTasks, List<SingleProjectReleaserTask> singleProjectReleaserTasks,
 			ConfigurableApplicationContext context) {
 		this.allTasks = allTasks;
 		this.singleProjectReleaserTasks = singleProjectReleaserTasks;
@@ -66,39 +65,32 @@ class OptionsParser implements Parser {
 		log.info("Got following args <{}>", (Object[]) args);
 		try {
 			ArgumentAcceptingOptionSpec<Boolean> metaReleaseOpt = parser
-					.acceptsAll(Arrays.asList("x", "meta-release"),
-							"Do you want to do the meta release?")
+					.acceptsAll(Arrays.asList("x", "meta-release"), "Do you want to do the meta release?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 			ArgumentAcceptingOptionSpec<Boolean> fullReleaseOpt = parser
 					.acceptsAll(Arrays.asList("f", "full-release"),
 							"Do you want to do the full release of a single project?")
 					.withOptionalArg().ofType(Boolean.class).defaultsTo(false);
-			ArgumentAcceptingOptionSpec<Boolean> interactiveOpt = parser.acceptsAll(
-					Arrays.asList("i", "interactive"),
-					"Do you want to set the properties from the command line of a single project?")
+			ArgumentAcceptingOptionSpec<Boolean> interactiveOpt = parser
+					.acceptsAll(Arrays.asList("i", "interactive"),
+							"Do you want to set the properties from the command line of a single project?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(true);
-			ArgumentAcceptingOptionSpec<Boolean> dryRunOpt = parser.acceptsAll(
-					Arrays.asList("dr", "dry-run"),
+			ArgumentAcceptingOptionSpec<Boolean> dryRunOpt = parser.acceptsAll(Arrays.asList("dr", "dry-run"),
 					"Do you want to do the release / meta release with build and install projects locally only?")
 					.withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 			LinkedList<ReleaserTask> singleProjectReleaseTasks = this.allTasks.stream()
 					.filter(releaserTask -> releaserTask instanceof SingleProjectReleaserTask)
 					.collect(Collectors.toCollection(LinkedList::new));
 			singleProjectReleaseTasks.forEach(task -> parser
-					.acceptsAll(Arrays.asList(task.shortName(), task.name()),
-							task.description())
-					.withOptionalArg());
-			ArgumentAcceptingOptionSpec<String> startFromOpt = parser.acceptsAll(
-					Arrays.asList("a", "start-from"),
-					"Starts all release task starting "
+					.acceptsAll(Arrays.asList(task.shortName(), task.name()), task.description()).withOptionalArg());
+			ArgumentAcceptingOptionSpec<String> startFromOpt = parser
+					.acceptsAll(Arrays.asList("a", "start-from"), "Starts all release task starting "
 							+ "from the given task. Requires passing the task name (either one letter or the full name)")
 					.withRequiredArg().ofType(String.class);
 			ArgumentAcceptingOptionSpec<String> taskNamesOpt = parser
-					.acceptsAll(Arrays.asList("tn", "task-names"),
-							"Starts all release task for the given task names")
+					.acceptsAll(Arrays.asList("tn", "task-names"), "Starts all release task for the given task names")
 					.withRequiredArg().ofType(String.class).defaultsTo("");
-			ArgumentAcceptingOptionSpec<String> rangeOpt = parser.acceptsAll(
-					Arrays.asList("r", "range"),
+			ArgumentAcceptingOptionSpec<String> rangeOpt = parser.acceptsAll(Arrays.asList("r", "range"),
 					"Runs release tasks from the given range. Requires passing "
 							+ "the task names with a hyphen. The first task is inclusive, "
 							+ "the second inclusive. E.g. 's-m' would mean running 'snapshot', "
@@ -115,32 +107,25 @@ class OptionsParser implements Parser {
 			Boolean interactive = options.valueOf(interactiveOpt);
 			Boolean dryRun = options.valueOf(dryRunOpt);
 			Boolean fullRelease = options.has(fullReleaseOpt);
-			List<String> providedTaskNames = StringUtils.hasText(options
-					.valueOf(taskNamesOpt)) ? Arrays.asList(
-							removeQuotingChars(options.valueOf(taskNamesOpt)).split(","))
-							: new ArrayList<>();
-			providedTaskNames = providedTaskNames.stream().map(this::removeQuotingChars)
-					.collect(Collectors.toList());
+			List<String> providedTaskNames = StringUtils.hasText(options.valueOf(taskNamesOpt))
+					? Arrays.asList(removeQuotingChars(options.valueOf(taskNamesOpt)).split(",")) : new ArrayList<>();
+			providedTaskNames = providedTaskNames.stream().map(this::removeQuotingChars).collect(Collectors.toList());
 			log.info("Passed tasks {} from command line", providedTaskNames);
-			List<String> allTaskNames = singleProjectReleaseTasks.stream()
-					.map(ReleaserTask::name).collect(Collectors.toList());
-			List<String> tasksFromOptions = singleProjectReleaseTasks.stream().filter(
-					task -> options.has(task.name()) || options.has(task.shortName()))
-					.map(ReleaserTask::name).collect(Collectors.toList());
+			List<String> allTaskNames = singleProjectReleaseTasks.stream().map(ReleaserTask::name)
+					.collect(Collectors.toList());
+			List<String> tasksFromOptions = singleProjectReleaseTasks.stream()
+					.filter(task -> options.has(task.name()) || options.has(task.shortName())).map(ReleaserTask::name)
+					.collect(Collectors.toList());
 			if (providedTaskNames.isEmpty()) {
-				providedTaskNames.addAll(tasksFromOptions.isEmpty() && !metaRelease
-						? allTaskNames : tasksFromOptions);
+				providedTaskNames.addAll(tasksFromOptions.isEmpty() && !metaRelease ? allTaskNames : tasksFromOptions);
 			}
-			List<String> taskNames = filterProvidedTaskNames(providedTaskNames,
-					allTaskNames, metaRelease);
+			List<String> taskNames = filterProvidedTaskNames(providedTaskNames, allTaskNames, metaRelease);
 			String startFrom = options.valueOf(startFromOpt);
 			String range = options.valueOf(rangeOpt);
-			Options buildOptions = new OptionsBuilder().metaRelease(metaRelease)
-					.fullRelease(fullRelease).interactive(interactive).dryRun(dryRun)
-					.taskNames(taskNames).startFrom(startFrom).range(range).options();
-			log.info(
-					"\n\nWill use the following options to process the project\n\n{}\n\n",
-					buildOptions);
+			Options buildOptions = new OptionsBuilder().metaRelease(metaRelease).fullRelease(fullRelease)
+					.interactive(interactive).dryRun(dryRun).taskNames(taskNames).startFrom(startFrom).range(range)
+					.options();
+			log.info("\n\nWill use the following options to process the project\n\n{}\n\n", buildOptions);
 			return buildOptions;
 		}
 		catch (Exception e) {
@@ -149,8 +134,8 @@ class OptionsParser implements Parser {
 		}
 	}
 
-	List<String> filterProvidedTaskNames(List<String> providedTaskNames,
-			List<String> allTaskNames, boolean metaRelease) {
+	List<String> filterProvidedTaskNames(List<String> providedTaskNames, List<String> allTaskNames,
+			boolean metaRelease) {
 		if (metaRelease) {
 			return providedTaskNames;
 		}
@@ -170,8 +155,7 @@ class OptionsParser implements Parser {
 		System.err.println(e.getMessage());
 		e.printStackTrace();
 		System.err.println(intro());
-		System.err.println(
-				"java -jar releaser-spring-1.0.0.BUILD-SNAPSHOT.jar [options...] ");
+		System.err.println("java -jar releaser-spring-1.0.0.BUILD-SNAPSHOT.jar [options...] ");
 		try {
 			parser.printHelpOn(System.err);
 		}
@@ -194,15 +178,13 @@ class OptionsParser implements Parser {
 
 	private String intro() {
 		return "\nHere you can find the list of tasks in order for a single project\n\n["
-				+ this.singleProjectReleaserTasks.stream().map(ReleaserTask::name)
-						.collect(Collectors.joining(","))
+				+ this.singleProjectReleaserTasks.stream().map(ReleaserTask::name).collect(Collectors.joining(","))
 				+ "]\n\n";
 	}
 
 	private String examples() {
-		return "\nExamples of usage:\n\n" + "Run 'build' & 'commit' & 'deploy'\n"
-				+ "java -jar jar.jar -b -c -d\n\n" + "Start from 'push'\n"
-				+ "java -jar releaser.jar -a push\n\n" + "Range 'docs' -> 'push'\n"
+		return "\nExamples of usage:\n\n" + "Run 'build' & 'commit' & 'deploy'\n" + "java -jar jar.jar -b -c -d\n\n"
+				+ "Start from 'push'\n" + "java -jar releaser.jar -a push\n\n" + "Range 'docs' -> 'push'\n"
 				+ "java -jar releaser.jar -r o-p\n\n" + "\n\n";
 	}
 

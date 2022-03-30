@@ -75,8 +75,7 @@ public class InitializrSpringCloudInfoServiceTests {
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
 		when(rest.getForObject(anyString(), eq(Map.class))).thenReturn(new HashMap());
-		InitializrSpringCloudInfoService service = new InitializrSpringCloudInfoService(
-				rest, github, githubPomReader);
+		InitializrSpringCloudInfoService service = new InitializrSpringCloudInfoService(rest, github, githubPomReader);
 		try {
 			service.getSpringCloudVersion("2.1.0");
 			fail("Exception should have been thrown");
@@ -94,8 +93,7 @@ public class InitializrSpringCloudInfoServiceTests {
 		Map<String, Map<String, String>> info = new HashMap<>();
 		info.put("bom-ranges", new HashMap<>());
 		when(rest.getForObject(anyString(), eq(Map.class))).thenReturn(info);
-		InitializrSpringCloudInfoService service = new InitializrSpringCloudInfoService(
-				rest, github, githubPomReader);
+		InitializrSpringCloudInfoService service = new InitializrSpringCloudInfoService(rest, github, githubPomReader);
 		try {
 			service.getSpringCloudVersion("2.1.0");
 			fail("Exception should have been thrown");
@@ -111,25 +109,19 @@ public class InitializrSpringCloudInfoServiceTests {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
-		when(githubPomReader.readPomFromUrl(eq(String
-				.format(SpringCloudRelease.SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion))))
-						.thenReturn(new MavenXpp3Reader()
-								.read(new FileReader(new ClassPathResource(
-										"spring-cloud-starter-parent-pom.xml")
-												.getFile())));
-		when(githubPomReader.readPomFromUrl(eq(String.format(
-				SpringCloudRelease.SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion))))
+		when(githubPomReader
+				.readPomFromUrl(eq(String.format(SpringCloudRelease.SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion))))
 						.thenReturn(new MavenXpp3Reader().read(new FileReader(
-								new ClassPathResource("spring-cloud-dependencies-pom.xml")
-										.getFile())));
+								new ClassPathResource("spring-cloud-starter-parent-pom.xml").getFile())));
+		when(githubPomReader.readPomFromUrl(
+				eq(String.format(SpringCloudRelease.SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion))))
+						.thenReturn(new MavenXpp3Reader().read(
+								new FileReader(new ClassPathResource("spring-cloud-dependencies-pom.xml").getFile())));
 		InitializrSpringCloudInfoService service = spy(
 				new InitializrSpringCloudInfoService(rest, github, githubPomReader));
-		doReturn(Arrays.asList(new String[] { bomVersion })).when(service)
-				.getSpringCloudVersions();
-		Map<String, String> releaseVersionsResult = service
-				.getReleaseVersions(bomVersion);
-		assertThat(releaseVersionsResult,
-				Matchers.equalTo(SpringCloudInfoTestData.releaseVersions));
+		doReturn(Arrays.asList(new String[] { bomVersion })).when(service).getSpringCloudVersions();
+		Map<String, String> releaseVersionsResult = service.getReleaseVersions(bomVersion);
+		assertThat(releaseVersionsResult, Matchers.equalTo(SpringCloudInfoTestData.releaseVersions));
 	}
 
 	@Test(expected = SpringCloudVersionNotFoundException.class)
@@ -138,17 +130,14 @@ public class InitializrSpringCloudInfoServiceTests {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
-		when(githubPomReader.readPomFromUrl(eq(String
-				.format(SpringCloudRelease.SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion))))
-						.thenReturn(new MavenXpp3Reader()
-								.read(new FileReader(new ClassPathResource(
-										"spring-cloud-starter-parent-pom.xml")
-												.getFile())));
-		when(githubPomReader.readPomFromUrl(eq(String.format(
-				SpringCloudRelease.SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion))))
+		when(githubPomReader
+				.readPomFromUrl(eq(String.format(SpringCloudRelease.SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion))))
 						.thenReturn(new MavenXpp3Reader().read(new FileReader(
-								new ClassPathResource("spring-cloud-dependencies-pom.xml")
-										.getFile())));
+								new ClassPathResource("spring-cloud-starter-parent-pom.xml").getFile())));
+		when(githubPomReader.readPomFromUrl(
+				eq(String.format(SpringCloudRelease.SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion))))
+						.thenReturn(new MavenXpp3Reader().read(
+								new FileReader(new ClassPathResource("spring-cloud-dependencies-pom.xml").getFile())));
 		InitializrSpringCloudInfoService service = spy(
 				new InitializrSpringCloudInfoService(rest, github, githubPomReader));
 		doReturn(new ArrayList()).when(service).getSpringCloudVersions();
@@ -163,10 +152,8 @@ public class InitializrSpringCloudInfoServiceTests {
 		Response response = mock(Response.class);
 		Request request = mock(Request.class);
 		RequestURI requestURI = mock(RequestURI.class);
-		JsonResponse jsonResponse = new JsonResponse(new DefaultResponse(request, 200, "",
-				new Array<>(),
-				IOUtils.toByteArray(new ClassPathResource("spring-cloud-versions.json")
-						.getInputStream())));
+		JsonResponse jsonResponse = new JsonResponse(new DefaultResponse(request, 200, "", new Array<>(),
+				IOUtils.toByteArray(new ClassPathResource("spring-cloud-versions.json").getInputStream())));
 		doReturn(request).when(requestURI).back();
 		doReturn(requestURI).when(requestURI).path(eq(SPRING_CLOUD_RELEASE_TAGS_PATH));
 		doReturn(requestURI).when(request).uri();
@@ -175,9 +162,8 @@ public class InitializrSpringCloudInfoServiceTests {
 		doReturn(request).when(github).entry();
 		InitializrSpringCloudInfoService service = spy(
 				new InitializrSpringCloudInfoService(rest, github, githubPomReader));
-		assertThat(service.getSpringCloudVersions(),
-				Matchers.equalTo(SpringCloudInfoTestData.springCloudVersions.stream()
-						.map(v -> v.replaceFirst("v", "")).collect(Collectors.toList())));
+		assertThat(service.getSpringCloudVersions(), Matchers.equalTo(SpringCloudInfoTestData.springCloudVersions
+				.stream().map(v -> v.replaceFirst("v", "")).collect(Collectors.toList())));
 	}
 
 	@Test
@@ -226,8 +212,7 @@ public class InitializrSpringCloudInfoServiceTests {
 		for (String m : milestoneStrings.keySet()) {
 			Milestone milestone = mock(Milestone.class);
 			String dueDate = milestoneStrings.get(m);
-			JsonObjectBuilder builder = builderFactory.createObjectBuilder().add("title",
-					m);
+			JsonObjectBuilder builder = builderFactory.createObjectBuilder().add("title", m);
 			if (dueDate == null) {
 				builder.add("due_on", JsonValue.NULL);
 			}
@@ -256,8 +241,7 @@ public class InitializrSpringCloudInfoServiceTests {
 		Map<String, Map<String, Map<String, String>>> info = new HashMap<>();
 		info.put("bom-ranges", springCloud);
 		when(rest.getForObject(anyString(), eq(Map.class))).thenReturn(info);
-		InitializrSpringCloudInfoService service = new InitializrSpringCloudInfoService(
-				rest, github, githubPomReader);
+		InitializrSpringCloudInfoService service = new InitializrSpringCloudInfoService(rest, github, githubPomReader);
 		String version = service.getSpringCloudVersion("2.1.0.RELEASE").getVersion();
 		assertThat(version, Matchers.equalTo("Greenwich.SR1"));
 		version = service.getSpringCloudVersion("2.1.4.RELEASE").getVersion();
@@ -273,20 +257,16 @@ public class InitializrSpringCloudInfoServiceTests {
 	private Map<String, String> generateSpringCloudData() {
 		Map<String, String> data = new HashMap<>();
 		data.put("Edgware.SR5", "Spring Boot >=1.5.0.RELEASE and <=1.5.20.RELEASE");
-		data.put("Edgware.BUILD-SNAPSHOT",
-				"Spring Boot >=1.5.21.BUILD-SNAPSHOT and <2.0.0.M1");
+		data.put("Edgware.BUILD-SNAPSHOT", "Spring Boot >=1.5.21.BUILD-SNAPSHOT and <2.0.0.M1");
 		data.put("Finchley.M2", "Spring Boot >=2.0.0.M3 and <2.0.0.M5");
 		data.put("Finchley.M3", "Spring Boot >=2.0.0.M5 and <=2.0.0.M5");
 		data.put("Finchley.M4", "Spring Boot >=2.0.0.M6 and <=2.0.0.M6");
 		data.put("Finchley.RC1", "Spring Boot >=2.0.1.RELEASE and <2.0.2.RELEASE");
 		data.put("Finchley.RC2", "Spring Boot >=2.0.2.RELEASE and <2.0.3.RELEASE");
-		data.put("Finchley.SR3",
-				"Spring Boot >=2.0.3.RELEASE and <2.0.999.BUILD-SNAPSHOT");
-		data.put("Finchley.BUILD-SNAPSHO",
-				"Spring Boot >=2.0.999.BUILD-SNAPSHOT and <2.1.0.M3");
+		data.put("Finchley.SR3", "Spring Boot >=2.0.3.RELEASE and <2.0.999.BUILD-SNAPSHOT");
+		data.put("Finchley.BUILD-SNAPSHO", "Spring Boot >=2.0.999.BUILD-SNAPSHOT and <2.1.0.M3");
 		data.put("Greenwich.M1", "Spring Boot >=2.1.0.M3 and <2.1.0.RELEASE");
-		data.put("Greenwich.SR1",
-				"Spring Boot >=2.1.0.RELEASE and <2.1.5.BUILD-SNAPSHOT");
+		data.put("Greenwich.SR1", "Spring Boot >=2.1.0.RELEASE and <2.1.5.BUILD-SNAPSHOT");
 		data.put("Greenwich.BUILD-SNAPSHOT", "Spring Boot >=2.1.5.BUILD-SNAPSHOT");
 		return data;
 

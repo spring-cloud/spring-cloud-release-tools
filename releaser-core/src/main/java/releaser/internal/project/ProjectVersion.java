@@ -597,9 +597,22 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		return "";
 	}
 
+	/**
+	 * @return the snapshot format of the current version.
+	 */
+	public String toSnapshotVersion() {
+		return assertVersion().withSnapshot().print();
+	}
+
 	@Override
 	public String toString() {
 		return this.version;
+	}
+
+	public String toPrettyString() {
+		return new ToStringCreator(this).append("projectName", projectName).append("version", version)
+				.append("groupId", groupId).append("artifactId", artifactId).append("releaseType", releaseType)
+				.toString();
 	}
 
 	@Override
@@ -773,7 +786,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return StringUtils.isEmpty(minor) && StringUtils.isEmpty(patch) && StringUtils.isEmpty(suffix);
 		}
 
-		private SplitVersion withSnapshot() {
+		public SplitVersion withSnapshot() {
 			return new SplitVersion(major, minor, patch, delimiter, suffix());
 		}
 

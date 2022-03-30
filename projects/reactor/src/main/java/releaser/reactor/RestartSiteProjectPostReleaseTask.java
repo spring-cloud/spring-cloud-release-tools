@@ -31,8 +31,7 @@ public class RestartSiteProjectPostReleaseTask extends PublishDocsReleaseTask {
 
 	private final String reactorAppName;
 
-	public RestartSiteProjectPostReleaseTask(Releaser releaser, CfClient cfClient,
-			String reactorAppName) {
+	public RestartSiteProjectPostReleaseTask(Releaser releaser, CfClient cfClient, String reactorAppName) {
 		super(releaser);
 		this.cfClient = cfClient;
 		this.reactorAppName = reactorAppName;
@@ -58,8 +57,7 @@ class CfClient {
 	}
 
 	void restartApp(String name) {
-		this.cloudFoundryOperations.applications()
-				.restart(RestartApplicationRequest.builder().name(name).build());
+		this.cloudFoundryOperations.applications().restart(RestartApplicationRequest.builder().name(name).build());
 	}
 
 }

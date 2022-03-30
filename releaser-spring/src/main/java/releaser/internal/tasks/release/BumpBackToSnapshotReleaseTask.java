@@ -56,8 +56,7 @@ public class BumpBackToSnapshotReleaseTask implements ReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return this.releaser.rollbackReleaseVersion(args.project, args.projects,
-				args.versionFromBom);
+		return this.releaser.rollbackReleaseVersion(args.project, args.projects, args.versionFromBom);
 	}
 
 	@Override

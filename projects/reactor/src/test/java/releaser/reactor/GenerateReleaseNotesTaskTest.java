@@ -60,23 +60,22 @@ class GenerateReleaseNotesTaskTest {
 
 	@Test
 	void extractTypeFromLabel() {
-		assertThat(task.extractTypes(Collections.singleton("type/bug"), ""))
-				.as("type/bug").containsOnly(Type.BUG);
+		assertThat(task.extractTypes(Collections.singleton("type/bug"), "")).as("type/bug").containsOnly(Type.BUG);
 
-		assertThat(task.extractTypes(Collections.singleton("type/enhancement"), ""))
-				.as("type/enhancement").containsOnly(Type.FEATURE);
+		assertThat(task.extractTypes(Collections.singleton("type/enhancement"), "")).as("type/enhancement")
+				.containsOnly(Type.FEATURE);
 
-		assertThat(task.extractTypes(Collections.singleton("type/documentation"), ""))
-				.as("type/documentation").containsOnly(Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.singleton("type/documentation"), "")).as("type/documentation")
+				.containsOnly(Type.DOC_MISC);
 
-		assertThat(task.extractTypes(Collections.singleton("type/chores"), ""))
-				.as("type/chores").containsOnly(Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.singleton("type/chores"), "")).as("type/chores")
+				.containsOnly(Type.DOC_MISC);
 
-		assertThat(task.extractTypes(Collections.singleton("warn/something"), ""))
-				.as("warn/*").containsOnly(Type.NOTEWORTHY);
+		assertThat(task.extractTypes(Collections.singleton("warn/something"), "")).as("warn/*")
+				.containsOnly(Type.NOTEWORTHY);
 
-		assertThat(task.extractTypes(Collections.singleton("type/whatever"), ""))
-				.as("type/whatever").containsOnly(Type.UNCLASSIFIED);
+		assertThat(task.extractTypes(Collections.singleton("type/whatever"), "")).as("type/whatever")
+				.containsOnly(Type.UNCLASSIFIED);
 	}
 
 	@Test
@@ -87,179 +86,158 @@ class GenerateReleaseNotesTaskTest {
 		labels.add("type/documentation");
 		labels.add("whatever");
 
-		assertThat(task.extractTypes(labels, "")).as("multiple labels")
-				.containsOnly(Type.BUG, Type.FEATURE, Type.DOC_MISC);
+		assertThat(task.extractTypes(labels, "")).as("multiple labels").containsOnly(Type.BUG, Type.FEATURE,
+				Type.DOC_MISC);
 	}
 
 	@Test
 	void extractMiscTypeFromBuildMessagePrefix() {
 		String message = "[build] Foo";
 
-		assertThat(task.extractTypes(Collections.emptySet(), message))
-				.containsOnly(Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.emptySet(), message)).containsOnly(Type.DOC_MISC);
 	}
 
 	@Test
 	void extractMiscTypeFromPolishMessagePrefix() {
 		String message = "[polish] Foo";
 
-		assertThat(task.extractTypes(Collections.emptySet(), message))
-				.containsOnly(Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.emptySet(), message)).containsOnly(Type.DOC_MISC);
 	}
 
 	@Test
 	void extractMiscTypeFromDocMessagePrefix() {
 		String message = "[doc] Foo";
 
-		assertThat(task.extractTypes(Collections.emptySet(), message))
-				.containsOnly(Type.DOC_MISC);
+		assertThat(task.extractTypes(Collections.emptySet(), message)).containsOnly(Type.DOC_MISC);
 	}
 
 	@Test
 	void extractUnclassifiedTypeFromRandomMessagePrefix() {
 		String message = "fix #123 There was a [bug], needed to [polish] the [doc]";
 
-		assertThat(task.extractTypes(Collections.emptySet(), message))
-				.containsOnly(Type.UNCLASSIFIED);
+		assertThat(task.extractTypes(Collections.emptySet(), message)).containsOnly(Type.UNCLASSIFIED);
 	}
 
 	@Test
 	void noTitleCleanupFromMergeCommit() {
-		SimpleCommit mergeCommit = new SimpleCommit("sha1", "fullsha1",
-				"merge #123 into 3.3 (#123)", "merge #123 into 3.3", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", true);
+		SimpleCommit mergeCommit = new SimpleCommit("sha1", "fullsha1", "merge #123 into 3.3 (#123)",
+				"merge #123 into 3.3", "Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", true);
 
-		assertThat(task.cleanupShortMessage(mergeCommit))
-				.isEqualTo("merge #123 into 3.3 (#123)");
+		assertThat(task.cleanupShortMessage(mergeCommit)).isEqualTo("merge #123 into 3.3 (#123)");
 	}
 
 	@Test
 	void titleCleanupFixPrefix() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"fix #123 Text from title", "fix #123 Some more text", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "fix #123 Text from title",
+				"fix #123 Some more text", "Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io",
+				false);
 
 		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Text from title");
 	}
 
 	@Test
 	void titleCleanupSeePrefix() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"see #123 Text from title", "see #123 Some more text", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "see #123 Text from title",
+				"see #123 Some more text", "Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io",
+				false);
 
 		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Text from title");
 	}
 
 	@Test
 	void titleCleanupPrStyleSuffix() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"Commit without issue (#123)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "Commit without issue (#123)", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Commit without issue");
 	}
 
 	@Test
 	void titleCleanupPrStyleSuffixNoSpace() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"Commit without issue(#123)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "Commit without issue(#123)", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Commit without issue");
 	}
 
 	@Test
 	void titleCleanupBothPrefixAndSuffix() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix #123 Commit title (#123)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix #123 Commit title (#123)", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.cleanupShortMessage(commit)).isEqualTo("Commit title");
 	}
 
 	@Test
 	void issueNumberTitlePrefix() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix #123 Commit title", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix #123 Commit title", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.extractIssueNumbers(commit)).containsOnly(123);
 	}
 
 	@Test
 	void issueNumberTitlePrStyleSuffix() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "Commit title (#123)",
-				"fullMessage", "Simon Baslé", "sbasle@pivotal.io", "Simon Baslé",
-				"sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "Commit title (#123)", "fullMessage", "Simon Baslé",
+				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.extractIssueNumbers(commit)).containsOnly(123);
 	}
 
 	@Test
 	void issueNumberTitlePrefixAndSuffix() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix #123 Commit title (#456)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix #123 Commit title (#456)", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.extractIssueNumbers(commit)).containsOnly(123, 456);
 	}
 
 	@Test
 	void issueNumberTitleNotSeparatedBySpace() {
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix#123Commit title(#456)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix#123Commit title(#456)", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
 		assertThat(task.extractIssueNumbers(commit)).containsOnly(123, 456);
 	}
 
-	static final VoidAnswer4<Issues, Set<Integer>, Set<String>, Map<String, String>> MOCK_FETCH_ISSUES = (
-			ignore1, issues, ignore2, resolved) -> issues
-					.forEach(i -> resolved.put("#" + i, "alternative title for " + i));
+	static final VoidAnswer4<Issues, Set<Integer>, Set<String>, Map<String, String>> MOCK_FETCH_ISSUES = (ignore1,
+			issues, ignore2, resolved) -> issues.forEach(i -> resolved.put("#" + i, "alternative title for " + i));
 
 	static final Issues MOCK_ISSUES = Mockito.mock(Issues.class);
 
 	@Test
 	void generateChangelogDescriptionSingleIssueTwice() throws IOException {
 		final GenerateReleaseNotesTask spy = Mockito.spy(task);
-		doAnswer(answerVoid(MOCK_FETCH_ISSUES)).when(spy).fetchIssueLabelsAndTitles(any(),
-				any(), any(), any());
+		doAnswer(answerVoid(MOCK_FETCH_ISSUES)).when(spy).fetchIssueLabelsAndTitles(any(), any(), any(), any());
 
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix #123 Commit title (#123)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix #123 Commit title (#123)", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
-		assertThat(spy.parseChangeLogEntry(githubClient.randomRepo().issues(),
-				commit).description).isEqualTo("Commit title (#123)");
+		assertThat(spy.parseChangeLogEntry(githubClient.randomRepo().issues(), commit).description)
+				.isEqualTo("Commit title (#123)");
 	}
 
 	@Test
 	void generateChangelogDescriptionTwoIssues() throws IOException {
 		final GenerateReleaseNotesTask spy = Mockito.spy(task);
-		doAnswer(answerVoid(MOCK_FETCH_ISSUES)).when(spy).fetchIssueLabelsAndTitles(any(),
-				any(), any(), any());
+		doAnswer(answerVoid(MOCK_FETCH_ISSUES)).when(spy).fetchIssueLabelsAndTitles(any(), any(), any(), any());
 
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix #123 Commit title (#456)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix #123 Commit title (#456)", "fullMessage",
+				"Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
-		assertThat(spy.parseChangeLogEntry(MOCK_ISSUES, commit).description)
-				.isEqualTo("Commit title (#123, #456)");
+		assertThat(spy.parseChangeLogEntry(MOCK_ISSUES, commit).description).isEqualTo("Commit title (#123, #456)");
 	}
 
 	@Test
 	void generateChangelogDescriptionTwoIssuesNoSpace() throws IOException {
 		final GenerateReleaseNotesTask spy = Mockito.spy(task);
-		doAnswer(answerVoid(MOCK_FETCH_ISSUES)).when(spy).fetchIssueLabelsAndTitles(any(),
-				any(), any(), any());
+		doAnswer(answerVoid(MOCK_FETCH_ISSUES)).when(spy).fetchIssueLabelsAndTitles(any(), any(), any(), any());
 
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix #123Commit title no space(#456)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix #123Commit title no space(#456)",
+				"fullMessage", "Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
-		assertThat(spy.parseChangeLogEntry(githubClient.randomRepo().issues(),
-				commit).description).isEqualTo("Commit title no space (#123, #456)");
+		assertThat(spy.parseChangeLogEntry(githubClient.randomRepo().issues(), commit).description)
+				.isEqualTo("Commit title no space (#123, #456)");
 	}
 
 	@Test
@@ -267,12 +245,11 @@ class GenerateReleaseNotesTaskTest {
 		final GenerateReleaseNotesTask spy = Mockito.spy(task);
 		doNothing().when(spy).fetchIssueLabelsAndTitles(any(), any(), any(), any());
 
-		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1",
-				"prefix #123 Commit title no space(#456)", "fullMessage", "Simon Baslé",
-				"sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
+		SimpleCommit commit = new SimpleCommit("sha1", "fullsha1", "prefix #123 Commit title no space(#456)",
+				"fullMessage", "Simon Baslé", "sbasle@pivotal.io", "Simon Baslé", "sbasle@pivotal.io", false);
 
-		assertThat(spy.parseChangeLogEntry(githubClient.randomRepo().issues(),
-				commit).description).isEqualTo("Commit title no space (sha1)");
+		assertThat(spy.parseChangeLogEntry(githubClient.randomRepo().issues(), commit).description)
+				.isEqualTo("Commit title no space (sha1)");
 	}
 
 	@Test
@@ -284,9 +261,8 @@ class GenerateReleaseNotesTaskTest {
 		assertThatExceptionOfType(Exception.class).as("github client fails")
 				.isThrownBy(() -> new Issue.Smart(issuesClient.get(123)).title());
 
-		assertThatCode(() -> task.fetchIssueLabelsAndTitles(issuesClient,
-				Collections.singleton(123), labels, associatedIssues))
-						.as("fetching just does nothing").doesNotThrowAnyException();
+		assertThatCode(() -> task.fetchIssueLabelsAndTitles(issuesClient, Collections.singleton(123), labels,
+				associatedIssues)).as("fetching just does nothing").doesNotThrowAnyException();
 
 		assertThat(labels).as("labels").isEmpty();
 		assertThat(associatedIssues).as("associated issues").isEmpty();

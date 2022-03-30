@@ -37,80 +37,59 @@ public class SpringCloudCustomMavenBomTests {
 
 	@Test
 	public void should_add_boot_to_versions_when_version_is_created() {
-		List<CustomBomParser> bomParsers = Collections
-				.singletonList(new SpringCloudMavenBomParser());
+		List<CustomBomParser> bomParsers = Collections.singletonList(new SpringCloudMavenBomParser());
 		VersionsFromBom customVersionsFromBom = new VersionsFromBomBuilder()
-				.releaserProperties(SpringCloudReleaserProperties.get())
-				.parsers(bomParsers).projects(springCloudBuildProjects())
-				.retrieveFromBom();
+				.releaserProperties(SpringCloudReleaserProperties.get()).parsers(bomParsers)
+				.projects(springCloudBuildProjects()).retrieveFromBom();
 		customVersionsFromBom.setVersion("spring-boot", "1.2.3.RELEASE");
 
-		then(customVersionsFromBom.versionForProject("spring-boot"))
-				.isEqualTo("1.2.3.RELEASE");
-		then(customVersionsFromBom.versionForProject("spring-boot-starter-parent"))
-				.isEqualTo("1.2.3.RELEASE");
-		then(customVersionsFromBom.versionForProject("spring-boot-dependencies"))
-				.isEqualTo("1.2.3.RELEASE");
+		then(customVersionsFromBom.versionForProject("spring-boot")).isEqualTo("1.2.3.RELEASE");
+		then(customVersionsFromBom.versionForProject("spring-boot-starter-parent")).isEqualTo("1.2.3.RELEASE");
+		then(customVersionsFromBom.versionForProject("spring-boot-dependencies")).isEqualTo("1.2.3.RELEASE");
 	}
 
 	@Test
 	public void should_update_projects_for_boot() {
-		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-boot",
-				"3.0.0");
+		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-boot", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-boot")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-starter-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-dependencies"))
-				.isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-boot-dependencies")).isEqualTo("3.0.0");
 
-		versionsFromBom = mixedVersions().setVersion("spring-boot-starter-parent",
-				"3.0.0");
+		versionsFromBom = mixedVersions().setVersion("spring-boot-starter-parent", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-boot")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-starter-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-dependencies"))
-				.isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-boot-dependencies")).isEqualTo("3.0.0");
 
 		versionsFromBom = mixedVersions().setVersion("spring-boot-dependencies", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-boot")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-starter-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-boot-dependencies"))
-				.isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-boot-starter-parent")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-boot-dependencies")).isEqualTo("3.0.0");
 	}
 
 	@Test
 	public void should_update_projects_for_build() {
-		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-cloud-build",
-				"3.0.0");
+		VersionsFromBom versionsFromBom = mixedVersions().setVersion("spring-cloud-build", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
 
 		versionsFromBom = mixedVersions().setVersion("spring-cloud-build", "3.0.0");
 
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies-parent")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.RELEASE");
 
-		versionsFromBom = mixedVersions().setVersion("spring-cloud-dependencies-parent",
-				"3.0.0");
+		versionsFromBom = mixedVersions().setVersion("spring-cloud-dependencies-parent", "3.0.0");
 
 		then(versionsFromBom.versionForProject("spring-cloud-build")).isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies-parent"))
-				.isEqualTo("3.0.0");
-		then(versionsFromBom.versionForProject("spring-cloud-dependencies"))
-				.isEqualTo("Greenwich.RELEASE");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies-parent")).isEqualTo("3.0.0");
+		then(versionsFromBom.versionForProject("spring-cloud-dependencies")).isEqualTo("Greenwich.RELEASE");
 	}
 
 	private VersionsFromBom mixedVersions() {
-		return new VersionsFromBomBuilder()
-				.releaserProperties(SpringCloudReleaserProperties.get())
-				.parsers(Collections.singletonList(new SpringCloudMavenBomParser()))
-				.projects(mixedProjects()).merged();
+		return new VersionsFromBomBuilder().releaserProperties(SpringCloudReleaserProperties.get())
+				.parsers(Collections.singletonList(new SpringCloudMavenBomParser())).projects(mixedProjects()).merged();
 	}
 
 	Set<Project> springCloudBuildProjects() {

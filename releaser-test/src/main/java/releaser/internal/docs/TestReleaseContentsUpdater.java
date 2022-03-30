@@ -25,8 +25,8 @@ import releaser.internal.template.TemplateGenerator;
  */
 public class TestReleaseContentsUpdater extends ReleaseTrainContentsUpdater {
 
-	public TestReleaseContentsUpdater(ReleaserProperties properties,
-			ProjectGitHandler handler, TemplateGenerator templateGenerator) {
+	public TestReleaseContentsUpdater(ReleaserProperties properties, ProjectGitHandler handler,
+			TemplateGenerator templateGenerator) {
 		super(properties, handler, templateGenerator);
 	}
 

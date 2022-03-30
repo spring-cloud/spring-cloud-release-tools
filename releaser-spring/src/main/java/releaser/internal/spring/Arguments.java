@@ -80,34 +80,29 @@ public final class Arguments implements Serializable {
 	 */
 	public final List<ProcessedProject> processedProjects;
 
-	private Arguments(ProjectToRun thisProject, Projects projects,
-			ProjectVersion currentProjectFromBom) {
+	private Arguments(ProjectToRun thisProject, Projects projects, ProjectVersion currentProjectFromBom) {
 		this.project = thisProject.thisProjectFolder;
 		this.projects = projects;
 		this.originalVersion = thisProject.originalVersion;
-		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: "
-				+ this.originalVersion);
+		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: " + this.originalVersion);
 		Assert.isTrue(this.originalVersion != null && this.originalVersion.version != null,
 				"Original Version must not be null for project: " + thisProject.name());
 		this.versionFromBom = currentProjectFromBom;
 		this.properties = thisProject.thisProjectReleaserProperties;
 		this.options = thisProject.options;
 		this.projectToRun = thisProject;
-		this.processedProjects = new LinkedList<>(Collections.singletonList(
-				new ProcessedProject(thisProject.thisProjectReleaserProperties,
-						this.versionFromBom, this.originalVersion)));
+		this.processedProjects = new LinkedList<>(Collections.singletonList(new ProcessedProject(
+				thisProject.thisProjectReleaserProperties, this.versionFromBom, this.originalVersion)));
 	}
 
 	// in this case the project will be the BOM
-	private Arguments(ProjectToRun thisProject,
-			List<ProcessedProject> processedProjects) {
+	private Arguments(ProjectToRun thisProject, List<ProcessedProject> processedProjects) {
 
 		this.project = thisProject.thisProjectFolder;
-		this.projects = new Projects(processedProjects.stream()
-				.map(p -> p.newProjectVersion).collect(Collectors.toSet()));
+		this.projects = new Projects(
+				processedProjects.stream().map(p -> p.newProjectVersion).collect(Collectors.toSet()));
 		this.originalVersion = thisProject.originalVersion;
-		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: "
-				+ this.originalVersion);
+		log.info("Creating Arguments for: " + thisProject.name() + "; Original version: " + this.originalVersion);
 		Assert.isTrue(this.originalVersion != null && this.originalVersion.version != null,
 				"Original Version must not be null for project: " + thisProject.name());
 		this.versionFromBom = thisProject.thisProjectVersionFromBom;
@@ -118,41 +113,28 @@ public final class Arguments implements Serializable {
 	}
 
 	public static Arguments forProject(ProjectToRun thisProject) {
-		return new Arguments(thisProject,
-				thisProject.allProjectsFromBom.allProjectVersionsFromBom,
+		return new Arguments(thisProject, thisProject.allProjectsFromBom.allProjectVersionsFromBom,
 				thisProject.allProjectsFromBom.currentProjectFromBom);
 	}
 
-	public static Arguments forPostRelease(ReleaserProperties properties,
-			ProjectsToRun projectsToRun) {
-		List<ProjectToRun> projects = projectsToRun.stream()
-				.map(ProjectToRun.ProjectToRunSupplier::get)
+	public static Arguments forPostRelease(ReleaserProperties properties, ProjectsToRun projectsToRun) {
+		List<ProjectToRun> projects = projectsToRun.stream().map(ProjectToRun.ProjectToRunSupplier::get)
 				.collect(Collectors.toCollection(LinkedList::new));
-		List<ProcessedProject> processedProjects = projectsToRunToProcessedProject(
-				projects);
-		ProjectToRun releaseTrainProject = projects.stream()
-				.filter(p -> isReleaseTrainProject(properties, p)).findFirst()
-				.orElseThrow(
-						() -> new IllegalStateException("Missing release train version"));
+		List<ProcessedProject> processedProjects = projectsToRunToProcessedProject(projects);
+		ProjectToRun releaseTrainProject = projects.stream().filter(p -> isReleaseTrainProject(properties, p))
+				.findFirst().orElseThrow(() -> new IllegalStateException("Missing release train version"));
 		return new Arguments(releaseTrainProject, processedProjects);
 	}
 
-	private static boolean isReleaseTrainProject(ReleaserProperties properties,
-			ProjectToRun p) {
-		return p.originalVersion.projectName
-				.equals(properties.getMetaRelease().getReleaseTrainProjectName())
-				|| properties.getMetaRelease().getReleaseTrainDependencyNames()
-						.contains(p.originalVersion.projectName)
-				|| p.name()
-						.equals(properties.getMetaRelease().getReleaseTrainProjectName());
+	private static boolean isReleaseTrainProject(ReleaserProperties properties, ProjectToRun p) {
+		return p.originalVersion.projectName.equals(properties.getMetaRelease().getReleaseTrainProjectName())
+				|| properties.getMetaRelease().getReleaseTrainDependencyNames().contains(p.originalVersion.projectName)
+				|| p.name().equals(properties.getMetaRelease().getReleaseTrainProjectName());
 	}
 
-	private static List<ProcessedProject> projectsToRunToProcessedProject(
-			List<ProjectToRun> projects) {
-		return projects.stream()
-				.map(p -> new ProcessedProject(p.thisProjectReleaserProperties,
-						p.thisProjectVersionFromBom, p.originalVersion))
-				.collect(Collectors.toCollection(LinkedList::new));
+	private static List<ProcessedProject> projectsToRunToProcessedProject(List<ProjectToRun> projects) {
+		return projects.stream().map(p -> new ProcessedProject(p.thisProjectReleaserProperties,
+				p.thisProjectVersionFromBom, p.originalVersion)).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	public ProjectVersion releaseTrain() {
@@ -161,11 +143,9 @@ public final class Arguments implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Arguments{" + "project=" + project + ", projects=" + projects
-				+ ", originalVersion=" + originalVersion + ", versionFromBom="
-				+ versionFromBom + ", properties=" + properties + ", options=" + options
-				+ ", projectToRun=" + projectToRun + ", processedProjects="
-				+ processedProjects + '}';
+		return "Arguments{" + "project=" + project + ", projects=" + projects + ", originalVersion=" + originalVersion
+				+ ", versionFromBom=" + versionFromBom + ", properties=" + properties + ", options=" + options
+				+ ", projectToRun=" + projectToRun + ", processedProjects=" + processedProjects + '}';
 	}
 
 }

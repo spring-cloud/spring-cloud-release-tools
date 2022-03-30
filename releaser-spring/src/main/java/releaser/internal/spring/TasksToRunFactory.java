@@ -51,11 +51,9 @@ class TasksToRunFactory {
 
 	TasksToRun release(OptionsAndProperties optionsAndProperties) {
 		TasksToRun tasks = releaseTasks(optionsAndProperties);
-		tasks.forEach(t -> t.setup(optionsAndProperties.options,
-				optionsAndProperties.properties));
-		log.info("Will run the following tasks {}",
-				tasks.stream().map(t -> t.getClass().getSimpleName()).collect(Collectors
-						.toCollection((Supplier<LinkedList<String>>) LinkedList::new)));
+		tasks.forEach(t -> t.setup(optionsAndProperties.options, optionsAndProperties.properties));
+		log.info("Will run the following tasks {}", tasks.stream().map(t -> t.getClass().getSimpleName())
+				.collect(Collectors.toCollection((Supplier<LinkedList<String>>) LinkedList::new)));
 		return tasks;
 	}
 
@@ -67,8 +65,7 @@ class TasksToRunFactory {
 		}
 		if (options.metaRelease) {
 			if (options.dryRun) {
-				return new TasksToRun(
-						this.context.getBean(MetaReleaseDryRunCompositeTask.class));
+				return new TasksToRun(this.context.getBean(MetaReleaseDryRunCompositeTask.class));
 			}
 			return new TasksToRun(this.context.getBean(MetaReleaseCompositeTask.class));
 		}
@@ -79,8 +76,7 @@ class TasksToRunFactory {
 			return new TasksToRun(this.context.getBean(ReleaseCompositeTask.class));
 		}
 		// A single project release
-		List<ReleaserTask> tasks = new LinkedList<>(
-				this.context.getBeansOfType(ReleaserTask.class).values());
+		List<ReleaserTask> tasks = new LinkedList<>(this.context.getBeansOfType(ReleaserTask.class).values());
 		tasks.sort(AnnotationAwareOrderComparator.INSTANCE);
 		return tasksToRunForSingleProject(options, tasks);
 	}
@@ -95,8 +91,7 @@ class TasksToRunFactory {
 		return new TasksToRun(tasks);
 	}
 
-	private TasksToRun tasksToRunForSingleProject(Options options,
-			List<ReleaserTask> tasks) {
+	private TasksToRun tasksToRunForSingleProject(Options options, List<ReleaserTask> tasks) {
 		if (StringUtils.hasText(options.startFrom)) {
 			return startFrom(tasks, options);
 		}
@@ -151,8 +146,7 @@ class TasksToRunFactory {
 	private TasksToRun startFrom(List<ReleaserTask> tasks, Options options) {
 		TasksToRun tasksToRun = new TasksToRun();
 		for (ReleaserTask task : tasks) {
-			if (options.startFrom.trim().equals(task.name())
-					|| options.startFrom.trim().equals(task.shortName())) {
+			if (options.startFrom.trim().equals(task.name()) || options.startFrom.trim().equals(task.shortName())) {
 				tasksToRun.add(task);
 			}
 		}
@@ -165,13 +159,11 @@ class TasksToRunFactory {
 		for (int i = 0; i < allTasks.size(); i++) {
 			msg.append(i).append(") ").append(allTasks.get(i).description()).append("\n");
 		}
-		msg.append("\n").append(
-				"You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]\n");
-		msg.append("You can execute all tasks starting from a job "
-				+ "by using a hyphen and providing only one "
+		msg.append("\n")
+				.append("You can pick a range of options by using the hyphen - e.g. '2-4' will execute jobs [2,3,4]\n");
+		msg.append("You can execute all tasks starting from a job " + "by using a hyphen and providing only one "
 				+ "number - e.g. '8-' will execute jobs [8,9,10]\n");
-		msg.append("You can execute given tasks by providing a "
-				+ "comma separated list of tasks - e.g. "
+		msg.append("You can execute given tasks by providing a " + "comma separated list of tasks - e.g. "
 				+ "'3,7,8' will execute jobs [3,7,8]\n");
 		msg.append("\n").append("You can press 'q' to quit\n\n");
 		return msg;

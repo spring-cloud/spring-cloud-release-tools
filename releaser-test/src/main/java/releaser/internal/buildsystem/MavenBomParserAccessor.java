@@ -21,8 +21,7 @@ import releaser.internal.ReleaserProperties;
 
 public class MavenBomParserAccessor {
 
-	public static BomParser bomParser(ReleaserProperties properties,
-			CustomBomParser parser) {
+	public static BomParser bomParser(ReleaserProperties properties, CustomBomParser parser) {
 		return new MavenBomParser(properties, Collections.singletonList(parser));
 	}
 

@@ -17,8 +17,9 @@
 		<javax.json-api.version>1.1.4</javax.json-api.version>
 		<maven-model.version>3.6.3</maven-model.version>
 		<scs.version>3.1.6.RELEASE</scs.version>
-		<spring-cloud-bom.version>Greenwich.RELEASE</spring-cloud-bom.version>
-		<spring-rest-docs.version>2.0.5.RELEASE</spring-rest-docs.version>
+		<spring-asciidoctor-extensions.version>0.2.0-RELEASE</spring-asciidoctor-extensions.version>
+		<spring-cloud-bom.version>2021.0.0</spring-cloud-bom.version>
+		<spring-rest-docs.version>2.0.6.RELEASE</spring-rest-docs.version>
 	</properties>
 
 	<dependencies>
@@ -58,6 +59,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -67,6 +72,11 @@
 		<dependency>
 			<groupId>org.springframework.restdocs</groupId>
 			<artifactId>spring-restdocs-mockmvc</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

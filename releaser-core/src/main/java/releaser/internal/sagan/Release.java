@@ -18,44 +18,69 @@ package releaser.internal.sagan;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import org.springframework.core.style.ToStringCreator;
+
 /**
  * @author Marcin Grzejszczak
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Release {
 
-	public String releaseStatus = "";
+	private String version;
 
-	public String refDocUrl = "";
+	private String status;
 
-	public String apiDocUrl = "";
+	private boolean current;
 
-	public String groupId = "";
+	private String referenceDocUrl;
 
-	public String artifactId = "";
+	private String apiDocUrl;
 
-	public Repository repository;
+	public String getVersion() {
+		return version;
+	}
 
-	public String version = "";
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-	public boolean current;
+	public String getStatus() {
+		return status;
+	}
 
-	public boolean generalAvailability;
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-	public boolean preRelease;
+	public boolean isCurrent() {
+		return current;
+	}
 
-	public String versionDisplayName = "";
+	public void setCurrent(boolean current) {
+		this.current = current;
+	}
 
-	public boolean snapshot;
+	public String getReferenceDocUrl() {
+		return referenceDocUrl;
+	}
+
+	public void setReferenceDocUrl(String referenceDocUrl) {
+		this.referenceDocUrl = referenceDocUrl;
+	}
+
+	public String getApiDocUrl() {
+		return apiDocUrl;
+	}
+
+	public void setApiDocUrl(String apiDocUrl) {
+		this.apiDocUrl = apiDocUrl;
+	}
 
 	@Override
 	public String toString() {
-		return "Release{" + "releaseStatus='" + this.releaseStatus + '\'' + ", refDocUrl='" + this.refDocUrl + '\''
-				+ ", apiDocUrl='" + this.apiDocUrl + '\'' + ", groupId='" + this.groupId + '\'' + ", artifactId='"
-				+ this.artifactId + '\'' + ", repository=" + this.repository + ", version='" + this.version + '\''
-				+ ", current=" + this.current + ", generalAvailability=" + this.generalAvailability + ", preRelease="
-				+ this.preRelease + ", versionDisplayName='" + this.versionDisplayName + '\'' + ", snapshot="
-				+ this.snapshot + '}';
+		return new ToStringCreator(this).append("version", version).append("status", status).append("current", current)
+				.append("referenceDocUrl", referenceDocUrl).append("apiDocUrl", apiDocUrl).toString();
+
 	}
 
 }

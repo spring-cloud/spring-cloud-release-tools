@@ -59,8 +59,7 @@ public class CreateTemplatesTrainPostReleaseTask implements TrainPostReleaseRele
 		return this.releaser.createEmail(args.versionFromBom, args.projects)
 				.merge(this.releaser.createBlog(args.versionFromBom, args.projects))
 				.merge(this.releaser.createTweet(args.versionFromBom, args.projects))
-				.merge(this.releaser.createReleaseNotes(args.versionFromBom,
-						args.projects));
+				.merge(this.releaser.createReleaseNotes(args.versionFromBom, args.projects));
 	}
 
 	@Override

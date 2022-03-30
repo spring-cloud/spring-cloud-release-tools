@@ -57,8 +57,7 @@ public class SpringCloudInfoRestController {
 	}
 
 	@GetMapping("/bomversions/{bomVersion}")
-	public Map<String, String> bomVersions(@PathVariable String bomVersion)
-			throws IOException {
+	public Map<String, String> bomVersions(@PathVariable String bomVersion) throws IOException {
 		try {
 			return versionService.getReleaseVersions(bomVersion);
 		}
@@ -74,8 +73,7 @@ public class SpringCloudInfoRestController {
 	}
 
 	@GetMapping("/milestones/{name}/duedate")
-	public SpringCloudInfoService.Milestone milestoneDueDate(@PathVariable String name)
-			throws IOException {
+	public SpringCloudInfoService.Milestone milestoneDueDate(@PathVariable String name) throws IOException {
 		try {
 			return versionService.getMilestoneDueDate(name);
 		}

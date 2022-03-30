@@ -34,8 +34,7 @@ public class ProjectsFromBom {
 	 */
 	public final ProjectVersion currentProjectFromBom;
 
-	public ProjectsFromBom(Projects allProjectVersionsFromBom,
-			ProjectVersion currentProjectFromBom) {
+	public ProjectsFromBom(Projects allProjectVersionsFromBom, ProjectVersion currentProjectFromBom) {
 		this.allProjectVersionsFromBom = allProjectVersionsFromBom;
 		this.currentProjectFromBom = currentProjectFromBom;
 	}

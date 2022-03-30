@@ -59,15 +59,14 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	VersionsToBumpFactory versionsToBumpFactory(Releaser releaser,
-			ReleaserProperties properties) {
+	VersionsToBumpFactory versionsToBumpFactory(Releaser releaser, ReleaserProperties properties) {
 		return new VersionsToBumpFactory(releaser, properties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	ProjectsToRunFactory projectsToRunFactory(VersionsToBumpFactory versionsToBumpFactory,
-			Releaser releaser, ReleaserPropertiesUpdater updater) {
+	ProjectsToRunFactory projectsToRunFactory(VersionsToBumpFactory versionsToBumpFactory, Releaser releaser,
+			ReleaserPropertiesUpdater updater) {
 		return new ProjectsToRunFactory(versionsToBumpFactory, releaser, updater);
 	}
 
@@ -80,11 +79,10 @@ class ReleaserConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	SpringReleaser springReleaser(OptionsAndPropertiesFactory optionsAndPropertiesFactory,
-			ProjectsToRunFactory projectsToRunFactory,
-			TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner,
+			ProjectsToRunFactory projectsToRunFactory, TasksToRunFactory tasksToRunFactory, FlowRunner flowRunner,
 			ReleaserProperties properties) {
-		return new DefaultSpringReleaser(properties, optionsAndPropertiesFactory,
-				projectsToRunFactory, tasksToRunFactory, flowRunner);
+		return new DefaultSpringReleaser(properties, optionsAndPropertiesFactory, projectsToRunFactory,
+				tasksToRunFactory, flowRunner);
 	}
 
 	@Bean
@@ -95,8 +93,7 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	VersionsFetcher versionsFetcher(ProjectPomUpdater updater,
-			ReleaserProperties properties) {
+	VersionsFetcher versionsFetcher(ProjectPomUpdater updater, ReleaserProperties properties) {
 		return new VersionsFetcher(properties, updater);
 	}
 
@@ -108,8 +105,7 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ProjectGitHubHandler projectGitHubHandler(
-			@Autowired(required = false) List<CustomGithubIssues> customGithubIssues,
+	ProjectGitHubHandler projectGitHubHandler(@Autowired(required = false) List<CustomGithubIssues> customGithubIssues,
 			ReleaserProperties properties) {
 		return new ProjectGitHubHandler(properties,
 				customGithubIssues != null ? customGithubIssues : new ArrayList<>());
@@ -117,8 +113,7 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	TemplateGenerator templateGenerator(ProjectGitHubHandler handler,
-			ReleaserProperties properties) {
+	TemplateGenerator templateGenerator(ProjectGitHubHandler handler, ReleaserProperties properties) {
 		return new TemplateGenerator(properties, handler);
 	}
 
@@ -130,47 +125,39 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	SaganUpdater saganUpdater(SaganClient saganClient,
-			ReleaserProperties releaserProperties) {
+	SaganUpdater saganUpdater(SaganClient saganClient, ReleaserProperties releaserProperties) {
 		return new SaganUpdater(saganClient, releaserProperties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	PostReleaseActions postReleaseActions(ProjectGitHandler handler,
-			ProjectPomUpdater pomUpdater, GradleUpdater gradleUpdater,
-			ProjectCommandExecutor projectCommandExecutor,
+	PostReleaseActions postReleaseActions(ProjectGitHandler handler, ProjectPomUpdater pomUpdater,
+			GradleUpdater gradleUpdater, ProjectCommandExecutor projectCommandExecutor,
 			ReleaserProperties releaserProperties, VersionsFetcher versionsFetcher,
 			ReleaserPropertiesUpdater releaserPropertiesUpdater) {
-		return new PostReleaseActions(handler, pomUpdater, gradleUpdater,
-				projectCommandExecutor, releaserProperties, versionsFetcher,
-				releaserPropertiesUpdater);
+		return new PostReleaseActions(handler, pomUpdater, gradleUpdater, projectCommandExecutor, releaserProperties,
+				versionsFetcher, releaserPropertiesUpdater);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler,
-			ReleaserProperties properties, TemplateGenerator templateGenerator,
-			@Autowired(
-					required = false) List<CustomProjectDocumentationUpdater> customProjectDocumentationUpdaters) {
+	DocumentationUpdater documentationUpdater(ProjectGitHandler projectGitHandler, ReleaserProperties properties,
+			TemplateGenerator templateGenerator,
+			@Autowired(required = false) List<CustomProjectDocumentationUpdater> customProjectDocumentationUpdaters) {
 		return new DocumentationUpdater(projectGitHandler, properties, templateGenerator,
-				customProjectDocumentationUpdaters != null
-						? customProjectDocumentationUpdaters : new ArrayList<>());
+				customProjectDocumentationUpdaters != null ? customProjectDocumentationUpdaters : new ArrayList<>());
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	Releaser releaser(ProjectPomUpdater projectPomUpdater,
-			ProjectCommandExecutor projectCommandExecutor,
-			ProjectGitHandler projectGitHandler,
-			ProjectGitHubHandler projectGitHubHandler,
-			TemplateGenerator templateGenerator, GradleUpdater gradleUpdater,
-			SaganUpdater saganUpdater, DocumentationUpdater documentationUpdater,
-			PostReleaseActions postReleaseActions,
+	Releaser releaser(ProjectPomUpdater projectPomUpdater, ProjectCommandExecutor projectCommandExecutor,
+			ProjectGitHandler projectGitHandler, ProjectGitHubHandler projectGitHubHandler,
+			TemplateGenerator templateGenerator, GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
+			DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions,
 			ReleaserProperties releaserProperties) {
-		return new Releaser(releaserProperties, projectPomUpdater, projectCommandExecutor,
-				projectGitHandler, projectGitHubHandler, templateGenerator, gradleUpdater,
-				saganUpdater, documentationUpdater, postReleaseActions);
+		return new Releaser(releaserProperties, projectPomUpdater, projectCommandExecutor, projectGitHandler,
+				projectGitHubHandler, templateGenerator, gradleUpdater, saganUpdater, documentationUpdater,
+				postReleaseActions);
 	}
 
 	@Bean
@@ -181,8 +168,7 @@ class ReleaserConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	Parser optionsParser(List<ReleaserTask> allTasks,
-			List<SingleProjectReleaserTask> singleProjectReleaserTasks,
+	Parser optionsParser(List<ReleaserTask> allTasks, List<SingleProjectReleaserTask> singleProjectReleaserTasks,
 			ConfigurableApplicationContext context) {
 		return new OptionsParser(allTasks, singleProjectReleaserTasks, context);
 	}

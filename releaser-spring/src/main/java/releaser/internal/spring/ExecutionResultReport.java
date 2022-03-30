@@ -42,8 +42,7 @@ public class ExecutionResultReport {
 	}
 
 	public ExecutionResultReport(String projectName, String shortName, String description,
-			Class<? extends ReleaserTask> releaserTaskType, String state,
-			List<Throwable> exceptions) {
+			Class<? extends ReleaserTask> releaserTaskType, String state, List<Throwable> exceptions) {
 		this.projectName = projectName;
 		this.shortName = shortName;
 		this.description = description;

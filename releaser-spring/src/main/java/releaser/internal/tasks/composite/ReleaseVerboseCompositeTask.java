@@ -33,8 +33,7 @@ public class ReleaseVerboseCompositeTask implements CompositeReleaserTask {
 	 */
 	public static final int ORDER = -90;
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ReleaseVerboseCompositeTask.class);
+	private static final Logger log = LoggerFactory.getLogger(ReleaseVerboseCompositeTask.class);
 
 	private final ApplicationContext context;
 

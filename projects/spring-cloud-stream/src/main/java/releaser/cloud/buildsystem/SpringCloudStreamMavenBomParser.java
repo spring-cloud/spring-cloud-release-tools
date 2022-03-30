@@ -51,17 +51,15 @@ import static releaser.cloud.buildsystem.SpringCloudBomConstants.STREAM_STARTER_
 
 class SpringCloudStreamMavenBomParser implements CustomBomParser {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(SpringCloudStreamMavenBomParser.class);
+	private static final Logger log = LoggerFactory.getLogger(SpringCloudStreamMavenBomParser.class);
 
 	@Override
 	public VersionsFromBom parseBom(File root, ReleaserProperties properties) {
 		VersionsFromBom springCloudBuild = springCloudBuild(root, properties);
 		VersionsFromBom boot = bootVersion(root, properties);
-		log.debug("Added Spring Cloud Build [{}] and boot versions [{}]",
-				springCloudBuild, boot);
-		return new VersionsFromBomBuilder().thisProjectRoot(root)
-				.releaserProperties(properties).projects(springCloudBuild, boot).merged();
+		log.debug("Added Spring Cloud Build [{}] and boot versions [{}]", springCloudBuild, boot);
+		return new VersionsFromBomBuilder().thisProjectRoot(root).releaserProperties(properties)
+				.projects(springCloudBuild, boot).merged();
 	}
 
 	private VersionsFromBom springCloudBuild(File root, ReleaserProperties properties) {
@@ -69,8 +67,8 @@ class SpringCloudStreamMavenBomParser implements CustomBomParser {
 		if (StringUtils.isEmpty(buildVersion)) {
 			return VersionsFromBom.EMPTY_VERSION;
 		}
-		VersionsFromBom scBuild = new VersionsFromBomBuilder().thisProjectRoot(root)
-				.releaserProperties(properties).merged();
+		VersionsFromBom scBuild = new VersionsFromBomBuilder().thisProjectRoot(root).releaserProperties(properties)
+				.merged();
 		scBuild.add(BUILD_ARTIFACT_ID, buildVersion);
 		scBuild.add(CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildVersion);
 		return scBuild;
@@ -87,11 +85,9 @@ class SpringCloudStreamMavenBomParser implements CustomBomParser {
 		}
 		Model model = PomReader.pom(root, properties.getPom().getThisTrainBom());
 		String buildArtifact = model.getParent().getArtifactId();
-		log.debug("[{}] artifact id is equal to [{}]",
-				CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
+		log.debug("[{}] artifact id is equal to [{}]", CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID, buildArtifact);
 		if (!CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID.equals(buildArtifact)) {
-			throw new IllegalStateException(
-					"The pom doesn't have a [spring-cloud-dependencies-parent] artifact id");
+			throw new IllegalStateException("The pom doesn't have a [spring-cloud-dependencies-parent] artifact id");
 		}
 		buildVersion = model.getParent().getVersion();
 		log.debug("Spring Cloud Build version is equal to [{}]", buildVersion);
@@ -103,8 +99,7 @@ class SpringCloudStreamMavenBomParser implements CustomBomParser {
 		if (StringUtils.hasText(bootVersion)) {
 			return bootVersion;
 		}
-		String pomWithBootStarterParent = properties.getPom()
-				.getPomWithBootStarterParent();
+		String pomWithBootStarterParent = properties.getPom().getPomWithBootStarterParent();
 		File pom = new File(root, pomWithBootStarterParent);
 		if (!pom.exists()) {
 			return "";
@@ -117,8 +112,8 @@ class SpringCloudStreamMavenBomParser implements CustomBomParser {
 		log.debug("Boot artifact id is equal to [{}]", bootArtifactId);
 		if (!BOOT_STARTER_PARENT_ARTIFACT_ID.equals(bootArtifactId)) {
 			if (log.isDebugEnabled()) {
-				throw new IllegalStateException("The pom doesn't have a ["
-						+ BOOT_STARTER_PARENT_ARTIFACT_ID + "] artifact id");
+				throw new IllegalStateException(
+						"The pom doesn't have a [" + BOOT_STARTER_PARENT_ARTIFACT_ID + "] artifact id");
 			}
 			return "";
 		}
@@ -131,8 +126,8 @@ class SpringCloudStreamMavenBomParser implements CustomBomParser {
 			return VersionsFromBom.EMPTY_VERSION;
 		}
 		log.debug("Boot version is equal to [{}]", bootVersion);
-		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
-				.thisProjectRoot(root).releaserProperties(properties).merged();
+		VersionsFromBom versionsFromBom = new VersionsFromBomBuilder().thisProjectRoot(root)
+				.releaserProperties(properties).merged();
 		versionsFromBom.add(SPRING_BOOT, bootVersion);
 		versionsFromBom.add(BOOT_STARTER_PARENT_ARTIFACT_ID, bootVersion);
 		versionsFromBom.add(BOOT_DEPENDENCIES_ARTIFACT_ID, bootVersion);
@@ -140,8 +135,7 @@ class SpringCloudStreamMavenBomParser implements CustomBomParser {
 	}
 
 	@Override
-	public Set<Project> setVersion(Set<Project> projects, String projectName,
-			String version) {
+	public Set<Project> setVersion(Set<Project> projects, String projectName, String version) {
 		Set<Project> newProjects = new LinkedHashSet<>(projects);
 		switch (projectName) {
 		case SPRING_BOOT:

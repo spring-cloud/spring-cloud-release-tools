@@ -64,8 +64,7 @@ public class ProjectToRun implements Serializable {
 	 */
 	public final Options options;
 
-	public ProjectToRun(File thisProjectFolder, ProjectsFromBom allProjectsFromBom,
-			ProjectVersion originalVersion,
+	public ProjectToRun(File thisProjectFolder, ProjectsFromBom allProjectsFromBom, ProjectVersion originalVersion,
 			ReleaserProperties thisProjectReleaserProperties, Options options) {
 		this.thisProjectFolder = thisProjectFolder;
 		this.allProjectsFromBom = allProjectsFromBom;
@@ -100,8 +99,7 @@ public class ProjectToRun implements Serializable {
 	 * Supplier of a project to run. Since retrieval of a project may require cloning it,
 	 * we will cache the cloned location instead of cloning it each time.
 	 */
-	public static class ProjectToRunSupplier
-			implements Supplier<ProjectToRun>, Closeable {
+	public static class ProjectToRunSupplier implements Supplier<ProjectToRun>, Closeable {
 
 		private static final Map<String, ProjectToRun> CACHE = new ConcurrentHashMap<>();
 

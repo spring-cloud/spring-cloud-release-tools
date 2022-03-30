@@ -34,8 +34,7 @@ import org.springframework.util.StringUtils;
 
 class VersionsToBumpFactory implements Closeable {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(VersionsToBumpFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(VersionsToBumpFactory.class);
 
 	private static final Map<File, ProjectsFromBom> CACHE = new ConcurrentHashMap<>();
 
@@ -51,10 +50,9 @@ class VersionsToBumpFactory implements Closeable {
 	ProjectsFromBom withProject(File project) {
 		return CACHE.computeIfAbsent(project, file -> {
 			log.info("Fetch from git [{}], meta release [{}], project [{}]",
-					this.properties.getGit().isFetchVersionsFromGit(),
-					this.properties.getMetaRelease().isEnabled(), project);
-			if (this.properties.getGit().isFetchVersionsFromGit()
-					&& !this.properties.getMetaRelease().isEnabled()) {
+					this.properties.getGit().isFetchVersionsFromGit(), this.properties.getMetaRelease().isEnabled(),
+					project);
+			if (this.properties.getGit().isFetchVersionsFromGit() && !this.properties.getMetaRelease().isEnabled()) {
 				return fetchVersionsFromGitForSingleProject(project);
 			}
 			return fetchVersionsFromFixedProjects(project);
@@ -65,14 +63,12 @@ class VersionsToBumpFactory implements Closeable {
 		ProjectVersion originalVersion = new ProjectVersion(project);
 		Projects fixedVersions = this.releaser.fixedVersions();
 		log.info("Got the following fixed versions [{}]", fixedVersions);
-		String fixedVersionForProject = fixedVersions
-				.containsProject(originalVersion.projectName)
-						? fixedVersions.forName(originalVersion.projectName).version : "";
-		log.info("Found fixed version for this project [{}] is [{}]",
-				originalVersion.projectName, fixedVersionForProject);
+		String fixedVersionForProject = fixedVersions.containsProject(originalVersion.projectName)
+				? fixedVersions.forName(originalVersion.projectName).version : "";
+		log.info("Found fixed version for this project [{}] is [{}]", originalVersion.projectName,
+				fixedVersionForProject);
 		ProjectVersion versionFromBom = StringUtils.hasText(fixedVersionForProject)
-				? new ProjectVersion(originalVersion.projectName, fixedVersionForProject)
-				: new ProjectVersion(project);
+				? new ProjectVersion(originalVersion.projectName, fixedVersionForProject) : new ProjectVersion(project);
 		log.info("Version from bom [{}]", versionFromBom);
 		fixedVersions.add(versionFromBom);
 		printSettingVersionFromFixedVersions(fixedVersions);
@@ -82,43 +78,35 @@ class VersionsToBumpFactory implements Closeable {
 	private ProjectsFromBom fetchVersionsFromGitForSingleProject(File project) {
 		printVersionRetrieval();
 		Projects projectsToUpdate = this.releaser.retrieveVersionsFromBom();
-		ProjectVersion versionFromBom = assertNoSnapshotsForANonSnapshotProject(project,
-				projectsToUpdate);
+		ProjectVersion versionFromBom = assertNoSnapshotsForANonSnapshotProject(project, projectsToUpdate);
 		return cachedProjectsFromBom(versionFromBom, projectsToUpdate);
 	}
 
-	private ProjectsFromBom cachedProjectsFromBom(ProjectVersion versionFromBom,
-			Projects projectsToUpdate) {
+	private ProjectsFromBom cachedProjectsFromBom(ProjectVersion versionFromBom, Projects projectsToUpdate) {
 		return new ProjectsFromBom(projectsToUpdate, versionFromBom);
 	}
 
-	ProjectVersion assertNoSnapshotsForANonSnapshotProject(File project,
-			Projects projectsToUpdate) {
+	ProjectVersion assertNoSnapshotsForANonSnapshotProject(File project, Projects projectsToUpdate) {
 		ProjectVersion versionFromBom;
 		versionFromBom = projectsToUpdate.forFile(project);
 		assertNoSnapshotsForANonSnapshotProject(projectsToUpdate, versionFromBom);
 		return versionFromBom;
 	}
 
-	private void assertNoSnapshotsForANonSnapshotProject(Projects projects,
-			ProjectVersion versionFromBom) {
+	private void assertNoSnapshotsForANonSnapshotProject(Projects projects, ProjectVersion versionFromBom) {
 		if (!versionFromBom.isSnapshot() && projects.containsSnapshots()) {
-			throw new IllegalStateException("You are trying to release a non snapshot "
-					+ "version [" + versionFromBom + "] of the project ["
-					+ versionFromBom.projectName + "] but "
+			throw new IllegalStateException("You are trying to release a non snapshot " + "version [" + versionFromBom
+					+ "] of the project [" + versionFromBom.projectName + "] but "
 					+ "there is at least one SNAPSHOT library version in the Spring Cloud Release project");
 		}
 	}
 
 	private void printVersionRetrieval() {
-		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone the BOM project"
-				+ " to retrieve all versions");
+		log.info("\n\n\n=== RETRIEVING VERSIONS ===\n\nWill clone the BOM project" + " to retrieve all versions");
 	}
 
 	private void printSettingVersionFromFixedVersions(Projects projectsToUpdate) {
-		log.info(
-				"\n\n\n=== RETRIEVED VERSIONS ===\n\nWill use the fixed versions"
-						+ " of projects\n\n{}",
+		log.info("\n\n\n=== RETRIEVED VERSIONS ===\n\nWill use the fixed versions" + " of projects\n\n{}",
 				projectsToUpdate.stream().map(p -> p.projectName + " => " + p.version)
 						.collect(Collectors.joining("\n")));
 	}

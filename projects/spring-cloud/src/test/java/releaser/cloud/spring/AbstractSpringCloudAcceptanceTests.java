@@ -36,10 +36,10 @@ public class AbstractSpringCloudAcceptanceTests extends AbstractSpringAcceptance
 	@BeforeEach
 	public void setupCloud() throws Exception {
 		this.temporaryFolder = this.tmp.newFolder();
-		this.springCloudConsulProject = new File(AbstractSpringAcceptanceTests.class
-				.getResource("/projects/spring-cloud-consul").toURI());
-		this.springCloudBuildProject = new File(AbstractSpringAcceptanceTests.class
-				.getResource("/projects/spring-cloud-build").toURI());
+		this.springCloudConsulProject = new File(
+				AbstractSpringAcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
+		this.springCloudBuildProject = new File(
+				AbstractSpringAcceptanceTests.class.getResource("/projects/spring-cloud-build").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 	}
@@ -51,12 +51,9 @@ public class AbstractSpringCloudAcceptanceTests extends AbstractSpringAcceptance
 	public void thenAllDryRunStepsWereExecutedForEachProject(
 			NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler) {
 		nonAssertingTestProjectGitHandler.clonedProjects.stream()
-				.filter(f -> !f.getName().contains("angel")
-						&& !f.getName().equals("spring-cloud"))
-				.forEach(project -> {
-					then(Arrays.asList("spring-cloud-starter-build",
-							"spring-cloud-consul"))
-									.contains(pom(project).getArtifactId());
+				.filter(f -> !f.getName().contains("angel") && !f.getName().equals("spring-cloud")).forEach(project -> {
+					then(Arrays.asList("spring-cloud-starter-build", "spring-cloud-consul"))
+							.contains(pom(project).getArtifactId());
 					then(new File("/tmp/executed_build")).exists();
 					then(new File("/tmp/executed_deploy")).doesNotExist();
 					then(new File("/tmp/executed_docs")).doesNotExist();

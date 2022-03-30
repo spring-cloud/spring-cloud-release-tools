@@ -19,7 +19,6 @@ package releaser.internal.sagan;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,13 +56,17 @@ public class SaganUpdater {
 					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
 			return ExecutionResult.skipped();
 		}
-		ReleaseUpdate update = releaseUpdate(branch, originalVersion, currentVersion, projects);
+		ReleaseInput update = releaseUpdate(branch, originalVersion, currentVersion, projects);
 		Exception updateReleaseException = updateSaganForNonSnapshot(branch, originalVersion, currentVersion, projects);
 		if (updateReleaseException == null) {
 			log.info("Updating Sagan releases with \n\n{}", update);
 			try {
-				Project project = this.saganClient.updateRelease(currentVersion.projectName,
-						Collections.singletonList(update));
+				boolean added = this.saganClient.addRelease(currentVersion.projectName, update);
+				if (!added) {
+					return ExecutionResult.unstable(
+							new Exception("Unable to add release for project " + currentVersion.toPrettyString()));
+				}
+				Project project = saganClient.getProject(currentVersion.projectName);
 				Optional<ProjectVersion> projectVersion = latestVersion(currentVersion, project);
 				log.info("Found the following latest project version [{}]", projectVersion);
 				boolean present = projectVersion.isPresent();
@@ -95,20 +98,24 @@ public class SaganUpdater {
 		if (indexDoc.exists()) {
 			log.debug("Index adoc file exists");
 			String fileText = fileToText(indexDoc);
-			if (StringUtils.hasText(fileText) && !fileText.equals(project.rawOverview)) {
-				log.info("Index adoc content differs from the previously stored, will update it");
-				project.rawOverview = fileText;
-				shouldUpdate = true;
-			}
+			// if (StringUtils.hasText(fileText) && !fileText.equals(project.rawOverview))
+			// {
+			// log.info("Index adoc content differs from the previously stored, will
+			// update it");
+			// project.rawOverview = fileText;
+			// shouldUpdate = true;
+			// }
 		}
 		if (bootDoc.exists()) {
 			log.debug("Boot adoc file exists");
 			String fileText = fileToText(bootDoc);
-			if (StringUtils.hasText(fileText) && !fileText.equals(project.rawBootConfig)) {
-				log.info("Boot adoc content differs from the previously stored, will update it");
-				project.rawBootConfig = fileText;
-				shouldUpdate = true;
-			}
+			// if (StringUtils.hasText(fileText) &&
+			// !fileText.equals(project.rawBootConfig)) {
+			// log.info("Boot adoc content differs from the previously stored, will update
+			// it");
+			// project.rawBootConfig = fileText;
+			// shouldUpdate = true;
+			// }
 		}
 		if (shouldUpdate) {
 			this.saganClient.patchProject(project);
@@ -136,8 +143,8 @@ public class SaganUpdater {
 		if (project == null) {
 			return Optional.empty();
 		}
-		return project.projectReleases.stream().filter(release -> release.current)
-				.map(release -> new ProjectVersion(currentVersion.projectName, release.version))
+		return project.getReleases().stream().filter(Release::isCurrent)
+				.map(release -> new ProjectVersion(currentVersion.projectName, release.getVersion()))
 				.max(Comparator.comparing(o -> o.version));
 	}
 
@@ -154,15 +161,15 @@ public class SaganUpdater {
 			if (project != null) {
 				removeAllSameMinorVersions(version, project);
 			}
-			String snapshot = toSnapshot(version.version);
+			String snapshot = toSnapshot(version);
 			removeVersionFromSagan(version, snapshot);
 			if (version.isRelease() || version.isServiceRelease()) {
 				try {
-					String bumpedSnapshot = toSnapshot(version.bumpedVersion());
-					ReleaseUpdate snapshotUpdate = releaseUpdate(branch, originalVersion,
+					String bumpedSnapshot = bumpedSnapshot(version);
+					ReleaseInput snapshotUpdate = releaseUpdate(branch, originalVersion,
 							new ProjectVersion(version.projectName, bumpedSnapshot), projects);
 					log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
-					this.saganClient.updateRelease(version.projectName, Collections.singletonList(snapshotUpdate));
+					this.saganClient.addRelease(version.projectName, snapshotUpdate);
 				}
 				catch (Exception e) {
 					log.warn("Failed to update [" + version.projectName + "/" + snapshot + "] from Sagan", e);
@@ -174,54 +181,46 @@ public class SaganUpdater {
 	}
 
 	private void removeAllSameMinorVersions(ProjectVersion version, Project project) {
-		project.projectReleases.stream().filter(release -> version.isSameMinor(release.version))
-				.collect(Collectors.toList()).forEach(release -> removeVersionFromSagan(version, release.version));
+		project.getReleases().stream().filter(release -> version.isSameMinor(release.getVersion()))
+				.collect(Collectors.toList()).forEach(release -> removeVersionFromSagan(version, release.getVersion()));
 	}
 
 	private void removeVersionFromSagan(ProjectVersion version, String snapshot) {
 		log.info("Removing [{}/{}] from Sagan", version.projectName, snapshot);
 		try {
-			this.saganClient.deleteRelease(version.projectName, snapshot);
+			boolean deleted = this.saganClient.deleteRelease(version.projectName, snapshot);
+			if (!deleted) {
+				log.warn("Failed to remove [" + version.projectName + "/" + snapshot + "] from Sagan");
+			}
 		}
 		catch (Exception e) {
 			log.warn("Failed to remove [" + version.projectName + "/" + snapshot + "] from Sagan", e);
 		}
 	}
 
-	private ReleaseUpdate releaseUpdate(String branch, ProjectVersion originalVersion, ProjectVersion version,
+	private ReleaseInput releaseUpdate(String branch, ProjectVersion originalVersion, ProjectVersion version,
 			Projects projects) {
-		ReleaseUpdate update = new ReleaseUpdate();
-		update.groupId = originalVersion.groupId();
-		update.artifactId = version.projectName;
-		update.version = version.version;
-		update.releaseStatus = version(version);
-		update.apiDocUrl = referenceUrl(branch, version, projects);
-		update.refDocUrl = update.apiDocUrl;
-		update.current = true;
+		ReleaseInput update = new ReleaseInput();
+		update.setVersion(version.version);
+		update.setReferenceDocUrl(referenceUrl(branch, version, projects));
+		update.setApiDocUrl(null);
 		return update;
 	}
 
-	private String toSnapshot(String version) {
+	private String bumpedSnapshot(ProjectVersion projectVersion) {
+		String bumpedVersion = projectVersion.bumpedVersion();
+		return toSnapshot(new ProjectVersion("", bumpedVersion));
+	}
+
+	private String toSnapshot(ProjectVersion projectVersion) {
+		String version = projectVersion.version;
 		if (version.contains("RELEASE")) {
 			return version.replace("RELEASE", "BUILD-SNAPSHOT");
 		}
 		else if (version.matches(".*SR[0-9]+")) {
 			return version.substring(0, version.lastIndexOf(".")) + ".BUILD-SNAPSHOT";
 		}
-		return version;
-	}
-
-	private String version(ProjectVersion version) {
-		if (version.isSnapshot()) {
-			return "SNAPSHOT";
-		}
-		else if (version.isMilestone() || version.isRc()) {
-			return "PRERELEASE";
-		}
-		else if (version.isRelease() || version.isServiceRelease()) {
-			return "GENERAL_AVAILABILITY";
-		}
-		return "";
+		return projectVersion.toSnapshotVersion();
 	}
 
 	private String releaseTrainVersion(Projects projects) {
@@ -245,16 +244,7 @@ public class SaganUpdater {
 	}
 
 	private String newReferenceUrl(String branch, ProjectVersion version) {
-		if (!version.isSnapshot()) {
-			// static/sleuth/{version}/
-			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName + "/{version}/reference/html/";
-		}
-		if (branch.toLowerCase().contains("main")) {
-			// sleuth/
-			return "https://cloud.spring.io/" + version.projectName + "/reference/html/";
-		}
-		// sleuth/1.1.x/
-		return "https://cloud.spring.io/" + version.projectName + "/" + branch + "/reference/html/";
+		return "https://docs.spring.io/" + version.projectName + "/docs/{version}/reference/html/";
 	}
 
 	private String oldReferenceUrl(String branch, ProjectVersion version) {

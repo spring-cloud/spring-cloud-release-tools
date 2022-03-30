@@ -83,14 +83,12 @@ public class ArgsBuilder {
 	}
 
 	private void removeIfPresent(String string) {
-		this.args.stream().filter(s -> s.startsWith(string)).findAny()
-				.ifPresent(s -> this.args.remove(s));
+		this.args.stream().filter(s -> s.startsWith(string)).findAny().ifPresent(s -> this.args.remove(s));
 	}
 
 	public ArgsBuilder projectsToSkip(String... toSkip) throws Exception {
 		removeIfPresent("releaser.meta-release.projects-to-skip");
-		this.args.add(
-				"releaser.meta-release.projects-to-skip=" + String.join(",", toSkip));
+		this.args.add("releaser.meta-release.projects-to-skip=" + String.join(",", toSkip));
 		return this;
 	}
 
@@ -149,18 +147,15 @@ public class ArgsBuilder {
 		return this;
 	}
 
-	public ArgsBuilder cloneDestinationDirectory(File cloneDestinationDirectory)
-			throws Exception {
+	public ArgsBuilder cloneDestinationDirectory(File cloneDestinationDirectory) throws Exception {
 		removeIfPresent("releaser.git.clone-destination-dir");
-		this.args.add("releaser.git.clone-destination-dir="
-				+ cloneDestinationDirectory.toString());
+		this.args.add("releaser.git.clone-destination-dir=" + cloneDestinationDirectory.toString());
 		return this;
 	}
 
 	public ArgsBuilder releaseTrainUrl(String relativePath) throws Exception {
 		removeIfPresent("releaser.git.release-train-bom-url");
-		this.args.add("releaser.git.release-train-bom-url="
-				+ file(relativePath).toURI().toString());
+		this.args.add("releaser.git.release-train-bom-url=" + file(relativePath).toURI().toString());
 		return this;
 	}
 

@@ -5,8 +5,9 @@ That's why this tool makes it easy to automate the release / dependency update p
 
 === Releasing through Jenkins
 
-NOTE: Whenever a release process is broken, Jenkins marks it with a red ball and breaks the build.
-Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow ball and marks the build as unstable.
+NOTE: Whenever a release process is broken, Jenkins marks it with a red 'X' and breaks the build.
+Whenever a post-release action went wrong but the release is successful, Jenkins marks the build with a yellow exclamation and marks the build as unstable.
+
 
 ==== Releasing a Single Project
 

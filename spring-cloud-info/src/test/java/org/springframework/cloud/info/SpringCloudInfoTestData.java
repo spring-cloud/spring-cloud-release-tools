@@ -33,29 +33,33 @@ public final class SpringCloudInfoTestData {
 	public static Map<String, String> milestoneStrings = new HashMap<>();
 
 	static {
-		releaseVersions.put("spring-boot", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-aws", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-bus", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-cloudfoundry", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-commons", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-config", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-consul", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-contract", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-function", "2.1.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-gateway", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-gcp", "1.1.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-kubernetes", "1.1.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-netflix", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-openfeign", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-security", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-sleuth", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-stream", "Germantown.BUILD-SNAPSHOT");
+		releaseVersions.put("spring-boot", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-aws", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-bus", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-cloudfoundry", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-commons", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-config", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-consul", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-contract", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-function", "2.1.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-gateway", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-gcp", "1.1.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-kubernetes", "1.1.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-netflix", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-openfeign", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-security", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-sleuth", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-stream", "Germantown-SNAPSHOT");
 		releaseVersions.put("spring-cloud-task", "2.0.0.RELEASE");
-		releaseVersions.put("spring-cloud-vault", "2.2.0.BUILD-SNAPSHOT");
-		releaseVersions.put("spring-cloud-zookeeper", "2.2.0.BUILD-SNAPSHOT");
+		releaseVersions.put("spring-cloud-vault", "2.2.0-SNAPSHOT");
+		releaseVersions.put("spring-cloud-zookeeper", "2.2.0-SNAPSHOT");
 	}
 
 	static {
+		springCloudVersions.add("v2020.0.1");
+		springCloudVersions.add("v2020.0.0");
+		springCloudVersions.add("v2020.0.0-RC1");
+		springCloudVersions.add("v2020.0.0-M1");
 		springCloudVersions.add("vGreenwich.SR1");
 		springCloudVersions.add("vGreenwich.RELEASE");
 		springCloudVersions.add("vGreenwich.RC2");
