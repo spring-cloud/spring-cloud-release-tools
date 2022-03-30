@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package releaser.internal.github;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -27,7 +26,6 @@ import com.jcabi.github.mock.MkGithub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
 
@@ -43,9 +41,6 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 @ExtendWith(OutputCaptureExtension.class)
 public class GithubMilestonesTests {
 
-	@TempDir
-	public File folder;
-
 	MkGithub github;
 
 	Repo repo;
@@ -57,7 +52,7 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_close_milestone_if_there_is_one(CapturedOutput capture) throws IOException {
+	public void should_close_milestone_if_there_is_one(CapturedOutput capturedOutput) throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
@@ -73,12 +68,12 @@ public class GithubMilestonesTests {
 
 		milestones.closeMilestone(nonGaSleuthProject());
 
-		then(capture.toString()).doesNotContain("No matching milestone was found");
+		then(capturedOutput.toString()).doesNotContain("No matching milestone was found");
 	}
 
 	@Test
 	public void should_close_milestone_when_the_milestone_contains_numeric_version_only_and_version_is_ga(
-			CapturedOutput capture) throws IOException {
+			CapturedOutput capturedOutput) throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
@@ -94,7 +89,7 @@ public class GithubMilestonesTests {
 
 		milestones.closeMilestone(gaSleuthProject());
 
-		then(capture.toString()).doesNotContain("No matching milestone was found");
+		then(capturedOutput.toString()).doesNotContain("No matching milestone was found");
 	}
 
 	private ProjectVersion gaSleuthProject() {
@@ -102,8 +97,8 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_not_close_milestone_when_the_milestone_contains_numeric_version_only(CapturedOutput capture)
-			throws IOException {
+	public void should_not_close_milestone_when_the_milestone_contains_numeric_version_only(
+			CapturedOutput capturedOutput) throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
@@ -119,7 +114,7 @@ public class GithubMilestonesTests {
 
 		milestones.closeMilestone(nonGaSleuthProject());
 
-		then(capture.toString()).contains("No matching milestone was found");
+		then(capturedOutput.toString()).contains("No matching milestone was found");
 	}
 
 	@Test
@@ -183,7 +178,7 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_return_null_if_no_matching_milestone_was_found_within_threshold(CapturedOutput capture)
+	public void should_return_null_if_no_matching_milestone_was_found_within_threshold(CapturedOutput capturedOutput)
 			throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withThreshold()) {
 			@Override
@@ -200,7 +195,7 @@ public class GithubMilestonesTests {
 
 		milestones.closeMilestone(gaSleuthProject());
 
-		then(capture.toString()).contains("No matching milestones were found within the provided threshold [0]");
+		then(capturedOutput.toString()).contains("No matching milestones were found within the provided threshold [0]");
 	}
 
 	private ProjectVersion nonGaSleuthProject() {
@@ -208,7 +203,8 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_throw_exception_when_there_is_no_matching_milestone(CapturedOutput capture) throws IOException {
+	public void should_throw_exception_when_there_is_no_matching_milestone(CapturedOutput capturedOutput)
+			throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
@@ -223,11 +219,11 @@ public class GithubMilestonesTests {
 		this.repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
 		milestones.closeMilestone(nonGaSleuthProject());
-		then(capture.toString()).contains("No matching milestone was found");
+		then(capturedOutput.toString()).contains("No matching milestone was found");
 	}
 
 	@Test
-	public void should_print_that_no_milestones_were_found_when_io_problems_occurred(CapturedOutput capture)
+	public void should_print_that_no_milestones_were_found_when_io_problems_occurred(CapturedOutput capturedOutput)
 			throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
@@ -244,7 +240,7 @@ public class GithubMilestonesTests {
 
 		milestones.closeMilestone(nonGaSleuthProject());
 
-		then(capture.toString()).contains("No matching milestone was found");
+		then(capturedOutput.toString()).contains("No matching milestone was found");
 	}
 
 	private Repo createSleuthRepo(MkGithub github) throws IOException {

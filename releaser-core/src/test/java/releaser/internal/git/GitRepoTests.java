@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.assertj.core.api.BDDAssertions;
@@ -45,18 +46,15 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  */
 public class GitRepoTests {
 
-	@TempDir
-	public File tmp;
-
 	File springCloudReleaseProject;
 
+	@TempDir
 	File tmpFolder;
 
 	GitRepo gitRepo;
 
 	@BeforeEach
 	public void setup() throws IOException, URISyntaxException {
-		this.tmpFolder = new File(tmp, "test");
 		this.springCloudReleaseProject = new File(
 				GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 		TestUtils.prepareLocalRepo();
@@ -189,9 +187,10 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_push_changes_to_master_branch() throws Exception {
-		File origin = GitTestUtils.clonedProject(new File(tmp, "test1"), this.springCloudReleaseProject);
-		File project = new GitRepo(this.tmpFolder)
+	public void should_push_changes_to_master_branch(@TempDir Path tempDirOrigin, @TempDir Path tempDirProject)
+			throws Exception {
+		File origin = GitTestUtils.clonedProject(tempDirOrigin.toFile(), this.springCloudReleaseProject);
+		File project = new GitRepo(tempDirProject.toFile())
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
@@ -206,9 +205,10 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_push_changes_to_current_branch() throws Exception {
-		File origin = GitTestUtils.clonedProject(new File(tmp, "test2"), this.springCloudReleaseProject);
-		File project = new GitRepo(this.tmpFolder)
+	public void should_push_changes_to_current_branch(@TempDir Path tempDirOrigin, @TempDir Path tempDirProject)
+			throws Exception {
+		File origin = GitTestUtils.clonedProject(tempDirOrigin.toFile(), this.springCloudReleaseProject);
+		File project = new GitRepo(tempDirProject.toFile())
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
@@ -223,9 +223,10 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_return_the_branch_name() throws Exception {
-		File origin = GitTestUtils.clonedProject(new File(tmp, "test3"), this.springCloudReleaseProject);
-		File project = new GitRepo(this.tmpFolder)
+	public void should_return_the_branch_name(@TempDir Path tempDirOrigin, @TempDir Path tempDirProject)
+			throws Exception {
+		File origin = GitTestUtils.clonedProject(tempDirOrigin.toFile(), this.springCloudReleaseProject);
+		File project = new GitRepo(tempDirProject.toFile())
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);
@@ -236,9 +237,10 @@ public class GitRepoTests {
 	}
 
 	@Test
-	public void should_push_a_tag_to_new_branch_in_origin() throws Exception {
-		File origin = GitTestUtils.clonedProject(new File(tmp, "test4"), this.springCloudReleaseProject);
-		File project = new GitRepo(this.tmpFolder)
+	public void should_push_a_tag_to_new_branch_in_origin(@TempDir Path tempDirOrigin, @TempDir Path tempDirProject)
+			throws Exception {
+		File origin = GitTestUtils.clonedProject(tempDirOrigin.toFile(), this.springCloudReleaseProject);
+		File project = new GitRepo(tempDirProject.toFile())
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 		createNewFile(project);

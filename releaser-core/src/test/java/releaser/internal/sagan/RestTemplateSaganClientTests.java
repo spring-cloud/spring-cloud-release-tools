@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package releaser.internal.sagan;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import releaser.internal.ReleaserProperties;
 
@@ -105,7 +105,7 @@ public class RestTemplateSaganClientTests {
 	}
 
 	@Test
-	@Ignore("no api yet https://github.com/spring-io/sagan/issues/1052")
+	@Disabled("no api yet https://github.com/spring-io/sagan/issues/1052")
 	public void should_patch_a_project() throws IOException {
 		String projectJson = "{\n  \"id\" : \"spring-framework\",\n  "
 				+ "\"rawBootConfig\" : \"rawBootConfig\",\n  \"rawOverview\" : \"rawOverview\",\n  "

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
@@ -34,26 +36,24 @@ import releaser.internal.PomUpdateAcceptanceTests;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
 
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * @author Marcin Grzejszczak
  */
+@ExtendWith(OutputCaptureExtension.class)
 public class ProjectCommandExecutorTests {
 
 	@TempDir
-	public File tmp;
-
 	File temporaryFolder;
 
 	@BeforeEach
 	public void checkOs() throws Exception {
-		assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
-		this.temporaryFolder = new File(tmp, "test");
+		Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects"), this.temporaryFolder);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,11 +70,11 @@ public class SpringCloudGhPagesParserTests {
 	}
 
 	@Test
-	public void should_not_parse_the_components_table_when_markers_are_not_found(CapturedOutput capture) {
+	public void should_not_parse_the_components_table_when_markers_are_not_found(CapturedOutput capturedOutput) {
 		ReleaseTrainContents contents = new ReleaseTrainContentsParser().parseProjectPage(this.wrongHtml);
 
 		BDDAssertions.then(contents).isNull();
-		BDDAssertions.then(capture.toString()).contains("The page is missing the components table markers");
+		BDDAssertions.then(capturedOutput.toString()).contains("The page is missing the components table markers");
 	}
 
 }

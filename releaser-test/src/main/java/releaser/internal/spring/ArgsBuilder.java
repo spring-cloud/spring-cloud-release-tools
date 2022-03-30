@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,44 +17,55 @@
 package releaser.internal.spring;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.rules.TemporaryFolder;
 import releaser.internal.git.GitTestUtils;
 
 public class ArgsBuilder {
 
 	private final File project;
 
-	private final TemporaryFolder tmp;
+	private final File tempDirTestSamplesProject;
+
+	private final File tempDirReleaseTrainDocs;
+
+	private final File tempDirSpringCloud;
+
+	private final File tempDirReleaseTrainWiki;
+
+	private final File tempDirAllTestSample;
 
 	List<String> args = new LinkedList<>();
 
-	public ArgsBuilder(File project, TemporaryFolder tmp) throws Exception {
+	public ArgsBuilder(File project, File tempDirTestSamplesProject, File tempDirReleaseTrainDocs,
+			File tempDirSpringCloud, File tempDirReleaseTrainWiki, File tempDirAllTestSample) throws Exception {
 		this.project = project;
-		this.tmp = tmp;
+		this.tempDirTestSamplesProject = tempDirTestSamplesProject;
+		this.tempDirReleaseTrainDocs = tempDirReleaseTrainDocs;
+		this.tempDirSpringCloud = tempDirSpringCloud;
+		this.tempDirReleaseTrainWiki = tempDirReleaseTrainWiki;
+		this.tempDirAllTestSample = tempDirAllTestSample;
 		defaults();
 	}
 
 	public ArgsBuilder defaults() throws Exception {
 		// @formatter:off
 		this.args.addAll(Arrays.asList(
-				"releaser.git.documentation-url=" + file("/projects/spring-cloud-static-angel/").toURI().toString(),
-				"releaser.git.test-samples-project-url=" + this.tmp.newFolder().toString(),
-				"releaser.git.release-train-docs-url=" + this.tmp.newFolder().toString(),
+				"releaser.git.documentation-url=" + file("/projects/spring-cloud-static-angel/").toURI(),
+				"releaser.git.test-samples-project-url=" + tempDirTestSamplesProject.getAbsolutePath(),
+				"releaser.git.release-train-docs-url=" + tempDirReleaseTrainDocs.getAbsolutePath(),
 				"releaser.maven.build-command=echo build",
 				"releaser.maven.deploy-command=echo deploy",
 				"releaser.maven.deploy-guides-command=echo guides",
 				"releaser.maven.publish-docs-command=echo docs",
 				"releaser.maven.generate-release-train-docs-command=echo releaseTrainDocs",
 				"releaser.working-dir=" + project.getPath(),
-				"releaser.git.spring-project-url=" + tmpFile("spring-cloud").getAbsolutePath() + "/",
-				"releaser.git.release-train-wiki-url=" + tmpGitRepo("spring-cloud-wiki").getAbsolutePath() + "/",
+				"releaser.git.spring-project-url=" + tempDirSpringCloud.getAbsolutePath(),
+				"releaser.git.release-train-wiki-url=" + tmpGitRepo(tempDirReleaseTrainWiki).getAbsolutePath() + "/",
 				"releaser.git.run-updated-samples=true",
 				"releaser.git.update-spring-guides=true",
 				"releaser.git.update-spring-project=true",
@@ -63,11 +74,11 @@ public class ArgsBuilder {
 				"releaser.git.update-documentation-repo=true",
 				"releaser.git.update-github-milestones=true",
 				"releaser.git.update-release-train-docs=true",
-				"releaser.git.all-test-sample-urls[spring-cloud-consul]=" + this.tmp.newFolder().toString(),
+				"releaser.git.all-test-sample-urls[spring-cloud-consul]=" + tempDirAllTestSample.getAbsolutePath(),
 				"releaser.sagan.update-sagan=true",
 				"releaser.template.enabled=true",
 				"releaser.versions.all-versions-file-url="
-						+ ArgsBuilder.class.getResource("/raw/initializr.yml").toURI().toString()
+						+ ArgsBuilder.class.getResource("/raw/initializr.yml").toURI()
 		));
 		// @formatter:on
 		fetchVersionsFromGit(true);
@@ -155,7 +166,7 @@ public class ArgsBuilder {
 
 	public ArgsBuilder releaseTrainUrl(String relativePath) throws Exception {
 		removeIfPresent("releaser.git.release-train-bom-url");
-		this.args.add("releaser.git.release-train-bom-url=" + file(relativePath).toURI().toString());
+		this.args.add("releaser.git.release-train-bom-url=" + file(relativePath).toURI());
 		return this;
 	}
 
@@ -191,24 +202,9 @@ public class ArgsBuilder {
 		return new File(ArgsBuilder.class.getResource(relativePath).toURI());
 	}
 
-	private File tmpFile(String relativePath) {
-		try {
-			return new File(this.tmp.newFolder(), relativePath);
-		}
-		catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
-	private File tmpGitRepo(String relativePath) {
-		try {
-			File file = new File(this.tmp.newFolder(), relativePath);
-			GitTestUtils.initGitProject(file);
-			return file;
-		}
-		catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
+	private File tmpGitRepo(File tempDir) {
+		GitTestUtils.initGitProject(tempDir);
+		return tempDir;
 	}
 
 }

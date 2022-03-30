@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.Iterator;
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.cloud.spring.AbstractSpringCloudAcceptanceTests;
 import releaser.internal.ReleaserProperties;
@@ -59,23 +60,41 @@ import static org.mockito.Mockito.times;
  */
 public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAcceptanceTests {
 
+	@TempDir
+	File tempDirTestSamplesProject;
+
+	@TempDir
+	File tempDirReleaseTrainDocs;
+
+	@TempDir
+	File tempDirSpringCloud;
+
+	@TempDir
+	File tempDirReleaseTrainWiki;
+
+	@TempDir
+	File tempDirAllTestSample;
+
 	SpringApplicationBuilder runner = new SpringApplicationBuilder(
 			SpringSingleProjectAcceptanceTests.SingleProjectReleaseConfig.class,
 			SpringSingleProjectAcceptanceTests.SingleProjectScanningConfiguration.class).web(WebApplicationType.NONE)
 					.properties("spring.jmx.enabled=false");
 
 	@Test
-	public void should_fail_to_perform_a_release_of_consul_when_sc_release_contains_snapshots() throws Exception {
+	public void should_fail_to_perform_a_release_of_consul_when_sc_release_contains_snapshots(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
+			throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release-with-snapshot/", "vCamden.SR5.BROKEN");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debugx=true").properties(new ArgsBuilder(project, this.tmp)
-						.releaseTrainUrl("/projects/spring-cloud-release-with-snapshot/")
-						.bomBranch("vCamden.SR5.BROKEN").expectedVersion("1.1.2.RELEASE").build()),
+				properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
+						tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+								.releaseTrainUrl("/projects/spring-cloud-release-with-snapshot/")
+								.bomBranch("vCamden.SR5.BROKEN").expectedVersion("1.1.2.RELEASE").build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BDDAssertions.thenThrownBy(releaser::release).hasMessageContaining(
@@ -85,17 +104,19 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 	}
 
 	@Test
-	public void should_perform_a_release_of_consul() throws Exception {
+	public void should_perform_a_release_of_consul(@TempDir File tempDirSpringCloudConsulOrigin,
+			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debugx=true").properties(
-						new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
-								.bomBranch("vGreenwich.SR2").expectedVersion("2.1.2.RELEASE").build()),
+				properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
+						tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+								.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vGreenwich.SR2")
+								.expectedVersion("2.1.2.RELEASE").build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
@@ -137,17 +158,19 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 
 	// issue #74
 	@Test
-	public void should_perform_a_release_of_sc_build() throws Exception {
+	public void should_perform_a_release_of_sc_build(@TempDir File tempDirSpringCloudConsulOrigin,
+			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "vGreenwich.SR2");
-		File origin = cloneToTemporaryDirectory(this.springCloudBuildProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudBuildProject);
 		assertThatClonedBuildProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-build"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-build"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debugx=true").properties(new ArgsBuilder(project, this.tmp)
-						.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vGreenwich.SR2")
-						.projectName("spring-cloud-build").expectedVersion("2.1.6.RELEASE").build()),
+				properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
+						tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+								.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vGreenwich.SR2")
+								.projectName("spring-cloud-build").expectedVersion("2.1.6.RELEASE").build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
@@ -188,17 +211,19 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 	}
 
 	@Test
-	public void should_perform_a_release_of_consul_rc1() throws Exception {
+	public void should_perform_a_release_of_consul_rc1(@TempDir File tempDirSpringCloudConsulOrigin,
+			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "vDalston.RC1");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(this.runner,
-				properties("debugx=true").properties(
-						new ArgsBuilder(project, this.tmp).releaseTrainUrl("/projects/spring-cloud-release/")
-								.bomBranch("vDalston.RC1").expectedVersion("1.2.0.RC1").build()),
+				properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
+						tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+								.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vDalston.RC1")
+								.expectedVersion("1.2.0.RC1").build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
@@ -239,22 +264,24 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 	}
 
 	@Test
-	public void should_not_clone_when_option_not_to_clone_was_switched_on() throws Exception {
+	public void should_not_clone_when_option_not_to_clone_was_switched_on(@TempDir File tempDirSpringCloudConsulOrigin,
+			@TempDir File tempDirSpringCloudConsulProject, @TempDir File temporaryDestination) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "master");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		final File temporaryDestination = this.tmp.newFolder();
 
 		run(this.runner,
-				properties("debugx=true").properties(new ArgsBuilder(project, this.tmp)
-						.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vCamden.SR5")
-						.expectedVersion("1.1.2.RELEASE")
-						// just build
-						.chosenOption("6").fetchVersionsFromGit(false).cloneDestinationDirectory(temporaryDestination)
-						.addFixedVersion("spring-cloud-release", "Finchley.RELEASE")
-						.addFixedVersion("spring-cloud-consul", "2.3.4.RELEASE").build()),
+				properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
+						tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+								.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vCamden.SR5")
+								.expectedVersion("1.1.2.RELEASE")
+								// just build
+								.chosenOption("6").fetchVersionsFromGit(false)
+								.cloneDestinationDirectory(temporaryDestination)
+								.addFixedVersion("spring-cloud-release", "Finchley.RELEASE")
+								.addFixedVersion("spring-cloud-consul", "2.3.4.RELEASE").build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 

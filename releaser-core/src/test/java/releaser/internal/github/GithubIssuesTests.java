@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,14 @@ import com.jcabi.github.Repos;
 import com.jcabi.github.mock.MkGithub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
-import org.springframework.boot.test.system.OutputCaptureExtension;
-
 /**
  * @author Marcin Grzejszczak
  */
-@ExtendWith(OutputCaptureExtension.class)
 public class GithubIssuesTests {
-
-	@TempDir
-	public File folder;
 
 	MkGithub github;
 

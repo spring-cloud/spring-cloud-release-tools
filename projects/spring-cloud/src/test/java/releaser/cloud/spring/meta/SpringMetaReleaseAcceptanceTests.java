@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
@@ -39,7 +40,6 @@ import releaser.internal.tasks.TrainPostReleaseReleaserTask;
 import releaser.internal.tasks.composite.MetaReleaseCompositeTask;
 import releaser.internal.tasks.composite.ReleaseCompositeTask;
 import releaser.internal.tasks.release.BuildProjectReleaseTask;
-import releaser.internal.tech.BuildUnstableException;
 import releaser.internal.tech.ExecutionResult;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -64,17 +64,35 @@ import static org.mockito.BDDMockito.given;
  */
 public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcceptanceTests {
 
+	@TempDir
+	File tempDirTestSamplesProject;
+
+	@TempDir
+	File tempDirReleaseTrainDocs;
+
+	@TempDir
+	File tempDirSpringCloud;
+
+	@TempDir
+	File tempDirReleaseTrainWiki;
+
+	@TempDir
+	File tempDirAllTestSample;
+
 	@Test
-	public void should_perform_a_meta_release_of_sc_release_and_consul() throws Exception {
+	public void should_perform_a_meta_release_of_sc_release_and_consul(@TempDir File tempDirSpringCloudConsulOrigin,
+			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(defaultRunner(),
-				properties("debugx=true").properties("test.metarelease=true").properties(
-						metaReleaseArgs(project).bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
+				properties("debugx=true").properties("test.metarelease=true")
+						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+										.bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
@@ -104,16 +122,18 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	@Test
-	public void should_perform_a_meta_release_of_sc_release_and_consul_in_parallel() throws Exception {
+	public void should_perform_a_meta_release_of_sc_release_and_consul_in_parallel(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
+			throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(defaultRunner(),
-				properties("debugx=true").properties("test.metarelease=true")
-						.properties(metaReleaseArgsForParallel(project).bomBranch("vGreenwich.SR2")
+		run(defaultRunner(), properties("debugx=true").properties("test.metarelease=true")
+				.properties(metaReleaseArgsForParallel(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+						tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("vGreenwich.SR2")
 								.addFixedVersions(edgwareSr10())
 								.metaReleaseGroups("example1,example2",
 										"spring-cloud-build,spring-cloud-consul,spring-cloud-release")
@@ -150,16 +170,20 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	@Test
-	public void should_perform_a_meta_release_dry_run_of_sc_release_and_consul() throws Exception {
+	public void should_perform_a_meta_release_dry_run_of_sc_release_and_consul(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
+			throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(defaultRunner(),
-				properties("debugx=true").properties("test.metarelease=true").properties(
-						metaReleaseArgs(project).bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
+				properties("debugx=true").properties("test.metarelease=true")
+						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+										.bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
@@ -191,18 +215,22 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	@Test
-	public void should_not_release_any_projects_when_they_are_on_list_of_projects_to_skip() throws Exception {
+	public void should_not_release_any_projects_when_they_are_on_list_of_projects_to_skip(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject,
+			@TempDir File temporaryDestination) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		File temporaryDestination = this.tmp.newFolder();
 
-		run(defaultRunner(), properties("debugx=true").properties("test.metarelease=true", "test.mockBuild=true")
-				.properties(metaReleaseArgs(project).bomBranch("Greenwich")
-						.addFixedVersions(consulAndReleaseSnapshots()).updateReleaseTrainWiki(false)
-						.cloneDestinationDirectory(temporaryDestination).projectsToSkip("spring-cloud-consul").build()),
+		run(defaultRunner(),
+				properties("debugx=true").properties("test.metarelease=true", "test.mockBuild=true")
+						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+										.bomBranch("Greenwich").addFixedVersions(consulAndReleaseSnapshots())
+										.updateReleaseTrainWiki(false).cloneDestinationDirectory(temporaryDestination)
+										.projectsToSkip("spring-cloud-consul").build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BuildProjectReleaseTask build = context.getBean(BuildProjectReleaseTask.class);
@@ -222,19 +250,21 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	@Test
-	public void should_perform_a_meta_release_of_consul_only_when_run_from_got_passed() throws Exception {
+	public void should_perform_a_meta_release_of_consul_only_when_run_from_got_passed(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject,
+			@TempDir File temporaryDestination) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		File temporaryDestination = this.tmp.newFolder();
 
 		run(defaultRunner(),
 				properties("debugx=true").properties("test.metarelease=true", "test.mockBuild=true")
-						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
-								.addFixedVersions(releaseConsulBuildSnapshots())
-								.cloneDestinationDirectory(temporaryDestination).build()),
+						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+										.bomBranch("Greenwich").addFixedVersions(releaseConsulBuildSnapshots())
+										.cloneDestinationDirectory(temporaryDestination).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BuildProjectReleaseTask build = context.getBean(BuildProjectReleaseTask.class);
@@ -263,19 +293,21 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	@Test
-	public void should_perform_a_meta_release_of_consul_only_when_task_names_got_passed() throws Exception {
+	public void should_perform_a_meta_release_of_consul_only_when_task_names_got_passed(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject,
+			@TempDir File temporaryDestination) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
-		File temporaryDestination = this.tmp.newFolder();
 
 		run(defaultRunner(),
 				properties("debugx=true").properties("test.metarelease=true", "test.mockBuild=true")
-						.properties(metaReleaseArgs(project).bomBranch("Greenwich")
-								.addFixedVersions(releaseConsulBuildSnapshots())
-								.cloneDestinationDirectory(temporaryDestination).build()),
+						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+										.bomBranch("Greenwich").addFixedVersions(releaseConsulBuildSnapshots())
+										.cloneDestinationDirectory(temporaryDestination).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					BuildProjectReleaseTask build = context.getBean(BuildProjectReleaseTask.class);
@@ -304,18 +336,22 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	@Test
-	public void should_not_execute_any_subsequent_task_when_first_one_fails() throws Exception {
+	public void should_not_execute_any_subsequent_task_when_first_one_fails(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
+			throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
-		File origin = cloneToTemporaryDirectory(this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
-		File project = cloneToTemporaryDirectory(tmpFile("spring-cloud-consul"));
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(failingBuildRunner(), properties("debugx=true")
-				.properties("test.metarelease=true", "test.metarelease.failing=true",
-						"releaser.flow.default-enabled=false")
-				.properties(
-						metaReleaseArgs(project).bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
+		run(failingBuildRunner(),
+				properties("debugx=true")
+						.properties("test.metarelease=true", "test.metarelease.failing=true",
+								"releaser.flow.default-enabled=false")
+						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+										.bomBranch("vGreenwich.SR2").addFixedVersions(edgwareSr10()).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
@@ -502,7 +538,7 @@ class FirstTask implements ReleaseReleaserTask {
 	}
 
 	@Override
-	public ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException {
+	public ExecutionResult runTask(Arguments args) throws RuntimeException {
 		return ExecutionResult.failure(new IllegalStateException("Failure"));
 	}
 
@@ -536,7 +572,7 @@ class SecondTask implements ReleaseReleaserTask {
 	}
 
 	@Override
-	public ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException {
+	public ExecutionResult runTask(Arguments args) throws RuntimeException {
 		return ExecutionResult.success();
 	}
 
@@ -570,7 +606,7 @@ class PostReleaseTask implements TrainPostReleaseReleaserTask {
 	}
 
 	@Override
-	public ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException {
+	public ExecutionResult runTask(Arguments args) throws RuntimeException {
 		return ExecutionResult.success();
 	}
 

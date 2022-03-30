@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public class ReleaserTests {
 
 	File pom;
 
-	@BeforeEach
+	@Before
 	public void setup() throws URISyntaxException {
 		URI pomUri = ReleaserTests.class.getResource("/projects/project/pom.xml").toURI();
 		this.pom = new File(pomUri);
@@ -107,12 +107,12 @@ public class ReleaserTests {
 	}
 
 	@Test
-	public void should_not_bump_versions_for_original_release_project(CapturedOutput outputCapture) {
+	public void should_not_bump_versions_for_original_release_project(CapturedOutput capturedOutput) {
 		releaser(() -> new ProjectVersion("original", "1.0.0.RELEASE")).rollbackReleaseVersion(this.pom,
 				new Projects(new ProjectVersion("changed", "1.0.0.RELEASE")),
 				new ProjectVersion("changed", "1.0.0.RELEASE"));
 
-		BDDAssertions.then(outputCapture.toString())
+		BDDAssertions.then(capturedOutput.toString())
 				.contains("Successfully reverted the commit and came back to snapshot versions");
 		then(this.projectGitHandler).should(never()).commitAfterBumpingVersions(any(File.class),
 				any(ProjectVersion.class));
@@ -120,18 +120,18 @@ public class ReleaserTests {
 
 	@Test
 	public void should_not_bump_versions_for_original_snapshot_project_and_current_snapshot(
-			CapturedOutput outputCapture) {
+			CapturedOutput capturedOutput) {
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")).rollbackReleaseVersion(this.pom,
 				new Projects(new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT")),
 				new ProjectVersion("changed", "1.0.0.BUILD-SNAPSHOT"));
 
-		BDDAssertions.then(outputCapture.toString()).contains("Won't rollback a snapshot version");
+		BDDAssertions.then(capturedOutput.toString()).contains("Won't rollback a snapshot version");
 		then(this.projectGitHandler).should(never()).commitAfterBumpingVersions(any(File.class),
 				any(ProjectVersion.class));
 	}
 
 	@Test
-	public void should_bump_versions_for_original_snapshot_project(CapturedOutput outputCapture) {
+	public void should_bump_versions_for_original_snapshot_project(CapturedOutput capturedOutput) {
 		ProjectVersion scReleaseVersion = new ProjectVersion("changed", "1.0.0.RELEASE");
 		releaser(() -> new ProjectVersion("original", "1.0.0.BUILD-SNAPSHOT")).rollbackReleaseVersion(this.pom,
 				new Projects(new ProjectVersion("changed", "1.0.0.RELEASE"),
@@ -139,7 +139,7 @@ public class ReleaserTests {
 						new ProjectVersion("spring-boot-starter", "3.0.0.RELEASE")),
 				scReleaseVersion);
 
-		BDDAssertions.then(outputCapture.toString()).contains("Project was successfully updated")
+		BDDAssertions.then(capturedOutput.toString()).contains("Project was successfully updated")
 				.contains("Successfully reverted the commit and bumped snapshot versions")
 				.contains("spring-boot-starter=>3.0.0.RELEASE").contains("spring-cloud-build=>2.0.1.SNAPSHOT")
 				.contains("changed=>1.0.1.SNAPSHOT");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,20 +41,17 @@ import org.springframework.util.FileSystemUtils;
  */
 public class PomUpdaterTests {
 
-	@TempDir
-	public File tmp;
-
 	VersionsFromBom versionsFromBom = new VersionsFromBomBuilder()
 			.releaserProperties(SpringCloudReleaserProperties.get()).projects(projects())
 			.parsers(Collections.emptyList()).retrieveFromBom();
 
 	PomUpdater pomUpdater = new PomUpdater();
 
+	@TempDir
 	File temporaryFolder;
 
 	@BeforeEach
 	public void setup() throws Exception {
-		this.temporaryFolder = new File(tmp, "test");
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 	}
 
