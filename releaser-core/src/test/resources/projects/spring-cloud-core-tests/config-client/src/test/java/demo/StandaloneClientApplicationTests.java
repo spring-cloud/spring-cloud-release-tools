@@ -30,13 +30,13 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-public class StandaloneClientApplicationTests {
+class StandaloneClientApplicationTests {
 
 	@Autowired
 	private ConfigServicePropertySourceLocator locator;
 
 	@Test
-	public void contextLoads() throws Exception {
+	void contextLoads() throws Exception {
 		assertNotNull(this.locator);
 	}
 

@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-public class BootstrapDecryptionClientApplicationTests {
+class BootstrapDecryptionClientApplicationTests {
 
 	@Autowired
 	private ConfigClientProperties config;
@@ -38,7 +38,7 @@ public class BootstrapDecryptionClientApplicationTests {
 	private ConfigServicePropertySourceLocator locator;
 
 	@Test
-	public void contextLoads() throws Exception {
+	void contextLoads() throws Exception {
 		assertThat(new String[] { "http://localhost:8888" }).isEqualTo(this.config.getUri());
 		// The application.yml is never read because spring.config.name=sample
 		assertThat(this.locator).isNotNull();

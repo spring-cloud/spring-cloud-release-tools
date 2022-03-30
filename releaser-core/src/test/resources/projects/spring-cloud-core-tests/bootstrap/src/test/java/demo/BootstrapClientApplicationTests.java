@@ -29,13 +29,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
-public class BootstrapClientApplicationTests {
+class BootstrapClientApplicationTests {
 
 	@Autowired
 	private ServerProperties server;
 
 	@Test
-	public void contextLoads() throws Exception {
+	void contextLoads() throws Exception {
 		assertThat(2).isEqualTo(this.server.getTomcat().getMaxThreads());
 		// The application.yml is never read because spring.config.name=sample
 		assertThat("application").isEqualTo(this.server.getServlet().getApplicationDisplayName());

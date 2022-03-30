@@ -12,7 +12,7 @@
 	<properties>
 		<docs.main>spring-cloud-release-tools</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
-		<maven.plugin.plugin.version>3.4</maven.plugin.plugin.version>
+		<maven.plugin.plugin.version>3.6.4</maven.plugin.plugin.version>
 		<configprops.inclusionPattern>releaser.*</configprops.inclusionPattern>
 	</properties>
 	<dependencies>

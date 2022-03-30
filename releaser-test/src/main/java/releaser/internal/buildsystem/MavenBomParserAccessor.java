@@ -16,7 +16,8 @@
 
 package releaser.internal.buildsystem;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
+
 import releaser.internal.ReleaserProperties;
 
 public class MavenBomParserAccessor {
