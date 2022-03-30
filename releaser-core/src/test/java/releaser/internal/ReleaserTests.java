@@ -83,7 +83,7 @@ public class ReleaserTests {
 
 	File pom;
 
-	@Before
+	@BeforeEach
 	public void setup() throws URISyntaxException {
 		URI pomUri = ReleaserTests.class.getResource("/projects/project/pom.xml").toURI();
 		this.pom = new File(pomUri);
