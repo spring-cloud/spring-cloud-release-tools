@@ -18,18 +18,17 @@ package org.springframework.cloud.info;
 
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.info.SpringCloudInfoService.SpringCloudVersion;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -50,11 +49,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Ryan Baxter
  */
 @WebMvcTest(SpringCloudInfoRestController.class)
-@RunWith(SpringRunner.class)
-public class SpringCloudInfoRestControllerTests {
+@ExtendWith(RestDocumentationExtension.class)
+class SpringCloudInfoRestControllerTests {
 
-	@Rule
-	public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
 
 	@MockBean
 	SpringCloudInfoService springCloudInfoService;
@@ -65,16 +62,17 @@ public class SpringCloudInfoRestControllerTests {
 	@Autowired
 	private WebApplicationContext context;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp(RestDocumentationContextProvider restDocumentation) {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-				.apply(documentationConfiguration(this.restDocumentation).uris().withHost("spring-cloud-info.cfapps.io")
+				.apply(documentationConfiguration(restDocumentation).uris()
+						.withHost("spring-cloud-info.cfapps.io")
 						.withPort(80))
 				.build();
 	}
 
 	@Test
-	public void version() throws Exception {
+	void version() throws Exception {
 		doReturn(new SpringCloudVersion("Greenwich.RELEASE")).when(springCloudInfoService)
 				.getSpringCloudVersion(eq("2.1.1.RELEASE"));
 		this.mockMvc
@@ -87,16 +85,18 @@ public class SpringCloudInfoRestControllerTests {
 	}
 
 	@Test
-	public void versions() throws Exception {
-		doReturn(springCloudVersions.stream().map(v -> v.replaceFirst("v", "")).collect(Collectors.toList()))
+	void versions() throws Exception {
+		doReturn(springCloudVersions.stream().map(v -> v.replaceFirst("v", ""))
+				.collect(Collectors.toList()))
 				.when(springCloudInfoService).getSpringCloudVersions();
-		this.mockMvc.perform(get("/springcloudversions").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+		this.mockMvc.perform(get("/springcloudversions").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
 				.andDo(document("springcloudversions",
 						responseFields(fieldWithPath("[]").description("An array versions"))));
 	}
 
 	@Test
-	public void bomVersions() throws Exception {
+	void bomVersions() throws Exception {
 		doReturn(SpringCloudInfoTestData.releaseVersions).when(springCloudInfoService)
 				.getReleaseVersions(eq("Finchley.SR1"));
 		this.mockMvc.perform(get("/bomversions/Finchley.SR1").accept(MediaType.APPLICATION_JSON))
@@ -104,14 +104,16 @@ public class SpringCloudInfoRestControllerTests {
 	}
 
 	@Test
-	public void milestones() throws Exception {
-		doReturn(SpringCloudInfoTestData.milestoneStrings.keySet()).when(springCloudInfoService).getMilestones();
-		this.mockMvc.perform(get("/milestones").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+	void milestones() throws Exception {
+		doReturn(SpringCloudInfoTestData.milestoneStrings.keySet()).when(springCloudInfoService)
+				.getMilestones();
+		this.mockMvc.perform(get("/milestones").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
 				.andDo(document("milestones"));
 	}
 
 	@Test
-	public void milestoneDueDate() throws Exception {
+	void milestoneDueDate() throws Exception {
 		doReturn(new SpringCloudInfoService.Milestone("2019-07-31")).when(springCloudInfoService)
 				.getMilestoneDueDate(eq("Hoxton.RELEASE"));
 		this.mockMvc.perform(get("/milestones/{release}/duedate", "Hoxton.RELEASE").accept(MediaType.APPLICATION_JSON))

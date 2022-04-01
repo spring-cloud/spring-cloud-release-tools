@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,12 +45,13 @@ import com.jcabi.immutable.Array;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.cloud.info.exceptions.SpringCloudVersionNotFoundException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.client.RestTemplate;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,10 +67,10 @@ import static org.springframework.cloud.info.SpringCloudRelease.SPRING_CLOUD_REL
 /**
  * @author Ryan Baxter
  */
-public class InitializrSpringCloudInfoServiceTests {
+class InitializrSpringCloudInfoServiceTests {
 
 	@Test
-	public void getSpringCloudVersionBomRangesMissingTest() {
+	void getSpringCloudVersionBomRangesMissingTest() {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
@@ -86,7 +86,7 @@ public class InitializrSpringCloudInfoServiceTests {
 	}
 
 	@Test
-	public void getSpringCloudVersionSpringCloudMissingTest() {
+	void getSpringCloudVersionSpringCloudMissingTest() {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
@@ -104,48 +104,51 @@ public class InitializrSpringCloudInfoServiceTests {
 	}
 
 	@Test
-	public void getSpringCloudReleaseVersionTest() throws Exception {
+	void getSpringCloudReleaseVersionTest() throws Exception {
 		String bomVersion = "v2020.0.0-SNAPSHOT";
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
 		when(githubPomReader
 				.readPomFromUrl(eq(String.format(SpringCloudRelease.SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion))))
-						.thenReturn(new MavenXpp3Reader().read(new FileReader(
-								new ClassPathResource("spring-cloud-starter-parent-pom.xml").getFile())));
+				.thenReturn(new MavenXpp3Reader().read(new FileReader(
+						new ClassPathResource("spring-cloud-starter-parent-pom.xml").getFile())));
 		when(githubPomReader.readPomFromUrl(
 				eq(String.format(SpringCloudRelease.SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion))))
-						.thenReturn(new MavenXpp3Reader().read(
-								new FileReader(new ClassPathResource("spring-cloud-dependencies-pom.xml").getFile())));
+				.thenReturn(new MavenXpp3Reader().read(
+						new FileReader(new ClassPathResource("spring-cloud-dependencies-pom.xml").getFile())));
 		InitializrSpringCloudInfoService service = spy(
 				new InitializrSpringCloudInfoService(rest, github, githubPomReader));
-		doReturn(Arrays.asList(new String[] { bomVersion })).when(service).getSpringCloudVersions();
+		doReturn(Arrays.asList(bomVersion)).when(service)
+				.getSpringCloudVersions();
 		Map<String, String> releaseVersionsResult = service.getReleaseVersions(bomVersion);
 		assertThat(releaseVersionsResult, Matchers.equalTo(SpringCloudInfoTestData.releaseVersions));
 	}
 
-	@Test(expected = SpringCloudVersionNotFoundException.class)
-	public void getSpringCloudReleaseVersionNotFoundTest() throws Exception {
-		String bomVersion = "vFooBar.BUILD-SNAPSHOT";
-		RestTemplate rest = mock(RestTemplate.class);
-		Github github = mock(Github.class);
-		GithubPomReader githubPomReader = mock(GithubPomReader.class);
-		when(githubPomReader
-				.readPomFromUrl(eq(String.format(SpringCloudRelease.SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion))))
-						.thenReturn(new MavenXpp3Reader().read(new FileReader(
-								new ClassPathResource("spring-cloud-starter-parent-pom.xml").getFile())));
-		when(githubPomReader.readPomFromUrl(
-				eq(String.format(SpringCloudRelease.SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion))))
-						.thenReturn(new MavenXpp3Reader().read(
-								new FileReader(new ClassPathResource("spring-cloud-dependencies-pom.xml").getFile())));
-		InitializrSpringCloudInfoService service = spy(
-				new InitializrSpringCloudInfoService(rest, github, githubPomReader));
-		doReturn(new ArrayList()).when(service).getSpringCloudVersions();
-		service.getReleaseVersions(bomVersion);
+	@Test
+	void getSpringCloudReleaseVersionNotFoundTest() {
+		assertThatExceptionOfType(SpringCloudVersionNotFoundException.class).isThrownBy(() -> {
+			String bomVersion = "vFooBar.BUILD-SNAPSHOT";
+			RestTemplate rest = mock(RestTemplate.class);
+			Github github = mock(Github.class);
+			GithubPomReader githubPomReader = mock(GithubPomReader.class);
+			when(githubPomReader
+					.readPomFromUrl(eq(String.format(SpringCloudRelease.SPRING_CLOUD_STARTER_PARENT_RAW, bomVersion))))
+					.thenReturn(new MavenXpp3Reader().read(new FileReader(
+							new ClassPathResource("spring-cloud-starter-parent-pom.xml").getFile())));
+			when(githubPomReader.readPomFromUrl(
+					eq(String.format(SpringCloudRelease.SPRING_CLOUD_RELEASE_DEPENDENCIES_RAW, bomVersion))))
+					.thenReturn(new MavenXpp3Reader().read(
+							new FileReader(new ClassPathResource("spring-cloud-dependencies-pom.xml").getFile())));
+			InitializrSpringCloudInfoService service = spy(
+					new InitializrSpringCloudInfoService(rest, github, githubPomReader));
+			doReturn(new ArrayList()).when(service).getSpringCloudVersions();
+			service.getReleaseVersions(bomVersion);
+		});
 	}
 
 	@Test
-	public void getSpringCloudVersionsTest() throws Exception {
+	void getSpringCloudVersionsTest() throws Exception {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
@@ -167,7 +170,7 @@ public class InitializrSpringCloudInfoServiceTests {
 	}
 
 	@Test
-	public void getMilestoneDueDateTest() throws Exception {
+	void getMilestoneDueDateTest() throws Exception {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
@@ -188,7 +191,7 @@ public class InitializrSpringCloudInfoServiceTests {
 	}
 
 	@Test
-	public void getMilestonesTest() throws Exception {
+	void getMilestonesTest() throws Exception {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);
@@ -222,16 +225,11 @@ public class InitializrSpringCloudInfoServiceTests {
 			doReturn(builder.build()).when(milestone).json();
 			milestonesList.add(milestone);
 		}
-		return new Iterable() {
-			@Override
-			public Iterator iterator() {
-				return milestonesList.iterator();
-			}
-		};
+		return (Iterable) () -> milestonesList.iterator();
 	}
 
 	@Test
-	public void getSpringCloudVersionTest() throws Exception {
+	void getSpringCloudVersionTest() throws Exception {
 		RestTemplate rest = mock(RestTemplate.class);
 		Github github = mock(Github.class);
 		GithubPomReader githubPomReader = mock(GithubPomReader.class);

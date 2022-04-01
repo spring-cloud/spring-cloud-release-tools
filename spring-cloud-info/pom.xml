@@ -13,12 +13,12 @@
 	<artifactId>spring-cloud-info</artifactId>
 
 	<properties>
-		<maven-core.version>3.6.1</maven-core.version>
+		<maven-core.version>3.8.5</maven-core.version>
 		<javax.json-api.version>1.1.4</javax.json-api.version>
-		<maven-model.version>3.6.3</maven-model.version>
+		<maven-model.version>3.8.5</maven-model.version>
 		<scs.version>3.1.6.RELEASE</scs.version>
 		<spring-asciidoctor-extensions.version>0.2.0-RELEASE</spring-asciidoctor-extensions.version>
-		<spring-cloud-bom.version>2021.0.0</spring-cloud-bom.version>
+		<spring-cloud-bom.version>2021.0.1</spring-cloud-bom.version>
 		<spring-rest-docs.version>2.0.6.RELEASE</spring-rest-docs.version>
 	</properties>
 
@@ -113,17 +113,17 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>${asciidoctor-maven-plugin.version}</version>
+				<version>2.2.2</version>
 				<dependencies>
 					<dependency>
 						<groupId>io.spring.asciidoctor</groupId>
 						<artifactId>spring-asciidoctor-extensions</artifactId>
-						<version>${spring-asciidoctor-extensions.version}</version>
+						<version>0.6.0</version>
 					</dependency>
 					<dependency>
 						<groupId>org.springframework.restdocs</groupId>
 						<artifactId>spring-restdocs-asciidoctor</artifactId>
-						<version>${spring-rest-docs.version}</version>
+						<version>2.0.6.RELEASE</version>
 					</dependency>
 				</dependencies>
 			</plugin>

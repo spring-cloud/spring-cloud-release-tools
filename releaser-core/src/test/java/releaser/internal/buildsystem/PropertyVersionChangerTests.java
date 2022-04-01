@@ -16,11 +16,11 @@
 
 package releaser.internal.buildsystem;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.model.Model;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,13 +37,13 @@ import static org.mockito.Mockito.never;
  * @author Marcin Grzejszczak
  */
 @ExtendWith(MockitoExtension.class)
-public class PropertyVersionChangerTests {
+class PropertyVersionChangerTests {
 
 	@Mock
 	PropertyStorer propertyStorer;
 
 	@Test
-	public void should_set_version_when_project_matches_property_name() throws Exception {
+	void should_set_version_when_project_matches_property_name() {
 		PropertyVersionChanger changer = new PropertyVersionChanger(model(), versions(), null, null,
 				this.propertyStorer);
 
@@ -54,7 +54,7 @@ public class PropertyVersionChangerTests {
 	}
 
 	@Test
-	public void should_not_set_version_when_project_doesnt_match_property_name() throws Exception {
+	void should_not_set_version_when_project_doesnt_match_property_name() {
 		PropertyVersionChanger changer = new PropertyVersionChanger(nonMatchingModel(), versions(), null, null,
 				this.propertyStorer);
 
@@ -64,7 +64,7 @@ public class PropertyVersionChangerTests {
 	}
 
 	@Test
-	public void should_not_set_version_when_project_matches_property_name_and_versions_are_the_same() throws Exception {
+	void should_not_set_version_when_project_matches_property_name_and_versions_are_the_same() {
 		PropertyVersionChanger changer = new PropertyVersionChanger(modelWithSameValues(), versions(), null, null,
 				this.propertyStorer);
 
@@ -80,8 +80,8 @@ public class PropertyVersionChangerTests {
 
 	@SuppressWarnings("unchecked")
 	private Set<Project> allProjects() {
-		return new HashSet<>(Arrays.asList(new Project[] { project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
-				project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT") }));
+		return new HashSet<>(Arrays.asList(project("spring-cloud-aws", "1.2.0.BUILD-SNAPSHOT"),
+				project("spring-cloud-sleuth", "1.2.0.BUILD-SNAPSHOT")));
 	}
 
 	Project project(String name, String value) {
