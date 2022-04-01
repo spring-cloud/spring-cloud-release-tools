@@ -16,7 +16,7 @@
 
 package demo;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +30,13 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-class StandaloneClientApplicationTests {
+public class StandaloneClientApplicationTests {
 
 	@Autowired
 	private ConfigServicePropertySourceLocator locator;
 
 	@Test
-	void contextLoads() throws Exception {
+	public void contextLoads() throws Exception {
 		assertNotNull(this.locator);
 	}
 

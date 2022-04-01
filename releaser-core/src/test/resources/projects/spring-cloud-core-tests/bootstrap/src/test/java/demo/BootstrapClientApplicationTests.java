@@ -16,7 +16,7 @@
 
 package demo;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +29,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
-class BootstrapClientApplicationTests {
+public class BootstrapClientApplicationTests {
 
 	@Autowired
 	private ServerProperties server;
 
 	@Test
-	void contextLoads() throws Exception {
+	public void contextLoads() throws Exception {
 		assertThat(2).isEqualTo(this.server.getTomcat().getMaxThreads());
 		// The application.yml is never read because spring.config.name=sample
 		assertThat("application").isEqualTo(this.server.getServlet().getApplicationDisplayName());
