@@ -201,6 +201,13 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_bump_version_by_patch_version_when_bumping_releases_with_new_notation() {
+		String version = "2021.0.0";
+
+		then(projectVersion(version).postReleaseSnapshotVersion()).isEqualTo("2021.0.1-SNAPSHOT");
+	}
+
+	@Test
 	public void should_bump_version_by_patch_version_when_bumping_releases_with_hyphen() {
 		String version = "1.0.1-RELEASE";
 

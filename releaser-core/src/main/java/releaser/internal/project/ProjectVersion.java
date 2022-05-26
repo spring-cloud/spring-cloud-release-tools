@@ -173,7 +173,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	private SplitVersion bumpedVersion(SplitVersion splitVersion) {
-		if (splitVersion.isReleaseTrain()) {
+		if (splitVersion.isReleaseTrain() && !splitVersion.isCalverReleaseTrain()) {
 			return splitVersion;
 		}
 		return splitVersion.fullVersionWithIncrementedPatch();
@@ -191,7 +191,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			throw new IllegalStateException("Version can't end with a delimiter!");
 		}
 		SplitVersion splitByHyphen = tryHyphenSeparatedVersion(version);
-		if (splitByHyphen != null && !splitByHyphen.calverReleaseTrain()) {
+		if (splitByHyphen != null) {
 			return splitByHyphen;
 		}
 		return dotSeparatedReleaseTrainsAndVersions(version);
@@ -310,11 +310,11 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 	}
 
 	public boolean isCalver() {
-		return this.assertVersion().calverReleaseTrain();
+		return this.assertVersion().isCalverReleaseTrain();
 	}
 
 	public String majorAndMinor() {
-		return this.assertVersion().major + this.assertVersion().delimiter + this.assertVersion().minor;
+		return this.assertVersion().major + "." + this.assertVersion().minor;
 	}
 
 	/**
@@ -741,10 +741,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		// 2020.0.0-SNAPSHOT or Hoxton-BUILD-SNAPSHOT or 2020.x.x
 		private boolean isReleaseTrain() {
-			return isOldReleaseTrain() || calverReleaseTrain();
+			return isOldReleaseTrain() || isCalverReleaseTrain();
 		}
 
-		public boolean calverReleaseTrain() {
+		public boolean isCalverReleaseTrain() {
 			try {
 				return Integer.parseInt(this.major) >= 2020;
 			}
