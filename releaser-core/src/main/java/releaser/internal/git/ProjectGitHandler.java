@@ -268,6 +268,7 @@ public class ProjectGitHandler implements Closeable {
 	}
 
 	public void checkout(File project, String branch) {
+		log.info("checkout project: " + project + " with branch: " + branch);
 		gitRepo(project).checkout(branch);
 	}
 
