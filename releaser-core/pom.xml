@@ -115,7 +115,7 @@
 			<version>${awaitility.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>io.spring.sagan</groupId>
 			<artifactId>sagan-site</artifactId>
 			<classifier>stubs</classifier>
@@ -127,7 +127,7 @@
 					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>

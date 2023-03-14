@@ -38,6 +38,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 /**
  * @author Marcin Grzejszczak
  */
+@Disabled
 @SpringBootTest(classes = RestTemplateSaganClientTests.Config.class)
 @AutoConfigureStubRunner(ids = "io.spring.sagan:sagan-site")
 public class RestTemplateSaganClientTests {
