@@ -83,7 +83,7 @@ public class SaganUpdater {
 			}
 			catch (Exception ex) {
 				log.warn("Exception occurred while trying to update sagan release", ex);
-				updateReleaseException = ex;
+				updateReleaseException = new IllegalStateException(ex.toString());
 			}
 		}
 		return updateReleaseException == null ? ExecutionResult.success()
@@ -173,7 +173,7 @@ public class SaganUpdater {
 				}
 				catch (Exception e) {
 					log.warn("Failed to update [" + version.projectName + "/" + snapshot + "] from Sagan", e);
-					updateReleaseException = e;
+					updateReleaseException = new RuntimeException(e.toString());
 				}
 			}
 		}
