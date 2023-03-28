@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>releaser-parent</artifactId>
 		<groupId>org.springframework.cloud.internal</groupId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +18,7 @@
 		<maven-model.version>3.8.5</maven-model.version>
 		<scs.version>3.1.6.RELEASE</scs.version>
 		<spring-asciidoctor-extensions.version>0.2.0-RELEASE</spring-asciidoctor-extensions.version>
-		<spring-cloud-bom.version>2021.0.1</spring-cloud-bom.version>
+		<spring-cloud-bom.version>2022.0.1</spring-cloud-bom.version>
 		<spring-rest-docs.version>2.0.6.RELEASE</spring-rest-docs.version>
 	</properties>
 

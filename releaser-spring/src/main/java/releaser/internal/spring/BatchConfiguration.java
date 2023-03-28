@@ -16,24 +16,16 @@
 
 package releaser.internal.spring;
 
-import javax.sql.DataSource;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import releaser.internal.ReleaserProperties;
 
-import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
-import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -76,11 +68,11 @@ class BatchConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	FlowRunner flowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory,
+	FlowRunner flowRunner(JobRepository jobRepository, PlatformTransactionManager manager,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier, ConfigurableApplicationContext context,
 			ReleaserProperties releaserProperties, BuildReportHandler reportHandler) {
-		return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory, projectsToRunFactory, jobLauncher,
+		return new SpringBatchFlowRunner(jobRepository, manager, projectsToRunFactory, jobLauncher,
 				flowRunnerTaskExecutorSupplier, context, releaserProperties, reportHandler);
 	}
 
@@ -95,32 +87,28 @@ class BatchConfiguration {
 		serializer.setObjectMapper(objectMapper);
 		return serializer;
 	}
-
-	// Needed to add this to serialize the exceptions
-	@Bean
-	BatchConfigurer myBatchConfigurer(DataSource dataSource,
-			Jackson2ExecutionContextStringSerializer myJackson2ExecutionContextStringSerializer,
-			PlatformTransactionManager transactionManager) {
-		return new DefaultBatchConfigurer(dataSource) {
-			@Override
-			protected JobExplorer createJobExplorer() throws Exception {
-				JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-				jobExplorerFactoryBean.setDataSource(dataSource);
-				jobExplorerFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
-				jobExplorerFactoryBean.afterPropertiesSet();
-				return jobExplorerFactoryBean.getObject();
-			}
-
-			@Override
-			protected JobRepository createJobRepository() throws Exception {
-				JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
-				jobRepositoryFactoryBean.setDataSource(dataSource);
-				jobRepositoryFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
-				jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-				jobRepositoryFactoryBean.afterPropertiesSet();
-				return jobRepositoryFactoryBean.getObject();
-			}
-		};
-	}
+	/*
+	 * // Needed to add this to serialize the exceptions
+	 *
+	 * @Bean BatchConfigurer myBatchConfigurer(DataSource dataSource,
+	 * Jackson2ExecutionContextStringSerializer
+	 * myJackson2ExecutionContextStringSerializer, PlatformTransactionManager
+	 * transactionManager) { return new DefaultBatchConfigurer(dataSource) {
+	 *
+	 * @Override protected JobExplorer createJobExplorer() throws Exception {
+	 * JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+	 * jobExplorerFactoryBean.setDataSource(dataSource);
+	 * jobExplorerFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
+	 * jobExplorerFactoryBean.afterPropertiesSet(); return
+	 * jobExplorerFactoryBean.getObject(); }
+	 *
+	 * @Override protected JobRepository createJobRepository() throws Exception {
+	 * JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+	 * jobRepositoryFactoryBean.setDataSource(dataSource);
+	 * jobRepositoryFactoryBean.setSerializer(myJackson2ExecutionContextStringSerializer);
+	 * jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+	 * jobRepositoryFactoryBean.afterPropertiesSet(); return
+	 * jobRepositoryFactoryBean.getObject(); } }; }
+	 */
 
 }

@@ -340,22 +340,22 @@ public class GenerateReleaseNotesTask implements ProjectPostReleaseReleaserTask,
 		List<Type> types = new ArrayList<>();
 		for (String label : labels) {
 			switch (label) {
-			case "type/bug":
-				types.add(Type.BUG);
-				break;
-			case "type/enhancement":
-				types.add(Type.FEATURE);
-				break;
-			case "type/documentation":
-			case "type/dependency-upgrade":
-			case "type/chores":
-				types.add(Type.DOC_MISC);
-				break;
-			default:
-				if (label.startsWith("warn/")) {
-					types.add(Type.NOTEWORTHY);
-				}
-				break;
+				case "type/bug":
+					types.add(Type.BUG);
+					break;
+				case "type/enhancement":
+					types.add(Type.FEATURE);
+					break;
+				case "type/documentation":
+				case "type/dependency-upgrade":
+				case "type/chores":
+					types.add(Type.DOC_MISC);
+					break;
+				default:
+					if (label.startsWith("warn/")) {
+						types.add(Type.NOTEWORTHY);
+					}
+					break;
 			}
 		}
 
