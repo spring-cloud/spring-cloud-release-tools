@@ -4,4 +4,5 @@ releaser:
 
 spring:
   batch:
-    initialize-schema: always
+    jdbc:
+      initialize-schema: always

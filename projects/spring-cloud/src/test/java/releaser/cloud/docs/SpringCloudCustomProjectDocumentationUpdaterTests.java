@@ -23,8 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 
-import javax.validation.constraints.NotNull;
-
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,13 +71,11 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				Collections.singletonList(SpringCloudGithubIssuesAccessor.springCloud(this.properties)));
 	}
 
-	@NotNull
 	private DocumentationUpdater projectDocumentationUpdater(ReleaserProperties properties) {
 		return new DocumentationUpdater(this.handler, properties, templateGenerator(properties),
 				Collections.singletonList(new SpringCloudCustomProjectDocumentationUpdater(this.handler, properties)));
 	}
 
-	@NotNull
 	private TemplateGenerator templateGenerator(ReleaserProperties properties) {
 		return new TemplateGenerator(properties, this.gitHubHandler);
 	}

@@ -18,7 +18,6 @@
 	<modules>
 		<module>spring-cloud</module>
 		<module>spring-cloud-stream</module>
-		<module>reactor</module>
 	</modules>
 
 </project>

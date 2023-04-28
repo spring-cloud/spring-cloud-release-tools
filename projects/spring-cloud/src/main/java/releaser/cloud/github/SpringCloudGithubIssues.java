@@ -16,7 +16,7 @@
 
 package releaser.cloud.github;
 
-import com.jcabi.github.Github;
+import org.kohsuke.github.GitHub;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.github.CustomGithubIssues;
 import releaser.internal.github.GithubIssueFiler;
@@ -38,7 +38,7 @@ class SpringCloudGithubIssues implements CustomGithubIssues {
 		this.properties = properties;
 	}
 
-	SpringCloudGithubIssues(Github github, ReleaserProperties properties) {
+	SpringCloudGithubIssues(GitHub github, ReleaserProperties properties) {
 		this.githubIssueFiler = new GithubIssueFiler(github, properties);
 		this.properties = properties;
 	}

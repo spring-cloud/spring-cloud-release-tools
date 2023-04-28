@@ -16,8 +16,8 @@
 
 package releaser.internal.spring;
 
-import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -62,7 +62,8 @@ class SpringBatchBuildReportHandler implements BuildReportHandler {
 
 	private List<Table> buildTable(List<StepExecution> stepContexts) {
 		return stepContexts.stream().map(step -> {
-			String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(step.getStartTime());
+			String date = step.getStartTime()
+					.format(new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss.SSS").toFormatter());
 			long millis = ChronoUnit.MILLIS.between(step.getStartTime().toInstant(ZoneOffset.UTC),
 					step.getEndTime().toInstant(ZoneOffset.UTC));
 			ExecutionContext context = step.getExecutionContext();
