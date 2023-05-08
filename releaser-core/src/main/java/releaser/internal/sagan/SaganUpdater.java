@@ -95,30 +95,27 @@ public class SaganUpdater {
 		File docsModule = docsModule(projectFile);
 		File indexDoc = new File(docsModule, this.releaserProperties.getSagan().getIndexSectionFileName());
 		File bootDoc = new File(docsModule, this.releaserProperties.getSagan().getBootSectionFileName());
+		ProjectDetails projectDetails = new ProjectDetails();
 		if (indexDoc.exists()) {
 			log.debug("Index adoc file exists");
 			String fileText = fileToText(indexDoc);
-			// if (StringUtils.hasText(fileText) && !fileText.equals(project.rawOverview))
-			// {
-			// log.info("Index adoc content differs from the previously stored, will
-			// update it");
-			// project.rawOverview = fileText;
-			// shouldUpdate = true;
-			// }
+			if (StringUtils.hasText(fileText)) {
+				log.info("Index adoc content differs from the previously stored, will update it");
+				projectDetails.setBody(fileText);
+				shouldUpdate = true;
+			}
 		}
 		if (bootDoc.exists()) {
 			log.debug("Boot adoc file exists");
 			String fileText = fileToText(bootDoc);
-			// if (StringUtils.hasText(fileText) &&
-			// !fileText.equals(project.rawBootConfig)) {
-			// log.info("Boot adoc content differs from the previously stored, will update
-			// it");
-			// project.rawBootConfig = fileText;
-			// shouldUpdate = true;
-			// }
+			if (StringUtils.hasText(fileText)) {
+				log.info("Boot adoc content differs from the previously stored, will update it");
+				projectDetails.setBootConfig(fileText);
+				shouldUpdate = true;
+			}
 		}
 		if (shouldUpdate) {
-			this.saganClient.patchProject(project);
+			this.saganClient.patchProjectDetails(project.getName(), projectDetails);
 			log.info("Updating Sagan project with adoc data.");
 		}
 		else {

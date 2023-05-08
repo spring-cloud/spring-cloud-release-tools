@@ -1,0 +1,19 @@
+{
+  "id" : "d26df67c-4167-4e85-bab9-dfa95dabe806",
+  "name" : "projects_spring-cloud-contract_releases",
+  "request" : {
+    "url" : "/projects/spring-cloud-contract/releases",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"version\":\"4.0.3-SNAPSHOT\",\"referenceDocUrl\":\"https://docs.spring.io/spring-cloud-contract/docs/{version}/reference/html/\",\"apiDocUrl\":\"https://docs.spring.io/spring-cloud-contract/docs/{version}/api/\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 201
+  },
+  "uuid" : "d26df67c-4167-4e85-bab9-dfa95dabe806",
+  "persistent" : true,
+  "insertionIndex" : 15
+}

@@ -16,19 +16,37 @@
 
 package releaser.internal.sagan;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author Marcin Grzejszczak
  */
-public interface SaganClient {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ProjectDetails {
 
-	Project getProject(String projectName);
+	private String bootConfig;
 
-	Release getRelease(String projectName, String releaseVersion);
+	private String body;
 
-	boolean deleteRelease(String projectName, String releaseVersion);
+	public String getBootConfig() {
+		return bootConfig;
+	}
 
-	boolean addRelease(String projectName, ReleaseInput releaseInput);
+	public void setBootConfig(String bootConfig) {
+		this.bootConfig = bootConfig;
+	}
 
-	void patchProjectDetails(String projectName, ProjectDetails details);
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	@Override
+	public String toString() {
+		return "ProjectDetails{" + "bootConfig='" + bootConfig + '\'' + ", body='" + body + '\'' + '}';
+	}
 
 }

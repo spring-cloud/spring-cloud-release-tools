@@ -1389,7 +1389,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * URL to the Sagan API.
 		 */
-		private String baseUrl = "https://spring.io";
+		private String baseUrl = "https://api.spring.io";
 
 		/**
 		 * Folder with asciidoctor files for docs.
