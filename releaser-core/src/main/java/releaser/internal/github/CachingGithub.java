@@ -24,7 +24,6 @@ import okhttp3.OkHttpClient;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
-import releaser.internal.ReleaserProperties;
 
 final class CachingGithub {
 
@@ -34,9 +33,9 @@ final class CachingGithub {
 
 	static GitHub INSTANCE;
 
-	static GitHub getInstance(ReleaserProperties properties) {
+	static GitHub getInstance(String oauthToken, String cacheDirectory) {
 		if (INSTANCE == null) {
-			INSTANCE = github(properties.getGit().getOauthToken(), properties.getGit().getCacheDirectory());
+			INSTANCE = github(oauthToken, cacheDirectory);
 		}
 		return INSTANCE;
 	}

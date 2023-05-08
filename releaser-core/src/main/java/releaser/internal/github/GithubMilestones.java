@@ -47,7 +47,8 @@ class GithubMilestones {
 	private final ReleaserProperties properties;
 
 	GithubMilestones(ReleaserProperties properties) {
-		this(CachingGithub.getInstance(properties), properties);
+		this(CachingGithub.getInstance(properties.getGit().getOauthToken(), properties.getGit().getCacheDirectory()),
+				properties);
 	}
 
 	GithubMilestones(GitHub github, ReleaserProperties properties) {

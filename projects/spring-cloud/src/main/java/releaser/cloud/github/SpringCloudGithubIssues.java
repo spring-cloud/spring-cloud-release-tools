@@ -45,16 +45,32 @@ class SpringCloudGithubIssues implements CustomGithubIssues {
 
 	@Override
 	public void fileIssueInSpringGuides(Projects projects, ProjectVersion version) {
-		String user = "spring-guides";
-		String repo = "getting-started-guides";
+		String user = getGuidesOrg();
+		String repo = getGuidesRepo();
 		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(), guidesIssueText(projects));
 	}
 
 	@Override
 	public void fileIssueInStartSpringIo(Projects projects, ProjectVersion version) {
-		String user = "spring-io";
-		String repo = "start.spring.io";
+		String user = getStartSpringIoOrg();
+		String repo = getStartSpringIoRepo();
 		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(), startSpringIoIssueText(projects));
+	}
+
+	String getGuidesOrg() {
+		return "spring-guides";
+	}
+
+	String getGuidesRepo() {
+		return "getting-started-guides";
+	}
+
+	String getStartSpringIoOrg() {
+		return "spring-io";
+	}
+
+	String getStartSpringIoRepo() {
+		return "start.spring.io";
 	}
 
 	private String issueTitle() {

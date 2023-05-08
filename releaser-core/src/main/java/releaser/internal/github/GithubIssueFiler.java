@@ -46,7 +46,8 @@ public class GithubIssueFiler {
 	private final ReleaserProperties properties;
 
 	public GithubIssueFiler(ReleaserProperties properties) {
-		this(CachingGithub.getInstance(properties), properties);
+		this(CachingGithub.getInstance(properties.getGit().getOauthToken(), properties.getGit().getCacheDirectory()),
+				properties);
 	}
 
 	public GithubIssueFiler(GitHub github, ReleaserProperties properties) {
@@ -94,7 +95,7 @@ public class GithubIssueFiler {
 		return version;
 	}
 
-	private boolean issueAlreadyFiled(GHRepository springGuides, String issueTitle) throws IOException {
+	boolean issueAlreadyFiled(GHRepository springGuides, String issueTitle) throws IOException {
 		Map<String, String> map = new HashMap<>();
 		map.put("state", "open");
 		int counter = 0;
