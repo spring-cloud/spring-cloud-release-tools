@@ -16,6 +16,7 @@
 
 package releaser.internal.spring;
 
+import java.io.Serializable;
 import java.util.List;
 
 import releaser.internal.tasks.ReleaserTask;
@@ -24,7 +25,7 @@ import releaser.internal.tasks.ReleaserTask;
  * A report from running a task. Can be mapped to a row in a table for a single execution
  * of a release task.
  */
-public class ExecutionResultReport {
+public class ExecutionResultReport implements Serializable {
 
 	private String projectName;
 

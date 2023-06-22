@@ -57,7 +57,7 @@ public class SaganUpdaterTest {
 	private Project project;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		project = new Project();
 		project.setReleases(Arrays.asList(release("2.2.0-RC1"), release("2.3.0-SNAPSHOT"), release("2.2.0-M4")));
 		this.properties.getSagan().setUpdateSagan(true);
@@ -72,7 +72,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_not_update_sagan_when_switch_is_off() {
+	void should_not_update_sagan_when_switch_is_off() {
 		this.properties.getSagan().setUpdateSagan(false);
 
 		ExecutionResult result = this.saganUpdater.updateSagan(new File("."), "main", version("2.2.0-M1"),
@@ -83,7 +83,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_update_sagan_releases_for_milestone() {
+	void should_update_sagan_releases_for_milestone() {
 		given(this.saganClient.addRelease(eq("foo"), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("2.2.0-M1"));
 
@@ -97,7 +97,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_update_sagan_releases_for_rc() {
+	void should_update_sagan_releases_for_rc() {
 		given(this.saganClient.addRelease(anyString(), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("2.2.0-RC1"));
 
@@ -111,7 +111,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_not_update_docs_for_sagan_when_current_version_older() {
+	void should_not_update_docs_for_sagan_when_current_version_older() {
 		given(this.saganClient.addRelease(anyString(), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("2.2.0-RC1"));
 
@@ -120,12 +120,12 @@ public class SaganUpdaterTest {
 		assertThat(result.isSkipped()).isFalse();
 		assertThat(result.isSuccess()).isTrue();
 
-		then(this.saganClient).should(never()).patchProject(any(Project.class));
+		then(this.saganClient).should(never()).patchProjectDetails(anyString(), any(ProjectDetails.class));
 
 	}
 
 	@Test
-	public void should_not_update_docs_for_sagan_when_files_exist_but_content_does_not_differ() throws IOException {
+	void should_not_update_docs_for_sagan_when_files_exist_but_content_does_not_differ() throws IOException {
 		given(this.saganClient.addRelease(anyString(), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("3.0.0-RC1"));
 
@@ -144,12 +144,11 @@ public class SaganUpdaterTest {
 		assertThat(result.isSkipped()).isFalse();
 		assertThat(result.isSuccess()).isTrue();
 
-		then(this.saganClient).should(never()).patchProject(any(Project.class));
+		then(this.saganClient).should(never()).patchProjectDetails(anyString(), any(ProjectDetails.class));
 	}
 
 	@Test
-	public void should_update_docs_for_sagan_when_current_version_newer_and_only_overview_adoc_exists()
-			throws IOException {
+	void should_update_docs_for_sagan_when_current_version_newer_and_only_overview_adoc_exists() throws IOException {
 		given(this.saganClient.addRelease(anyString(), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("3.0.0-RC1"));
 
@@ -172,7 +171,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_update_docs_for_sagan_when_current_version_newer_and_only_boot_adoc_exists() throws IOException {
+	void should_update_docs_for_sagan_when_current_version_newer_and_only_boot_adoc_exists() throws IOException {
 		given(this.saganClient.addRelease(anyString(), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("3.0.0-RC1"));
 
@@ -205,7 +204,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_update_sagan_from_main() {
+	void should_update_sagan_from_main() {
 		ProjectVersion projectVersion = version("2.4.0-SNAPSHOT");
 		given(this.saganClient.addRelease(anyString(), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("2.4.0-SNAPSHOT"));
@@ -225,7 +224,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_update_sagan_from_release_version() {
+	void should_update_sagan_from_release_version() {
 		ProjectVersion projectVersion = version("2.2.0");
 		given(this.saganClient.addRelease(eq("foo"), any())).willReturn(true);
 		given(this.saganClient.deleteRelease("foo", "2.2.0-RC1")).willReturn(true);
@@ -248,7 +247,7 @@ public class SaganUpdaterTest {
 	}
 
 	@Test
-	public void should_update_sagan_from_non_main() {
+	void should_update_sagan_from_non_main() {
 		ProjectVersion projectVersion = version("2.3.0-SNAPSHOT");
 		given(this.saganClient.addRelease(eq("foo"), any())).willReturn(true);
 		given(this.saganClient.getProject("foo")).willReturn(projectWithNewRelease("2.3.0-SNAPSHOT"));

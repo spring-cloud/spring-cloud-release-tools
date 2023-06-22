@@ -17,6 +17,7 @@
 package releaser.internal;
 
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,8 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import javax.validation.constraints.NotBlank;
-
+import jakarta.validation.constraints.NotBlank;
 import org.apache.commons.lang.SerializationUtils;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -429,6 +429,12 @@ public class ReleaserProperties implements Serializable {
 	public static class Git implements Serializable {
 
 		/**
+		 * Absolute path to a directory with cache for OkHTTP calls to GitHub.
+		 */
+		@NotBlank
+		private String cacheDirectory = temporaryDirectory();
+
+		/**
 		 * URL to a release train repository.
 		 */
 		@NotBlank
@@ -816,6 +822,14 @@ public class ReleaserProperties implements Serializable {
 			this.orgName = orgName;
 		}
 
+		public String getCacheDirectory() {
+			return cacheDirectory;
+		}
+
+		public void setCacheDirectory(String cacheDirectory) {
+			this.cacheDirectory = cacheDirectory;
+		}
+
 		@Override
 		public String toString() {
 			return "Git{" + "releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\'' + ", documentationUrl='"
@@ -828,6 +842,15 @@ public class ReleaserProperties implements Serializable {
 					+ this.fetchVersionsFromGit + ", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones
 					+ ", updateSpringGuides=" + this.updateSpringGuides + ", updateSpringProject="
 					+ this.updateSpringProject + ", sampleUrlsSize=" + this.allTestSampleUrls.size() + '}';
+		}
+
+		private static String temporaryDirectory() {
+			try {
+				return Files.createTempDirectory("github-cache").toAbsolutePath().toString();
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 	}
@@ -1194,7 +1217,7 @@ public class ReleaserProperties implements Serializable {
 		 * A mapping that should be applied to {@code gradle.properties} in order to
 		 * perform a substitution of properties. The mapping is from a property inside
 		 * {@code gradle.properties} to the projects name. Example.
-		 *
+		 * <p>
 		 * In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You want
 		 * this property to get updated with the value of {@code spring-cloud-contract}
 		 * version. Then it's enough to do the mapping like this for this Releaser's
@@ -1366,7 +1389,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * URL to the Sagan API.
 		 */
-		private String baseUrl = "https://spring.io";
+		private String baseUrl = "https://api.spring.io";
 
 		/**
 		 * Folder with asciidoctor files for docs.

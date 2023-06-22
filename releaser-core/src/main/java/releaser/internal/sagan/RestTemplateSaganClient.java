@@ -52,13 +52,13 @@ class RestTemplateSaganClient implements SaganClient {
 	public Project getProject(String projectName) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.put("Accept", Collections.singletonList("application/hal+json"));
-		Project project = this.restTemplate.exchange(this.baseUrl + "/api/projects/{projectName}", HttpMethod.GET,
+		Project project = this.restTemplate.exchange(this.baseUrl + "/projects/{projectName}", HttpMethod.GET,
 				new HttpEntity<>(headers), Project.class, projectName).getBody();
 		if (project == null) {
 			return null;
 		}
 
-		EmbeddedProjectReleases body = this.restTemplate.exchange(this.baseUrl + "/api/projects/{projectName}/releases",
+		EmbeddedProjectReleases body = this.restTemplate.exchange(this.baseUrl + "/projects/{projectName}/releases",
 				HttpMethod.GET, new HttpEntity<>(headers), EmbeddedProjectReleases.class, projectName).getBody();
 		project.setReleases(body._embedded.releases);
 		return project;
@@ -68,14 +68,14 @@ class RestTemplateSaganClient implements SaganClient {
 	public Release getRelease(String projectName, String releaseVersion) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.put("Accept", Collections.singletonList("application/hal+json"));
-		return this.restTemplate.exchange(this.baseUrl + "/api/projects/{projectName}/releases/{releaseVersion}",
+		return this.restTemplate.exchange(this.baseUrl + "/projects/{projectName}/releases/{releaseVersion}",
 				HttpMethod.GET, new HttpEntity<>(headers), Release.class, projectName, releaseVersion).getBody();
 	}
 
 	@Override
 	public boolean deleteRelease(String projectName, String releaseVersion) {
 		ResponseEntity<Release> entity = this.restTemplate.exchange(
-				this.baseUrl + "/api/projects/{projectName}/releases/{releaseVersion}", HttpMethod.DELETE,
+				this.baseUrl + "/projects/{projectName}/releases/{releaseVersion}", HttpMethod.DELETE,
 				new HttpEntity<>(""), Release.class, projectName, releaseVersion);
 		boolean deleted = entity.getStatusCode().is2xxSuccessful();
 		log.info("Response from Sagan\n\n[{}] \n with status [{}]", entity, entity.getStatusCode());
@@ -85,7 +85,7 @@ class RestTemplateSaganClient implements SaganClient {
 	@Override
 	public boolean addRelease(String projectName, ReleaseInput releaseInput) {
 		RequestEntity<ReleaseInput> request = RequestEntity
-				.post(URI.create(this.baseUrl + "/api/projects/" + projectName + "/releases"))
+				.post(URI.create(this.baseUrl + "/projects/" + projectName + "/releases"))
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE).body(releaseInput);
 		ResponseEntity<Project> entity = this.restTemplate.exchange(request, Project.class);
 		boolean added = entity.getStatusCode().is2xxSuccessful();
@@ -94,19 +94,12 @@ class RestTemplateSaganClient implements SaganClient {
 	}
 
 	@Override
-	public Project patchProject(Project project) {
-		// RequestEntity<Project> request = RequestEntity
-		// .patch(URI.create(this.baseUrl + "/project_metadata/" + project.getSlug()))
-		// .header(HttpHeaders.CONTENT_TYPE,
-		// MediaType.APPLICATION_JSON_UTF8_VALUE).body(project);
-		// ResponseEntity<Project> entity = this.restTemplate.exchange(request,
-		// Project.class);
-		// Project updatedProject = entity.getBody();
-		// log.info("Response from Sagan\n\n[{}] \n with body [{}]", entity,
-		// updatedProject);
-		// return updatedProject;
-		// FIXME: no api yet https://github.com/spring-io/sagan/issues/1052
-		return null;
+	public void patchProjectDetails(String projectName, ProjectDetails details) {
+		RequestEntity<ProjectDetails> request = RequestEntity
+				.patch(URI.create(this.baseUrl + "/projects/" + projectName + "/details"))
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE).body(details);
+		ResponseEntity<Object> entity = this.restTemplate.exchange(request, Object.class);
+		log.info("Response from Sagan\n\n[{}]", entity);
 	}
 
 	private static class EmbeddedProjectReleases {

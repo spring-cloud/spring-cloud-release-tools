@@ -1,7 +1,0 @@
----
-applications:
-  - name: spring-cloud-info
-    memory: 2048M
-    path: ./target/spring-cloud-info-2.0.0-SNAPSHOT.jar
-    services:
-      - config-server

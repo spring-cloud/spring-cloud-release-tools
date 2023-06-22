@@ -23,8 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 
-import javax.validation.constraints.NotNull;
-
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +43,7 @@ import org.springframework.util.FileSystemUtils;
 /**
  * @author Marcin Grzejszczak
  */
-public class SpringCloudCustomProjectDocumentationUpdaterTests {
+class SpringCloudCustomProjectDocumentationUpdaterTests {
 
 	File project;
 
@@ -61,7 +59,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	ReleaserProperties properties = SpringCloudReleaserProperties.get();
 
 	@BeforeEach
-	public void setup() throws IOException, URISyntaxException {
+	void setup() throws IOException, URISyntaxException {
 		this.project = new File(SpringCloudCustomProjectDocumentationUpdater.class
 				.getResource("/projects/spring-cloud-static").toURI());
 		TestUtils.prepareLocalRepo();
@@ -73,19 +71,17 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 				Collections.singletonList(SpringCloudGithubIssuesAccessor.springCloud(this.properties)));
 	}
 
-	@NotNull
 	private DocumentationUpdater projectDocumentationUpdater(ReleaserProperties properties) {
 		return new DocumentationUpdater(this.handler, properties, templateGenerator(properties),
 				Collections.singletonList(new SpringCloudCustomProjectDocumentationUpdater(this.handler, properties)));
 	}
 
-	@NotNull
 	private TemplateGenerator templateGenerator(ReleaserProperties properties) {
 		return new TemplateGenerator(properties, this.gitHubHandler);
 	}
 
 	@Test
-	public void should_not_update_current_version_in_the_docs_if_current_release_starts_with_v_and_then_lower_letter_than_the_stored_release()
+	void should_not_update_current_version_in_the_docs_if_current_release_starts_with_v_and_then_lower_letter_than_the_stored_release()
 			throws URISyntaxException, IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release", "Finchley.SR33");
 		ReleaserProperties properties = new ReleaserProperties();
@@ -114,7 +110,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@Test
-	public void should_not_commit_if_the_same_version_is_already_there() {
+	void should_not_commit_if_the_same_version_is_already_there() {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release", "Dalston.SR3");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
@@ -127,7 +123,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@Test
-	public void should_do_nothing_when_release_train_docs_update_happen_for_a_project_that_does_not_start_with_spring_cloud() {
+	void should_do_nothing_when_release_train_docs_update_happen_for_a_project_that_does_not_start_with_spring_cloud() {
 		ProjectVersion springBootVersion = new ProjectVersion("spring-boot", "2.2.5");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
@@ -140,7 +136,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@Test
-	public void should_do_nothing_when_single_project_docs_update_happen_for_a_project_that_does_not_start_with_spring_cloud() {
+	void should_do_nothing_when_single_project_docs_update_happen_for_a_project_that_does_not_start_with_spring_cloud() {
 		ProjectVersion springBootVersion = new ProjectVersion("spring-boot", "2.2.5");
 		ReleaserProperties properties = new ReleaserProperties();
 		properties.getGit().setDocumentationUrl(this.clonedDocProject.toURI().toString());
@@ -153,7 +149,7 @@ public class SpringCloudCustomProjectDocumentationUpdaterTests {
 	}
 
 	@Test
-	public void should_not_update_current_version_in_the_docs_if_current_release_starts_with_lower_letter_than_the_stored_release()
+	void should_not_update_current_version_in_the_docs_if_current_release_starts_with_lower_letter_than_the_stored_release()
 			throws IOException {
 		ProjectVersion releaseTrainVersion = new ProjectVersion("spring-cloud-release", "Angel.SR33");
 		ReleaserProperties properties = new ReleaserProperties();

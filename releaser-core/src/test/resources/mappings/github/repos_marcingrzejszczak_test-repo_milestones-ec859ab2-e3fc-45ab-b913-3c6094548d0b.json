@@ -1,0 +1,15 @@
+{
+  "id" : "ec859ab2-e3fc-45ab-b913-3c6094548d0b",
+  "name" : "repos_marcingrzejszczak_test-repo_milestones",
+  "request" : {
+    "url" : "/repos/marcingrzejszczak/test-repo/milestones?state=closed",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "[{\"url\":\"https://api.github.com/repos/marcingrzejszczak/test-repo/milestones/3\",\"html_url\":\"https://github.com/marcingrzejszczak/test-repo/milestone/3\",\"labels_url\":\"https://api.github.com/repos/marcingrzejszczak/test-repo/milestones/3/labels\",\"id\":9372427,\"node_id\":\"MI_kwDOJgNfic4AjwML\",\"number\":3,\"title\":\"0.1.0\",\"description\":\"Closed\",\"creator\":{\"login\":\"marcingrzejszczak\",\"id\":3297437,\"node_id\":\"MDQ6VXNlcjMyOTc0Mzc=\",\"avatar_url\":\"https://avatars.githubusercontent.com/u/3297437?v=4\",\"gravatar_id\":\"\",\"url\":\"https://api.github.com/users/marcingrzejszczak\",\"html_url\":\"https://github.com/marcingrzejszczak\",\"followers_url\":\"https://api.github.com/users/marcingrzejszczak/followers\",\"following_url\":\"https://api.github.com/users/marcingrzejszczak/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/marcingrzejszczak/gists{/gist_id}\",\"starred_url\":\"https://api.github.com/users/marcingrzejszczak/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/marcingrzejszczak/subscriptions\",\"organizations_url\":\"https://api.github.com/users/marcingrzejszczak/orgs\",\"repos_url\":\"https://api.github.com/users/marcingrzejszczak/repos\",\"events_url\":\"https://api.github.com/users/marcingrzejszczak/events{/privacy}\",\"received_events_url\":\"https://api.github.com/users/marcingrzejszczak/received_events\",\"type\":\"User\",\"site_admin\":false},\"open_issues\":0,\"closed_issues\":0,\"state\":\"closed\",\"created_at\":\"2023-05-08T11:50:54Z\",\"updated_at\":\"2023-05-08T11:51:14Z\",\"due_on\":null,\"closed_at\":\"2023-05-08T11:51:14Z\"}]"
+  },
+  "uuid" : "ec859ab2-e3fc-45ab-b913-3c6094548d0b",
+  "persistent" : true,
+  "insertionIndex" : 40
+}

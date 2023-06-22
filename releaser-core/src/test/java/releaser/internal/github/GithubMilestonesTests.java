@@ -19,13 +19,12 @@ package releaser.internal.github;
 import java.io.IOException;
 import java.net.URL;
 
-import com.jcabi.github.Milestone;
-import com.jcabi.github.Repo;
-import com.jcabi.github.Repos;
-import com.jcabi.github.mock.MkGithub;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.kohsuke.github.GHMilestone;
+import org.kohsuke.github.GitHub;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
 
@@ -39,32 +38,23 @@ import static org.assertj.core.api.BDDAssertions.thenThrownBy;
  * @author Marcin Grzejszczak
  */
 @ExtendWith(OutputCaptureExtension.class)
-public class GithubMilestonesTests {
+@WireMockTest(httpPort = 12345)
+class GithubMilestonesTests {
 
-	MkGithub github;
+	private static final String ORG = "marcingrzejszczak";
 
-	Repo repo;
+	private static final String TOKEN = "foo";
+
+	GitHub github;
 
 	@BeforeEach
 	public void setup() throws IOException {
-		this.github = new MkGithub();
-		this.repo = createSleuthRepo(this.github);
+		this.github = GitHub.connectToEnterprise("http://localhost:12345", TOKEN);
 	}
 
 	@Test
-	public void should_close_milestone_if_there_is_one(CapturedOutput capturedOutput) throws IOException {
-		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
-			@Override
-			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
-			}
-
-			@Override
-			String milestoneTitle(Milestone.Smart milestone) {
-				return "0.2.0.BUILD-SNAPSHOT";
-			}
-		};
-		this.repo.milestones().create("0.2.0.BUILD-SNAPSHOT");
+	void should_close_milestone_if_there_is_one(CapturedOutput capturedOutput) throws IOException {
+		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
 
 		milestones.closeMilestone(nonGaSleuthProject());
 
@@ -72,183 +62,126 @@ public class GithubMilestonesTests {
 	}
 
 	@Test
-	public void should_close_milestone_when_the_milestone_contains_numeric_version_only_and_version_is_ga(
+	void should_close_milestone_when_the_milestone_contains_numeric_version_only_and_version_is_ga(
 			CapturedOutput capturedOutput) throws IOException {
-		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
-			@Override
-			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
-			}
+		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
 
-			@Override
-			String milestoneTitle(Milestone.Smart milestone) {
-				return "0.2.0";
-			}
-		};
-		this.repo.milestones().create("0.2.0");
-
-		milestones.closeMilestone(gaSleuthProject());
+		milestones.closeMilestone(gaProject());
 
 		then(capturedOutput.toString()).doesNotContain("No matching milestone was found");
 	}
 
-	private ProjectVersion gaSleuthProject() {
-		return new ProjectVersion("spring-cloud-sleuth", "0.2.0.RELEASE");
+	private ProjectVersion closedProject() {
+		return new ProjectVersion("test-repo", "0.1.0");
+	}
+
+	private ProjectVersion gaProject() {
+		return new ProjectVersion("test-repo", "0.0.1");
 	}
 
 	@Test
-	public void should_not_close_milestone_when_the_milestone_contains_numeric_version_only(
-			CapturedOutput capturedOutput) throws IOException {
-		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
-			@Override
-			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
-			}
+	void should_not_close_milestone_when_the_milestone_contains_numeric_version_only(CapturedOutput capturedOutput)
+			throws IOException {
+		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
 
-			@Override
-			String milestoneTitle(Milestone.Smart milestone) {
-				return "0.2.0";
-			}
-		};
-		this.repo.milestones().create("0.2.0");
-
-		milestones.closeMilestone(nonGaSleuthProject());
+		milestones.closeMilestone(notMatchingProjectVersion());
 
 		then(capturedOutput.toString()).contains("No matching milestone was found");
 	}
 
 	@Test
-	public void should_fetch_url_of_a_closed_matching_milestone() throws IOException {
+	void should_fetch_url_of_a_closed_matching_milestone() throws IOException {
+		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
+
+		String url = milestones.milestoneUrl(closedProject());
+
+		then(url).isEqualTo("https://github.com/marcingrzejszczak/test-repo/milestone/3?closed=1");
+	}
+
+	@Test
+	void should_fetch_url_of_a_closed_matching_milestone_from_cache() {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
-			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
-			}
-
-			@Override
-			String milestoneTitle(Milestone.Smart milestone) {
-				return "0.2.0.RELEASE";
-			}
-
-			@Override
-			URL foundMilestoneUrl(Milestone.Smart milestone) throws IOException {
-				return new URL("https://api.github.com/repos/spring-cloud/spring-cloud-sleuth/milestones/33");
+			GHMilestone matchingMilestone(String tagVersion, Iterable<GHMilestone> milestones) {
+				throw new AssertionError("This should not be called");
 			}
 		};
-		this.repo.milestones().create("0.2.0.RELEASE");
+		GithubMilestones.MILESTONE_URL_CACHE.put(gaProject(),
+				"https://github.com/marcingrzejszczak/test-repo/milestone/3?closed=1");
 
-		String url = milestones.milestoneUrl(gaSleuthProject());
+		String url = milestones.milestoneUrl(gaProject());
 
-		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
+		then(url).isEqualTo("https://github.com/marcingrzejszczak/test-repo/milestone/3?closed=1");
 	}
 
 	@Test
-	public void should_fetch_url_of_a_closed_matching_milestone_from_cache() {
-		GithubMilestones milestones = new GithubMilestones(this.github, withToken());
-		GithubMilestones.MILESTONE_URL_CACHE.put(gaSleuthProject(),
-				"https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
-
-		String url = milestones.milestoneUrl(gaSleuthProject());
-
-		then(url).isEqualTo("https://github.com/spring-cloud/spring-cloud-sleuth/milestone/33?closed=1");
-	}
-
-	@Test
-	public void should_return_null_if_no_matching_milestone_was_found() {
+	void should_return_null_if_no_matching_milestone_was_found() {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
-			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
+			String milestoneTitle(GHMilestone milestone) {
+				return "0.9.0";
 			}
 
 			@Override
-			String milestoneTitle(Milestone.Smart milestone) {
-				return "0.9.0.RELEASE";
-			}
-
-			@Override
-			URL foundMilestoneUrl(Milestone.Smart milestone) throws IOException {
+			URL foundMilestoneUrl(GHMilestone milestone) throws IOException {
 				return new URL("http://www.foo.com/bar");
 			}
 		};
 
-		String url = milestones.milestoneUrl(gaSleuthProject());
+		String url = milestones.milestoneUrl(gaProject());
 
 		then(url).isEmpty();
 	}
 
 	@Test
-	public void should_return_null_if_no_matching_milestone_was_found_within_threshold(CapturedOutput capturedOutput)
+	void should_return_null_if_no_matching_milestone_was_found_within_threshold(CapturedOutput capturedOutput)
 			throws IOException {
-		GithubMilestones milestones = new GithubMilestones(this.github, withThreshold()) {
-			@Override
-			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
-			}
+		GithubMilestones milestones = new GithubMilestones(this.github, withThreshold());
 
-			@Override
-			String milestoneTitle(Milestone.Smart milestone) {
-				return "0.2.0";
-			}
-		};
-		this.repo.milestones().create("0.2.0");
-
-		milestones.closeMilestone(gaSleuthProject());
+		milestones.closeMilestone(gaProject());
 
 		then(capturedOutput.toString()).contains("No matching milestones were found within the provided threshold [0]");
 	}
 
 	private ProjectVersion nonGaSleuthProject() {
-		return new ProjectVersion("spring-cloud-sleuth", "0.2.0.BUILD-SNAPSHOT");
+		return new ProjectVersion("test-repo", "0.0.1-SNAPSHOT");
+	}
+
+	private ProjectVersion notMatchingProjectVersion() {
+		return new ProjectVersion("test-repo", "0.0.100-SNAPSHOT");
 	}
 
 	@Test
-	public void should_throw_exception_when_there_is_no_matching_milestone(CapturedOutput capturedOutput)
-			throws IOException {
+	void should_throw_exception_when_there_is_no_matching_milestone(CapturedOutput capturedOutput) throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
 			@Override
 			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
-			}
-
-			@Override
-			String milestoneTitle(Milestone.Smart milestone) {
-				return "0.1.0.BUILD-SNAPSHOT";
+				return ORG;
 			}
 		};
-		this.repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
-		milestones.closeMilestone(nonGaSleuthProject());
+		milestones.closeMilestone(notMatchingProjectVersion());
 		then(capturedOutput.toString()).contains("No matching milestone was found");
 	}
 
 	@Test
-	public void should_print_that_no_milestones_were_found_when_io_problems_occurred(CapturedOutput capturedOutput)
+	void should_print_that_no_milestones_were_found_when_io_problems_occurred(CapturedOutput capturedOutput)
 			throws IOException {
 		GithubMilestones milestones = new GithubMilestones(this.github, withToken()) {
-			@Override
-			String org() {
-				return GithubMilestonesTests.this.repo.coordinates().user();
-			}
 
 			@Override
-			String milestoneTitle(Milestone.Smart milestone) throws IOException {
-				throw new IOException("foo");
+			GHMilestone matchingMilestone(String tagVersion, Iterable<GHMilestone> milestones) {
+				return null;
 			}
 		};
-		this.repo.milestones().create("v0.2.0.BUILD-SNAPSHOT");
 
 		milestones.closeMilestone(nonGaSleuthProject());
 
 		then(capturedOutput.toString()).contains("No matching milestone was found");
 	}
 
-	private Repo createSleuthRepo(MkGithub github) throws IOException {
-		return github.repos().create(new Repos.RepoCreate("spring-cloud-sleuth", false));
-	}
-
 	@Test
-	public void should_throw_exception_when_no_token_was_passed() {
+	void should_throw_exception_when_no_token_was_passed() {
 		GithubMilestones milestones = new GithubMilestones(new ReleaserProperties());
 
 		thenThrownBy(() -> milestones.closeMilestone(nonGaSleuthProject())).isInstanceOf(IllegalArgumentException.class)
@@ -257,13 +190,16 @@ public class GithubMilestonesTests {
 
 	ReleaserProperties withToken() {
 		ReleaserProperties properties = new ReleaserProperties();
-		properties.getGit().setOauthToken("foo");
+		properties.getGit().setOauthToken(TOKEN);
+		properties.getGit().setOrgName(ORG);
 		return properties;
 	}
 
 	ReleaserProperties withThreshold() {
 		ReleaserProperties properties = withToken();
 		properties.getGit().setNumberOfCheckedMilestones(0);
+		properties.getGit().setOauthToken(TOKEN);
+		properties.getGit().setOrgName(ORG);
 		return properties;
 	}
 

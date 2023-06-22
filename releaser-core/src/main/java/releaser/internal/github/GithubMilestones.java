@@ -18,16 +18,12 @@ package releaser.internal.github;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.jcabi.github.Coordinates;
-import com.jcabi.github.Github;
-import com.jcabi.github.Milestone;
-import com.jcabi.github.RtGithub;
-import com.jcabi.http.wire.RetryWire;
+import org.kohsuke.github.GHIssueState;
+import org.kohsuke.github.GHMilestone;
+import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
@@ -42,21 +38,21 @@ import org.springframework.util.StringUtils;
 class GithubMilestones {
 
 	static final Map<ProjectVersion, String> MILESTONE_URL_CACHE = new ConcurrentHashMap<>();
-	static final Map<ProjectVersion, Milestone.Smart> MILESTONE_CACHE = new ConcurrentHashMap<>();
+	static final Map<ProjectVersion, GHMilestone> MILESTONE_CACHE = new ConcurrentHashMap<>();
 
 	private static final Logger log = LoggerFactory.getLogger(GithubMilestones.class);
 
-	private final Github github;
+	private final GitHub github;
 
 	private final ReleaserProperties properties;
 
 	GithubMilestones(ReleaserProperties properties) {
-		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry().through(RetryWire.class)),
+		this(CachingGithub.getInstance(properties.getGit().getOauthToken(), properties.getGit().getCacheDirectory()),
 				properties);
 	}
 
-	GithubMilestones(Github github, ReleaserProperties properties) {
-		this.github = new CachingGithub(github);
+	GithubMilestones(GitHub github, ReleaserProperties properties) {
+		this.github = github;
 		this.properties = properties;
 	}
 
@@ -66,7 +62,7 @@ class GithubMilestones {
 						+ "either via the command line [--releaser.git.oauth-token=...] "
 						+ "or put it as an env variable in [~/.bashrc] or "
 						+ "[~/.zshrc] e.g. [export RELEASER_GIT_OAUTH_TOKEN=...]");
-		Milestone.Smart foundMilestone = MILESTONE_CACHE.get(version);
+		GHMilestone foundMilestone = MILESTONE_CACHE.get(version);
 		String tagVersion = version.version;
 		if (foundMilestone == null) {
 			foundMilestone = matchingMilestone(tagVersion, openMilestones(version));
@@ -89,27 +85,26 @@ class GithubMilestones {
 		}
 	}
 
-	Milestone.Smart matchingMilestone(String tagVersion, Iterable<Milestone> milestones) {
+	GHMilestone matchingMilestone(String tagVersion, Iterable<GHMilestone> milestones) {
 		log.debug("Successfully received list of milestones [{}]", milestones);
 		log.info("Will try to match against tag version [{}]", tagVersion);
 		try {
 			int counter = 0;
-			for (Milestone milestone : milestones) {
+			for (GHMilestone milestone : milestones) {
 				if (counter++ >= this.properties.getGit().getNumberOfCheckedMilestones()) {
 					log.warn(
 							"No matching milestones were found within the provided threshold [{}] of checked milestones",
 							this.properties.getGit().getNumberOfCheckedMilestones());
 					return null;
 				}
-				Milestone.Smart smartMilestone = new Milestone.Smart(milestone);
-				String title = milestoneTitle(smartMilestone);
+				String title = milestone.getTitle();
 				if (tagVersion.equals(title) || numericVersion(tagVersion).equals(title)) {
-					log.info("Found a matching milestone [{}]", smartMilestone.number());
-					return smartMilestone;
+					log.info("Found a matching milestone [{}]", milestone.getNumber());
+					return milestone;
 				}
 			}
 		}
-		catch (AssertionError | IOException e) {
+		catch (Exception e) {
 			log.error("Exception occurred while trying to retrieve the milestone", e);
 			return null;
 		}
@@ -125,7 +120,7 @@ class GithubMilestones {
 		Assert.hasText(this.properties.getGit().getOauthToken(),
 				"You have to pass Github OAuth token for milestone closing to be operational");
 		String tagVersion = version.version;
-		Milestone.Smart foundMilestone = matchingMilestone(tagVersion, closedMilestones(version));
+		GHMilestone foundMilestone = matchingMilestone(tagVersion, closedMilestones(version));
 		String foundUrl = "";
 		if (foundMilestone != null) {
 			try {
@@ -149,51 +144,36 @@ class GithubMilestones {
 		return version.contains("RELEASE") ? version.substring(0, version.lastIndexOf(".")) : "";
 	}
 
-	String milestoneTitle(Milestone.Smart milestone) throws IOException {
-		return milestone.title();
+	String milestoneTitle(GHMilestone milestone) throws IOException {
+		return milestone.getTitle();
 	}
 
-	URL foundMilestoneUrl(Milestone.Smart milestone) throws IOException {
-		return milestone.url();
+	URL foundMilestoneUrl(GHMilestone milestone) throws IOException {
+		return milestone.getUrl();
 	}
 
-	private Iterable<Milestone> getMilestones(ProjectVersion version, Map<String, String> map) {
+	private Iterable<GHMilestone> openMilestones(ProjectVersion version) {
 		try {
-			return this.github.repos().get(new Coordinates.Simple(org(), version.projectName)).milestones()
-					.iterate(map);
+			return this.github.getRepository(org() + "/" + version.projectName).listMilestones(GHIssueState.OPEN)
+					.toList();
 		}
-		catch (AssertionError e) {
-			log.error("Exception occurred while trying to fetch milestones", e);
-			return new ArrayList<>();
+		catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	private Iterable<Milestone> openMilestones(ProjectVersion version) {
-		return getMilestones(version, openMilestones());
-	}
-
-	private Iterable<Milestone> closedMilestones(ProjectVersion version) {
-		return getMilestones(version, closedMilestones());
+	private Iterable<GHMilestone> closedMilestones(ProjectVersion version) {
+		try {
+			return this.github.getRepository(org() + "/" + version.projectName).listMilestones(GHIssueState.CLOSED)
+					.toList();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	String org() {
 		return this.properties.getGit().getOrgName();
-	}
-
-	private Map<String, String> openMilestones() {
-		Map<String, String> params = new HashMap<>();
-		params.put("state", "open");
-		params.put("sort", "due_on");
-		params.put("direction", "desc");
-		return params;
-	}
-
-	private Map<String, String> closedMilestones() {
-		Map<String, String> params = new HashMap<>();
-		params.put("state", "closed");
-		params.put("sort", "due_on");
-		params.put("direction", "desc");
-		return params;
 	}
 
 }

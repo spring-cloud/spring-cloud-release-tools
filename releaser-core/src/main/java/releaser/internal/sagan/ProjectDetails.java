@@ -14,20 +14,39 @@
  * limitations under the License.
  */
 
-package releaser.cloud.github;
+package releaser.internal.sagan;
 
-import org.kohsuke.github.GitHub;
-import releaser.internal.ReleaserProperties;
-import releaser.internal.github.CustomGithubIssues;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-public class SpringCloudGithubIssuesAccessor {
+/**
+ * @author Marcin Grzejszczak
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ProjectDetails {
 
-	public static CustomGithubIssues springCloud(GitHub github, ReleaserProperties releaserProperties) {
-		return new SpringCloudGithubIssues(github, releaserProperties);
+	private String bootConfig;
+
+	private String body;
+
+	public String getBootConfig() {
+		return bootConfig;
 	}
 
-	public static CustomGithubIssues springCloud(ReleaserProperties releaserProperties) {
-		return new SpringCloudGithubIssues(releaserProperties);
+	public void setBootConfig(String bootConfig) {
+		this.bootConfig = bootConfig;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	@Override
+	public String toString() {
+		return "ProjectDetails{" + "bootConfig='" + bootConfig + '\'' + ", body='" + body + '\'' + '}';
 	}
 
 }

@@ -18,14 +18,13 @@ package releaser.internal.github;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import com.jcabi.github.Coordinates;
-import com.jcabi.github.Github;
-import com.jcabi.github.Issue;
-import com.jcabi.github.Repo;
-import com.jcabi.github.RtGithub;
-import com.jcabi.http.wire.RetryWire;
+import org.kohsuke.github.GHIssue;
+import org.kohsuke.github.GHIssueState;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
@@ -40,19 +39,19 @@ import org.springframework.util.Assert;
  */
 public class GithubIssueFiler {
 
-	private static final Logger log = LoggerFactory.getLogger(GithubIssues.class);
+	private static final Logger log = LoggerFactory.getLogger(GithubIssueFiler.class);
 
-	private final Github github;
+	private final GitHub github;
 
 	private final ReleaserProperties properties;
 
 	public GithubIssueFiler(ReleaserProperties properties) {
-		this(new RtGithub(new RtGithub(properties.getGit().getOauthToken()).entry().through(RetryWire.class)),
+		this(CachingGithub.getInstance(properties.getGit().getOauthToken(), properties.getGit().getCacheDirectory()),
 				properties);
 	}
 
-	public GithubIssueFiler(Github github, ReleaserProperties properties) {
-		this.github = new CachingGithub(github);
+	public GithubIssueFiler(GitHub github, ReleaserProperties properties) {
+		this.github = github;
 		this.properties = properties;
 	}
 
@@ -70,15 +69,16 @@ public class GithubIssueFiler {
 	}
 
 	private void fileAGithubIssue(String user, String repo, String issueTitle, String issueText) {
-		Repo ghRepo = this.github.repos().get(new Coordinates.Simple(user, repo));
-		// check if the issue is not already there
-		boolean issueAlreadyFiled = issueAlreadyFiled(ghRepo, issueTitle);
-		if (issueAlreadyFiled) {
-			log.info("Issue already filed, will not do that again");
-			return;
-		}
 		try {
-			int number = ghRepo.issues().create(issueTitle, issueText).number();
+			GHRepository ghRepo = github.getRepository(user + "/" + repo);
+			// check if the issue is not already there
+			boolean issueAlreadyFiled = issueAlreadyFiled(ghRepo, issueTitle);
+			if (issueAlreadyFiled) {
+				log.info("Issue already filed, will not do that again");
+				return;
+			}
+			GHIssue ghIssue = ghRepo.createIssue(issueTitle).body(issueText).create();
+			int number = ghIssue.getNumber();
 			log.info("Successfully created an issue with " + "title [{}] for the [{}/{}] GitHub repository" + number,
 					issueTitle, user, repo);
 		}
@@ -95,23 +95,20 @@ public class GithubIssueFiler {
 		return version;
 	}
 
-	private boolean issueAlreadyFiled(Repo springGuides, String issueTitle) {
+	boolean issueAlreadyFiled(GHRepository springGuides, String issueTitle) throws IOException {
 		Map<String, String> map = new HashMap<>();
 		map.put("state", "open");
 		int counter = 0;
 		int maxIssues = 10;
-		for (Issue issue : springGuides.issues().iterate(map)) {
+
+		for (Iterator<GHIssue> it = springGuides.getIssues(GHIssueState.OPEN).iterator(); it.hasNext();) {
+			GHIssue issue = it.next();
 			if (counter >= maxIssues) {
 				return false;
 			}
-			Issue.Smart smartIssue = new Issue.Smart(issue);
-			try {
-				if (issueTitle.equals(smartIssue.title())) {
-					return true;
-				}
-			}
-			catch (IOException e) {
-				return false;
+			String title = issue.getTitle();
+			if (issueTitle.equals(title)) {
+				return true;
 			}
 			counter = counter + 1;
 		}

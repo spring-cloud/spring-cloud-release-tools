@@ -1,0 +1,18 @@
+{
+  "id" : "5e584f53-bb48-4c2f-ad6d-c56c5b1fb0c5",
+  "name" : "projects_spring-boot_releases_2514",
+  "request" : {
+    "url" : "/projects/spring-boot/releases/2.5.14",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"version\":\"2.5.14\",\"apiDocUrl\":\"https://docs.spring.io/spring-boot/docs/{version}/api/\",\"referenceDocUrl\":\"https://docs.spring.io/spring-boot/docs/{version}/reference/html/\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":false,\"_links\":{\"repository\":{\"href\":\"https://api.spring.io/repositories/spring-releases\"},\"self\":{\"href\":\"https://api.spring.io/projects/spring-boot/releases/2.5.14\"}}}",
+    "headers" : {
+      "Content-Type" : "application/hal+json"
+    }
+  },
+  "uuid" : "5e584f53-bb48-4c2f-ad6d-c56c5b1fb0c5",
+  "persistent" : true,
+  "insertionIndex" : 4
+}

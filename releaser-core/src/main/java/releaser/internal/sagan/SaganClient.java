@@ -29,6 +29,6 @@ public interface SaganClient {
 
 	boolean addRelease(String projectName, ReleaseInput releaseInput);
 
-	Project patchProject(Project project);
+	void patchProjectDetails(String projectName, ProjectDetails details);
 
 }

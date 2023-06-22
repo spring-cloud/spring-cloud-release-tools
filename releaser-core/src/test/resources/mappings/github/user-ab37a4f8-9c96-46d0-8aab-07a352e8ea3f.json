@@ -1,0 +1,14 @@
+{
+  "id" : "ab37a4f8-9c96-46d0-8aab-07a352e8ea3f",
+  "name" : "user",
+  "request" : {
+    "url" : "/user",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200
+  },
+  "uuid" : "ab37a4f8-9c96-46d0-8aab-07a352e8ea3f",
+  "persistent" : true,
+  "insertionIndex" : 23
+}
