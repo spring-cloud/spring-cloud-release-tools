@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
-		<version>4.0.1</version>
+		<version>4.0.3</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
@@ -30,8 +30,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>17</java.version>
 
-		<spring-cloud-bom.version>2022.0.2</spring-cloud-bom.version>
-		<github-api.version>1.314</github-api.version>
+		<spring-cloud-bom.version>2022.0.3</spring-cloud-bom.version>
+		<github-api.version>1.315</github-api.version>
 		<jsch-agent.version>0.0.9</jsch-agent.version>
 		<!--Matches JGit in Boot:-->
 		<org.eclipse.jgit-version>6.5.0.202303070854-r</org.eclipse.jgit-version>
