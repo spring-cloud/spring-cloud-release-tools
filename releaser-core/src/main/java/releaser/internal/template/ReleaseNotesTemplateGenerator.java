@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.github.jknack.handlebars.Template;
 import com.google.common.collect.ImmutableMap;
+import releaser.internal.ReleaserProperties;
 import releaser.internal.github.ProjectGitHubHandler;
 import releaser.internal.project.Projects;
 
@@ -44,12 +45,12 @@ class ReleaseNotesTemplateGenerator {
 	private final NotesGenerator notesGenerator;
 
 	ReleaseNotesTemplateGenerator(Template template, String releaseVersion, File blogOutput, Projects projects,
-			ProjectGitHubHandler handler) {
+			ProjectGitHubHandler handler, ReleaserProperties properties) {
 		this.template = template;
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;
 		this.projects = projects;
-		this.notesGenerator = new NotesGenerator(handler);
+		this.notesGenerator = new NotesGenerator(handler, properties);
 	}
 
 	File releaseNotes() {

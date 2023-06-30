@@ -128,10 +128,11 @@ public class SpringCloudMavenBomParserTests {
 	}
 
 	private void thenAllCloudVersionsSet(VersionsFromBom cloudVersionsFromBom) {
-		Arrays.asList("spring-cloud-bus", "spring-cloud-contract", "spring-cloud-cloudfoundry", "spring-cloud-commons",
-				"spring-cloud-config", "spring-cloud-netflix", "spring-cloud-security", "spring-cloud-consul",
-				"spring-cloud-sleuth", "spring-cloud-stream", "spring-cloud-task", "spring-cloud-vault",
-				"spring-cloud-zookeeper").forEach(s -> then(cloudVersionsFromBom.versionForProject(s)).isNotBlank());
+		Arrays.asList("spring-cloud-bus", "spring-cloud-contract", "spring-cloud-commons", "spring-cloud-config",
+				"spring-cloud-netflix", "spring-cloud-consul", "spring-cloud-stream", "spring-cloud-task",
+				"spring-cloud-vault", "spring-cloud-zookeeper")
+				.forEach(s -> then(cloudVersionsFromBom.versionForProject(s))
+						.as("For project <%s> version should not be blank", s).isNotBlank());
 	}
 
 	@Test

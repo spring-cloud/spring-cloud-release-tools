@@ -44,9 +44,10 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 				tempDirReleaseTrainWiki, tempDirAllTestSample)
 						.releaseTrainUrl("/projects/spring-cloud-release/")
 						.projectsToSkip("spring-boot", "spring-cloud-build", "spring-cloud-commons",
-								"spring-cloud-stream", "spring-cloud-task", "spring-cloud-function", "spring-cloud-aws",
-								"spring-cloud-bus", "spring-cloud-config", "spring-cloud-netflix",
-								"spring-cloud-cloudfoundry", "spring-cloud-gateway", "spring-cloud-security",
+								"spring-cloud-circuitbreaker", "spring-cloud-stream", "spring-cloud-task",
+								"spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus", "spring-cloud-config",
+								"spring-cloud-netflix", "spring-cloud-kubernetes", "spring-cloud-cloudfoundry",
+								"spring-cloud-gateway", "spring-cloud-security", "spring-cloud-openfeign",
 								"spring-cloud-zookeeper", "spring-cloud-sleuth", "spring-cloud-contract",
 								"spring-cloud-vault")
 						.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
@@ -62,11 +63,13 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 		return new ArgsBuilder(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs, tempDirSpringCloud,
 				tempDirReleaseTrainWiki, tempDirAllTestSample)
 						.releaseTrainUrl("/projects/spring-cloud-release/")
-						.projectsToSkip("spring-boot", "spring-cloud-commons", "spring-cloud-stream",
-								"spring-cloud-task", "spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus",
-								"spring-cloud-config", "spring-cloud-netflix", "spring-cloud-cloudfoundry",
-								"spring-cloud-gateway", "spring-cloud-security", "spring-cloud-zookeeper",
-								"spring-cloud-sleuth", "spring-cloud-contract", "spring-cloud-vault")
+						.projectsToSkip("spring-boot", "spring-cloud-build", "spring-cloud-commons",
+								"spring-cloud-circuitbreaker", "spring-cloud-stream", "spring-cloud-task",
+								"spring-cloud-function", "spring-cloud-aws", "spring-cloud-bus", "spring-cloud-config",
+								"spring-cloud-netflix", "spring-cloud-kubernetes", "spring-cloud-cloudfoundry",
+								"spring-cloud-gateway", "spring-cloud-security", "spring-cloud-openfeign",
+								"spring-cloud-zookeeper", "spring-cloud-sleuth", "spring-cloud-contract",
+								"spring-cloud-vault")
 						.mavenBuildCommand("echo '{{profiles}}' > /tmp/executed_build")
 						.mavenPublishCommand("echo '{{profiles}}' > /tmp/executed_docs")
 						.mavenDeployCommand("echo '{{profiles}}' > /tmp/executed_deploy")
@@ -74,27 +77,26 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 						.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 	}
 
-	public Map<String, String> edgwareSr10() {
+	public Map<String, String> v2022_0_4() {
 		Map<String, String> versions = new LinkedHashMap<>();
-		versions.put("spring-boot", "5.5.16.RELEASE");
-		versions.put("spring-cloud-build", "5.3.11.RELEASE");
-		versions.put("spring-cloud-commons", "5.3.5.RELEASE");
-		versions.put("spring-cloud-stream", "Xitmars.SR4");
-		versions.put("spring-cloud-task", "5.2.3.RELEASE");
-		versions.put("spring-cloud-function", "5.0.1.RELEASE");
-		versions.put("spring-cloud-aws", "5.2.3.RELEASE");
-		versions.put("spring-cloud-bus", "5.3.4.RELEASE");
-		versions.put("spring-cloud-config", "5.4.5.RELEASE");
-		versions.put("spring-cloud-netflix", "5.4.6.RELEASE");
-		versions.put("spring-cloud-cloudfoundry", "5.1.2.RELEASE");
-		versions.put("spring-cloud-gateway", "5.0.2.RELEASE");
-		versions.put("spring-cloud-security", "5.2.3.RELEASE");
-		versions.put("spring-cloud-consul", "5.3.5.RELEASE");
-		versions.put("spring-cloud-zookeeper", "5.2.2.RELEASE");
-		versions.put("spring-cloud-sleuth", "5.3.5.RELEASE");
-		versions.put("spring-cloud-contract", "5.2.6.RELEASE");
-		versions.put("spring-cloud-vault", "5.1.2.RELEASE");
-		versions.put("spring-cloud-release", "Edgware.SR10");
+		versions.put("spring-boot", "3.0.7");
+		versions.put("spring-cloud-build", "4.0.3");
+		versions.put("spring-cloud-function", "4.0.3");
+		versions.put("spring-cloud-stream", "4.0.3");
+		versions.put("spring-cloud-commons", "4.0.3");
+		versions.put("spring-cloud-bus", "4.0.1");
+		versions.put("spring-cloud-task", "3.0.3");
+		versions.put("spring-cloud-config", "4.0.3");
+		versions.put("spring-cloud-netflix", "4.0.2");
+		versions.put("spring-cloud-openfeign", "4.0.3");
+		versions.put("spring-cloud-consul", "4.0.2");
+		versions.put("spring-cloud-circuitbreaker", "3.0.2");
+		versions.put("spring-cloud-gateway", "4.0.6");
+		versions.put("spring-cloud-zookeeper", "4.0.0");
+		versions.put("spring-cloud-contract", "4.0.3");
+		versions.put("spring-cloud-kubernetes", "3.0.3");
+		versions.put("spring-cloud-vault", "4.0.1");
+		versions.put("spring-cloud-release", "2022.0.4");
 		return versions;
 	}
 

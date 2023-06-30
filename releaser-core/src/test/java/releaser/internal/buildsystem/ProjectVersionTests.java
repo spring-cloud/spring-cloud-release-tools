@@ -96,6 +96,23 @@ public class ProjectVersionTests {
 	}
 
 	@Test
+	public void should_bump_version_by_patch_and_add_snapshot_suffix() {
+		then(projectVersion("2020.0.0-SNAPSHOT").bumpedSnapshotVersion()).isEqualTo("2020.0.1-SNAPSHOT");
+		then(projectVersion("2020.0.0-M1").bumpedSnapshotVersion()).isEqualTo("2020.0.1-SNAPSHOT");
+		then(projectVersion("2020.0.0-RC2").bumpedSnapshotVersion()).isEqualTo("2020.0.1-SNAPSHOT");
+		then(projectVersion("2020.0.0").bumpedSnapshotVersion()).isEqualTo("2020.0.1-SNAPSHOT");
+		then(projectVersion("2020.1.1").bumpedSnapshotVersion()).isEqualTo("2020.1.2-SNAPSHOT");
+		then(projectVersion("1.0.1-SNAPSHOT").bumpedSnapshotVersion()).isEqualTo("1.0.2-SNAPSHOT");
+		then(projectVersion("1.0.3-RC1").bumpedSnapshotVersion()).isEqualTo("1.0.4-SNAPSHOT");
+		then(projectVersion("1.0.4-M1").bumpedSnapshotVersion()).isEqualTo("1.0.5-SNAPSHOT");
+		then(projectVersion("3.0.0").bumpedSnapshotVersion()).isEqualTo("3.0.1-SNAPSHOT");
+		then(projectVersion("3.1.1").bumpedSnapshotVersion()).isEqualTo("3.1.2-SNAPSHOT");
+		then(projectVersion("Finchley-SNAPSHOT").bumpedSnapshotVersion()).isEqualTo("Finchley-SNAPSHOT");
+		then(projectVersion("Finchley.RELEASE").bumpedSnapshotVersion()).isEqualTo("Finchley.SNAPSHOT");
+		then(projectVersion("Finchley-SR1").bumpedSnapshotVersion()).isEqualTo("Finchley-SNAPSHOT");
+	}
+
+	@Test
 	public void should_return_the_previous_version_for_release_train_version() {
 		String version = "Edgware-SNAPSHOT";
 

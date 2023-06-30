@@ -20,7 +20,11 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import releaser.internal.ReleaserProperties;
 import releaser.internal.github.ProjectGitHubHandler;
+import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
 import org.springframework.util.StringUtils;
@@ -30,10 +34,15 @@ import org.springframework.util.StringUtils;
  */
 class NotesGenerator {
 
+	private static final Logger log = LoggerFactory.getLogger(NotesGenerator.class);
+
 	private final ProjectGitHubHandler handler;
 
-	NotesGenerator(ProjectGitHubHandler handler) {
+	private final ReleaserProperties properties;
+
+	NotesGenerator(ProjectGitHubHandler handler, ReleaserProperties properties) {
 		this.handler = handler;
+		this.properties = properties;
 	}
 
 	Set<Notes> fromProjects(Projects projects) {
@@ -41,11 +50,22 @@ class NotesGenerator {
 				.map(projectVersion -> {
 					String name = projectVersion.projectName;
 					String version = projectVersion.version;
-					String closedMilestoneUrl = this.handler.milestoneUrl(projectVersion);
+					String closedMilestoneUrl = closedMilestoneUrl(projectVersion);
 					String convertedName = Arrays.stream(name.split("-")).map(StringUtils::capitalize)
 							.collect(Collectors.joining(" "));
 					return new Notes(convertedName, version, closedMilestoneUrl);
 				}).collect(Collectors.toSet());
+	}
+
+	private String closedMilestoneUrl(ProjectVersion projectVersion) {
+		try {
+			return this.handler.milestoneUrl(projectVersion);
+		}
+		catch (Exception ex) {
+			log.warn("Exception occurred while trying to fetch a milestone url. Will fallback to tag url", ex);
+			return "https://github.com/" + this.properties.getGit().getOrgName() + "/" + projectVersion.projectName
+					+ "/releases/tag/v" + projectVersion.version;
+		}
 	}
 
 }

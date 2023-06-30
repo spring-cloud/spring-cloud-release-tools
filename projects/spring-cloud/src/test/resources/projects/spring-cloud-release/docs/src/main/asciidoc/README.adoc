@@ -6,8 +6,7 @@ include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/maste
 
 == Building and Deploying
 
-Since there is no code to compile in the starters they should do not need to compile, but a compiler has to be available because they are built and deployed as JAR artifacts.
-To install locally:
+Since there is no code to compile in the starters they should do not need to compile, but a compiler has to be available because they are built and deployed as JAR artifacts. To install locally:
 
 ----
 
