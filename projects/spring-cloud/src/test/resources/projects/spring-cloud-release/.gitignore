@@ -15,4 +15,3 @@ target/
 *.ipr
 *.iws
 .factorypath
-.flattened-pom.xml

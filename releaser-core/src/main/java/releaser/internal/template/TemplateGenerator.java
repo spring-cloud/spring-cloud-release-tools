@@ -96,8 +96,7 @@ public class TemplateGenerator {
 		File blogOutput = file(this.blogOutput);
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(BLOG_TEMPLATE);
-		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects, this.handler, this.props)
-				.blog();
+		return new BlogTemplateGenerator(template, releaseVersion, blogOutput, projects, this.handler).blog();
 	}
 
 	public File tweet(Projects projects) {
@@ -111,7 +110,7 @@ public class TemplateGenerator {
 		File output = file(this.releaseNotesOutput);
 		String releaseVersion = parsedVersion(projects);
 		Template template = template(RELEASE_NOTES_TEMPLATE);
-		return new ReleaseNotesTemplateGenerator(template, releaseVersion, output, projects, this.handler, this.props)
+		return new ReleaseNotesTemplateGenerator(template, releaseVersion, output, projects, this.handler)
 				.releaseNotes();
 	}
 

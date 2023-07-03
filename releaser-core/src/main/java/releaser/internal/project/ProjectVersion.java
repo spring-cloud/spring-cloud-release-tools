@@ -172,11 +172,6 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		return bumpedVersion(assertVersion()).print();
 	}
 
-	public String bumpedSnapshotVersion() {
-		SplitVersion splitVersion = bumpedVersion(assertVersion());
-		return splitVersion.withSnapshot().print();
-	}
-
 	private SplitVersion bumpedVersion(SplitVersion splitVersion) {
 		if (splitVersion.isReleaseTrain() && !splitVersion.isCalverReleaseTrain()) {
 			return splitVersion;

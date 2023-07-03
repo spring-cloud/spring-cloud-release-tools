@@ -56,8 +56,8 @@ public class SaganUpdater {
 					+ "is off. Set [releaser.sagan.update-sagan] to [true] to change that");
 			return ExecutionResult.skipped();
 		}
-		ReleaseInput update = releaseUpdate(currentVersion);
-		Exception updateReleaseException = updateSaganForNonSnapshot(currentVersion);
+		ReleaseInput update = releaseUpdate(branch, originalVersion, currentVersion, projects);
+		Exception updateReleaseException = updateSaganForNonSnapshot(branch, originalVersion, currentVersion, projects);
 		if (updateReleaseException == null) {
 			log.info("Updating Sagan releases with \n\n{}", update);
 			try {
@@ -149,7 +149,8 @@ public class SaganUpdater {
 		return currentVersion.compareTo(projectVersion.get()) >= 0;
 	}
 
-	private Exception updateSaganForNonSnapshot(ProjectVersion version) {
+	private Exception updateSaganForNonSnapshot(String branch, ProjectVersion originalVersion, ProjectVersion version,
+			Projects projects) {
 		Exception updateReleaseException = null;
 		if (!version.isSnapshot()) {
 			log.info("Version is non snapshot [{}]. Will remove all older versions and mark this as current", version);
@@ -157,13 +158,13 @@ public class SaganUpdater {
 			if (project != null) {
 				removeAllSameMinorVersions(version, project);
 			}
-			String snapshot = version.toSnapshotVersion();
+			String snapshot = toSnapshot(version);
 			removeVersionFromSagan(version, snapshot);
 			if (version.isRelease() || version.isServiceRelease()) {
 				try {
 					String bumpedSnapshot = bumpedSnapshot(version);
-					ReleaseInput snapshotUpdate = releaseUpdate(
-							new ProjectVersion(version.projectName, bumpedSnapshot));
+					ReleaseInput snapshotUpdate = releaseUpdate(branch, originalVersion,
+							new ProjectVersion(version.projectName, bumpedSnapshot), projects);
 					log.info("Updating Sagan with bumped snapshot \n\n[{}]", snapshotUpdate);
 					this.saganClient.addRelease(version.projectName, snapshotUpdate);
 				}
@@ -194,20 +195,66 @@ public class SaganUpdater {
 		}
 	}
 
-	private ReleaseInput releaseUpdate(ProjectVersion version) {
+	private ReleaseInput releaseUpdate(String branch, ProjectVersion originalVersion, ProjectVersion version,
+			Projects projects) {
 		ReleaseInput update = new ReleaseInput();
 		update.setVersion(version.version);
-		update.setReferenceDocUrl(newReferenceUrl(version));
+		update.setReferenceDocUrl(referenceUrl(branch, version, projects));
 		update.setApiDocUrl(null);
 		return update;
 	}
 
 	private String bumpedSnapshot(ProjectVersion projectVersion) {
-		return projectVersion.bumpedSnapshotVersion();
+		String bumpedVersion = projectVersion.bumpedVersion();
+		return toSnapshot(new ProjectVersion("", bumpedVersion));
 	}
 
-	private String newReferenceUrl(ProjectVersion version) {
+	private String toSnapshot(ProjectVersion projectVersion) {
+		String version = projectVersion.version;
+		if (version.contains("RELEASE")) {
+			return version.replace("RELEASE", "BUILD-SNAPSHOT");
+		}
+		else if (version.matches(".*SR[0-9]+")) {
+			return version.substring(0, version.lastIndexOf(".")) + ".BUILD-SNAPSHOT";
+		}
+		return projectVersion.toSnapshotVersion();
+	}
+
+	private String releaseTrainVersion(Projects projects) {
+		String releaseTrainProjectName = this.releaserProperties.getMetaRelease().getReleaseTrainProjectName();
+		return projects.containsProject(releaseTrainProjectName) ? projects.forName(releaseTrainProjectName).version
+				: "";
+	}
+
+	private String referenceUrl(String branch, ProjectVersion version, Projects projects) {
+		String releaseTrainVersion = releaseTrainVersion(projects);
+		// up till Greenwich we have a different URL for docs
+		// if there's no release train, will assume that 2.2.x is the version that has the
+		// new docs
+		boolean hasReleaseTrainVersion = StringUtils.hasText(releaseTrainVersion);
+		boolean newDocs = hasReleaseTrainVersion ? releaseTrainVersion.toLowerCase().charAt(0) > 'g'
+				: version.version.compareTo("2.2") > 0;
+		if (newDocs) {
+			return newReferenceUrl(branch, version);
+		}
+		return oldReferenceUrl(branch, version);
+	}
+
+	private String newReferenceUrl(String branch, ProjectVersion version) {
 		return "https://docs.spring.io/" + version.projectName + "/docs/{version}/reference/html/";
+	}
+
+	private String oldReferenceUrl(String branch, ProjectVersion version) {
+		if (!version.isSnapshot()) {
+			// static/sleuth/{version}/
+			return "https://cloud.spring.io/spring-cloud-static/" + version.projectName + "/{version}/";
+		}
+		if (branch.toLowerCase().contains("main")) {
+			// sleuth/
+			return "https://cloud.spring.io/" + version.projectName + "/" + version.projectName + ".html";
+		}
+		// sleuth/1.1.x/
+		return "https://cloud.spring.io/" + version.projectName + "/" + branch + "/";
 	}
 
 }

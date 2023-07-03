@@ -26,7 +26,6 @@ import com.github.jknack.handlebars.Template;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import releaser.internal.ReleaserProperties;
 import releaser.internal.github.ProjectGitHubHandler;
 import releaser.internal.project.Projects;
 
@@ -54,12 +53,12 @@ class BlogTemplateGenerator {
 	private final NotesGenerator notesGenerator;
 
 	BlogTemplateGenerator(Template template, String releaseVersion, File blogOutput, Projects projects,
-			ProjectGitHubHandler handler, ReleaserProperties properties) {
+			ProjectGitHubHandler handler) {
 		this.template = template;
 		this.releaseVersion = releaseVersion;
 		this.blogOutput = blogOutput;
 		this.projects = projects;
-		this.notesGenerator = new NotesGenerator(handler, properties);
+		this.notesGenerator = new NotesGenerator(handler);
 	}
 
 	File blog() {

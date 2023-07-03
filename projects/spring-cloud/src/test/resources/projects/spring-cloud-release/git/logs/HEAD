@@ -1,59 +1,42 @@
-0000000000000000000000000000000000000000 5e59b54c95305b5e402f19666f37a91e120810b6 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1639063414 +0100	clone: from github.com:spring-cloud/spring-cloud-release.git
-5e59b54c95305b5e402f19666f37a91e120810b6 26c3e2d3254abd6ccf975755e92f11cb850afce0 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1639063418 +0100	checkout: moving from main to v2021.0.0
-26c3e2d3254abd6ccf975755e92f11cb850afce0 5e59b54c95305b5e402f19666f37a91e120810b6 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1643282376 +0100	checkout: moving from 26c3e2d3254abd6ccf975755e92f11cb850afce0 to main
-5e59b54c95305b5e402f19666f37a91e120810b6 36e5c83639f7596c133691e3256ccc4e2e54338e Marcin Grzejszczak <mgrzejszczak@vmware.com> 1643282381 +0100	pull --rebase origin main: Fast-forward
-36e5c83639f7596c133691e3256ccc4e2e54338e a8f7edcff2c8117b7a66cd6fb3f62a494df56e4d Marcin Grzejszczak <mgrzejszczak@vmware.com> 1643285227 +0100	commit: Bringing back contract
-a8f7edcff2c8117b7a66cd6fb3f62a494df56e4d 4a38607b690187fcd596c1034b806d945052260b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1646726413 +0100	pull --rebase origin main: Fast-forward
-4a38607b690187fcd596c1034b806d945052260b ec7331f8a88ddfd84029ef101a033516a322e793 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1646726432 +0100	checkout: moving from main to 2021.0.x
-ec7331f8a88ddfd84029ef101a033516a322e793 b0fc42faa6a6101acdafa956c2a4d4f25ce9ead1 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1646726437 +0100	pull --rebase origin 2021.0.x: Fast-forward
-b0fc42faa6a6101acdafa956c2a4d4f25ce9ead1 66873703a4f37736a6c88317262f82f2ee35b83d Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062123 +0200	commit: Bumped train-docs versions
-66873703a4f37736a6c88317262f82f2ee35b83d 4a38607b690187fcd596c1034b806d945052260b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062129 +0200	checkout: moving from 2021.0.x to main
-4a38607b690187fcd596c1034b806d945052260b 66873703a4f37736a6c88317262f82f2ee35b83d Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062135 +0200	checkout: moving from main to 2021.0.x
-66873703a4f37736a6c88317262f82f2ee35b83d 0cee0b1b487479d6a0c35f6020db5cefffa080de Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062142 +0200	pull --rebase origin 2021.0.x (start): checkout 0cee0b1b487479d6a0c35f6020db5cefffa080de
-0cee0b1b487479d6a0c35f6020db5cefffa080de a9144c26b6f2216ceacef51a7866e36ed4a5434b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062142 +0200	pull --rebase origin 2021.0.x (pick): Bumped train-docs versions
-a9144c26b6f2216ceacef51a7866e36ed4a5434b a9144c26b6f2216ceacef51a7866e36ed4a5434b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062142 +0200	pull --rebase origin 2021.0.x (finish): returning to refs/heads/2021.0.x
-a9144c26b6f2216ceacef51a7866e36ed4a5434b 4a38607b690187fcd596c1034b806d945052260b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062146 +0200	checkout: moving from 2021.0.x to main
-4a38607b690187fcd596c1034b806d945052260b b7e7e284090324d7f4d327031086c37970318542 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062150 +0200	pull --rebase origin main: Fast-forward
-b7e7e284090324d7f4d327031086c37970318542 b7e7e284090324d7f4d327031086c37970318542 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062214 +0200	reset: moving to HEAD
-b7e7e284090324d7f4d327031086c37970318542 95baa3924ea1748e2879d5d87af8659ab223c4d8 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651062261 +0200	commit (merge): Merge branch '2021.0.x'
-95baa3924ea1748e2879d5d87af8659ab223c4d8 bf1cf4ab4843de5837b48ae7f6cbdccd069c0d3a Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651064694 +0200	commit: Going with 3.0.0-SNAPSHOT for Boot
-bf1cf4ab4843de5837b48ae7f6cbdccd069c0d3a ac2d3d88234950b4c7307664b0957352dc3383fc Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651157365 +0200	checkout: moving from main to v2021.0.2
-ac2d3d88234950b4c7307664b0957352dc3383fc a9144c26b6f2216ceacef51a7866e36ed4a5434b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651158679 +0200	checkout: moving from ac2d3d88234950b4c7307664b0957352dc3383fc to 2021.0.x
-a9144c26b6f2216ceacef51a7866e36ed4a5434b 9709a7f0eb15744bfb2b8a89369be35281c705ea Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651158684 +0200	pull --rebase origin 2021.0.x: Fast-forward
-9709a7f0eb15744bfb2b8a89369be35281c705ea e5d27ba1bf078530af2601b075fcbd3d1018bd2c Marcin Grzejszczak <mgrzejszczak@vmware.com> 1651158718 +0200	commit: Don't sign train docs
-e5d27ba1bf078530af2601b075fcbd3d1018bd2c 224f5592065ed46d90a2f50df528dc553aaa40f4 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653485226 +0200	pull --rebase origin 2021.0.x: Fast-forward
-224f5592065ed46d90a2f50df528dc553aaa40f4 accf3c1e77679f6400d576650883802959e08b65 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653637505 +0200	pull: Fast-forward
-accf3c1e77679f6400d576650883802959e08b65 a331ef4c182a2cdf6a745de93d5a234f4e7875b7 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653645700 +0200	checkout: moving from 2021.0.x to a331ef4c182a2cdf6a745de93d5a234f4e7875b7
-a331ef4c182a2cdf6a745de93d5a234f4e7875b7 accf3c1e77679f6400d576650883802959e08b65 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653646923 +0200	checkout: moving from a331ef4c182a2cdf6a745de93d5a234f4e7875b7 to 2021.0.x
-accf3c1e77679f6400d576650883802959e08b65 aa33294e96817a1720f181e49688004a455f989b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653647008 +0200	commit: Updated versions after the release
-aa33294e96817a1720f181e49688004a455f989b a331ef4c182a2cdf6a745de93d5a234f4e7875b7 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653647489 +0200	checkout: moving from 2021.0.x to v2021.0.3
-a331ef4c182a2cdf6a745de93d5a234f4e7875b7 bf1cf4ab4843de5837b48ae7f6cbdccd069c0d3a Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653982677 +0200	checkout: moving from a331ef4c182a2cdf6a745de93d5a234f4e7875b7 to main
-bf1cf4ab4843de5837b48ae7f6cbdccd069c0d3a aa33294e96817a1720f181e49688004a455f989b Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653982681 +0200	checkout: moving from main to 2021.0.x
-aa33294e96817a1720f181e49688004a455f989b 063650255846b01168f6397c7ccd341915e950d0 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1653982688 +0200	pull --rebase origin 2021.0.x: Fast-forward
-063650255846b01168f6397c7ccd341915e950d0 bf1cf4ab4843de5837b48ae7f6cbdccd069c0d3a Marcin Grzejszczak <mgrzejszczak@vmware.com> 1655207117 +0200	checkout: moving from 2021.0.x to main
-bf1cf4ab4843de5837b48ae7f6cbdccd069c0d3a da95978f91a608cab81aa2020e511e9fce0d3593 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1655209368 +0200	commit: Added train-docs attribute
-da95978f91a608cab81aa2020e511e9fce0d3593 da95978f91a608cab81aa2020e511e9fce0d3593 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660659298 +0200	checkout: moving from main to unzipping
-da95978f91a608cab81aa2020e511e9fce0d3593 eedb764786313401e1058a8eda4e653d7eb89e01 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660659301 +0200	commit: Prevents unzipping files outside of the target folder
-eedb764786313401e1058a8eda4e653d7eb89e01 063650255846b01168f6397c7ccd341915e950d0 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729898 +0200	checkout: moving from unzipping to 2021.0.x
-063650255846b01168f6397c7ccd341915e950d0 15d9a8568f2289687a85c12a646616943813970c Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729903 +0200	cherry-pick: Prevents unzipping files outside of the target folder
-15d9a8568f2289687a85c12a646616943813970c da95978f91a608cab81aa2020e511e9fce0d3593 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729911 +0200	checkout: moving from 2021.0.x to main
-da95978f91a608cab81aa2020e511e9fce0d3593 15d9a8568f2289687a85c12a646616943813970c Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729914 +0200	checkout: moving from main to 2021.0.x
-15d9a8568f2289687a85c12a646616943813970c 164958c3e7ab9147b6eff2556eef65c3aeb29da9 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729919 +0200	pull --rebase origin 2021.0.x (start): checkout 164958c3e7ab9147b6eff2556eef65c3aeb29da9
-164958c3e7ab9147b6eff2556eef65c3aeb29da9 790dd20d1945dd321f87167071a5ae089158e59f Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729919 +0200	pull --rebase origin 2021.0.x (pick): Prevents unzipping files outside of the target folder
-790dd20d1945dd321f87167071a5ae089158e59f 790dd20d1945dd321f87167071a5ae089158e59f Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729919 +0200	pull --rebase origin 2021.0.x (finish): returning to refs/heads/2021.0.x
-790dd20d1945dd321f87167071a5ae089158e59f da95978f91a608cab81aa2020e511e9fce0d3593 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729922 +0200	checkout: moving from 2021.0.x to main
-da95978f91a608cab81aa2020e511e9fce0d3593 61a279e8d4521d5d2be2c48b8c487758dfa59836 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729926 +0200	pull --rebase origin main: Fast-forward
-61a279e8d4521d5d2be2c48b8c487758dfa59836 308c74143e360ad20602d89d1ef51e95ae99a53c Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660729933 +0200	cherry-pick: Prevents unzipping files outside of the target folder
-308c74143e360ad20602d89d1ef51e95ae99a53c acccdd1f0d6020fc598fb6ea3c1f660790a3c916 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675782967 +0100	pull: Fast-forward
-acccdd1f0d6020fc598fb6ea3c1f660790a3c916 ecbeb68df64f1dcd9a45cd7dac70e857e2cde8a0 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675783565 +0100	commit: Disables jar signing for train docs
-ecbeb68df64f1dcd9a45cd7dac70e857e2cde8a0 ecbeb68df64f1dcd9a45cd7dac70e857e2cde8a0 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675784191 +0100	reset: moving to HEAD
-ecbeb68df64f1dcd9a45cd7dac70e857e2cde8a0 790dd20d1945dd321f87167071a5ae089158e59f Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675784194 +0100	checkout: moving from main to 2021.0.x
-790dd20d1945dd321f87167071a5ae089158e59f 55f92ff863c185caf81f474702d37b73992f7156 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675784199 +0100	pull --rebase origin 2021.0.x: Fast-forward
-55f92ff863c185caf81f474702d37b73992f7156 dd371879d6786a9ce4b85c23e1f7564fe251e499 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675784259 +0100	commit: Skipping gpg and standard deploy for release train docs
-dd371879d6786a9ce4b85c23e1f7564fe251e499 ecbeb68df64f1dcd9a45cd7dac70e857e2cde8a0 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675784264 +0100	checkout: moving from 2021.0.x to main
-ecbeb68df64f1dcd9a45cd7dac70e857e2cde8a0 5812dd9ca14d6d61a76632662000c7a93c051c79 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675784320 +0100	commit (merge): Merge branch '2021.0.x'
-5812dd9ca14d6d61a76632662000c7a93c051c79 310b20cbb6f7fca74695b3ff6dc43cf4b3d4ba6a Marcin Grzejszczak <mgrzejszczak@vmware.com> 1686912310 +0200	pull: Fast-forward
-310b20cbb6f7fca74695b3ff6dc43cf4b3d4ba6a 6e3fe942d6d8e2bedc298097b06f944ff8613fa3 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1686912315 +0200	checkout: moving from main to 2022.0.x
-6e3fe942d6d8e2bedc298097b06f944ff8613fa3 310b20cbb6f7fca74695b3ff6dc43cf4b3d4ba6a Marcin Grzejszczak <mgrzejszczak@vmware.com> 1686912330 +0200	checkout: moving from 2022.0.x to main
-310b20cbb6f7fca74695b3ff6dc43cf4b3d4ba6a 217e46bc4aa6df83f3a131c344d53bf02dd28a9c Marcin Grzejszczak <mgrzejszczak@vmware.com> 1686912332 +0200	merge 2022.0.x: Merge made by the 'ort' strategy.
-217e46bc4aa6df83f3a131c344d53bf02dd28a9c 0686dad89dadf285c219841468fdfec6e6dc67ba Marcin Grzejszczak <mgrzejszczak@vmware.com> 1688124894 +0200	commit: WIP
+0000000000000000000000000000000000000000 4696b27899c5144635a2e1ab8a7e4d7e90e9a922 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940461 +0100	clone: from git@github.com:spring-cloud/spring-cloud-release.git
+4696b27899c5144635a2e1ab8a7e4d7e90e9a922 4696b27899c5144635a2e1ab8a7e4d7e90e9a922 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940477 +0100	checkout: moving from master to build_for_greenwich
+4696b27899c5144635a2e1ab8a7e4d7e90e9a922 3444ec7655081e8baaa9d67da39003413f152361 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940701 +0100	commit: bumped
+3444ec7655081e8baaa9d67da39003413f152361 25d36c116933e83f5e11c87eb6abba491226a517 Marcin Grzejszczak <marcin@grzejszczak.pl> 1546940993 +0100	commit: WAT
+25d36c116933e83f5e11c87eb6abba491226a517 4696b27899c5144635a2e1ab8a7e4d7e90e9a922 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074103 +0100	checkout: moving from build_for_greenwich to master
+4696b27899c5144635a2e1ab8a7e4d7e90e9a922 7eb07fb2cfe5167e7b8f4d1e8b5ca97b2172f337 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074111 +0100	pull --rebase origin master: Fast-forward
+7eb07fb2cfe5167e7b8f4d1e8b5ca97b2172f337 84dcb519ab8b24c170b193d3da3c1d72d2ffff09 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074254 +0100	commit: Bumped Spring Cloud Build
+84dcb519ab8b24c170b193d3da3c1d72d2ffff09 371f4038422970a25bafcab8827f01c86f67915e Marcin Grzejszczak <marcin@grzejszczak.pl> 1548074263 +0100	commit (amend): Bumped Spring Cloud Build
+371f4038422970a25bafcab8827f01c86f67915e f46f941f5869e8bd70041c8842953f6ffd6da7d4 Marcin Grzejszczak <marcin@grzejszczak.pl> 1548417223 +0100	pull --rebase origin master: Fast-forward
+f46f941f5869e8bd70041c8842953f6ffd6da7d4 94e5602cb92e15adbc9de624264647066fb87cd1 Marcin Grzejszczak <marcin@grzejszczak.pl> 1549649256 +0100	commit: Added checkstyle
+94e5602cb92e15adbc9de624264647066fb87cd1 caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976044 +0100	pull --rebase origin master: Fast-forward
+caa72691da75cfb9208264d33b80ac39fc744cd6 caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976053 +0100	checkout: moving from master to Greenwich
+caa72691da75cfb9208264d33b80ac39fc744cd6 caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976062 +0100	checkout: moving from Greenwich to master
+caa72691da75cfb9208264d33b80ac39fc744cd6 01deb507356f4a36ea3209f8e57ddbac348f460b Marcin Grzejszczak <marcin@grzejszczak.pl> 1551976352 +0100	commit: Hoxton
+01deb507356f4a36ea3209f8e57ddbac348f460b 01deb507356f4a36ea3209f8e57ddbac348f460b Marcin Grzejszczak <marcin@grzejszczak.pl> 1552062251 +0100	reset: moving to HEAD
+01deb507356f4a36ea3209f8e57ddbac348f460b a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1552062520 +0100	commit: Updated for Hoxton
+a33643672892641471e4dca82a38f72c8ca3f35f a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520096 +0100	checkout: moving from master to scBuild214
+a33643672892641471e4dca82a38f72c8ca3f35f a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520108 +0100	checkout: moving from scBuild214 to master
+a33643672892641471e4dca82a38f72c8ca3f35f caa72691da75cfb9208264d33b80ac39fc744cd6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520120 +0100	checkout: moving from master to Greenwich
+caa72691da75cfb9208264d33b80ac39fc744cd6 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520129 +0100	pull --rebase origin Greenwich: Fast-forward
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520931 +0100	checkout: moving from Greenwich to scBuild214
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 0dfe0b0d109afe8969c2379a1d9789ae15e80e32 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553520937 +0100	commit: BUild 2.1.4
+0dfe0b0d109afe8969c2379a1d9789ae15e80e32 8aa3cb92a11adedbc5acfb300e721e0c7c7cd875 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553521862 +0100	commit: No snapshots
+8aa3cb92a11adedbc5acfb300e721e0c7c7cd875 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1553890436 +0100	checkout: moving from scBuild214 to Greenwich
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 9e70d9508ce6faafcb9ab785b1f939540c0deac6 Marcin Grzejszczak <marcin@grzejszczak.pl> 1557912513 +0200	reset: moving to HEAD
+9e70d9508ce6faafcb9ab785b1f939540c0deac6 a33643672892641471e4dca82a38f72c8ca3f35f Marcin Grzejszczak <marcin@grzejszczak.pl> 1557912514 +0200	checkout: moving from Greenwich to master
+a33643672892641471e4dca82a38f72c8ca3f35f a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560176662 +0200	pull --rebase origin master: Fast-forward
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560176674 +0200	checkout: moving from master to springCloudBuildRelease
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560177565 +0200	reset: moving to HEAD
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560177763 +0200	reset: moving to HEAD
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123097 +0200	checkout: moving from springCloudBuildRelease to master
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123103 +0200	reset: moving to HEAD
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 36b1fc71be5c290679009dda8873c960632816d7 Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123107 +0200	checkout: moving from master to vGreenwich.SR2
+36b1fc71be5c290679009dda8873c960632816d7 a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 Marcin Grzejszczak <marcin@grzejszczak.pl> 1565944802 +0200	checkout: moving from 36b1fc71be5c290679009dda8873c960632816d7 to master
+a06b51f45f40bf0f7c924f6e62b54f03ed0020f5 4d3656c3411c666e4bab64e1e5b02b5d02c3af7c Marcin Grzejszczak <marcin@grzejszczak.pl> 1565944806 +0200	pull --rebase origin master: Fast-forward
+4d3656c3411c666e4bab64e1e5b02b5d02c3af7c 19cd5760bb235822f58274a95dbf4c2451ece5ca Marcin Grzejszczak <marcin@grzejszczak.pl> 1565944855 +0200	commit: Added spring cloud build to the list of dependencies
+19cd5760bb235822f58274a95dbf4c2451ece5ca 36b1fc71be5c290679009dda8873c960632816d7 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566308875 +0200	checkout: moving from master to vGreenwich.SR2
+36b1fc71be5c290679009dda8873c960632816d7 3a55043d86d982c2ac1f86df7dd6945fa6c41058 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566310550 +0200	checkout: moving from 36b1fc71be5c290679009dda8873c960632816d7 to vEdgware.SR6
+3a55043d86d982c2ac1f86df7dd6945fa6c41058 df9f8dd8313f3b5d9a2a75ffb737bf328c6ca00d Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312025 +0200	checkout: moving from 3a55043d86d982c2ac1f86df7dd6945fa6c41058 to Edgware
+df9f8dd8313f3b5d9a2a75ffb737bf328c6ca00d e112ef52996d7b564d90e9436b50e6d1bd2af740 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312039 +0200	checkout: moving from Edgware to Dalston
+e112ef52996d7b564d90e9436b50e6d1bd2af740 f3fa9e830bcf486accf364eb3fb874dd663f2b49 Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312042 +0200	checkout: moving from Dalston to Finchley
+f3fa9e830bcf486accf364eb3fb874dd663f2b49 19cd5760bb235822f58274a95dbf4c2451ece5ca Marcin Grzejszczak <marcin@grzejszczak.pl> 1566312044 +0200	checkout: moving from Finchley to master

@@ -1,1 +1,5 @@
-0000000000000000000000000000000000000000 4e030063b617d966e604e13d608fff1bf9170cdb Marcin Grzejszczak <mgrzejszczak@vmware.com> 1675784191 +0100	WIP on main: ecbeb68 Disables jar signing for train docs
+0000000000000000000000000000000000000000 cc54ac2e86b7f75b2f3055eb3b08f5ceba06548d Marcin Grzejszczak <marcin@grzejszczak.pl> 1552062251 +0100	WIP on master: 01deb50 Hoxton
+cc54ac2e86b7f75b2f3055eb3b08f5ceba06548d bece815dcfc78185588566588a5f368fb66943f9 Marcin Grzejszczak <marcin@grzejszczak.pl> 1557912513 +0200	WIP on Greenwich: 9e70d95 Bumping kubernetes version
+bece815dcfc78185588566588a5f368fb66943f9 119e0117aac6e1b0ab3bccb032a84888632af251 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560177565 +0200	WIP on springCloudBuildRelease: a06b51f Moving to Horsham
+119e0117aac6e1b0ab3bccb032a84888632af251 b7204c64d76c0a554f6b539bfbb3a9159c6fca88 Marcin Grzejszczak <marcin@grzejszczak.pl> 1560177763 +0200	WIP on springCloudBuildRelease: a06b51f Moving to Horsham
+b7204c64d76c0a554f6b539bfbb3a9159c6fca88 5d99a44f92f53e72b9cf2fd5fe18ceb8070dee6e Marcin Grzejszczak <marcin@grzejszczak.pl> 1561123103 +0200	WIP on master: a06b51f Moving to Horsham

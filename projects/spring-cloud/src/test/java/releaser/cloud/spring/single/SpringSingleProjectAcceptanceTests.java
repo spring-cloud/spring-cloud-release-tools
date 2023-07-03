@@ -106,7 +106,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 	@Test
 	public void should_perform_a_release_of_consul(@TempDir File tempDirSpringCloudConsulOrigin,
 			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
-		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "2022.0.x");
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "Greenwich");
 		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
 		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
@@ -115,8 +115,8 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		run(this.runner,
 				properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
 						tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
-								.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("v2022.0.3")
-								.expectedVersion("4.0.2").build()),
+								.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("vGreenwich.SR2")
+								.expectedVersion("2.1.2.RELEASE").build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
@@ -129,12 +129,12 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 
 					Iterable<RevCommit> commits = listOfCommits(project);
 					Iterator<RevCommit> iterator = commits.iterator();
-					tagIsPresentInOrigin(origin, "v4.0.2");
-					commitIsPresent(iterator, "Bumping versions to 4.0.3-SNAPSHOT after release");
+					tagIsPresentInOrigin(origin, "v2.1.2.RELEASE");
+					commitIsPresent(iterator, "Bumping versions to 2.1.3.SNAPSHOT after release");
 					commitIsPresent(iterator, "Going back to snapshots");
-					commitIsPresent(iterator, "Update SNAPSHOT to 4.0.2");
-					pomVersionIsEqualTo(project, "4.0.3-SNAPSHOT");
-					consulPomParentVersionIsEqualTo(project, "4.0.3-SNAPSHOT");
+					commitIsPresent(iterator, "Update SNAPSHOT to 2.1.2.RELEASE");
+					pomVersionIsEqualTo(project, "2.1.3.SNAPSHOT");
+					consulPomParentVersionIsEqualTo(project, "2.1.3.SNAPSHOT");
 					then(gitHubHandler.closedMilestones).isTrue();
 					then(emailTemplate()).doesNotExist();
 					then(blogTemplate()).doesNotExist();
@@ -145,7 +145,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					BDDMockito.then(saganClient).should(times(2)).addRelease(BDDMockito.eq("spring-cloud-consul"),
 							BDDMockito.any());
 					BDDMockito.then(saganClient).should(times(2)).getProject("spring-cloud-consul");
-					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "4.0.2-SNAPSHOT");
+					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "2.1.2.BUILD-SNAPSHOT");
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
@@ -199,7 +199,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					// second time to update SNAPSHOT
 					BDDMockito.then(saganClient).should(times(2)).addRelease(BDDMockito.eq("spring-cloud-build"),
 							BDDMockito.any());
-					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-build", "2.1.6.SNAPSHOT");
+					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-build", "2.1.6.BUILD-SNAPSHOT");
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
@@ -266,7 +266,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 	@Test
 	public void should_not_clone_when_option_not_to_clone_was_switched_on(@TempDir File tempDirSpringCloudConsulOrigin,
 			@TempDir File tempDirSpringCloudConsulProject, @TempDir File temporaryDestination) throws Exception {
-		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "main");
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "master");
 		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
 		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
