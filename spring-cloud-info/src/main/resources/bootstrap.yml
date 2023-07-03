@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: spring-cloud-info
+  cloud:
+    config:
+      label: spring-cloud-info-config

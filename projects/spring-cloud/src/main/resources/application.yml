@@ -41,6 +41,10 @@ releaser:
     update-release-train-wiki: true
     update-all-test-samples: true
     all-test-sample-urls:
+      spring-cloud-sleuth:
+        - https://github.com/spring-cloud-samples/sleuth-issues
+        - https://github.com/spring-cloud-samples/sleuth-documentation-apps
+        - https://github.com/spring-cloud-samples/spring-cloud-sleuth-samples
       spring-cloud-contract:
         - https://github.com/spring-cloud-samples/spring-cloud-contract-samples
         - https://github.com/spring-cloud-samples/the-legacy-app
@@ -97,7 +101,7 @@ releaser:
     enabled: true
     template-folder: cloud
   versions:
-    all-versions-file-url: https://raw.githubusercontent.com/spring-io/start.spring.io/main/start-site/src/main/resources/application.yml
+    all-versions-file-url: https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml
     bom-name: spring-cloud
   # fixed-versions:
   meta-release:

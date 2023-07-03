@@ -16,13 +16,13 @@
 
 package releaser.cloud.github;
 
-import org.kohsuke.github.GitHub;
+import com.jcabi.github.Github;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.github.CustomGithubIssues;
 
 public class SpringCloudGithubIssuesAccessor {
 
-	public static CustomGithubIssues springCloud(GitHub github, ReleaserProperties releaserProperties) {
+	public static CustomGithubIssues springCloud(Github github, ReleaserProperties releaserProperties) {
 		return new SpringCloudGithubIssues(github, releaserProperties);
 	}
 

@@ -50,6 +50,8 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -57,14 +59,11 @@ import org.springframework.batch.core.job.builder.JobFlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
@@ -74,9 +73,9 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
 	private final ConsoleInputStepSkipper stepSkipper;
 
-	private final JobRepository jobRepository;
+	private final StepBuilderFactory stepBuilderFactory;
 
-	private final PlatformTransactionManager manager;
+	private final JobBuilderFactory jobBuilderFactory;
 
 	private final ProjectsToRunFactory projectsToRunFactory;
 
@@ -90,12 +89,12 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 
 	private final ReleaserProperties releaserProperties;
 
-	SpringBatchFlowRunner(JobRepository jobRepository, PlatformTransactionManager manager,
+	SpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory, JobBuilderFactory jobBuilderFactory,
 			ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 			FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier, ConfigurableApplicationContext context,
 			ReleaserProperties releaserProperties, BuildReportHandler reportHandler) {
-		this.jobRepository = jobRepository;
-		this.manager = manager;
+		this.stepBuilderFactory = stepBuilderFactory;
+		this.jobBuilderFactory = jobBuilderFactory;
 		this.projectsToRunFactory = projectsToRunFactory;
 		this.jobLauncher = jobLauncher;
 		this.flowRunnerTaskExecutorSupplier = flowRunnerTaskExecutorSupplier;
@@ -111,7 +110,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	}
 
 	private Step createStep(ReleaserTask releaserTask, NamedArgumentsSupplier argsSupplier) {
-		return new StepBuilder(argsSupplier.projectName + "_" + releaserTask.name(), jobRepository)
+		return this.stepBuilderFactory.get(argsSupplier.projectName + "_" + releaserTask.name())
 				.tasklet((contribution, chunkContext) -> {
 					Arguments args = argsSupplier.get();
 					FlowRunner.Decision decision = beforeTask(args.options, args.properties, releaserTask);
@@ -139,7 +138,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 						log.info("Skipping step [{}]", releaserTask.name());
 					}
 					return RepeatStatus.FINISHED;
-				}, this.manager).listener(releaserListener(argsSupplier, releaserTask)).build();
+				}).listener(releaserListener(argsSupplier, releaserTask)).build();
 	}
 
 	private List<Throwable> addExceptionToErrors(List<Throwable> errors, RuntimeException exception) {
@@ -305,7 +304,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	}
 
 	private Job buildJobForFlows(Iterator<StuffToRun> flowsIterator) {
-		JobBuilder release = new JobBuilder("release_" + System.currentTimeMillis(), this.jobRepository);
+		JobBuilder release = this.jobBuilderFactory.get("release_" + System.currentTimeMillis());
 		StuffToRun stuffToRun = flowsIterator.next();
 		Flow first = stuffToRun.flow;
 		JobFlowBuilder start = release.start(first);
@@ -363,7 +362,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 			log.info("No release train post release tasks to run, will do nothing");
 			return ExecutionResult.success();
 		}
-		Job job = new JobBuilder(name, this.jobRepository).start(flow).build().build();
+		Job job = this.jobBuilderFactory.get(name).start(flow).build().build();
 		return runJob(job);
 	}
 
@@ -512,14 +511,14 @@ class ConsoleInputStepSkipper {
 	public boolean skipStep() {
 		String input = chosenOption();
 		switch (input.toLowerCase()) {
-			case "s":
-				return true;
-			case "q":
-				reportHandler.reportBuildSummary();
-				System.exit(SpringApplication.exit(this.context, () -> 0));
-				return true;
-			default:
-				return false;
+		case "s":
+			return true;
+		case "q":
+			reportHandler.reportBuildSummary();
+			System.exit(SpringApplication.exit(this.context, () -> 0));
+			return true;
+		default:
+			return false;
 		}
 	}
 

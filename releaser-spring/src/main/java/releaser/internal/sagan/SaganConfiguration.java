@@ -66,8 +66,8 @@ class SaganConfiguration {
 			}
 
 			@Override
-			public void patchProjectDetails(String projectName, ProjectDetails details) {
-
+			public Project patchProject(Project project) {
+				return null;
 			}
 		};
 	}

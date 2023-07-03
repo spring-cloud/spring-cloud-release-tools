@@ -16,7 +16,7 @@
 
 package releaser.cloud.github;
 
-import org.kohsuke.github.GitHub;
+import com.jcabi.github.Github;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.github.CustomGithubIssues;
 import releaser.internal.github.GithubIssueFiler;
@@ -38,39 +38,23 @@ class SpringCloudGithubIssues implements CustomGithubIssues {
 		this.properties = properties;
 	}
 
-	SpringCloudGithubIssues(GitHub github, ReleaserProperties properties) {
+	SpringCloudGithubIssues(Github github, ReleaserProperties properties) {
 		this.githubIssueFiler = new GithubIssueFiler(github, properties);
 		this.properties = properties;
 	}
 
 	@Override
 	public void fileIssueInSpringGuides(Projects projects, ProjectVersion version) {
-		String user = getGuidesOrg();
-		String repo = getGuidesRepo();
+		String user = "spring-guides";
+		String repo = "getting-started-guides";
 		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(), guidesIssueText(projects));
 	}
 
 	@Override
 	public void fileIssueInStartSpringIo(Projects projects, ProjectVersion version) {
-		String user = getStartSpringIoOrg();
-		String repo = getStartSpringIoRepo();
+		String user = "spring-io";
+		String repo = "start.spring.io";
 		this.githubIssueFiler.fileAGitHubIssue(user, repo, version, issueTitle(), startSpringIoIssueText(projects));
-	}
-
-	String getGuidesOrg() {
-		return "spring-guides";
-	}
-
-	String getGuidesRepo() {
-		return "getting-started-guides";
-	}
-
-	String getStartSpringIoOrg() {
-		return "spring-io";
-	}
-
-	String getStartSpringIoRepo() {
-		return "start.spring.io";
 	}
 
 	private String issueTitle() {

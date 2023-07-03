@@ -41,7 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.HttpServerErrorException;
 
-@SpringBootTest(properties = "spring.batch.jdbc.initialize-schema=always")
+@SpringBootTest
 @ActiveProfiles("batch")
 class SpringBatchFlowRunnerTests {
 
