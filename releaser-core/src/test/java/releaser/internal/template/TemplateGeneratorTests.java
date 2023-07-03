@@ -109,10 +109,8 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("General Availability (RELEASE) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Maven Central]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.RELEASE))")
-				.contains(
-						"| Spring Cloud Foo    | 1.0.2.RELEASE    | ([issues](https://github.com/spring-cloud/spring-cloud-foo/releases/tag/v1.0.2.RELEASE))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://foo.bar.com))")
+				.contains("| Spring Cloud Foo    | 1.0.2.RELEASE    | &nbsp;")
 				.contains("<version>Dalston.RELEASE</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RELEASE'");
 	}
@@ -131,8 +129,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("General Availability (RELEASE) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Maven Central]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.RELEASE))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://foo.bar.com))")
 				.contains("<version>Dalston.RELEASE</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RELEASE'");
 	}
@@ -151,8 +148,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("General Availability (RELEASE) of the [Spring Cloud 2020.0.5]")
 				.contains("The release can be found in [Maven Central]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0    | ([issues](https://foo.bar.com))")
 				.contains("<version>2020.0.5</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.5'");
 	}
@@ -171,8 +167,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Service Release 1 (SR1) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Maven Central]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.RELEASE))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://foo.bar.com))")
 				.contains("<version>Dalston.SR1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.SR1'");
 	}
@@ -191,8 +186,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Service Release 1 (SR1) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Maven Central]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.RELEASE))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.RELEASE    | ([issues](https://foo.bar.com))")
 				.contains("<version>Dalston.SR1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.SR1'");
 	}
@@ -211,8 +205,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Milestone 1 (M1) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Spring Milestone]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.M1    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.M1))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.M1    | ([issues](https://foo.bar.com))")
 				.contains("<id>spring-milestones</id>").contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.M1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.M1'");
@@ -232,8 +225,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Milestone 1 (M1) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Spring Milestone]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.M1    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.M1))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.M1    | ([issues](https://foo.bar.com))")
 				.contains("<id>spring-milestones</id>").contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.M1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.M1'");
@@ -254,8 +246,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Milestone 1 (M1) of the [Spring Cloud 2020.0.0]")
 				.contains("The release can be found in [Spring Milestone]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0-M1    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0-M1))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0-M1    | ([issues](https://foo.bar.com))")
 				.contains("<id>spring-milestones</id>").contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>2020.0.0-M1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.0-M1'");
@@ -275,8 +266,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Release Candidate 1 (RC1) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Spring Milestone]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.RC1    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.RC1))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.RC1    | ([issues](https://foo.bar.com))")
 				.contains("<id>spring-milestones</id>").contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.RC1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RC1'");
@@ -296,8 +286,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Release Candidate 1 (RC1) of the [Spring Cloud Dalston]")
 				.contains("The release can be found in [Spring Milestone]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0.RC1    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.RC1))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0.RC1    | ([issues](https://foo.bar.com))")
 				.contains("<id>spring-milestones</id>").contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>Dalston.RC1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.RC1'");
@@ -317,8 +306,7 @@ public class TemplateGeneratorTests {
 
 		then(content(generatedBlog)).contains("Release Candidate 1 (RC1) of the [Spring Cloud 2020.0.0]")
 				.contains("The release can be found in [Spring Milestone]").contains("### Spring Cloud Sleuth")
-				.contains(
-						"| Spring Cloud Sleuth    | 1.0.0-RC1    | ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0-RC1))")
+				.contains("| Spring Cloud Sleuth    | 1.0.0-RC1    | ([issues](https://foo.bar.com))")
 				.contains("<id>spring-milestones</id>").contains("url 'https://repo.spring.io/milestone'")
 				.contains("<version>2020.0.0-RC1</version>")
 				.contains("mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.0-RC1'");
@@ -343,10 +331,9 @@ public class TemplateGeneratorTests {
 
 		File generatedOutput = new TemplateGenerator(this.props, handler).releaseNotes(projects);
 
-		then(content(generatedOutput)).contains("# Dalston.RC1").contains(
-				"Spring Cloud Sleuth `1.0.0.RC1` ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/releases/tag/v1.0.0.RC1))")
-				.contains(
-						"Spring Cloud Consul `1.0.1.RC1` ([issues](https://github.com/spring-cloud/spring-cloud-consul/releases/tag/v1.0.1.RC1))")
+		then(content(generatedOutput)).contains("# Dalston.RC1")
+				.contains("Spring Cloud Sleuth `1.0.0.RC1` ([issues](https://foo.bar.com?closed=1))")
+				.contains("Spring Cloud Consul `1.0.1.RC1` ([issues](https://foo.bar.com?closed=1))")
 				.doesNotContain("Boot");
 	}
 

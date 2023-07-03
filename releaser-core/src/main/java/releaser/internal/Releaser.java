@@ -193,9 +193,6 @@ public class Releaser {
 		try {
 			this.projectGitHubHandler.closeMilestone(releaseVersion);
 			log.info("\nSuccessfully closed milestone");
-			log.info("\nWill try to create release notes for milestone");
-			this.projectGitHubHandler.createReleaseNotesForMilestone(releaseVersion);
-			log.info("\nSuccessfully created release notes for milestone");
 			return ExecutionResult.success();
 		}
 		catch (Exception ex) {

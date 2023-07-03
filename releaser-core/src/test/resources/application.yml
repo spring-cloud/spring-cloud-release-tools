@@ -13,7 +13,6 @@ releaser:
   flow:
     default-enabled: true
   git:
-    org-name: "spring-cloud"
     release-train-bom-url: https://github.com/spring-cloud/spring-cloud-release
     documentation-url: https://github.com/spring-cloud/spring-cloud-static
     spring-project-url: https://github.com/spring-projects/spring-cloud
@@ -31,7 +30,6 @@ releaser:
     # username:
     # password:
     number-of-checked-milestones: 50
-    create-release-notes-for-milestone: true
     update-documentation-repo: true
     update-github-milestones: true
     update-spring-guides: true

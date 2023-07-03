@@ -33,7 +33,6 @@ releaser:
     number-of-checked-milestones: 50
     update-documentation-repo: true
     update-github-milestones: true
-    create-release-notes-for-milestone: true
     update-spring-guides: true
     update-start-spring-io: true
     update-spring-project: true
