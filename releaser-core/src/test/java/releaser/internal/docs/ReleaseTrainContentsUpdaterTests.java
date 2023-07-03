@@ -123,8 +123,8 @@ public class ReleaseTrainContentsUpdaterTests {
 		File file = this.updater.updateReleaseTrainWiki(newReleaseTrain());
 
 		BDDAssertions.then(file).isNotNull();
-		BDDAssertions.then(edgwareWikiEntryContent(file)).contains("# Edgware.SR7")
-				.contains("Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
+		BDDAssertions.then(edgwareWikiEntryContent(file)).contains("# Edgware.SR7").contains(
+				"Spring Cloud Consul `2.0.1.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-consul/releases/tag/v2.0.1.RELEASE))");
 		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [Edgware.SR7]");
 	}
@@ -138,8 +138,8 @@ public class ReleaseTrainContentsUpdaterTests {
 		File file = this.updater.updateReleaseTrainWiki(freshNewReleaseTrain());
 
 		BDDAssertions.then(file).isNotNull();
-		BDDAssertions.then(greenwichWikiEntryContent(file)).contains("# Greenwich.RELEASE")
-				.contains("Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
+		BDDAssertions.then(greenwichWikiEntryContent(file)).contains("# Greenwich.RELEASE").contains(
+				"Spring Cloud Consul `2.0.1.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-consul/releases/tag/v2.0.1.RELEASE))");
 		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [Greenwich.RELEASE]");
 	}
@@ -154,8 +154,8 @@ public class ReleaseTrainContentsUpdaterTests {
 		File file = this.updater.updateReleaseTrainWiki(freshNewReleaseTrainCalver());
 
 		BDDAssertions.then(file).isNotNull();
-		BDDAssertions.then(calverWikiEntryContent(file)).contains("# 2020.0.5")
-				.contains("Spring Cloud Consul `2.0.1.RELEASE` ([issues](http://www.foo.com/))");
+		BDDAssertions.then(calverWikiEntryContent(file)).contains("# 2020.0.5").contains(
+				"Spring Cloud Consul `2.0.1.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-consul/releases/tag/v2.0.1.RELEASE))");
 		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [2020.0.5]");
 	}

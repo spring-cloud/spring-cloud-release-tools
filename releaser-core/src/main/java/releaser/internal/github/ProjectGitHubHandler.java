@@ -60,6 +60,15 @@ public class ProjectGitHubHandler {
 		this.githubMilestones.closeMilestone(releaseVersion);
 	}
 
+	public void createReleaseNotesForMilestone(ProjectVersion releaseVersion) {
+		if (!this.properties.getGit().isCreateReleaseNotesForMilestone()) {
+			log.info("Will not create release notes for milestone, since the switch to do so "
+					+ "is off. Set [releaser.git.create-release-notes-for-milestone] to [true] to change that");
+			return;
+		}
+		this.githubMilestones.createReleaseNotesForMilestone(releaseVersion);
+	}
+
 	public void createIssueInSpringGuides(Projects projects, ProjectVersion version) {
 		if (!this.properties.getGit().isUpdateSpringGuides()) {
 			log.info("Will not update the release train documentation, since the switch to do so "
@@ -71,7 +80,7 @@ public class ProjectGitHubHandler {
 
 	public void createIssueInStartSpringIo(Projects projects, ProjectVersion version) {
 		if (!this.properties.getGit().isUpdateStartSpringIo()) {
-			log.info("Will not update the release train documentation, since the switch to do so "
+			log.info("Will not update start.spring.io, since the switch to do so "
 					+ "is off. Set [releaser.git.update-start-spring-io] to [true] to change that");
 			return;
 		}

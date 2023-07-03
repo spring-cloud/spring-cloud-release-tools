@@ -531,6 +531,11 @@ public class ReleaserProperties implements Serializable {
 		private String password;
 
 		/**
+		 * URL to the fat jar with Github Changelog Generator.
+		 */
+		private String githubChangelogGeneratorUrl = "https://github.com/spring-io/github-changelog-generator/releases/download/v0.0.8/github-changelog-generator.jar";
+
+		/**
 		 * In order not to iterate endlessly over milestones we introduce a threshold of
 		 * milestones that we will go through to find the matching milestone.
 		 */
@@ -545,6 +550,11 @@ public class ReleaserProperties implements Serializable {
 		 * If set to {@code false}, will not update Github milestones.
 		 */
 		private boolean updateGithubMilestones = false;
+
+		/**
+		 * If set to {@code false}, will not create release notes for milestone.
+		 */
+		private boolean createReleaseNotesForMilestone = false;
 
 		/**
 		 * If set to {@code false}, will not update Spring Guides for a release train.
@@ -812,6 +822,22 @@ public class ReleaserProperties implements Serializable {
 
 		public void setUpdateGithubMilestones(boolean updateGithubMilestones) {
 			this.updateGithubMilestones = updateGithubMilestones;
+		}
+
+		public boolean isCreateReleaseNotesForMilestone() {
+			return createReleaseNotesForMilestone;
+		}
+
+		public void setCreateReleaseNotesForMilestone(boolean createReleaseNotesForMilestone) {
+			this.createReleaseNotesForMilestone = createReleaseNotesForMilestone;
+		}
+
+		public String getGithubChangelogGeneratorUrl() {
+			return githubChangelogGeneratorUrl;
+		}
+
+		public void setGithubChangelogGeneratorUrl(String githubChangelogGeneratorUrl) {
+			this.githubChangelogGeneratorUrl = githubChangelogGeneratorUrl;
 		}
 
 		public String getOrgName() {

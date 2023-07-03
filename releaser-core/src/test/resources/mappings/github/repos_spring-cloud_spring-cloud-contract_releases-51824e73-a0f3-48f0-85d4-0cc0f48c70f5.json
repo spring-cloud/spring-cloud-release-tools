@@ -1,0 +1,21 @@
+{
+  "id" : "51824e73-a0f3-48f0-85d4-0cc0f48c70f5",
+  "name" : "repos_spring-cloud_spring-cloud-contract_releases",
+  "request" : {
+    "url" : "/repos/marcingrzejszczak/spring-cloud-contract/releases",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"tag_name\":\"v3.1.8\",\"name\":\"3.1.8\",\"body\":\"FOOOO\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 201,
+    "body" : "{\"url\":\"https://api.github.com/repos/marcingrzejszczak/spring-cloud-contract/releases/110836354\",\"assets_url\":\"https://api.github.com/repos/marcingrzejszczak/spring-cloud-contract/releases/110836354/assets\",\"upload_url\":\"https://uploads.github.com/repos/marcingrzejszczak/spring-cloud-contract/releases/110836354/assets{?name,label}\",\"html_url\":\"https://github.com/marcingrzejszczak/spring-cloud-contract/releases/tag/v3.1.8\",\"id\":110836354,\"author\":{\"login\":\"marcingrzejszczak\",\"id\":3297437,\"node_id\":\"MDQ6VXNlcjMyOTc0Mzc=\",\"avatar_url\":\"https://avatars.githubusercontent.com/u/3297437?v=4\",\"gravatar_id\":\"\",\"url\":\"https://api.github.com/users/marcingrzejszczak\",\"html_url\":\"https://github.com/marcingrzejszczak\",\"followers_url\":\"https://api.github.com/users/marcingrzejszczak/followers\",\"following_url\":\"https://api.github.com/users/marcingrzejszczak/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/marcingrzejszczak/gists{/gist_id}\",\"starred_url\":\"https://api.github.com/users/marcingrzejszczak/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/marcingrzejszczak/subscriptions\",\"organizations_url\":\"https://api.github.com/users/marcingrzejszczak/orgs\",\"repos_url\":\"https://api.github.com/users/marcingrzejszczak/repos\",\"events_url\":\"https://api.github.com/users/marcingrzejszczak/events{/privacy}\",\"received_events_url\":\"https://api.github.com/users/marcingrzejszczak/received_events\",\"type\":\"User\",\"site_admin\":false},\"node_id\":\"RE_kwDOA6J4xc4GmzqC\",\"tag_name\":\"v3.1.8\",\"target_commitish\":\"main\",\"name\":\"3.1.8\",\"draft\":false,\"prerelease\":false,\"created_at\":\"2023-06-29T13:38:36Z\",\"published_at\":\"2023-07-03T09:24:59Z\",\"assets\":[],\"tarball_url\":\"https://api.github.com/repos/marcingrzejszczak/spring-cloud-contract/tarball/v3.1.8\",\"zipball_url\":\"https://api.github.com/repos/marcingrzejszczak/spring-cloud-contract/zipball/v3.1.8\",\"body\":\"FOOOO\",\"mentions_count\":1}"
+  },
+  "uuid" : "51824e73-a0f3-48f0-85d4-0cc0f48c70f5",
+  "persistent" : true,
+  "insertionIndex" : 14
+}
+

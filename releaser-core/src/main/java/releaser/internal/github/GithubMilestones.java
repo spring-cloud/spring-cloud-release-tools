@@ -16,18 +16,27 @@
 
 package releaser.internal.github;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHMilestone;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.project.ProjectVersion;
+import releaser.internal.tech.ReleaserProcessExecutor;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -39,6 +48,8 @@ class GithubMilestones {
 
 	static final Map<ProjectVersion, String> MILESTONE_URL_CACHE = new ConcurrentHashMap<>();
 	static final Map<ProjectVersion, GHMilestone> MILESTONE_CACHE = new ConcurrentHashMap<>();
+
+	static final AtomicReference<Path> DOWNLOADED_GITHUB_CHANGELOG = new AtomicReference<>();
 
 	private static final Logger log = LoggerFactory.getLogger(GithubMilestones.class);
 
@@ -83,6 +94,72 @@ class GithubMilestones {
 		else {
 			log.warn("No matching milestone was found");
 		}
+	}
+
+	void createReleaseNotesForMilestone(ProjectVersion version) {
+		String contents = null;
+		if (version.isReleaseTrain()) {
+			String listOfReleases = this.properties.getFixedVersions().entrySet().stream()
+					.sorted(Map.Entry.comparingByKey())
+					.filter(entry -> !entry.getKey().equals("spring-boot") && this.properties.getMetaRelease()
+							.getReleaseTrainDependencyNames().stream().noneMatch(s -> entry.getKey().equals(s)))
+					.map(entry -> "- " + entry.getKey() + " [" + entry.getValue() + "](https://github.com/" + org()
+							+ "/" + entry.getKey() + "/releases/tag/v" + entry.getValue() + ")")
+					.collect(Collectors.joining("\n"));
+			contents = "## :star: Releases\n\n" + listOfReleases;
+		}
+		else {
+			try {
+				boolean notPreviouslyDownloaded = DOWNLOADED_GITHUB_CHANGELOG.compareAndSet(null,
+						Files.createTempFile("releaser-changelog-generator", ".jar"));
+				if (notPreviouslyDownloaded) {
+					try (ReadableByteChannel readableByteChannel = Channels.newChannel(
+							new URL(this.properties.getGit().getGithubChangelogGeneratorUrl()).openStream())) {
+						downloadFatJarIfNotPresent(readableByteChannel);
+					}
+				}
+				contents = readChangelogFromGeneratorOutput(version);
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		createGithubMilestoneReleaseNotes(version, contents);
+	}
+
+	String readChangelogFromGeneratorOutput(ProjectVersion version) throws IOException {
+		Path path = DOWNLOADED_GITHUB_CHANGELOG.get();
+		Path workDir = path.getParent();
+		ReleaserProcessExecutor processExecutor = new ReleaserProcessExecutor(workDir.toAbsolutePath().toString());
+		// java -jar -Dchangelog.repository=spring-cloud/spring-cloud-sleuth
+		// github-changelog-generator.jar 3.1.8 ./sleuth.md
+		processExecutor.runCommand(new String[] { "java", "-jar",
+				"-Dchangelog.repository=" + this.properties.getGit().getOrgName() + "/" + version.projectName,
+				"-Dgithub.username=" + this.properties.getGit().getUsername(),
+				"-Dgithub.password=" + this.properties.getGit().getOauthToken(), path.getFileName().toString(),
+				version.version, version.projectName + ".md" }, 2L);
+		return Files.readString(workDir.resolve(version.projectName + ".md"));
+	}
+
+	void createGithubMilestoneReleaseNotes(ProjectVersion version, String contents) {
+		try {
+			String tag = "v" + version.version;
+			log.info("Creating a new release {} for project {}", tag, version.projectName);
+			getRepository(version).createRelease(tag).name(version.version).body(contents).create();
+			log.info("Created a new release");
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void downloadFatJarIfNotPresent(ReadableByteChannel readableByteChannel) throws IOException {
+		Path path = DOWNLOADED_GITHUB_CHANGELOG.get();
+		log.info("Will download the github changelog generator from {} to {}",
+				this.properties.getGit().getGithubChangelogGeneratorUrl(), path);
+		FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
+		fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+		log.info("File downloaded");
 	}
 
 	GHMilestone matchingMilestone(String tagVersion, Iterable<GHMilestone> milestones) {
@@ -144,22 +221,21 @@ class GithubMilestones {
 		return version.contains("RELEASE") ? version.substring(0, version.lastIndexOf(".")) : "";
 	}
 
-	String milestoneTitle(GHMilestone milestone) throws IOException {
-		return milestone.getTitle();
-	}
-
 	URL foundMilestoneUrl(GHMilestone milestone) throws IOException {
 		return milestone.getUrl();
 	}
 
 	private Iterable<GHMilestone> openMilestones(ProjectVersion version) {
 		try {
-			return this.github.getRepository(org() + "/" + version.projectName).listMilestones(GHIssueState.OPEN)
-					.toList();
+			return getRepository(version).listMilestones(GHIssueState.OPEN).toList();
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private GHRepository getRepository(ProjectVersion version) throws IOException {
+		return this.github.getRepository(org() + "/" + version.projectName);
 	}
 
 	private Iterable<GHMilestone> closedMilestones(ProjectVersion version) {

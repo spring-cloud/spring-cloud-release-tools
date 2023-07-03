@@ -16,14 +16,10 @@
 
 package releaser.internal.project;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +31,8 @@ import org.zeroturnaround.exec.ProcessResult;
 import releaser.internal.PomUpdateAcceptanceTests;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.buildsystem.TestUtils;
+import releaser.internal.tech.ReleaserProcessExecutor;
+import releaser.internal.tech.TestReleaserProcessExecutor;
 
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.util.FileSystemUtils;
@@ -471,10 +469,10 @@ public class ProjectCommandExecutorTests {
 		ProjectCommandExecutor builder = new ProjectCommandExecutor() {
 			@Override
 			ReleaserProcessExecutor executor(String workingDir) {
-				return new ReleaserProcessExecutor(properties.getWorkingDir()) {
+				return new TestReleaserProcessExecutor(properties.getWorkingDir(), temporaryFolder) {
+
 					@Override
-					ProcessResult doExecute(ProcessExecutor processExecutor)
-							throws IOException, InterruptedException, TimeoutException {
+					public ProcessResult doExecute(ProcessExecutor processExecutor) {
 						return new ProcessResult(1, null);
 					}
 				};
@@ -486,7 +484,7 @@ public class ProjectCommandExecutorTests {
 	}
 
 	private TestReleaserProcessExecutor testExecutor(String workingDir) {
-		return new TestReleaserProcessExecutor(workingDir);
+		return new TestReleaserProcessExecutor(workingDir, temporaryFolder);
 	}
 
 	private File tmpFile(String relativePath) {
@@ -503,37 +501,6 @@ public class ProjectCommandExecutorTests {
 
 	private ProjectVersion original() {
 		return new ProjectVersion("foo", "0.100.0.BUILD-SNAPSHOT");
-	}
-
-	class TestReleaserProcessExecutor extends ReleaserProcessExecutor {
-
-		int counter = 0;
-
-		TestReleaserProcessExecutor(String workingDir) {
-			super(workingDir);
-		}
-
-		@Override
-		ProcessExecutor processExecutor(String[] commands, String workingDir) {
-			this.counter++;
-			final ProcessExecutor processExecutor = super.processExecutor(commands, workingDir);
-
-			File tempFile = tmpFile("/builder/resolved/resolved.log");
-			try {
-				tempFile.createNewFile();
-				OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile));
-
-				return processExecutor
-						// use redirectOutputAlsoTo to avoid overriding all output
-						// destinations
-						.redirectOutput(fos);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				return processExecutor;
-			}
-		}
-
 	}
 
 }

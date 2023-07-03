@@ -89,7 +89,8 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
 		run(defaultRunner(),
-				properties("debugx=true").properties("test.metarelease=true")
+				properties("debugx=true")
+						.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
 						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
 								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
 										.bomBranch("v2022.0.2").addFixedVersions(v2022_0_4()).build()),
@@ -131,7 +132,8 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(defaultRunner(), properties("debugx=true").properties("test.metarelease=true")
+		run(defaultRunner(), properties("debugx=true")
+				.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
 				.properties(metaReleaseArgsForParallel(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
 						tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2022.0.2")
 								.addFixedVersions(v2022_0_4())

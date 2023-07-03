@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.github.ProjectGitHubHandler;
-import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 
 import org.springframework.util.StringUtils;
@@ -50,22 +49,12 @@ class NotesGenerator {
 				.map(projectVersion -> {
 					String name = projectVersion.projectName;
 					String version = projectVersion.version;
-					String closedMilestoneUrl = closedMilestoneUrl(projectVersion);
+					String release = "https://github.com/" + this.properties.getGit().getOrgName() + "/"
+							+ projectVersion.projectName + "/releases/tag/v" + projectVersion.version;
 					String convertedName = Arrays.stream(name.split("-")).map(StringUtils::capitalize)
 							.collect(Collectors.joining(" "));
-					return new Notes(convertedName, version, closedMilestoneUrl);
+					return new Notes(convertedName, version, release);
 				}).collect(Collectors.toSet());
-	}
-
-	private String closedMilestoneUrl(ProjectVersion projectVersion) {
-		try {
-			return this.handler.milestoneUrl(projectVersion);
-		}
-		catch (Exception ex) {
-			log.warn("Exception occurred while trying to fetch a milestone url. Will fallback to tag url", ex);
-			return "https://github.com/" + this.properties.getGit().getOrgName() + "/" + projectVersion.projectName
-					+ "/releases/tag/v" + projectVersion.version;
-		}
 	}
 
 }
