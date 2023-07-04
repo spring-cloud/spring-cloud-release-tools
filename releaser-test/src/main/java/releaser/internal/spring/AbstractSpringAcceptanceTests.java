@@ -50,14 +50,14 @@ import releaser.internal.sagan.Project;
 import releaser.internal.sagan.Release;
 import releaser.internal.tasks.ReleaserTask;
 
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -320,11 +320,11 @@ public abstract class AbstractSpringAcceptanceTests {
 	public static class DefaultTestConfiguration {
 
 		@Bean
-		SpringBatchFlowRunner mySpringBatchFlowRunner(JobRepository jobRepository, PlatformTransactionManager manager,
-				ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
+		SpringBatchFlowRunner mySpringBatchFlowRunner(StepBuilderFactory stepBuilderFactory,
+				JobBuilderFactory jobBuilderFactory, ProjectsToRunFactory projectsToRunFactory, JobLauncher jobLauncher,
 				FlowRunnerTaskExecutorSupplier flowRunnerTaskExecutorSupplier, ConfigurableApplicationContext context,
 				ReleaserProperties releaserProperties, BuildReportHandler reportHandler) {
-			return new SpringBatchFlowRunner(jobRepository, manager, projectsToRunFactory, jobLauncher,
+			return new SpringBatchFlowRunner(stepBuilderFactory, jobBuilderFactory, projectsToRunFactory, jobLauncher,
 					flowRunnerTaskExecutorSupplier, context, releaserProperties, reportHandler) {
 				@Override
 				Decision decide(Options options, ReleaserTask task) {

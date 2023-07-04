@@ -139,31 +139,31 @@ class SpringCloudMavenBomParser implements CustomBomParser {
 	public Set<Project> setVersion(Set<Project> projects, String projectName, String version) {
 		Set<Project> newProjects = new LinkedHashSet<>(projects);
 		switch (projectName) {
-			case SPRING_BOOT:
-			case BOOT_STARTER_ARTIFACT_ID:
-			case BOOT_STARTER_PARENT_ARTIFACT_ID:
-			case BOOT_DEPENDENCIES_ARTIFACT_ID:
-				updateBootVersions(newProjects, version);
-				break;
-			case BUILD_ARTIFACT_ID:
-			case CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID:
-				updateBuildVersions(newProjects, version);
-				break;
-			case CLOUD_ARTIFACT_ID:
-			case CLOUD_DEPENDENCIES_ARTIFACT_ID:
-			case CLOUD_RELEASE_ARTIFACT_ID:
-			case CLOUD_STARTER_ARTIFACT_ID:
-			case CLOUD_STARTER_PARENT_ARTIFACT_ID:
-			case CLOUD_STARTER_BUILD_ARTIFACT_ID:
-				updateSpringCloudVersions(newProjects, version);
-				break;
-			case STREAM_DEPS_ARTIFACT_ID:
-			case STREAM_STARTER_ARTIFACT_ID:
-			case STREAM_STARTER_BUILD_ARTIFACT_ID:
-			case STREAM_STARTER_PARENT_ARTIFACT_ID:
-			case STREAM_DOCS_ARTIFACT_ID:
-				updateStreamVersions(newProjects, version);
-				break;
+		case SPRING_BOOT:
+		case BOOT_STARTER_ARTIFACT_ID:
+		case BOOT_STARTER_PARENT_ARTIFACT_ID:
+		case BOOT_DEPENDENCIES_ARTIFACT_ID:
+			updateBootVersions(newProjects, version);
+			break;
+		case BUILD_ARTIFACT_ID:
+		case CLOUD_DEPENDENCIES_PARENT_ARTIFACT_ID:
+			updateBuildVersions(newProjects, version);
+			break;
+		case CLOUD_ARTIFACT_ID:
+		case CLOUD_DEPENDENCIES_ARTIFACT_ID:
+		case CLOUD_RELEASE_ARTIFACT_ID:
+		case CLOUD_STARTER_ARTIFACT_ID:
+		case CLOUD_STARTER_PARENT_ARTIFACT_ID:
+		case CLOUD_STARTER_BUILD_ARTIFACT_ID:
+			updateSpringCloudVersions(newProjects, version);
+			break;
+		case STREAM_DEPS_ARTIFACT_ID:
+		case STREAM_STARTER_ARTIFACT_ID:
+		case STREAM_STARTER_BUILD_ARTIFACT_ID:
+		case STREAM_STARTER_PARENT_ARTIFACT_ID:
+		case STREAM_DOCS_ARTIFACT_ID:
+			updateStreamVersions(newProjects, version);
+			break;
 		}
 		return newProjects;
 	}

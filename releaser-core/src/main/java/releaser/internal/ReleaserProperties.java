@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
+
 import org.apache.commons.lang.SerializationUtils;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
