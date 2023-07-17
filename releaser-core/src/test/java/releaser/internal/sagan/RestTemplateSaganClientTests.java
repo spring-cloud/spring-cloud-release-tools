@@ -40,6 +40,7 @@ class RestTemplateSaganClientTests {
 	@BeforeEach
 	void setup() {
 		ReleaserProperties properties = new ReleaserProperties();
+		properties.getGit().setUsername("user");
 		properties.getGit().setOauthToken("foo");
 		properties.getSagan().setBaseUrl("http://localhost:23456");
 		this.client = saganClient(properties);
@@ -108,7 +109,8 @@ class RestTemplateSaganClientTests {
 	}
 
 	private RestTemplate restTemplate(ReleaserProperties properties) {
-		return new RestTemplateBuilder().basicAuthentication(properties.getGit().getOauthToken(), "").build();
+		return new RestTemplateBuilder()
+				.basicAuthentication(properties.getGit().getUsername(), properties.getGit().getOauthToken()).build();
 	}
 
 }
