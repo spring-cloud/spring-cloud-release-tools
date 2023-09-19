@@ -23,7 +23,7 @@
 		<module>releaser-test</module>
 		<!--<module>spring-cloud-info</module>-->
 		<module>projects</module>
-		<module>docs</module>
+<!--		<module>docs</module>--> <!-- TODO: Revert -->
 	</modules>
 
 	<properties>
