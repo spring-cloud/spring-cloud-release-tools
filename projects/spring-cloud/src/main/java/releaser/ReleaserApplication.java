@@ -23,6 +23,7 @@ import releaser.internal.spring.SpringReleaser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.util.StringUtils;
 
 @SpringBootApplication
 public class ReleaserApplication extends ReleaserCommandLineRunner {
@@ -32,6 +33,7 @@ public class ReleaserApplication extends ReleaserCommandLineRunner {
 	}
 
 	public static void main(String[] args) {
+		System.err.println("Releaser Args = " + StringUtils.arrayToCommaDelimitedString(args));
 		SpringApplication application = new SpringApplication(ReleaserApplication.class);
 		application.setWebApplicationType(WebApplicationType.NONE);
 		application.run(args);
