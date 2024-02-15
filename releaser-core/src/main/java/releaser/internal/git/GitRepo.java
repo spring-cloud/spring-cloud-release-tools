@@ -436,7 +436,7 @@ class GitRepo {
 		Git git = this.gitFactory.open(projectDir);
 		FetchCommand command = git.fetch();
 		try {
-			return command.call();
+			return command.setCredentialsProvider(gitFactory.provider).call();
 		}
 		catch (GitAPIException e) {
 			deleteBaseDirIfExists();
