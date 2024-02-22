@@ -78,6 +78,8 @@ public class ReleaserProperties implements Serializable {
 
 	private Versions versions = new Versions();
 
+	private boolean commercial = false;
+
 	/**
 	 * Project name to its version - overrides all versions retrieved from a release train
 	 * repository like Spring Cloud Release.
@@ -198,12 +200,20 @@ public class ReleaserProperties implements Serializable {
 		this.versions = versions;
 	}
 
+	public boolean isCommercial() {
+		return commercial;
+	}
+
+	public void setCommercial(boolean commercial) {
+		this.commercial = commercial;
+	}
+
 	@Override
 	public String toString() {
 		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git + ", pom="
 				+ this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan=" + this.sagan
 				+ ", fixedVersions=" + this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
-				+ this.template + ", versions=" + this.versions + '}';
+				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + '}';
 	}
 
 	public ReleaserProperties copy() {

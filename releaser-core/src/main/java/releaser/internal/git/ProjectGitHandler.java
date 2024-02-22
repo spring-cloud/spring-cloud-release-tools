@@ -136,6 +136,10 @@ public class ProjectGitHandler implements Closeable {
 		return clonedProject;
 	}
 
+	private String addCommercialSuffix(String projectName) {
+		return this.properties.isCommercial() ? projectName + "-commercial" : projectName;
+	}
+
 	/**
 	 * For meta-release. Works with fixed versions only
 	 * @param projectName - name of the project to clone
@@ -144,7 +148,7 @@ public class ProjectGitHandler implements Closeable {
 	public File cloneProjectFromOrg(String projectName) {
 		String orgUrl = this.properties.getMetaRelease().getGitOrgUrl();
 		String fullUrl = orgUrl.endsWith("/") ? (orgUrl + projectName)
-				: (orgUrl + "/" + projectName + suffixNonHttpRepo(orgUrl));
+				: (orgUrl + "/" + addCommercialSuffix(projectName) + suffixNonHttpRepo(orgUrl));
 		if (log.isDebugEnabled()) {
 			log.debug("Full url of the project is [{}]", fullUrl);
 		}
