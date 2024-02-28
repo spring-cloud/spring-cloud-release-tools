@@ -281,6 +281,8 @@ public class PostReleaseActions implements Closeable {
 			return ExecutionResult.skipped();
 		}
 		ProjectVersion releaseTrain = projects.releaseTrain(this.properties);
+		log.debug("generating release train documentation for release train {}", releaseTrain);
+		log.debug("\t\t properties {}", this.properties);
 		File file;
 		String branch = releaseTrain.releaseTagName();
 		if (StringUtils.hasText(branch)) {
@@ -291,6 +293,7 @@ public class PostReleaseActions implements Closeable {
 			file = this.projectGitHandler.cloneReleaseTrainDocumentationProject();
 		}
 		ReleaserProperties projectProps = projectProps(file);
+		log.debug("\t\t projectProps {}", projectProps);
 		String releaseTrainVersion = releaseTrain.version;
 		this.projectCommandExecutor.generateReleaseTrainDocs(projectProps, releaseTrainVersion, file.getAbsolutePath());
 		return ExecutionResult.success();
