@@ -282,9 +282,11 @@ public class PostReleaseActions implements Closeable {
 		}
 		ProjectVersion releaseTrain = projects.releaseTrain(this.properties);
 		log.debug("generating release train documentation for release train {}", releaseTrain);
+		log.debug("\t\t releaseTrainDocsUrl {}", this.properties.getGit().getReleaseTrainDocsUrl());
 		log.debug("\t\t properties {}", this.properties);
 		File file;
 		String branch = releaseTrain.releaseTagName();
+		log.debug("\t\t branch {}", branch);
 		if (StringUtils.hasText(branch)) {
 			file = this.projectGitHandler.cloneReleaseTrainDocumentationProject(branch);
 		}
