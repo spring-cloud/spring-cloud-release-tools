@@ -184,6 +184,21 @@ class GitRepo {
 		}
 	}
 
+	void checkoutTag(String tagName) {
+		try (Git git = this.gitFactory.open(file(this.basedir))) {
+			Optional<ObjectId> tagId = findTagIdByName(tagName, false);
+			if (tagId.isPresent()) {
+				git.checkout().setName(tagId.get().getName()).call();
+			}
+			else {
+				throw new IllegalStateException("Tag with name [" + tagName + "] not found");
+			}
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
 	/**
 	 * Attempt to retrieve a tag id from a name, prepending the name with /refs/tags/.
 	 */

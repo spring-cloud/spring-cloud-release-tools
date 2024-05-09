@@ -90,6 +90,15 @@ public class Releaser {
 		return this.projectGitHandler.cloneProjectFromOrg(projectName);
 	}
 
+	public ExecutionResult buildAntoraDocs(File project) {
+		String currentBranch = projectGitHandler.currentBranch(project);
+		projectGitHandler.cloneAndCheckoutDocsBuild(project);
+		this.projectCommandExecutor.runAntora(this.releaserProperties, originalVersion(project),
+				new ProjectVersion(project), project.getAbsolutePath());
+		projectGitHandler.checkout(project, currentBranch);
+		return ExecutionResult.success();
+	}
+
 	public Projects retrieveVersionsFromBom() {
 		return this.projectPomUpdater.retrieveVersionsFromReleaseTrainBom();
 	}
@@ -122,6 +131,12 @@ public class Releaser {
 		return ExecutionResult.success();
 	}
 
+	public ExecutionResult runAntoraBuild(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion versionFromBom) {
+		this.projectCommandExecutor.runAntora(properties, originalVersion, versionFromBom, properties.getWorkingDir());
+		return ExecutionResult.success();
+	}
+
 	public ExecutionResult commitAndPushTags(File project, ProjectVersion changedVersion) {
 		this.projectGitHandler.commitAndTagIfApplicable(project, changedVersion);
 		log.info("\nCommit was made and tag was pushed successfully");
@@ -135,9 +150,9 @@ public class Releaser {
 		return ExecutionResult.success();
 	}
 
-	public ExecutionResult publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
-			ProjectVersion changedVersion) {
-		this.projectCommandExecutor.publishDocs(properties, originalVersion, changedVersion);
+	public ExecutionResult publishDocs(ReleaserProperties properties, File project) {
+		File springDocsActionsProject = this.projectGitHandler.cloneAndCheckoutSpringDocsActions();
+		this.projectCommandExecutor.publishAntoraDocs(springDocsActionsProject, project, properties);
 		log.info("\nThe docs were published successfully");
 		return ExecutionResult.success();
 	}

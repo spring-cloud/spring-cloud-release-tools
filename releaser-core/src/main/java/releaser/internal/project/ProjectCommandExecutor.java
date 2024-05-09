@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.tech.ReleaserProcessExecutor;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 
 /**
@@ -51,6 +52,13 @@ public class ProjectCommandExecutor {
 	private static final String OLD_VERSION_MUSTACHE = "{{oldVersion}}";
 
 	private static final String NEXT_VERSION_MUSTACHE = "{{nextVersion}}";
+
+	private static final String RSYNC_ACTIONS_PROJECT_DIR = "/rsync-antora-reference/src";
+
+	private static final String SPRING_DOCS_ACTION_RUNNER = "spring-docs-action-runner.sh";
+
+	private static final String RUNNER_DESTINATION = RSYNC_ACTIONS_PROJECT_DIR + File.separator
+			+ SPRING_DOCS_ACTION_RUNNER;
 
 	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain) {
@@ -89,6 +97,19 @@ public class ProjectCommandExecutor {
 			runCommand(properties, projectRoot, commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
 			log.info("No HTML files from docs contain unresolved tags");
+		}
+		catch (Exception e) {
+			String message = properties + "\n" + originalVersion + "\n" + versionFromReleaseTrain + "\n" + projectRoot;
+			throw new IllegalStateException(message, e);
+		}
+	}
+
+	public void runAntora(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion versionFromReleaseTrain, String projectRoot) {
+		try {
+			String command = new CommandPicker(properties, projectRoot).runAntoraCommand(versionFromReleaseTrain);
+			String[] commands = replaceAllPlaceHolders(originalVersion, versionFromReleaseTrain, command).split(" ");
+			runCommand(properties, projectRoot, commands);
 		}
 		catch (Exception e) {
 			String message = properties + "\n" + originalVersion + "\n" + versionFromReleaseTrain + "\n" + projectRoot;
@@ -164,6 +185,35 @@ public class ProjectCommandExecutor {
 
 	ReleaserProcessExecutor executor(String workDir) {
 		return new ReleaserProcessExecutor(workDir);
+	}
+
+	public void publishAntoraDocs(File antoraDocsProject, File project, ReleaserProperties properties) {
+		try {
+			copyRunnerToActions(antoraDocsProject);
+			String command = new CommandPicker(properties).publishAntoraDocsCommand(project, properties);
+			log.info("Executing command for publishing Antora docs " + command + " / " + properties);
+			String[] commands = command.split(" ");
+			// TODO fix this hack
+			for (int i = 0; i < commands.length; i++) {
+				if (commands[i].contains("{{host-key}}")) {
+					commands[i] = commands[i].replace("{{host-key}}",
+							"\"" + properties.getAntora().getSpringDocsSshHostKey()) + "\"";
+				}
+			}
+			runCommand(properties, antoraDocsProject.getAbsolutePath() + RSYNC_ACTIONS_PROJECT_DIR, commands);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	public void copyRunnerToActions(File antoraDocsProject) throws IOException {
+		File destination = new File(antoraDocsProject.getAbsolutePath() + RUNNER_DESTINATION);
+		if (!destination.exists()) {
+			ClassPathResource runner = new ClassPathResource(SPRING_DOCS_ACTION_RUNNER);
+			Files.copy(runner.getInputStream(), destination.toPath());
+			destination.setExecutable(true);
+		}
 	}
 
 	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
@@ -305,6 +355,27 @@ class CommandPicker {
 			return mavenCommandWithSystemProps(releaserProperties.getMaven().getBuildCommand(), version);
 		}
 		return bashCommandWithSystemProps(releaserProperties.getBash().getBuildCommand());
+	}
+
+	String runAntoraCommand(ProjectVersion version) {
+		if (projectType == ProjectType.GRADLE) {
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getRunAntoraCommand());
+		}
+		return mavenCommandWithSystemProps(releaserProperties.getMaven().getRunAntoraCommand(), version);
+	}
+
+	String publishAntoraDocsCommand(File project, ReleaserProperties properties) {
+		ProjectVersion version = new ProjectVersion(project);
+		String repo = properties.getGit().getOrgName() + "/" + version.projectName;
+		String command = properties.getAntora().getSyncAntoraDocsCommand().replace("{{github-repo}}", repo)
+				.replace("{{site-path}}", project.getAbsolutePath() + "/target/antora/site");
+		if (StringUtils.hasText(properties.getAntora().getSpringDocsSshUsername())) {
+			command = command.replace("{{ssh-username}}", properties.getAntora().getSpringDocsSshUsername());
+		}
+		if (StringUtils.hasText(properties.getAntora().getSpringDocsSshKeyPath())) {
+			command = command.replace("{{ssh-key-path}}", properties.getAntora().getSpringDocsSshKeyPath());
+		}
+		return command;
 	}
 
 	String version() {
