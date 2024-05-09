@@ -1,6 +1,7 @@
 image:https://circleci.com/gh/spring-cloud/spring-cloud-build.svg?style=svg[link="https://travis-ci.org/spring-cloud/spring-cloud-build"]
 
-Spring Cloud Build is a common utility project for Spring Cloud to use for plugin and dependency management.
+Spring Cloud Build is a common utility project for Spring Cloud
+to use for plugin and dependency management.
 
 == Building and Deploying
 
@@ -43,8 +44,10 @@ include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/maste
 
 == Reusing the documentation
 
-Spring Cloud Build publishes its `spring-cloud-build-docs` module that contains helpful scripts (e.g. README generation ruby script) and css, xslt and images for the Spring Cloud documentation.
-If you want to follow the same convention approach of generating documentation just add these plugins to your `docs` module
+Spring Cloud Build publishes its `spring-cloud-build-docs` module that contains
+helpful scripts (e.g. README generation ruby script) and css, xslt and images
+for the Spring Cloud documentation. If you want to follow the same convention
+approach of generating documentation just add these plugins to your `docs` module
 
 [source,xml]
 ----

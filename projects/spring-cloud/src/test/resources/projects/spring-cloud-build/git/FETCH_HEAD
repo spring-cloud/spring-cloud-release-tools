@@ -1,0 +1,19 @@
+8789ac642f97af8de17206ea825db592c27758f8		branch '1.3.x' of github.com:spring-cloud/spring-cloud-build
+6d4a7e37e382cd8de6c4c6763e67968b83f2d49a	not-for-merge	branch '1.0.x' of github.com:spring-cloud/spring-cloud-build
+ee0e96f18db8a9e0d27259a7b5c1017fbce54608	not-for-merge	branch '1.1.x' of github.com:spring-cloud/spring-cloud-build
+08a04fd22bf8320d48b5995a64d1a192a0892de1	not-for-merge	branch '1.2.x' of github.com:spring-cloud/spring-cloud-build
+538aebc1fa9b5628e2d9b7ffdb00ba44878e201b	not-for-merge	branch '2.0.x' of github.com:spring-cloud/spring-cloud-build
+99e1cdfebde01c9878f5e094ef65ac6fbaf86e6b	not-for-merge	branch '2.1.x' of github.com:spring-cloud/spring-cloud-build
+3a4d022702529aa892927ef765992b19a73b2052	not-for-merge	branch '2.2.x' of github.com:spring-cloud/spring-cloud-build
+e182637f0dacc7d2429d0c9f3be1807c22308267	not-for-merge	branch '2.3.x' of github.com:spring-cloud/spring-cloud-build
+3539937d2473e16ba496a71b5340e3b9da64bf93	not-for-merge	branch '3-1-x' of github.com:spring-cloud/spring-cloud-build
+58fe9dff85271a8927e93e7e41af5d9f07a1aabf	not-for-merge	branch '3.0.x' of github.com:spring-cloud/spring-cloud-build
+6aaecc25b38f56736862a198d94b33ba831961b1	not-for-merge	branch '3.1.x' of github.com:spring-cloud/spring-cloud-build
+86830f715413a18e4a4c7f8e3c59e2857cfa428c	not-for-merge	branch '4.0.x' of github.com:spring-cloud/spring-cloud-build
+5fb165b90020915ea57a7dbac527c329bddb9e49	not-for-merge	branch 'antora' of github.com:spring-cloud/spring-cloud-build
+feacd9f4dfbea37cfe352dcdc113886f25d75c3d	not-for-merge	branch 'disabling_default_deploy_for_docs' of github.com:spring-cloud/spring-cloud-build
+69424b6ef146c5a499ed0f870d3794c5289e9f71	not-for-merge	branch 'docs-build' of github.com:spring-cloud/spring-cloud-build
+5e0ce9329331796425571cdfb14c17479b6e2b7a	not-for-merge	branch 'gh-pages' of github.com:spring-cloud/spring-cloud-build
+bc9b9ea33965b66a0df3ea0612ac9c67b295186b	not-for-merge	branch 'main' of github.com:spring-cloud/spring-cloud-build
+0d09a0ab298d716738287cf2b3f18bda807374b6	not-for-merge	branch 'remove_lf_requirement' of github.com:spring-cloud/spring-cloud-build
+86b02191d000f3f2d8e76e88a71d8ef3ae172c48	not-for-merge	branch 'test-m2' of github.com:spring-cloud/spring-cloud-build

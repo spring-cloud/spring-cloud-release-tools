@@ -4,7 +4,7 @@
 Syntax highlighting definition for C#
 
 xslthl - XSLT Syntax Highlighting
-https://sourceforge.net/projects/xslthl/
+http://sourceforge.net/projects/xslthl/
 Copyright (C) 2005-2008 Michal Molhanec, Jirka Kosek, Michiel Hendriks
 
 This software is provided 'as-is', without any express or implied
@@ -62,7 +62,7 @@ Michiel Hendriks <elmuerte at users.sourceforge.net>
 		<string>@"</string>
 		<endString>"</endString>
 		<escape>\</escape>
-		<spanNewLines/>
+		<spanNewLines />
 	</highlighter>
 	<highlighter type="string">
 		<string>"</string>
@@ -78,11 +78,11 @@ Michiel Hendriks <elmuerte at users.sourceforge.net>
 		<suffix>lu</suffix>
 		<suffix>u</suffix>
 		<suffix>l</suffix>
-		<ignoreCase/>
+		<ignoreCase />
 	</highlighter>
 	<highlighter type="number">
 		<point>.</point>
-		<pointStarts/>
+		<pointStarts />
 		<exponent>e</exponent>
 		<suffix>ul</suffix>
 		<suffix>lu</suffix>
@@ -91,7 +91,7 @@ Michiel Hendriks <elmuerte at users.sourceforge.net>
 		<suffix>d</suffix>
 		<suffix>m</suffix>
 		<suffix>l</suffix>
-		<ignoreCase/>
+		<ignoreCase />
 	</highlighter>
 	<highlighter type="keywords">
 		<keyword>abstract</keyword>
