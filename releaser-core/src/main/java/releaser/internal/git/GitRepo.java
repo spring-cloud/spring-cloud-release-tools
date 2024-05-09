@@ -186,7 +186,7 @@ class GitRepo {
 
 	void checkoutTag(String tagName) {
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
-			Optional<ObjectId> tagId = findTagIdByName(tagName, true);
+			Optional<ObjectId> tagId = findTagIdByName(tagName, false);
 			if (tagId.isPresent()) {
 				git.checkout().setName(tagId.get().getName()).call();
 			}

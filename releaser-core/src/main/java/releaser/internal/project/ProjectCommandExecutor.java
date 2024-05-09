@@ -182,6 +182,13 @@ public class ProjectCommandExecutor {
 	public void publishAntoraDocs(File antoraDocsProject, File project, ReleaserProperties properties) {
 		String command = new CommandPicker(properties).publishAntoraDocsCommand(project, properties);
 		log.info("Executing command for publishing Antora docs " + command + " / " + properties);
+		String[] commands = command.split(" ");
+		//TODO fix this hack
+		for (int i = 0; i < commands.length; i++) {
+			if (commands[i].contains("{{cat-key}}")) {
+				commands[i] = commands[i].replace("{{cat-key}}", "\"$(cat $DOCS_SERVER_SSH_KEY)\"");
+			}
+		}
 		runCommand(properties, antoraDocsProject.getAbsolutePath(), command.split(" "));
 	}
 
@@ -336,7 +343,7 @@ class CommandPicker {
 		String repo = properties.getGit().getOrgName() + "/" + version.projectName;
 		// TODO this needs to be a property
 		return bashCommandWithSystemProps("./rsync-antora-reference/src/action.sh"
-				+ " --docs-username \"$DOCS_SERVER_SSH_USER\" --docs-host \"docs.spring.io\" --docs-ssh-key \"$(cat $DOCS_SERVER_SSH_KEY)\" --docs-ssh-host-key \"#\" --site-path \""
+				+ " --docs-username \"$DOCS_SERVER_SSH_USER\" --docs-host \"docs.spring.io\" --docs-ssh-key {{cat-key}} --docs-ssh-host-key \"#\" --site-path \""
 				+ project.getAbsolutePath() + "/target/antora/site\" --github-repository \"" + repo
 				+ "\" --dry-run {{systemProps}}");
 	}
