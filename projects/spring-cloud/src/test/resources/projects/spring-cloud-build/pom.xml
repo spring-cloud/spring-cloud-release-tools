@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-build</artifactId>
@@ -57,21 +57,21 @@
 			<name>Apache License, Version 2.0</name>
 			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
 			<comments>
-				Copyright 2014-2015 the original author or authors.
+Copyright 2014-2015 the original author or authors.
 
-				Licensed under the Apache License, Version 2.0 (the "License");
-				you may not use this file except in compliance with the License.
-				You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-				https://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
-				Unless required by applicable law or agreed to in writing, software
-				distributed under the License is distributed on an "AS IS" BASIS,
-				WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-				implied.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied.
 
-				See the License for the specific language governing permissions and
-				limitations under the License.
+See the License for the specific language governing permissions and
+limitations under the License.
 			</comments>
 		</license>
 	</licenses>
@@ -87,7 +87,7 @@
 			<name>Dave Syer</name>
 			<email>dsyer at pivotal.io</email>
 			<organization>Pivotal Software, Inc.</organization>
-			<organizationUrl>https://www.spring.io</organizationUrl>
+			<organizationUrl>http://www.spring.io</organizationUrl>
 			<roles>
 				<role>lead</role>
 			</roles>
@@ -97,7 +97,7 @@
 			<name>Spencer Gibb</name>
 			<email>sgibb at pivotal.io</email>
 			<organization>Pivotal Software, Inc.</organization>
-			<organizationUrl>https://www.spring.io</organizationUrl>
+			<organizationUrl>http://www.spring.io</organizationUrl>
 			<roles>
 				<role>lead</role>
 			</roles>
@@ -107,7 +107,7 @@
 			<name>Marcin Grzejszczak</name>
 			<email>mgrzejszczak at pivotal.io</email>
 			<organization>Pivotal Software, Inc.</organization>
-			<organizationUrl>https://www.spring.io</organizationUrl>
+			<organizationUrl>http://www.spring.io</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -117,7 +117,7 @@
 			<name>Ryan Baxter</name>
 			<email>rbaxter at pivotal.io</email>
 			<organization>Pivotal Software, Inc.</organization>
-			<organizationUrl>https://www.spring.io</organizationUrl>
+			<organizationUrl>http://www.spring.io</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -275,33 +275,33 @@
 						<useDefaultDelimiters>false</useDefaultDelimiters>
 					</configuration>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>${checkstyle.version}</version>
-					<dependencies>
-						<dependency>
-							<groupId>org.springframework.cloud</groupId>
-							<artifactId>spring-cloud-build-tools</artifactId>
-							<version>${spring-cloud-build.version}</version>
-						</dependency>
-					</dependencies>
-					<configuration>
-						<configLocation>checkstyle.xml</configLocation>
-						<headerLocation>LICENSE.txt</headerLocation>
-						<consoleOutput>true</consoleOutput>
-						<failsOnError>true</failsOnError>
-					</configuration>
-					<executions>
-						<execution>
-							<id>validate</id>
-							<phase>validate</phase>
-							<goals>
-								<goal>check</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.springframework.cloud</groupId>
+						<artifactId>spring-cloud-build-tools</artifactId>
+						<version>${spring-cloud-build.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<headerLocation>LICENSE.txt</headerLocation>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>true</failsOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 				<plugin>
 					<groupId>pl.project13.maven</groupId>
 					<artifactId>git-commit-id-plugin</artifactId>
@@ -317,8 +317,7 @@
 						<verbose>true</verbose>
 						<dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>
-						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
-						</generateGitPropertiesFilename>
+						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
 					</configuration>
 				</plugin>
 				<!-- Support our own plugin -->
@@ -371,22 +370,17 @@
 							</goals>
 							<configuration>
 								<transformers>
-									<transformer
-											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
 										<resource>META-INF/spring.handlers</resource>
 									</transformer>
-									<transformer
-											implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+									<transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
 										<resource>META-INF/spring.factories</resource>
 									</transformer>
-									<transformer
-											implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
 										<resource>META-INF/spring.schemas</resource>
 									</transformer>
-									<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-									<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+									<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 										<mainClass>${start-class}</mainClass>
 									</transformer>
 								</transformers>
@@ -451,9 +445,7 @@
 		<downloadUrl>https://github.com/spring-cloud</downloadUrl>
 		<site>
 			<id>spring-docs</id>
-			<url>
-				scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-cloud/docs/${project.artifactId}/${project.version}
-			</url>
+			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-cloud/docs/${project.artifactId}/${project.version}</url>
 		</site>
 		<repository>
 			<id>sonatype-nexus-staging</id>
@@ -764,8 +756,7 @@
 								<foCustomization>${docs.resources.dir}/docbook/xsl/pdf.xsl</foCustomization>
 								<useExtensions>1</useExtensions>
 								<highlightSource>1</highlightSource>
-								<highlightXslthlConfig>${docs.resources.dir}/docbook/xsl/xslthl-config.xml
-								</highlightXslthlConfig>
+								<highlightXslthlConfig>${docs.resources.dir}/docbook/xsl/xslthl-config.xml</highlightXslthlConfig>
 							</configuration>
 							<dependencies>
 								<dependency>
@@ -790,21 +781,20 @@
 									</goals>
 									<phase>prepare-package</phase>
 									<configuration>
-										<htmlCustomization>${docs.resources.dir}/docbook/xsl/html-singlepage.xsl
-										</htmlCustomization>
+										<htmlCustomization>${docs.resources.dir}/docbook/xsl/html-singlepage.xsl</htmlCustomization>
 										<targetDirectory>${basedir}/target/docbook/htmlsingle</targetDirectory>
 										<postProcess>
 											<copy todir="${basedir}/target/contents/reference/htmlsingle">
 												<fileset dir="${basedir}/target/docbook/htmlsingle">
-													<include name="**/*.html"/>
+													<include name="**/*.html" />
 												</fileset>
 											</copy>
 											<copy todir="${basedir}/target/contents/reference/htmlsingle">
 												<fileset dir="${docs.resources.dir}/docbook">
-													<include name="**/*.css"/>
-													<include name="**/*.png"/>
-													<include name="**/*.gif"/>
-													<include name="**/*.jpg"/>
+													<include name="**/*.css" />
+													<include name="**/*.png" />
+													<include name="**/*.gif" />
+													<include name="**/*.jpg" />
 												</fileset>
 											</copy>
 										</postProcess>
@@ -817,8 +807,7 @@
 									</goals>
 									<phase>prepare-package</phase>
 									<configuration>
-										<htmlCustomization>${docs.resources.dir}/docbook/xsl/html-multipage.xsl
-										</htmlCustomization>
+										<htmlCustomization>${docs.resources.dir}/docbook/xsl/html-multipage.xsl</htmlCustomization>
 										<targetDirectory>${basedir}/target/docbook/html</targetDirectory>
 										<!-- By default `-` prefix is added to files and gh-pages don't render these files -->
 										<chunkedFilenamePrefix>multi_</chunkedFilenamePrefix>
@@ -826,15 +815,15 @@
 										<postProcess>
 											<copy todir="${basedir}/target/contents/reference/html">
 												<fileset dir="${basedir}/target/docbook/html">
-													<include name="**/*.html"/>
+													<include name="**/*.html" />
 												</fileset>
 											</copy>
 											<copy todir="${basedir}/target/contents/reference/html">
 												<fileset dir="${docs.resources.dir}/docbook">
-													<include name="**/*.css"/>
-													<include name="**/*.png"/>
-													<include name="**/*.gif"/>
-													<include name="**/*.jpg"/>
+													<include name="**/*.css" />
+													<include name="**/*.png" />
+													<include name="**/*.gif" />
+													<include name="**/*.jpg" />
 												</fileset>
 											</copy>
 										</postProcess>
@@ -927,19 +916,19 @@
 									<configuration>
 										<target>
 											<echo file="${basedir}/target/generated-index/${docs.main}.adoc">
-												:nofooter:
-												:linkcss:
-												:stylesdir: css
-												:stylesheet: manual-singlepage.css
+:nofooter:
+:linkcss:
+:stylesdir: css
+:stylesheet: manual-singlepage.css
 
-												= {docs-main}
+= {docs-main}
 
-												{spring-cloud-version}
+{spring-cloud-version}
 
-												== Pick The Documentation Option
+== Pick The Documentation Option
 
-												- link:single/{docs-main}.html[Single HTML]
-												- link:multi/multi_{docs-main}.html[Multi HTML]
+- link:single/{docs-main}.html[Single HTML]
+- link:multi/multi_{docs-main}.html[Multi HTML]
 											</echo>
 										</target>
 									</configuration>
@@ -975,22 +964,22 @@
 											<var name="version-type" value="${project.version}"/>
 											<propertyregex property="version-type"
 														   override="true" input="${version-type}" regexp=".*\.(.*)"
-														   replace="\1"/>
+														   replace="\1" />
 											<propertyregex property="version-type"
 														   override="true" input="${version-type}" regexp="(M)\d+"
-														   replace="MILESTONE"/>
+														   replace="MILESTONE" />
 											<propertyregex property="version-type"
 														   override="true" input="${version-type}" regexp="(RC)\d+"
-														   replace="MILESTONE"/>
+														   replace="MILESTONE" />
 											<propertyregex property="version-type"
 														   override="true" input="${version-type}" regexp="BUILD-(.*)"
-														   replace="SNAPSHOT"/>
+														   replace="SNAPSHOT" />
 											<stringutil string="${version-type}" property="spring-cloud-repo">
 												<lowercase/>
 											</stringutil>
 											<var name="github-tag" value="v${project.version}"/>
 											<propertyregex property="github-tag" override="true"
-														   input="${github-tag}" regexp=".*SNAPSHOT" replace="master"/>
+														   input="${github-tag}" regexp=".*SNAPSHOT" replace="master" />
 										</target>
 									</configuration>
 								</execution>

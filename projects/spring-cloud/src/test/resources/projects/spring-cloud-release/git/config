@@ -15,3 +15,6 @@
 [branch "2022.0.x"]
 	remote = origin
 	merge = refs/heads/2022.0.x
+[branch "docs-build"]
+	remote = origin
+	merge = refs/heads/docs-build

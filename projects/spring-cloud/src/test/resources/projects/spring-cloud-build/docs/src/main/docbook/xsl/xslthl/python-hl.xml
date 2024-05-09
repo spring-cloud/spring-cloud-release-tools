@@ -4,7 +4,7 @@
 Syntax highlighting definition for Python
 
 xslthl - XSLT Syntax Highlighting
-https://sourceforge.net/projects/xslthl/
+http://sourceforge.net/projects/xslthl/
 Copyright (C) 2005-2008 Michal Molhanec, Jirka Kosek, Michiel Hendriks
 
 This software is provided 'as-is', without any express or implied
@@ -38,11 +38,11 @@ Michiel Hendriks <elmuerte at users.sourceforge.net>
 	<highlighter type="oneline-comment">#</highlighter>
 	<highlighter type="string">
 		<string>"""</string>
-		<spanNewLines/>
+		<spanNewLines />
 	</highlighter>
 	<highlighter type="string">
 		<string>'''</string>
-		<spanNewLines/>
+		<spanNewLines />
 	</highlighter>
 	<highlighter type="string">
 		<string>"</string>
@@ -55,14 +55,14 @@ Michiel Hendriks <elmuerte at users.sourceforge.net>
 	<highlighter type="hexnumber">
 		<prefix>0x</prefix>
 		<suffix>l</suffix>
-		<ignoreCase/>
+		<ignoreCase />
 	</highlighter>
 	<highlighter type="number">
 		<point>.</point>
-		<pointStarts/>
+		<pointStarts />
 		<exponent>e</exponent>
 		<suffix>l</suffix>
-		<ignoreCase/>
+		<ignoreCase />
 	</highlighter>
 	<highlighter type="keywords">
 		<keyword>and</keyword>

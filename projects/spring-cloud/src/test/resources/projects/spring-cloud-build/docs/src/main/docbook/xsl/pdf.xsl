@@ -9,7 +9,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-https://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -22,7 +22,7 @@ under the License.
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 				xmlns:d="http://docbook.org/ns/docbook"
 				xmlns:fo="http://www.w3.org/1999/XSL/Format"
-				xmlns:xslthl="http://xslthl.sourceforge.net/"
+				xmlns:xslthl="http://xslthl.sf.net"
 				xmlns:xlink='http://www.w3.org/1999/xlink'
 				xmlns:exsl="http://exslt.org/common"
 				exclude-result-prefixes="exsl xslthl d xlink"
@@ -69,9 +69,9 @@ under the License.
 						<fo:table-cell text-align="center">
 							<fo:block>
 								<fo:external-graphic src="images/logo.png" width="240px"
-													 height="auto" content-width="scale-to-fit"
-													 content-height="scale-to-fit"
-													 content-type="content-type:image/png" text-align="center"
+									height="auto" content-width="scale-to-fit"
+									content-height="scale-to-fit"
+									content-type="content-type:image/png" text-align="center"
 								/>
 							</fo:block>
 							<fo:block font-family="Helvetica" font-size="20pt" font-weight="bold" padding="10mm">
@@ -308,9 +308,9 @@ under the License.
 	Let's remove it, so this sucker can use our attribute-set only... -->
 	<xsl:template match="d:title" mode="chapter.titlepage.recto.auto.mode">
 		<fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format"
-				  xsl:use-attribute-sets="chapter.titlepage.recto.style">
+				xsl:use-attribute-sets="chapter.titlepage.recto.style">
 			<xsl:call-template name="component.title">
-				<xsl:with-param name="node" select="ancestor-or-self::d:chapter[1]"/>
+			<xsl:with-param name="node" select="ancestor-or-self::d:chapter[1]"/>
 			</xsl:call-template>
 		</fo:block>
 	</xsl:template>
@@ -524,7 +524,7 @@ under the License.
 		<xsl:attribute name="space-after.maximum">1.5em</xsl:attribute>
 	</xsl:attribute-set>
 
-	<xsl:attribute-set name="admonition.title.properties">
+    <xsl:attribute-set name="admonition.title.properties">
 		<xsl:attribute name="font-size">10pt</xsl:attribute>
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
 		<xsl:attribute name="hyphenate">false</xsl:attribute>
@@ -549,46 +549,34 @@ under the License.
 		</fo:block>
 	</xsl:template>
 
-	<xsl:template match="processing-instruction('asciidoc-pagebreak')">
-		<fo:block break-after='page'/>
-	</xsl:template>
+  <xsl:template match="processing-instruction('asciidoc-pagebreak')">
+    <fo:block break-after='page'/>
+  </xsl:template>
 
 	<!-- SYNTAX HIGHLIGHT -->
 
 	<xsl:template match='xslthl:keyword' mode="xslthl">
-		<fo:inline font-weight="bold" color="#7F0055">
-			<xsl:apply-templates mode="xslthl"/>
-		</fo:inline>
+	  <fo:inline font-weight="bold" color="#7F0055"><xsl:apply-templates mode="xslthl"/></fo:inline>
 	</xsl:template>
 
 	<xsl:template match='xslthl:string' mode="xslthl">
-		<fo:inline font-weight="bold" font-style="italic" color="#2A00FF">
-			<xsl:apply-templates mode="xslthl"/>
-		</fo:inline>
+	  <fo:inline font-weight="bold" font-style="italic" color="#2A00FF"><xsl:apply-templates mode="xslthl"/></fo:inline>
 	</xsl:template>
 
 	<xsl:template match='xslthl:comment' mode="xslthl">
-		<fo:inline font-style="italic" color="#3F5FBF">
-			<xsl:apply-templates mode="xslthl"/>
-		</fo:inline>
+	  <fo:inline font-style="italic" color="#3F5FBF"><xsl:apply-templates mode="xslthl"/></fo:inline>
 	</xsl:template>
 
 	<xsl:template match='xslthl:tag' mode="xslthl">
-		<fo:inline font-weight="bold" color="#3F7F7F">
-			<xsl:apply-templates mode="xslthl"/>
-		</fo:inline>
+	  <fo:inline font-weight="bold" color="#3F7F7F"><xsl:apply-templates mode="xslthl"/></fo:inline>
 	</xsl:template>
 
 	<xsl:template match='xslthl:attribute' mode="xslthl">
-		<fo:inline font-weight="bold" color="#7F007F">
-			<xsl:apply-templates mode="xslthl"/>
-		</fo:inline>
+	  <fo:inline font-weight="bold" color="#7F007F"><xsl:apply-templates mode="xslthl"/></fo:inline>
 	</xsl:template>
 
 	<xsl:template match='xslthl:value' mode="xslthl">
-		<fo:inline font-weight="bold" color="#2A00FF">
-			<xsl:apply-templates mode="xslthl"/>
-		</fo:inline>
+	  <fo:inline font-weight="bold" color="#2A00FF"><xsl:apply-templates mode="xslthl"/></fo:inline>
 	</xsl:template>
 
 </xsl:stylesheet>

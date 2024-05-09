@@ -9,7 +9,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-https://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -39,12 +39,12 @@ under the License.
 			<xsl:apply-imports/>
 		</xsl:param>
 
-		<xsl:call-template name="user.preroot"/>
+  		<xsl:call-template name="user.preroot"/>
 
 		<html>
 			<xsl:call-template name="html.head">
-				<xsl:with-param name="prev" select="$prev"/>
-				<xsl:with-param name="next" select="$next"/>
+			<xsl:with-param name="prev" select="$prev"/>
+			<xsl:with-param name="next" select="$next"/>
 			</xsl:call-template>
 			<body>
 				<xsl:if test="count($prev) = 0">

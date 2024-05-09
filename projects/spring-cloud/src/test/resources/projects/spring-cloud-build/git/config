@@ -14,3 +14,9 @@
 [branch "1.3.x"]
 	remote = origin
 	merge = refs/heads/1.3.x
+[branch "docs-build"]
+	remote = origin
+	merge = refs/heads/docs-build
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main

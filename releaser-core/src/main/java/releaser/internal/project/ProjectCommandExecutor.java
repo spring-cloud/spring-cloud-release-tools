@@ -96,6 +96,19 @@ public class ProjectCommandExecutor {
 		}
 	}
 
+	public void runAntora(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion versionFromReleaseTrain, String projectRoot) {
+		try {
+			String command = new CommandPicker(properties, projectRoot).runAntoraCommand(versionFromReleaseTrain);
+			String[] commands = replaceAllPlaceHolders(originalVersion, versionFromReleaseTrain, command).split(" ");
+			runCommand(properties, projectRoot, commands);
+		}
+		catch (Exception e) {
+			String message = properties + "\n" + originalVersion + "\n" + versionFromReleaseTrain + "\n" + projectRoot;
+			throw new IllegalStateException(message, e);
+		}
+	}
+
 	public void generateReleaseTrainDocs(ReleaserProperties properties, String version, String projectRoot) {
 		try {
 			String updatedCommand = new CommandPicker(properties, projectRoot)
@@ -164,6 +177,12 @@ public class ProjectCommandExecutor {
 
 	ReleaserProcessExecutor executor(String workDir) {
 		return new ReleaserProcessExecutor(workDir);
+	}
+
+	public void publishAntoraDocs(File antoraDocsProject, File project, ReleaserProperties properties) {
+		String command = new CommandPicker(properties).publishAntoraDocsCommand(project, properties);
+		log.info("Executing command for publishing Antora docs " + command + " / " + properties);
+		runCommand(properties, antoraDocsProject.getAbsolutePath(), command.split(" "));
 	}
 
 	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
@@ -305,6 +324,21 @@ class CommandPicker {
 			return mavenCommandWithSystemProps(releaserProperties.getMaven().getBuildCommand(), version);
 		}
 		return bashCommandWithSystemProps(releaserProperties.getBash().getBuildCommand());
+	}
+
+	String runAntoraCommand(ProjectVersion version) {
+		// TODO handle gradle and bash?
+		return mavenCommandWithSystemProps(releaserProperties.getMaven().getRunAntoraCommand(), version);
+	}
+
+	String publishAntoraDocsCommand(File project, ReleaserProperties properties) {
+		ProjectVersion version = new ProjectVersion(project);
+		String repo = properties.getGit().getOrgName() + "/" + version.projectName;
+		// TODO this needs to be a property
+		return bashCommandWithSystemProps("./rsync-antora-reference/src/action.sh"
+				+ " --docs-username \"$DOCS_SERVER_SSH_USER\" --docs-host \"docs.spring.io\" --docs-ssh-key \"$(cat $DOCS_SERVER_SSH_KEY)\" --docs-ssh-host-key \"#\" --site-path \""
+				+ project.getAbsolutePath() + "/target/antora/site\" --github-repository \"" + repo
+				+ "\" --dry-run {{systemProps}}");
 	}
 
 	String version() {
