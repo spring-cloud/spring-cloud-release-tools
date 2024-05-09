@@ -130,6 +130,16 @@ public class ProjectGitHandler implements Closeable {
 				this.properties.getGit().getSpringProjectBranch());
 	}
 
+	public void cloneAndCheckoutDocsBuild(File project) {
+		checkout(project, "docs-build");
+	}
+
+	public File cloneAndCheckoutSpringDocsActions() {
+		File project = cloneProject(this.properties.getAntora().getSpringDocsActionsUrl());
+		checkoutTag(project, this.properties.getAntora().getSpringDocsActionsTag());
+		return project;
+	}
+
 	private File cloneAndCheckOut(String springProjectUrl, String springProjectUrlBranch) {
 		File clonedProject = cloneProject(springProjectUrl);
 		checkout(clonedProject, springProjectUrlBranch);
@@ -146,12 +156,7 @@ public class ProjectGitHandler implements Closeable {
 	 * @return location of the cloned project
 	 */
 	public File cloneProjectFromOrg(String projectName) {
-		String orgUrl = this.properties.getMetaRelease().getGitOrgUrl();
-		String fullUrl = orgUrl.endsWith("/") ? (orgUrl + projectName)
-				: (orgUrl + "/" + addCommercialSuffix(projectName) + suffixNonHttpRepo(orgUrl));
-		if (log.isDebugEnabled()) {
-			log.debug("Full url of the project is [{}]", fullUrl);
-		}
+		String fullUrl = createRepoUrlFromProject(projectName);
 		File clonedProject = cloneProject(fullUrl);
 		if (log.isDebugEnabled()) {
 			log.debug("Successfully cloned the project to [{}]", clonedProject);
@@ -190,6 +195,16 @@ public class ProjectGitHandler implements Closeable {
 			log.debug("Successfully cloned the project to [{}]", clonedProject);
 		}
 		return findAndCheckOutBranchForVersion(clonedProject, versions);
+	}
+
+	private String createRepoUrlFromProject(String projectName) {
+		String orgUrl = this.properties.getMetaRelease().getGitOrgUrl();
+		String fullUrl = orgUrl.endsWith("/") ? (orgUrl + projectName)
+				: (orgUrl + "/" + addCommercialSuffix(projectName) + suffixNonHttpRepo(orgUrl));
+		if (log.isDebugEnabled()) {
+			log.debug("Full url of the project is [{}]", fullUrl);
+		}
+		return fullUrl;
 	}
 
 	private File findAndCheckOutBranchForVersion(File clonedProject, String[] versions) {
@@ -269,6 +284,11 @@ public class ProjectGitHandler implements Closeable {
 
 	private File humanishDestination(URIish projectUrl, File destinationFolder) {
 		return new File(destinationFolder, projectUrl.getHumanishName());
+	}
+
+	public void checkoutTag(File project, String tag) {
+		log.info("checkout tag: " + tag);
+		gitRepo(project).checkoutTag(tag);
 	}
 
 	public void checkout(File project, String branch) {

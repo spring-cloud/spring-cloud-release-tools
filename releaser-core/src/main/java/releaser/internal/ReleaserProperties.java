@@ -78,6 +78,8 @@ public class ReleaserProperties implements Serializable {
 
 	private Versions versions = new Versions();
 
+	private Antora antora = new Antora();
+
 	private boolean commercial = false;
 
 	/**
@@ -208,12 +210,21 @@ public class ReleaserProperties implements Serializable {
 		this.commercial = commercial;
 	}
 
+	public Antora getAntora() {
+		return antora;
+	}
+
+	public void setAntora(Antora antora) {
+		this.antora = antora;
+	}
+
 	@Override
 	public String toString() {
 		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git + ", pom="
 				+ this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan=" + this.sagan
 				+ ", fixedVersions=" + this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
-				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + '}';
+				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + ", antora="
+				+ this.antora + '}';
 	}
 
 	public ReleaserProperties copy() {
@@ -432,6 +443,58 @@ public class ReleaserProperties implements Serializable {
 
 		public void setDefaultEnabled(boolean defaultEnabled) {
 			this.defaultEnabled = defaultEnabled;
+		}
+
+	}
+
+	public static class Antora implements Serializable {
+
+		/**
+		 * URL to Spring Docs Actions repo.
+		 */
+		private String springDocsActionsUrl;
+
+		/**
+		 * Command to sync Antora docs.
+		 */
+		private String syncAntoraDocsCommand;
+
+		/**
+		 * Tag for Spring Docs Actions repo.
+		 */
+		private String springDocsActionsTag;
+
+		public String getSpringDocsActionsUrl() {
+			return springDocsActionsUrl;
+		}
+
+		public void setSpringDocsActionsUrl(String springDocsActionsUrl) {
+			this.springDocsActionsUrl = springDocsActionsUrl;
+		}
+
+		public String getSpringDocsActionsTag() {
+			return springDocsActionsTag;
+		}
+
+		public void setSpringDocsActionsTag(String springDocsActionsTag) {
+			this.springDocsActionsTag = springDocsActionsTag;
+		}
+
+		public String getSyncAntoraDocsCommand() {
+			return syncAntoraDocsCommand;
+		}
+
+		public void setSyncAntoraDocsCommand(String syncAntoraDocsCommand) {
+			this.syncAntoraDocsCommand = syncAntoraDocsCommand;
+		}
+
+		@Override
+		public String toString() {
+			return new StringJoiner(", ", Antora.class.getSimpleName() + "[", "]")
+					.add("springDocsActionsUrl='" + springDocsActionsUrl + "'")
+					.add("syncAntoraDocsCommand='" + syncAntoraDocsCommand + "'")
+					.add("springDocsActionsTag='" + springDocsActionsTag + "'").toString();
+
 		}
 
 	}
@@ -1021,6 +1084,8 @@ public class ReleaserProperties implements Serializable {
 		private String generateReleaseTrainDocsCommand = "bash release_train.sh "
 				+ "--retrieveversions --version {{version}} --ghpages --auto";
 
+		private String runAntoraCommand = "./mvnw antora {{systemProps}}";
+
 		/**
 		 * Additional system properties that should be passed to the build / deploy
 		 * commands. If present in other commands "{{systemProps}}" will be substituted
@@ -1101,12 +1166,20 @@ public class ReleaserProperties implements Serializable {
 			this.systemProperties = systemProperties;
 		}
 
+		public String getRunAntoraCommand() {
+			return runAntoraCommand;
+		}
+
+		public void setRunAntoraCommand(String runAntoraCommand) {
+			this.runAntoraCommand = runAntoraCommand;
+		}
+
 		@Override
 		public String toString() {
 			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='" + this.deployCommand
 					+ '\'' + ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
-					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes=" + this.waitTimeInMinutes
-					+ '}';
+					+ this.generateReleaseTrainDocsCommand + '\'' + ", runAntoraCommand= "
+					+ runAntoraCommand + ", waitTimeInMinutes=" + this.waitTimeInMinutes + '}';
 		}
 
 	}
