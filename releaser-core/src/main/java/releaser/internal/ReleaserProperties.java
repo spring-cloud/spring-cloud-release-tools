@@ -1178,8 +1178,8 @@ public class ReleaserProperties implements Serializable {
 		public String toString() {
 			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='" + this.deployCommand
 					+ '\'' + ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
-					+ this.generateReleaseTrainDocsCommand + '\'' + ", runAntoraCommand= "
-					+ runAntoraCommand + ", waitTimeInMinutes=" + this.waitTimeInMinutes + '}';
+					+ this.generateReleaseTrainDocsCommand + '\'' + ", runAntoraCommand= " + runAntoraCommand
+					+ ", waitTimeInMinutes=" + this.waitTimeInMinutes + '}';
 		}
 
 	}
