@@ -342,10 +342,10 @@ class CommandPicker {
 		ProjectVersion version = new ProjectVersion(project);
 		String repo = properties.getGit().getOrgName() + "/" + version.projectName;
 		// TODO this needs to be a property
-		return bashCommandWithSystemProps("./rsync-antora-reference/src/action.sh"
+		return "./rsync-antora-reference/src/action.sh"
 				+ " --docs-username \"$DOCS_SERVER_SSH_USER\" --docs-host \"docs.spring.io\" --docs-ssh-key {{cat-key}} --docs-ssh-host-key \"#\" --site-path \""
 				+ project.getAbsolutePath() + "/target/antora/site\" --github-repository \"" + repo
-				+ "\" --dry-run");
+				+ "\" --dry-run";
 	}
 
 	String version() {
