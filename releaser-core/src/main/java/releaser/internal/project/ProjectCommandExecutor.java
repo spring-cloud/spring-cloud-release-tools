@@ -183,13 +183,13 @@ public class ProjectCommandExecutor {
 		String command = new CommandPicker(properties).publishAntoraDocsCommand(project, properties);
 		log.info("Executing command for publishing Antora docs " + command + " / " + properties);
 		String[] commands = command.split(" ");
-		//TODO fix this hack
+		// TODO fix this hack
 		for (int i = 0; i < commands.length; i++) {
 			if (commands[i].contains("{{cat-key}}")) {
 				commands[i] = commands[i].replace("{{cat-key}}", "\"$(cat $DOCS_SERVER_SSH_KEY)\"");
 			}
 		}
-		runCommand(properties, antoraDocsProject.getAbsolutePath(), command.split(" "));
+		runCommand(properties, antoraDocsProject.getAbsolutePath() + "/rsync-antora-reference/src", command.split(" "));
 	}
 
 	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
@@ -342,10 +342,9 @@ class CommandPicker {
 		ProjectVersion version = new ProjectVersion(project);
 		String repo = properties.getGit().getOrgName() + "/" + version.projectName;
 		// TODO this needs to be a property
-		return "./rsync-antora-reference/src/action.sh"
+		return "./action.sh"
 				+ " --docs-username \"$DOCS_SERVER_SSH_USER\" --docs-host \"docs.spring.io\" --docs-ssh-key {{cat-key}} --docs-ssh-host-key \"#\" --site-path \""
-				+ project.getAbsolutePath() + "/target/antora/site\" --github-repository \"" + repo
-				+ "\" --dry-run";
+				+ project.getAbsolutePath() + "/target/antora/site\" --github-repository \"" + repo + "\" --dry-run";
 	}
 
 	String version() {

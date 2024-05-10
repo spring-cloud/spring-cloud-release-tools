@@ -104,7 +104,7 @@ releaser:
   antora:
     spring-docs-actions-url: https://github.com/spring-io/spring-doc-actions
     spring-docs-actions-tag: v0.0.16
-    sync-antora-docs-command: "./rsync-antora-reference/src/action.sh"
+    sync-antora-docs-command: "./action.sh"
   meta-release:
     enabled: false
     release-train-project-name: spring-cloud-release
