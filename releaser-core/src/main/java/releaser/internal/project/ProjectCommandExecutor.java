@@ -345,7 +345,7 @@ class CommandPicker {
 		return bashCommandWithSystemProps("./rsync-antora-reference/src/action.sh"
 				+ " --docs-username \"$DOCS_SERVER_SSH_USER\" --docs-host \"docs.spring.io\" --docs-ssh-key {{cat-key}} --docs-ssh-host-key \"#\" --site-path \""
 				+ project.getAbsolutePath() + "/target/antora/site\" --github-repository \"" + repo
-				+ "\" --dry-run {{systemProps}}");
+				+ "\" --dry-run");
 	}
 
 	String version() {
