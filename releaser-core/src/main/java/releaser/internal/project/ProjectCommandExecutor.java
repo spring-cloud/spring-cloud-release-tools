@@ -189,7 +189,7 @@ public class ProjectCommandExecutor {
 				commands[i] = commands[i].replace("{{cat-key}}", "\"$(cat $DOCS_SERVER_SSH_KEY)\"");
 			}
 		}
-		runCommand(properties, antoraDocsProject.getAbsolutePath() + "/rsync-antora-reference/src", command.split(" "));
+		runCommand(properties, antoraDocsProject.getAbsolutePath() + "/rsync-antora-reference/src", commands);
 	}
 
 	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
