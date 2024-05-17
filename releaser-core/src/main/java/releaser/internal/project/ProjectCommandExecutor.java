@@ -342,8 +342,8 @@ class CommandPicker {
 		ProjectVersion version = new ProjectVersion(project);
 		String repo = properties.getGit().getOrgName() + "/" + version.projectName;
 		// TODO this needs to be a property
-		return "./jenkins.sh"
-				+ " --docs-host docs-ip.spring.io --docs-ssh-host-key # --site-path "
+		return "./jenkins.sh --docs-username " + properties.getAntora().getSpringDocsSshUsername() + " --docs-ssh-key " + properties.getAntora().getSpringDocsSshKey()
+				+ " --docs-host docs-ip.spring.io --docs-ssh-host-key " + properties.getAntora().getSpringDocsSshHostKey() + " --site-path "
 				+ project.getAbsolutePath() + "/target/antora/site --github-repository " + repo + " --dry-run";
 	}
 

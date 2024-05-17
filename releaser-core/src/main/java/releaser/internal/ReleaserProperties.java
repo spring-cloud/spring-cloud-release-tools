@@ -502,7 +502,7 @@ public class ReleaserProperties implements Serializable {
 			this.springDocsSshUsername = springDocsSshUsername;
 		}
 
-		public String getSpringDocsSshKey(String springDocsSshKey) {
+		public String getSpringDocsSshKey() {
 			return springDocsSshKey;
 		}
 
@@ -510,7 +510,7 @@ public class ReleaserProperties implements Serializable {
 			this.springDocsSshKey = springDocsSshKey;
 		}
 
-		public String getSpringDocsSshHostKey(String springDocsSshHostKey) {
+		public String getSpringDocsSshHostKey() {
 			return springDocsSshHostKey;
 		}
 
