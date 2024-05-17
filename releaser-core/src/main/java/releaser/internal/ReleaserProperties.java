@@ -464,6 +464,12 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private String springDocsActionsTag;
 
+		private String springDocsSshUsername;
+
+		private String springDocsSshKey;
+
+		private String springDocsSshHostKey;
+
 		public String getSpringDocsActionsUrl() {
 			return springDocsActionsUrl;
 		}
@@ -488,15 +494,41 @@ public class ReleaserProperties implements Serializable {
 			this.syncAntoraDocsCommand = syncAntoraDocsCommand;
 		}
 
-		@Override
-		public String toString() {
-			return new StringJoiner(", ", Antora.class.getSimpleName() + "[", "]")
-					.add("springDocsActionsUrl='" + springDocsActionsUrl + "'")
-					.add("syncAntoraDocsCommand='" + syncAntoraDocsCommand + "'")
-					.add("springDocsActionsTag='" + springDocsActionsTag + "'").toString();
-
+		public String getSpringDocsSshUsername() {
+			return springDocsSshUsername;
 		}
 
+		public void setSpringDocsSshUsername(String springDocsSshUsername) {
+			this.springDocsSshUsername = springDocsSshUsername;
+		}
+
+		public String getSpringDocsSshKey(String springDocsSshKey) {
+			return springDocsSshKey;
+		}
+
+		public void setSpringDocsSshKey(String springDocsSshKey) {
+			this.springDocsSshKey = springDocsSshKey;
+		}
+
+		public String getSpringDocsSshHostKey(String springDocsSshHostKey) {
+			return springDocsSshHostKey;
+		}
+
+		public void setSpringDocsSshHostKey(String springDocsSshHostKey) {
+			this.springDocsSshHostKey = springDocsSshHostKey;
+		}
+
+		@Override
+		public String toString() {
+			return "Antora{" +
+					"springDocsActionsUrl='" + springDocsActionsUrl + '\'' +
+					", syncAntoraDocsCommand='" + syncAntoraDocsCommand + '\'' +
+					", springDocsActionsTag='" + springDocsActionsTag + '\'' +
+					", springDocsSshUsername='" + springDocsSshUsername + '\'' +
+					", springDocsSshKey='" + springDocsSshKey + '\'' +
+					", springDocsSshHostKey='" + springDocsSshHostKey + '\'' +
+					'}';
+		}
 	}
 
 	public static class Git implements Serializable {
