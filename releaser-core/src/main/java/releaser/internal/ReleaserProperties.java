@@ -466,7 +466,7 @@ public class ReleaserProperties implements Serializable {
 
 		private String springDocsSshUsername;
 
-		private String springDocsSshKey;
+		private String springDocsSshKeyPath;
 
 		private String springDocsSshHostKey;
 
@@ -502,12 +502,12 @@ public class ReleaserProperties implements Serializable {
 			this.springDocsSshUsername = springDocsSshUsername;
 		}
 
-		public String getSpringDocsSshKey() {
-			return springDocsSshKey;
+		public String getSpringDocsSshKeyPath() {
+			return springDocsSshKeyPath;
 		}
 
-		public void setSpringDocsSshKey(String springDocsSshKey) {
-			this.springDocsSshKey = springDocsSshKey;
+		public void setSpringDocsSshKeyPath(String springDocsSshKeyPath) {
+			this.springDocsSshKeyPath = springDocsSshKeyPath;
 		}
 
 		public String getSpringDocsSshHostKey() {
@@ -525,7 +525,7 @@ public class ReleaserProperties implements Serializable {
 					", syncAntoraDocsCommand='" + syncAntoraDocsCommand + '\'' +
 					", springDocsActionsTag='" + springDocsActionsTag + '\'' +
 					", springDocsSshUsername='" + springDocsSshUsername + '\'' +
-					", springDocsSshKey='" + springDocsSshKey + '\'' +
+					", springDocsSshKey='" + springDocsSshKeyPath + '\'' +
 					", springDocsSshHostKey='" + springDocsSshHostKey + '\'' +
 					'}';
 		}
