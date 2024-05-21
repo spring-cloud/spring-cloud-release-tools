@@ -191,7 +191,7 @@ public class ProjectCommandExecutor {
 		}
 		for (int i = 0; i < commands.length; i++) {
 			if (commands[i].contains("{{host-key}}")) {
-				commands[i] = commands[i].replace("{{host-key}}", properties.getAntora().getSpringDocsSshHostKey());
+				commands[i] = commands[i].replace("{{host-key}}", "\"" + properties.getAntora().getSpringDocsSshHostKey()) + "\"";
 			}
 		}
 		runCommand(properties, antoraDocsProject.getAbsolutePath() + "/rsync-antora-reference/src", commands);
