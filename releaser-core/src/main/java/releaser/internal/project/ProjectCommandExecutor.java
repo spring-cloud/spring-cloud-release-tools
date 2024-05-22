@@ -185,13 +185,9 @@ public class ProjectCommandExecutor {
 		String[] commands = command.split(" ");
 		// TODO fix this hack
 		for (int i = 0; i < commands.length; i++) {
-			if (commands[i].contains("{{cat-key}}")) {
-				commands[i] = commands[i].replace("{{cat-key}}", "\"$(cat $DOCS_SERVER_SSH_KEY)\"");
-			}
-		}
-		for (int i = 0; i < commands.length; i++) {
 			if (commands[i].contains("{{host-key}}")) {
-				commands[i] = commands[i].replace("{{host-key}}", "\"" + properties.getAntora().getSpringDocsSshHostKey()) + "\"";
+				commands[i] = commands[i].replace("{{host-key}}",
+						"\"" + properties.getAntora().getSpringDocsSshHostKey()) + "\"";
 			}
 		}
 		runCommand(properties, antoraDocsProject.getAbsolutePath() + "/rsync-antora-reference/src", commands);
@@ -346,10 +342,15 @@ class CommandPicker {
 	String publishAntoraDocsCommand(File project, ReleaserProperties properties) {
 		ProjectVersion version = new ProjectVersion(project);
 		String repo = properties.getGit().getOrgName() + "/" + version.projectName;
-		// TODO this needs to be a property
-		return "./jenkins.sh --docs-username " + properties.getAntora().getSpringDocsSshUsername() + " --docs-ssh-key-path " + properties.getAntora().getSpringDocsSshKeyPath()
-				+ " --docs-host docs-ip.spring.io --docs-ssh-host-key {{host-key}} --site-path "
-				+ project.getAbsolutePath() + "/target/antora/site --github-repository " + repo + " --dry-run";
+		String command = properties.getAntora().getSyncAntoraDocsCommand().replace("{{github-repo}}", repo)
+				.replace("{{site-path}}", project.getAbsolutePath() + "/target/antora/site");
+		if (StringUtils.hasText(properties.getAntora().getSpringDocsSshUsername())) {
+			command = command.replace("{{ssh-username}}", properties.getAntora().getSpringDocsSshUsername());
+		}
+		if (StringUtils.hasText(properties.getAntora().getSpringDocsSshKeyPath())) {
+			command = command.replace("{{ssh-key-path}}", properties.getAntora().getSpringDocsSshKeyPath());
+		}
+		return command;
 	}
 
 	String version() {
