@@ -520,15 +520,12 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Antora{" +
-					"springDocsActionsUrl='" + springDocsActionsUrl + '\'' +
-					", syncAntoraDocsCommand='" + syncAntoraDocsCommand + '\'' +
-					", springDocsActionsTag='" + springDocsActionsTag + '\'' +
-					", springDocsSshUsername='" + springDocsSshUsername + '\'' +
-					", springDocsSshKey='" + springDocsSshKeyPath + '\'' +
-					", springDocsSshHostKey='" + springDocsSshHostKey + '\'' +
-					'}';
+			return "Antora{" + "springDocsActionsUrl='" + springDocsActionsUrl + '\'' + ", syncAntoraDocsCommand='"
+					+ syncAntoraDocsCommand + '\'' + ", springDocsActionsTag='" + springDocsActionsTag + '\''
+					+ ", springDocsSshUsername='" + springDocsSshUsername + '\'' + ", springDocsSshKey='"
+					+ springDocsSshKeyPath + '\'' + ", springDocsSshHostKey='" + springDocsSshHostKey + '\'' + '}';
 		}
+
 	}
 
 	public static class Git implements Serializable {
