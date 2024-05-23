@@ -335,7 +335,9 @@ class CommandPicker {
 	}
 
 	String runAntoraCommand(ProjectVersion version) {
-		// TODO handle gradle and bash?
+		if (projectType == ProjectType.GRADLE) {
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getRunAntoraCommand());
+		}
 		return mavenCommandWithSystemProps(releaserProperties.getMaven().getRunAntoraCommand(), version);
 	}
 
