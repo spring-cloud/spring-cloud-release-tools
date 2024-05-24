@@ -1113,6 +1113,9 @@ public class ReleaserProperties implements Serializable {
 		private String generateReleaseTrainDocsCommand = "bash release_train.sh "
 				+ "--retrieveversions --version {{version}} --ghpages --auto";
 
+		/**
+		 * Command to be executed to run Antora.
+		 */
 		private String runAntoraCommand = "./mvnw antora {{systemProps}}";
 
 		/**
@@ -1418,6 +1421,11 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private long waitTimeInMinutes = 20;
 
+		/**
+		 * Command to be executed to run Antora.
+		 */
+		private String runAntoraCommand = "./gradlew antora {{systemProps}}";
+
 		@Override
 		public String getBuildCommand() {
 			return this.buildCommand;
@@ -1502,6 +1510,14 @@ public class ReleaserProperties implements Serializable {
 			this.ignoredGradleRegex = ignoredGradleRegex;
 		}
 
+		public String getRunAntoraCommand() {
+			return runAntoraCommand;
+		}
+
+		public void setRunAntoraCommand(String runAntoraCommand) {
+			this.runAntoraCommand = runAntoraCommand;
+		}
+
 		@Override
 		public String toString() {
 			return new StringJoiner(", ", Gradle.class.getSimpleName() + "[", "]")
@@ -1511,6 +1527,7 @@ public class ReleaserProperties implements Serializable {
 					.add("deployGuidesCommand='" + deployGuidesCommand + "'")
 					.add("publishDocsCommand=" + publishDocsCommand)
 					.add("generateReleaseTrainDocsCommand='" + generateReleaseTrainDocsCommand + "'")
+					.add("runAntoraCommand='" + runAntoraCommand + "'")
 					.add("systemProperties='" + systemProperties + "'").add("waitTimeInMinutes=" + waitTimeInMinutes)
 					.toString();
 		}

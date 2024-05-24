@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.tech.ReleaserProcessExecutor;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 
 /**
@@ -51,6 +52,13 @@ public class ProjectCommandExecutor {
 	private static final String OLD_VERSION_MUSTACHE = "{{oldVersion}}";
 
 	private static final String NEXT_VERSION_MUSTACHE = "{{nextVersion}}";
+
+	private static final String RSYNC_ACTIONS_PROJECT_DIR = "/rsync-antora-reference/src";
+
+	private static final String SPRING_DOCS_ACTION_RUNNER = "spring-docs-action-runner.sh";
+
+	private static final String RUNNER_DESTINATION = RSYNC_ACTIONS_PROJECT_DIR + File.separator
+			+ SPRING_DOCS_ACTION_RUNNER;
 
 	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain) {
@@ -180,17 +188,32 @@ public class ProjectCommandExecutor {
 	}
 
 	public void publishAntoraDocs(File antoraDocsProject, File project, ReleaserProperties properties) {
-		String command = new CommandPicker(properties).publishAntoraDocsCommand(project, properties);
-		log.info("Executing command for publishing Antora docs " + command + " / " + properties);
-		String[] commands = command.split(" ");
-		// TODO fix this hack
-		for (int i = 0; i < commands.length; i++) {
-			if (commands[i].contains("{{host-key}}")) {
-				commands[i] = commands[i].replace("{{host-key}}",
-						"\"" + properties.getAntora().getSpringDocsSshHostKey()) + "\"";
+		try {
+			copyRunnerToActions(antoraDocsProject);
+			String command = new CommandPicker(properties).publishAntoraDocsCommand(project, properties);
+			log.info("Executing command for publishing Antora docs " + command + " / " + properties);
+			String[] commands = command.split(" ");
+			// TODO fix this hack
+			for (int i = 0; i < commands.length; i++) {
+				if (commands[i].contains("{{host-key}}")) {
+					commands[i] = commands[i].replace("{{host-key}}",
+							"\"" + properties.getAntora().getSpringDocsSshHostKey()) + "\"";
+				}
 			}
+			runCommand(properties, antoraDocsProject.getAbsolutePath() + RSYNC_ACTIONS_PROJECT_DIR, commands);
 		}
-		runCommand(properties, antoraDocsProject.getAbsolutePath() + "/rsync-antora-reference/src", commands);
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	public void copyRunnerToActions(File antoraDocsProject) throws IOException {
+		File destination = new File(antoraDocsProject.getAbsolutePath() + RUNNER_DESTINATION);
+		if (!destination.exists()) {
+			ClassPathResource runner = new ClassPathResource(SPRING_DOCS_ACTION_RUNNER);
+			Files.copy(runner.getInputStream(), destination.toPath());
+			destination.setExecutable(true);
+		}
 	}
 
 	public void publishDocs(ReleaserProperties properties, ProjectVersion originalVersion,
@@ -335,7 +358,9 @@ class CommandPicker {
 	}
 
 	String runAntoraCommand(ProjectVersion version) {
-		// TODO handle gradle and bash?
+		if (projectType == ProjectType.GRADLE) {
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getRunAntoraCommand());
+		}
 		return mavenCommandWithSystemProps(releaserProperties.getMaven().getRunAntoraCommand(), version);
 	}
 
