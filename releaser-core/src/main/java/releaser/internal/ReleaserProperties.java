@@ -1531,6 +1531,7 @@ public class ReleaserProperties implements Serializable {
 					.add("systemProperties='" + systemProperties + "'").add("waitTimeInMinutes=" + waitTimeInMinutes)
 					.toString();
 		}
+
 	}
 
 	public static class Sagan implements Serializable {
