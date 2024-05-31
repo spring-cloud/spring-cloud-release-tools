@@ -60,7 +60,8 @@ public class CreateProjectReleaseBundlePostReleaseTask implements ProjectPostRel
 
 	@Override
 	public ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException {
-		return this.releaser.createReleaseBundle(args.properties.isCommercial(), args.versionFromBom, args.options.dryRun);
+		return this.releaser.createReleaseBundle(args.properties.isCommercial(), args.versionFromBom,
+				args.options.dryRun);
 	}
 
 	@Override
