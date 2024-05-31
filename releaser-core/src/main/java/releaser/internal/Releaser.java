@@ -377,4 +377,21 @@ public class Releaser {
 		return ExecutionResult.skipped();
 	}
 
+	public ExecutionResult createReleaseBundle(boolean commercial, ProjectVersion versionFromBom, Boolean dryRun) {
+		if (dryRun) {
+			log.info("\nWon't create a release bundle for a dry run");
+			return ExecutionResult.skipped();
+		}
+		if (versionFromBom.isSnapshot()) {
+			log.info("\nWon't create a release bundle for a SNAPSHOT version");
+			return ExecutionResult.skipped();
+		}
+		if (!commercial) {
+			log.info("\nWon't create a release bundle for a non commercial project");
+			return ExecutionResult.skipped();
+		}
+		log.info("\nCreating a release bundle");
+		return ExecutionResult.success();
+	}
+
 }
