@@ -17,6 +17,7 @@
 package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
+import releaser.internal.project.ProjectVersion;
 import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
@@ -60,7 +61,8 @@ public class CreateReleaseTrainReleaseBundlePostReleaseTask implements TrainPost
 
 	@Override
 	public ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException {
-		return releaser.createReleaseBundle(args.properties.isCommercial(), args.versionFromBom, args.options.dryRun);
+		return releaser.createReleaseBundle(args.properties.isCommercial(), args.versionFromBom, args.options.dryRun,
+				args.properties.getBundles().getRepos(), new ProjectVersion(args.project).projectName);
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import releaser.internal.ReleaserProperties;
 import releaser.internal.ReleaserPropertiesUpdater;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
+import releaser.internal.commercial.ReleaseBundleCreator;
 import releaser.internal.docs.CustomProjectDocumentationUpdater;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.ProjectGitHandler;
@@ -154,10 +155,10 @@ class ReleaserConfiguration {
 			ProjectGitHandler projectGitHandler, ProjectGitHubHandler projectGitHubHandler,
 			TemplateGenerator templateGenerator, GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
 			DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions,
-			ReleaserProperties releaserProperties) {
+			ReleaserProperties releaserProperties, ReleaseBundleCreator releaseBundleCreator) {
 		return new Releaser(releaserProperties, projectPomUpdater, projectCommandExecutor, projectGitHandler,
 				projectGitHubHandler, templateGenerator, gradleUpdater, saganUpdater, documentationUpdater,
-				postReleaseActions);
+				postReleaseActions, releaseBundleCreator);
 	}
 
 	@Bean
@@ -171,6 +172,12 @@ class ReleaserConfiguration {
 	Parser optionsParser(List<ReleaserTask> allTasks, List<SingleProjectReleaserTask> singleProjectReleaserTasks,
 			ConfigurableApplicationContext context) {
 		return new OptionsParser(allTasks, singleProjectReleaserTasks, context);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	ReleaseBundleCreator releaseBundleCreator(ReleaserProperties properties) {
+		return new ReleaseBundleCreator(properties);
 	}
 
 }

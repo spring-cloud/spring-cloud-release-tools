@@ -17,6 +17,7 @@
 package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
+import releaser.internal.project.ProjectVersion;
 import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.ProjectPostReleaseReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
@@ -61,7 +62,8 @@ public class CreateProjectReleaseBundlePostReleaseTask implements ProjectPostRel
 	@Override
 	public ExecutionResult runTask(Arguments args) throws BuildUnstableException, RuntimeException {
 		return this.releaser.createReleaseBundle(args.properties.isCommercial(), args.versionFromBom,
-				args.options.dryRun);
+				args.options.dryRun, args.properties.getBundles().getRepos(),
+				new ProjectVersion(args.project).projectName);
 	}
 
 	@Override
