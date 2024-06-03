@@ -43,6 +43,9 @@ public class ReleaseBundleCreator {
 
 	public ReleaseBundleCreator(ReleaserProperties properties) {
 		this.properties = properties;
+		log.info("Creating Artifactory client with URL [{}]", properties.getBundles().getRepoUrl());
+		log.info("Creating Artifactory client with username [{}]", properties.getBundles().getRepoUsername());
+		log.info("Creating Artifactory client with password [{}]", properties.getBundles().getRepoPassword());
 		this.artifactory = ArtifactoryClientBuilder.create().setUrl(properties.getBundles().getRepoUrl())
 				.setUsername(properties.getBundles().getRepoUsername())
 				.setPassword(properties.getBundles().getRepoPassword()).build();
