@@ -17,6 +17,7 @@
 package releaser.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.function.Supplier;
@@ -31,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import releaser.SpringCloudReleaserProperties;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
+import releaser.internal.commercial.ReleaseBundleCreator;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.github.ProjectGitHubHandler;
@@ -92,7 +94,13 @@ public class ReleaserTests {
 	Releaser releaser(Supplier<ProjectVersion> originalVersionSupplier) {
 		return new Releaser(SpringCloudReleaserProperties.get(), this.projectPomUpdater, this.projectCommandExecutor,
 				this.projectGitHandler, this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater, this.postReleaseActions) {
+				this.saganUpdater, this.documentationUpdater, this.postReleaseActions,
+				new ReleaseBundleCreator(SpringCloudReleaserProperties.get()) {
+					@Override
+					public boolean createReleaseBundle(String aql) throws IOException {
+						return true;
+					}
+				}) {
 			@Override
 			ProjectVersion originalVersion(File project) {
 				return originalVersionSupplier.get();
@@ -103,7 +111,13 @@ public class ReleaserTests {
 	Releaser releaser() {
 		return new Releaser(new ReleaserProperties(), this.projectPomUpdater, this.projectCommandExecutor,
 				this.projectGitHandler, this.projectGitHubHandler, this.templateGenerator, this.gradleUpdater,
-				this.saganUpdater, this.documentationUpdater, this.postReleaseActions);
+				this.saganUpdater, this.documentationUpdater, this.postReleaseActions,
+				new ReleaseBundleCreator(SpringCloudReleaserProperties.get()) {
+					@Override
+					public boolean createReleaseBundle(String aql) throws IOException {
+						return true;
+					}
+				});
 	}
 
 	@Test
