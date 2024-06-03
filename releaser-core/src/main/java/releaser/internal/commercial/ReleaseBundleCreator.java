@@ -48,7 +48,7 @@ public class ReleaseBundleCreator {
 		log.info("Creating Artifactory client with password [{}]", properties.getBundles().getRepoPassword());
 		this.artifactory = ArtifactoryClientBuilder.create().setUrl(properties.getBundles().getRepoUrl())
 				.setUsername(properties.getBundles().getRepoUsername())
-				.setPassword(properties.getBundles().getRepoPassword()).build();
+				.setAccessToken(properties.getBundles().getRepoPassword()).build();
 	}
 
 	public boolean createReleaseBundle(List<String> repos, String version) throws IOException {
