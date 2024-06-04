@@ -164,6 +164,7 @@ releaser:
       spring-cloud-vault:
         - "org/springframework/cloud/spring-cloud-vault*"
         - "org/springframework/cloud/spring-cloud-starter-vault*"
-      spring-cloud-release:
+      # This is Spring Cloud Release, the POM id is spring-cloud-starter-build
+      spring-cloud-starter-build:
         - "org/springframework/cloud/spring-cloud-starter*"
         - "org/springframework/cloud/spring-cloud-dependencies*"
