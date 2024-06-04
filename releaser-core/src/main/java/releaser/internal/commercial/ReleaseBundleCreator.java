@@ -40,27 +40,37 @@ public class ReleaseBundleCreator {
 
 	private static final Logger log = LoggerFactory.getLogger(ReleaseBundleCreator.class);
 
-	private ReleaserProperties properties;
-
 	private Artifactory artifactory;
 
+	private ObjectMapper objectMapper;
+
 	public ReleaseBundleCreator(ReleaserProperties properties) {
-		this.properties = properties;
 		log.info("Creating Artifactory client with URL [{}]", properties.getBundles().getRepoUrl());
 		log.info("Creating Artifactory client with username [{}]", properties.getBundles().getRepoUsername());
-		log.info("Creating Artifactory client with password [{}]", properties.getBundles().getRepoPassword());
+		log.info("Creating Artifactory client with access token [{}]", properties.getBundles().getRepoAccessToken());
 		this.artifactory = ArtifactoryClientBuilder.create().setUrl(properties.getBundles().getRepoUrl())
 				.setUsername(properties.getBundles().getRepoUsername())
-				.setAccessToken(properties.getBundles().getRepoPassword()).build();
+				.setAccessToken(properties.getBundles().getRepoAccessToken()).build();
+		this.objectMapper = new ObjectMapper();
 	}
 
-	public boolean createReleaseBundle(List<String> repos, String version) throws IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
+	public boolean createReleaseBundle(List<String> repos, String version, String releaseBundleName) throws IOException {
 		Map<String, Object> json = new HashMap<>();
-		json.put("release_bundle_name", "TNZ-spring-cloud-netflix-commercial");
+		json.put("release_bundle_name", releaseBundleName);
 		json.put("release_bundle_version", version);
 		json.put( "source_type", "aql");
+		json.put("source", createAqlMap(repos, version));
+		return createReleaseBundle(objectMapper.writeValueAsString(json));
+	}
 
+	private Map<String, Object> createAqlMap(List<String> repos, String version) {
+		String aql = createAql(repos, version);
+		Map<String, Object> aqlObject = new HashMap<>();
+		aqlObject.put("aql", aql);
+		return aqlObject;
+	}
+
+	private String createAql(List<String> repos, String version) {
 		AqlQueryBuilder builder = new AqlQueryBuilder()
 				.item(AqlItem.aqlItem("repo", AqlItem.aqlItem("$eq", "spring-enterprise-maven-prod-local")));
 
@@ -68,11 +78,7 @@ public class ReleaseBundleCreator {
 		for (String repo : repos) {
 			items[repos.indexOf(repo)] = AqlItem.match("path", repo + "/" + version);
 		}
-		String aql = builder.or(items).asc("path", "name").build();
-		Map<String, Object> aqlObject = new HashMap<>();
-		aqlObject.put("aql", aql);
-		json.put("source", aqlObject);
-		return createReleaseBundle(objectMapper.writeValueAsString(json));
+		return builder.or(items).asc("path", "name").build();
 	}
 
 	public boolean createReleaseBundle(String json) throws IOException {

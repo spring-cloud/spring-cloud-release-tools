@@ -404,7 +404,8 @@ public class Releaser {
 		List<String> repos = commercialRepos.get(projectName);
 		log.info("Creating release bundles for project [{}] in repos [{}]", projectName, repos);
 		try {
-			boolean result = this.releaseBundleCreator.createReleaseBundle(repos, versionFromBom.version);
+			boolean result = this.releaseBundleCreator.createReleaseBundle(repos, versionFromBom.version,
+					"TNZ-" + projectName + "-commercial");
 			if (!result) {
 				log.warn("Failed to create release bundle");
 				return ExecutionResult.unstable(new BuildUnstableException("Failed to create a release bundle"));
