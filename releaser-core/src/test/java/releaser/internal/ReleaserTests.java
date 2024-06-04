@@ -97,7 +97,7 @@ public class ReleaserTests {
 				this.saganUpdater, this.documentationUpdater, this.postReleaseActions,
 				new ReleaseBundleCreator(SpringCloudReleaserProperties.get()) {
 					@Override
-					public boolean createReleaseBundle(String aql) throws IOException {
+					public boolean createReleaseBundle(String json) throws IOException {
 						return true;
 					}
 				}) {
@@ -114,7 +114,7 @@ public class ReleaserTests {
 				this.saganUpdater, this.documentationUpdater, this.postReleaseActions,
 				new ReleaseBundleCreator(SpringCloudReleaserProperties.get()) {
 					@Override
-					public boolean createReleaseBundle(String aql) throws IOException {
+					public boolean createReleaseBundle(String json) throws IOException {
 						return true;
 					}
 				});
