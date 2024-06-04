@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
-		<version>4.0.6</version>
+		<version>4.0.3</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
@@ -47,8 +47,6 @@
 		<fliptables.version>1.1.0</fliptables.version>
 		<zt.exec.version>1.12</zt.exec.version>
 		<okhttp.version>4.11.0</okhttp.version>
-		<artifactory-client.version>2.17.0</artifactory-client.version>
-		<groovy.version>4.0.6</groovy.version>
 	</properties>
 
 	<dependencyManagement>
@@ -146,16 +144,6 @@
 				<groupId>org.awaitility</groupId>
 				<artifactId>awaitility</artifactId>
 				<version>${awaitility.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jfrog.artifactory.client</groupId>
-				<artifactId>artifactory-java-client-services</artifactId>
-				<version>${artifactory-client.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.groovy</groupId>
-				<artifactId>groovy</artifactId>
-				<version>${groovy.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

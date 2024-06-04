@@ -18,13 +18,11 @@ package releaser.internal;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
-import releaser.internal.commercial.ReleaseBundleCreator;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.github.ProjectGitHubHandler;
@@ -71,13 +69,11 @@ public class Releaser {
 
 	private ReleaserProperties releaserProperties;
 
-	private ReleaseBundleCreator releaseBundleCreator;
-
 	public Releaser(ReleaserProperties releaserProperties, ProjectPomUpdater projectPomUpdater,
 			ProjectCommandExecutor projectCommandExecutor, ProjectGitHandler projectGitHandler,
 			ProjectGitHubHandler projectGitHubHandler, TemplateGenerator templateGenerator, GradleUpdater gradleUpdater,
-			SaganUpdater saganUpdater, DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions,
-			ReleaseBundleCreator releaseBundleCreator) {
+			SaganUpdater saganUpdater, DocumentationUpdater documentationUpdater,
+			PostReleaseActions postReleaseActions) {
 		this.releaserProperties = releaserProperties;
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectCommandExecutor = projectCommandExecutor;
@@ -88,7 +84,6 @@ public class Releaser {
 		this.saganUpdater = saganUpdater;
 		this.documentationUpdater = documentationUpdater;
 		this.postReleaseActions = postReleaseActions;
-		this.releaseBundleCreator = releaseBundleCreator;
 	}
 
 	public File clonedProjectFromOrg(String projectName) {
@@ -380,43 +375,6 @@ public class Releaser {
 			return ExecutionResult.success();
 		}
 		return ExecutionResult.skipped();
-	}
-
-	public ExecutionResult createReleaseBundle(boolean commercial, ProjectVersion versionFromBom, Boolean dryRun,
-			Map<String, List<String>> commercialRepos, String projectName) {
-		if (dryRun) {
-			log.info("\nWon't create a release bundle for a dry run");
-			return ExecutionResult.skipped();
-		}
-		if (versionFromBom.isSnapshot()) {
-			log.info("\nWon't create a release bundle for a SNAPSHOT version");
-			return ExecutionResult.skipped();
-		}
-		if (!commercial) {
-			log.info("\nWon't create a release bundle for a non commercial project");
-			return ExecutionResult.skipped();
-		}
-		log.info("\nCreating a release bundle");
-		if (!commercialRepos.containsKey(projectName)) {
-			log.warn("No commercial repos configured for project [{}], double check releaser.bundles.repos",
-					projectName);
-		}
-		List<String> repos = commercialRepos.get(projectName);
-		log.info("Creating release bundles for project [{}] in repos [{}]", projectName, repos);
-		try {
-			boolean result = this.releaseBundleCreator.createReleaseBundle(repos, versionFromBom.version,
-					"TNZ-" + projectName + "-commercial");
-			if (!result) {
-				log.warn("Failed to create release bundle");
-				return ExecutionResult.unstable(new BuildUnstableException("Failed to create a release bundle"));
-			}
-			log.info("\nSuccessfully created a release bundle");
-			return ExecutionResult.success();
-		}
-		catch (Exception ex) {
-			log.error("Failed to create a release bundle", ex);
-			return ExecutionResult.unstable(new BuildUnstableException("Failed to create a release bundle", ex));
-		}
 	}
 
 }
