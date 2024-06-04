@@ -1583,7 +1583,7 @@ public class ReleaserProperties implements Serializable {
 
 		private String repoUsername;
 
-		private String repoPassword;
+		private String repoAccessToken;
 
 		private Map<String, List<String>> repos;
 
@@ -1627,12 +1627,12 @@ public class ReleaserProperties implements Serializable {
 			this.repoUsername = repoUsername;
 		}
 
-		public String getRepoPassword() {
-			return repoPassword;
+		public String getRepoAccessToken() {
+			return repoAccessToken;
 		}
 
-		public void setRepoPassword(String repoPassword) {
-			this.repoPassword = repoPassword;
+		public void setRepoAccessToken(String repoAccessToken) {
+			this.repoAccessToken = repoAccessToken;
 		}
 
 	}
