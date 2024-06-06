@@ -1579,6 +1579,8 @@ public class ReleaserProperties implements Serializable {
 
 		private boolean createReleaseTrainReleaseBundle = false;
 
+		private boolean distributeReleaseBundle = false;
+
 		private String repoUrl = "https://usw1.packages.broadcom.com";
 
 		private String repoUsername;
@@ -1601,6 +1603,14 @@ public class ReleaserProperties implements Serializable {
 
 		public void setCreateReleaseTrainReleaseBundle(boolean createReleaseTrainReleaseBundle) {
 			this.createReleaseTrainReleaseBundle = createReleaseTrainReleaseBundle;
+		}
+
+		public boolean isDistributeReleaseBundle() {
+			return distributeReleaseBundle;
+		}
+
+		public void setDistributeReleaseBundle(boolean distributeReleaseBundle) {
+			this.distributeReleaseBundle = distributeReleaseBundle;
 		}
 
 		public Map<String, List<String>> getRepos() {

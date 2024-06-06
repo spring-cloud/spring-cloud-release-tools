@@ -17,6 +17,9 @@
 package releaser.internal.commercial;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,7 @@ import org.jfrog.artifactory.client.impl.ArtifactoryRequestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import releaser.internal.ReleaserProperties;
+import releaser.internal.project.ProjectVersion;
 
 /**
  * @author Ryan Baxter
@@ -40,9 +44,11 @@ public class ReleaseBundleCreator {
 
 	private static final Logger log = LoggerFactory.getLogger(ReleaseBundleCreator.class);
 
-	private Artifactory artifactory;
+	public static final String RELEASE_TRAIN_BUNDLE_NAME = "TNZ-spring-cloud-commercial-release";
 
-	private ObjectMapper objectMapper;
+	private final Artifactory artifactory;
+
+	private final ObjectMapper objectMapper;
 
 	public ReleaseBundleCreator(ReleaserProperties properties) {
 		log.info("Creating Artifactory client with URL [{}]", properties.getBundles().getRepoUrl());
@@ -54,11 +60,12 @@ public class ReleaseBundleCreator {
 		this.objectMapper = new ObjectMapper();
 	}
 
-	public boolean createReleaseBundle(List<String> repos, String version, String releaseBundleName) throws IOException {
+	public boolean createReleaseBundle(List<String> repos, String version, String releaseBundleName)
+			throws IOException {
 		Map<String, Object> json = new HashMap<>();
 		json.put("release_bundle_name", releaseBundleName);
 		json.put("release_bundle_version", version);
-		json.put( "source_type", "aql");
+		json.put("source_type", "aql");
 		json.put("source", createAqlMap(repos, version));
 		return createReleaseBundle(objectMapper.writeValueAsString(json));
 	}
@@ -88,13 +95,77 @@ public class ReleaseBundleCreator {
 				.apiUrl("lifecycle/api/v2/release_bundle").addQueryParam("project", "spring")
 				.addHeader("X-JFrog-Signing-Key-Name", "packagesKey").requestType(ArtifactoryRequest.ContentType.JSON)
 				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(json);
-		ArtifactoryResponse response = artifactory.restCall(aqlRequest);
+		return makeArtifactoryRequest(aqlRequest);
+	}
+
+	public boolean createReleaseTrainSourceBundle(List<ProjectVersion> projectsReleased, String version)
+			throws IOException {
+		log.info("Creating release train source bundle for projects {}", projectsReleased);
+		Map<String, Object> json = new HashMap<>();
+		json.put("release_bundle_name", RELEASE_TRAIN_BUNDLE_NAME);
+		json.put("release_bundle_version", version);
+		json.put("skip_docker_manifest_resolution", false);
+		json.put("source_type", "release_bundles");
+		json.put("source", createReleaseBundlesJson(projectsReleased));
+		return createReleaseBundle(objectMapper.writeValueAsString(json));
+	}
+
+	private Map<String, Object> createReleaseBundlesJson(List<ProjectVersion> projectsReleased) {
+		Map<String, Object> json = new HashMap<>();
+		List<Map<String, Object>> releaseBundles = new ArrayList<>();
+		projectsReleased.forEach(project -> releaseBundles.add(createReleaseBundleJson(project)));
+		json.put("release_bundles", releaseBundles);
+		return json;
+	}
+
+	private Map<String, Object> createReleaseBundleJson(ProjectVersion project) {
+		Map<String, Object> json = new HashMap<>();
+		json.put("project_key", "spring");
+		json.put("repository_key", "spring-release-bundles-v2");
+		json.put("release_bundle_name", "TNZ-" + project.projectName + "-commercial");
+		json.put("release_bundle_version", project.version);
+		return json;
+	}
+
+	public boolean distributeReleaseTrainSourceBundle(String version) throws IOException {
+		return distributeReleaseBundle(RELEASE_TRAIN_BUNDLE_NAME, version,
+				objectMapper.writeValueAsString(createDistributionJson()));
+	}
+
+	public boolean distributeReleaseBundle(String releaseBundleName, String version, String json) throws IOException {
+		log.info("Distributing release bundle with name [{}] and version[{}] and JSON data [{}]", releaseBundleName,
+				version, json);
+		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
+				.apiUrl("lifecycle/api/v2/distribution/distribute/" + RELEASE_TRAIN_BUNDLE_NAME + "/" + version)
+				.addQueryParam("project", "spring").requestType(ArtifactoryRequest.ContentType.JSON)
+				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(json);
+		return makeArtifactoryRequest(request);
+	}
+
+	private boolean makeArtifactoryRequest(ArtifactoryRequest request) throws IOException {
+		ArtifactoryResponse response = artifactory.restCall(request);
 		if (!response.isSuccessResponse()) {
-			log.warn("Failed to create release bundle {}", response.getRawBody());
-			return false;
+			log.warn("Artifactory request failed {}", response.getRawBody());
 		}
-		log.info("Created release bundle {}", response.getRawBody());
-		return true;
+		else {
+			log.info("Artifactory request succeeded {}", response.getRawBody());
+		}
+		return response.isSuccessResponse();
+	}
+
+	private Map<String, Object> createDistributionJson() {
+		Map<String, Object> json = new HashMap<>();
+		json.put("auto_create_missing_repositories", "false");
+		json.put("distribution_rules", List.of(Collections.singletonMap("site_name", "JP-SaaS")));
+		json.put("modifications", createMappings());
+		return json;
+	}
+
+	private Map<String, Object> createMappings() {
+		Map<String, Object> input = Collections.singletonMap("input", "spring-enterprise-maven-prod-local/(.*)");
+		Map<String, Object> output = Collections.singletonMap("output", "spring-enterprise/$1");
+		List<Map<String, Object>> mappingsArray = Arrays.asList(input, output);
+		return Collections.singletonMap("mappings", mappingsArray);
 
 	}
 

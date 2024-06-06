@@ -16,11 +16,7 @@
 
 package releaser.internal.tasks.postrelease;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import releaser.internal.Releaser;
-import releaser.internal.project.ProjectVersion;
 import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.TrainPostReleaseReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
@@ -29,50 +25,43 @@ import releaser.internal.tech.ExecutionResult;
 /**
  * @author Ryan Baxter
  */
-public class CreateReleaseTrainReleaseBundlePostReleaseTask implements TrainPostReleaseReleaserTask {
+public class DistributeReleaseBundleTask implements TrainPostReleaseReleaserTask {
 
 	/**
 	 * Order of this task. The higher value, the lower order.
 	 */
-	public static final int ORDER = 160;
+	public static final int ORDER = CreateReleaseTrainReleaseBundlePostReleaseTask.ORDER + 10;
 
 	private final Releaser releaser;
 
-	public CreateReleaseTrainReleaseBundlePostReleaseTask(Releaser releaser) {
+	public DistributeReleaseBundleTask(Releaser releaser) {
 		this.releaser = releaser;
 	}
 
 	@Override
 	public String name() {
-		return "createReleaseTrainReleaseBundlePostReleaseTask";
+		return "distributeReleaseBundleTask";
 	}
 
 	@Override
 	public String shortName() {
-		return "rtb";
+		return "drb";
 	}
 
 	@Override
 	public String header() {
-		return "CREATE RELEASE TRAIN RELEASE BUNDLE";
+		return "DISTRIBUTING RELEASE BUNDLE";
 	}
 
 	@Override
 	public String description() {
-		return "Creates a release train release bundle";
+		return "Distributes the release bundle to the edge repository.";
 	}
 
 	@Override
 	public ExecutionResult runTask(Arguments args) throws BuildUnstableException {
-		List<ProjectVersion> releasedProjects = new LinkedList<>();
-		args.projects.forEach(projectVersion -> {
-			if (args.properties.getMetaRelease().getProjectsToSkip().stream()
-					.noneMatch(projectVersion.projectName::startsWith)) {
-				releasedProjects.add(projectVersion);
-			}
-		});
-		return releaser.createReleaseTrainSourceBundle(releasedProjects, args.properties.isCommercial(),
-				args.options.dryRun, args.versionFromBom);
+		return releaser.distributeReleaseTrainSourceBundle(args.properties.isCommercial(), args.options.dryRun,
+				args.versionFromBom);
 	}
 
 	@Override
