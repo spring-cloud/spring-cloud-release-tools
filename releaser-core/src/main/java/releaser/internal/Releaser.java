@@ -384,16 +384,7 @@ public class Releaser {
 
 	public ExecutionResult createReleaseBundle(boolean commercial, ProjectVersion versionFromBom, Boolean dryRun,
 			Map<String, List<String>> commercialRepos, String projectName) {
-		if (dryRun) {
-			log.info("\nWon't create a release bundle for a dry run");
-			return ExecutionResult.skipped();
-		}
-		if (versionFromBom.isSnapshot()) {
-			log.info("\nWon't create a release bundle for a SNAPSHOT version");
-			return ExecutionResult.skipped();
-		}
-		if (!commercial) {
-			log.info("\nWon't create a release bundle for a non commercial project");
+		if (!shouldCreateReleaseBundle(dryRun, versionFromBom.isSnapshot(), commercial)) {
 			return ExecutionResult.skipped();
 		}
 		log.info("\nCreating a release bundle");
@@ -416,6 +407,67 @@ public class Releaser {
 		catch (Exception ex) {
 			log.error("Failed to create a release bundle", ex);
 			return ExecutionResult.unstable(new BuildUnstableException("Failed to create a release bundle", ex));
+		}
+	}
+
+	private boolean shouldCreateReleaseBundle(boolean dryRun, boolean isSnapshot, boolean commercial) {
+		if (!dryRun && !isSnapshot && commercial) {
+			return true;
+		}
+		if (dryRun) {
+			log.info("\nWon't create a release bundle for a dry run");
+		}
+		if (isSnapshot) {
+			log.info("\nWon't create a release bundle for a SNAPSHOT version");
+		}
+		if (!commercial) {
+			log.info("\nWon't create a release bundle for a non commercial project");
+		}
+		return false;
+	}
+
+	public ExecutionResult createReleaseTrainSourceBundle(List<ProjectVersion> projectsWithNewRelease,
+			boolean isCommercial, boolean dryRun, ProjectVersion projectVersion) {
+		if (!shouldCreateReleaseBundle(dryRun, projectVersion.isSnapshot(), isCommercial)) {
+			return ExecutionResult.skipped();
+		}
+		try {
+			boolean result = this.releaseBundleCreator.createReleaseTrainSourceBundle(projectsWithNewRelease,
+					projectVersion.version);
+			if (!result) {
+				log.warn("Failed to create release train source bundle");
+				return ExecutionResult
+						.unstable(new BuildUnstableException("Failed to create a release train source bundle"));
+			}
+			log.info("\nSuccessfully created a release train source bundle");
+			return ExecutionResult.success();
+		}
+		catch (Exception ex) {
+			log.error("Failed to create a release train source bundle", ex);
+			return ExecutionResult
+					.unstable(new BuildUnstableException("Failed to create a release train source bundle", ex));
+		}
+	}
+
+	public ExecutionResult distributeReleaseTrainSourceBundle(boolean isCommercial, boolean dryRun,
+			ProjectVersion projectVersion) {
+		if (!shouldCreateReleaseBundle(dryRun, projectVersion.isSnapshot(), isCommercial)) {
+			return ExecutionResult.skipped();
+		}
+		try {
+			boolean result = this.releaseBundleCreator.distributeReleaseTrainSourceBundle(projectVersion.version);
+			if (!result) {
+				log.warn("Failed to distribute release train source bundle");
+				return ExecutionResult
+						.unstable(new BuildUnstableException("Failed to distribute a release train source bundle"));
+			}
+			log.info("\nSuccessfully distributed a release train source bundle");
+			return ExecutionResult.success();
+		}
+		catch (Exception ex) {
+			log.error("Failed to distribute a release train source bundle", ex);
+			return ExecutionResult
+					.unstable(new BuildUnstableException("Failed to distribute a release train source bundle", ex));
 		}
 	}
 
