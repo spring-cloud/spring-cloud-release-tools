@@ -50,7 +50,6 @@ public class ReleaseBundleCreator {
 
 	private final ObjectMapper objectMapper;
 
-
 	public ReleaseBundleCreator(ReleaserProperties properties) {
 		log.info("Creating Artifactory client with URL [{}]", properties.getBundles().getRepoUrl());
 		log.info("Creating Artifactory client with username [{}]", properties.getBundles().getRepoUsername());
