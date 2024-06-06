@@ -162,7 +162,7 @@ public class ReleaseBundleCreator {
 	}
 
 	private Map<String, Object> createMappings() {
-		Map<String, Object> input = Collections.singletonMap("input", "spring-enterprise-maven-prod-local/(.*)");
+		Map<String, Object> input = Collections.singletonMap("input", "^spring-enterprise-maven-prod-local/(\\..*)$");
 		Map<String, Object> output = Collections.singletonMap("output", "spring-enterprise/$1");
 		List<Map<String, Object>> mappingsArray = Arrays.asList(input, output);
 		return Collections.singletonMap("mappings", mappingsArray);
