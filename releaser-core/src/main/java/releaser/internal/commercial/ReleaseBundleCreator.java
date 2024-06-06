@@ -50,6 +50,7 @@ public class ReleaseBundleCreator {
 
 	private final ObjectMapper objectMapper;
 
+
 	public ReleaseBundleCreator(ReleaserProperties properties) {
 		log.info("Creating Artifactory client with URL [{}]", properties.getBundles().getRepoUrl());
 		log.info("Creating Artifactory client with username [{}]", properties.getBundles().getRepoUsername());
@@ -166,7 +167,6 @@ public class ReleaseBundleCreator {
 		Map<String, Object> output = Collections.singletonMap("output", "spring-enterprise/$1");
 		List<Map<String, Object>> mappingsArray = Arrays.asList(input, output);
 		return Collections.singletonMap("mappings", mappingsArray);
-
 	}
 
 }

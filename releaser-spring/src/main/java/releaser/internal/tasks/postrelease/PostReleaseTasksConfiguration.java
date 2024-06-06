@@ -112,5 +112,4 @@ class PostReleaseTasksConfiguration {
 	DistributeReleaseBundleTask distributeReleaseBundleTask(Releaser releaser) {
 		return new DistributeReleaseBundleTask(releaser);
 	}
-
 }

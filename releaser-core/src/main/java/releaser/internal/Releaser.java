@@ -470,5 +470,4 @@ public class Releaser {
 					.unstable(new BuildUnstableException("Failed to distribute a release train source bundle", ex));
 		}
 	}
-
 }
