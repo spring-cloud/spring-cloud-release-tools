@@ -28,6 +28,8 @@ public class AbstractSpringCloudMetaAcceptanceTests extends AbstractSpringMetaRe
 
 	public File springCloudConsulProject;
 
+	public File springCloudConsulCommercialProject;
+
 	public File springCloudBuildProject;
 
 	@BeforeEach
@@ -36,6 +38,8 @@ public class AbstractSpringCloudMetaAcceptanceTests extends AbstractSpringMetaRe
 				AbstractSpringCloudMetaAcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
 		this.springCloudBuildProject = new File(
 				AbstractSpringCloudMetaAcceptanceTests.class.getResource("/projects/spring-cloud-build").toURI());
+		this.springCloudConsulCommercialProject = new File(AbstractSpringCloudMetaAcceptanceTests.class
+				.getResource("/projects/spring-cloud-consul-commercial").toURI());
 	}
 
 	public void consulPomParentVersionIsEqualTo(File project, String expected) {

@@ -108,8 +108,16 @@ class PostReleaseTasksConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty("releaser.bundles.distribute-release-bundle")
-	DistributeReleaseBundleTask distributeReleaseBundleTask(Releaser releaser) {
-		return new DistributeReleaseBundleTask(releaser);
+	@ConditionalOnProperty("releaser.bundles.distribute-release-train-source-bundle")
+	DistributeReleaseTrainSourceBundleTask distributeReleaseBundleTask(Releaser releaser) {
+		return new DistributeReleaseTrainSourceBundleTask(releaser);
 	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty("releaser.bundles.distribute-project-release-bundle")
+	DistributeProjectReleaseBundleTask distributeProjectReleaseBundleTask(Releaser releaser) {
+		return new DistributeProjectReleaseBundleTask(releaser);
+	}
+
 }

@@ -17,8 +17,10 @@
 package releaser.cloud.spring.single;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.cloud.spring.AbstractSpringCloudAcceptanceTests;
 import releaser.internal.ReleaserProperties;
+import releaser.internal.commercial.ReleaseBundleCreator;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.GitTestUtils;
 import releaser.internal.github.ProjectGitHubHandler;
@@ -53,6 +56,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 /**
@@ -116,7 +120,8 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 				properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
 						tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
 								.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("v2022.0.3")
-								.expectedVersion("4.0.2").build()),
+								.expectedVersion("4.0.2").commercial(true).projectReleaseBundle(true)
+								.distributeProjectReleaseBundle(true).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
@@ -124,6 +129,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					PostReleaseActions postReleaseActions = context.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
 							.getBean(TestExecutionResultHandler.class);
+					ReleaseBundleCreator releaseBundleCreator = context.getBean(ReleaseBundleCreator.class);
 
 					ExecutionResult result = releaser.release(new OptionsBuilder().interactive(true).options());
 
@@ -153,6 +159,13 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					// print results
 					testExecutionResultHandler.accept(result);
 					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
+					BDDMockito.then(releaseBundleCreator).should(times(1)).createReleaseBundle(
+							List.of("org/springframework/cloud/spring-cloud-consul*",
+									"org/springframework/cloud/spring-cloud-starter-consul*"),
+							"4.0.2", "TNZ-spring-cloud-consul-commercial");
+					BDDMockito.then(releaseBundleCreator).should(times(1))
+							.distributeProjectReleaseBundle("TNZ-spring-cloud-consul-commercial", "4.0.2");
 				});
 	}
 
@@ -346,7 +359,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 
 		@Bean
 		SaganClient testSaganClient() {
-			SaganClient saganClient = BDDMockito.mock(SaganClient.class);
+			SaganClient saganClient = mock(SaganClient.class);
 			given(saganClient.getProject(anyString())).willReturn(newProject());
 			given(saganClient.addRelease(anyString(), any())).willReturn(true);
 			given(saganClient.deleteRelease(anyString(), anyString())).willReturn(true);
@@ -354,8 +367,16 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 		}
 
 		@Bean
+		ReleaseBundleCreator testReleaseBundleCreator() throws IOException {
+			ReleaseBundleCreator releaseBundleCreator = mock(ReleaseBundleCreator.class);
+			given(releaseBundleCreator.createReleaseBundle(any(), anyString(), anyString())).willReturn(true);
+			given(releaseBundleCreator.distributeProjectReleaseBundle(anyString(), anyString())).willReturn(true);
+			return releaseBundleCreator;
+		}
+
+		@Bean
 		PostReleaseActions myPostReleaseActions() {
-			return BDDMockito.mock(PostReleaseActions.class);
+			return mock(PostReleaseActions.class);
 		}
 
 		@Bean
@@ -374,7 +395,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 
 		@Bean
 		DocumentationUpdater testDocumentationUpdater() {
-			return BDDMockito.mock(DocumentationUpdater.class);
+			return mock(DocumentationUpdater.class);
 		}
 
 	}

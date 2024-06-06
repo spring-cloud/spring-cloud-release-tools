@@ -28,6 +28,9 @@ import releaser.internal.project.Project;
  */
 public interface CustomBomParser {
 
+	/**
+	 * No-op parser.
+	 */
 	CustomBomParser NO_OP = (thisProjectRoot, properties) -> VersionsFromBom.EMPTY_VERSION;
 
 	/**

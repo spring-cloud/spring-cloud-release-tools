@@ -18,7 +18,6 @@ package releaser.internal.commercial;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +48,6 @@ public class ReleaseBundleCreator {
 	private final Artifactory artifactory;
 
 	private final ObjectMapper objectMapper;
-
 
 	public ReleaseBundleCreator(ReleaserProperties properties) {
 		log.info("Creating Artifactory client with URL [{}]", properties.getBundles().getRepoUrl());
@@ -123,9 +121,13 @@ public class ReleaseBundleCreator {
 		Map<String, Object> json = new HashMap<>();
 		json.put("project_key", "spring");
 		json.put("repository_key", "spring-release-bundles-v2");
-		json.put("release_bundle_name", "TNZ-" + project.projectName + "-commercial");
+		json.put("release_bundle_name", createReleaseBundleName(project.projectName));
 		json.put("release_bundle_version", project.version);
 		return json;
+	}
+
+	public static String createReleaseBundleName(String projectName) {
+		return "TNZ-" + projectName + "-commercial";
 	}
 
 	public boolean distributeReleaseTrainSourceBundle(String version) throws IOException {
@@ -137,7 +139,7 @@ public class ReleaseBundleCreator {
 		log.info("Distributing release bundle with name [{}] and version[{}] and JSON data [{}]", releaseBundleName,
 				version, json);
 		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
-				.apiUrl("lifecycle/api/v2/distribution/distribute/" + RELEASE_TRAIN_BUNDLE_NAME + "/" + version)
+				.apiUrl("lifecycle/api/v2/distribution/distribute/" + releaseBundleName + "/" + version)
 				.addQueryParam("project", "spring").requestType(ArtifactoryRequest.ContentType.JSON)
 				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(json);
 		return makeArtifactoryRequest(request);
@@ -146,7 +148,7 @@ public class ReleaseBundleCreator {
 	private boolean makeArtifactoryRequest(ArtifactoryRequest request) throws IOException {
 		ArtifactoryResponse response = artifactory.restCall(request);
 		if (!response.isSuccessResponse()) {
-			log.warn("Artifactory request failed {}", response.getRawBody());
+			log.warn("Artifactory request {} failed {}", request, response.getRawBody());
 		}
 		else {
 			log.info("Artifactory request succeeded {}", response.getRawBody());
@@ -163,10 +165,15 @@ public class ReleaseBundleCreator {
 	}
 
 	private Map<String, Object> createMappings() {
-		Map<String, Object> input = Collections.singletonMap("input", "spring-enterprise-maven-prod-local/(.*)");
-		Map<String, Object> output = Collections.singletonMap("output", "spring-enterprise/$1");
-		List<Map<String, Object>> mappingsArray = Arrays.asList(input, output);
+		Map<String, Object> mappings = new HashMap<>();
+		mappings.put("input", "spring-enterprise-maven-prod-local/(.*)");
+		mappings.put("output", "spring-enterprise/$1");
+		List<Map<String, Object>> mappingsArray = List.of(mappings);
 		return Collections.singletonMap("mappings", mappingsArray);
+	}
+
+	public boolean distributeProjectReleaseBundle(String projectName, String version) throws IOException {
+		return distributeReleaseBundle(projectName, version, objectMapper.writeValueAsString(createDistributionJson()));
 	}
 
 }

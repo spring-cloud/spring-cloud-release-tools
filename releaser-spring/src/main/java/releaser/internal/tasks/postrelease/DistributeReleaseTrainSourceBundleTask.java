@@ -25,7 +25,7 @@ import releaser.internal.tech.ExecutionResult;
 /**
  * @author Ryan Baxter
  */
-public class DistributeReleaseBundleTask implements TrainPostReleaseReleaserTask {
+public class DistributeReleaseTrainSourceBundleTask implements TrainPostReleaseReleaserTask {
 
 	/**
 	 * Order of this task. The higher value, the lower order.
@@ -34,7 +34,7 @@ public class DistributeReleaseBundleTask implements TrainPostReleaseReleaserTask
 
 	private final Releaser releaser;
 
-	public DistributeReleaseBundleTask(Releaser releaser) {
+	public DistributeReleaseTrainSourceBundleTask(Releaser releaser) {
 		this.releaser = releaser;
 	}
 

@@ -211,9 +211,7 @@ class SpringBatchFlowRunner implements FlowRunner, Closeable {
 	@Override
 	public ExecutionResult runReleaseTasks(Options options, ReleaserProperties properties, ProjectsToRun projectsToRun,
 			TasksToRun tasksToRun) {
-		// TODO this seems to not be exclusive to meta releases
-		if (properties.isPostReleaseTasksOnly()/** && options.metaRelease */
-		) {
+		if (properties.isPostReleaseTasksOnly() && options.metaRelease) {
 			log.info("Only post release tasks will be executed for the meta release");
 			return ExecutionResult.skipped();
 		}

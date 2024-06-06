@@ -223,7 +223,8 @@ public class ReleaserProperties implements Serializable {
 		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git + ", pom="
 				+ this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan=" + this.sagan
 				+ ", fixedVersions=" + this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
-				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + '}';
+				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + ", bundles="
+				+ this.bundles + '}';
 	}
 
 	public ReleaserProperties copy() {
@@ -1579,7 +1580,9 @@ public class ReleaserProperties implements Serializable {
 
 		private boolean createReleaseTrainReleaseBundle = false;
 
-		private boolean distributeReleaseBundle = false;
+		private boolean distributeReleaseTrainSourceBundle = false;
+
+		private boolean distributeProjectReleaseBundle = false;
 
 		private String repoUrl = "https://usw1.packages.broadcom.com";
 
@@ -1605,12 +1608,20 @@ public class ReleaserProperties implements Serializable {
 			this.createReleaseTrainReleaseBundle = createReleaseTrainReleaseBundle;
 		}
 
-		public boolean isDistributeReleaseBundle() {
-			return distributeReleaseBundle;
+		public boolean isDistributeReleaseTrainSourceBundle() {
+			return distributeReleaseTrainSourceBundle;
 		}
 
-		public void setDistributeReleaseBundle(boolean distributeReleaseBundle) {
-			this.distributeReleaseBundle = distributeReleaseBundle;
+		public void setDistributeReleaseTrainSourceBundle(boolean distributeReleaseTrainSourceBundle) {
+			this.distributeReleaseTrainSourceBundle = distributeReleaseTrainSourceBundle;
+		}
+
+		public boolean isDistributeProjectReleaseBundle() {
+			return distributeProjectReleaseBundle;
+		}
+
+		public void setDistributeProjectReleaseBundle(boolean distributeProjectReleaseBundle) {
+			this.distributeProjectReleaseBundle = distributeProjectReleaseBundle;
 		}
 
 		public Map<String, List<String>> getRepos() {
@@ -1643,6 +1654,16 @@ public class ReleaserProperties implements Serializable {
 
 		public void setRepoAccessToken(String repoAccessToken) {
 			this.repoAccessToken = repoAccessToken;
+		}
+
+		@Override
+		public String toString() {
+			return "Bundles{" + "createProjectReleaseBundle=" + createProjectReleaseBundle
+					+ ", createReleaseTrainReleaseBundle=" + createReleaseTrainReleaseBundle
+					+ ", distributeReleaseTrainSourceBundle=" + distributeReleaseTrainSourceBundle
+					+ ", distributeProjectReleaseBundle=" + distributeProjectReleaseBundle + ", repoUrl='" + repoUrl
+					+ '\'' + ", repoUsername='" + repoUsername + '\'' + ", repoAccessToken='" + repoAccessToken + '\''
+					+ ", repos=" + repos + '}';
 		}
 
 	}

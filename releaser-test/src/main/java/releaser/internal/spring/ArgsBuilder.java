@@ -194,6 +194,36 @@ public class ArgsBuilder {
 		return this;
 	}
 
+	public ArgsBuilder commercial(boolean commercial) {
+		removeIfPresent("releaser.commercial");
+		this.args.add("releaser.commercial=" + commercial);
+		return this;
+	}
+
+	public ArgsBuilder projectReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.create-project-release-bundle");
+		this.args.add("releaser.bundles.create-project-release-bundle=" + enable);
+		return this;
+	}
+
+	public ArgsBuilder distributeProjectReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.distribute-project-release-bundle");
+		this.args.add("releaser.bundles.distribute-project-release-bundle=" + enable);
+		return this;
+	}
+
+	public ArgsBuilder releaseTrainSourceReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.create-release-train-release-bundle");
+		this.args.add("releaser.bundles.create-release-train-release-bundle=" + enable);
+		return this;
+	}
+
+	public ArgsBuilder distributeReleaseTrainSourceReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.distribute-release-train-source-bundle");
+		this.args.add("releaser.bundles.distribute-release-train-source-bundle=" + enable);
+		return this;
+	}
+
 	public String[] build() {
 		return args.toArray(new String[0]);
 	}
