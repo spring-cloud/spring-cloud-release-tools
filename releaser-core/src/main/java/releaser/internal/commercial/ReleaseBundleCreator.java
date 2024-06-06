@@ -145,7 +145,7 @@ public class ReleaseBundleCreator {
 	private boolean makeArtifactoryRequest(ArtifactoryRequest request) throws IOException {
 		ArtifactoryResponse response = artifactory.restCall(request);
 		if (!response.isSuccessResponse()) {
-			log.warn("Artifactory request failed {}", response.getRawBody());
+			log.warn("Artifactory request {} failed {}", request, response.getRawBody());
 		}
 		else {
 			log.info("Artifactory request succeeded {}", response.getRawBody());
