@@ -161,7 +161,7 @@ public class ReleaseBundleCreator {
 	}
 
 	private Map<String, Object> createMappings() {
-		Map<String, Object> mappings = new HashMap<>();;
+		Map<String, Object> mappings = new HashMap<>();
 		mappings.put("input", "spring-enterprise-maven-prod-local/(.*)");
 		mappings.put("output", "spring-enterprise/$1");
 		List<Map<String, Object>> mappingsArray = List.of(mappings);
