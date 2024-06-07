@@ -139,7 +139,7 @@ public class ReleaseBundleCreator {
 		log.info("Distributing release bundle with name [{}] and version[{}] and JSON data [{}]", releaseBundleName,
 				version, json);
 		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
-				.apiUrl("lifecycle/api/v2/distribution/distribute/" + RELEASE_TRAIN_BUNDLE_NAME + "/" + version)
+				.apiUrl("lifecycle/api/v2/distribution/distribute/" + releaseBundleName + "/" + version)
 				.addQueryParam("project", "spring").requestType(ArtifactoryRequest.ContentType.JSON)
 				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(json);
 		return makeArtifactoryRequest(request);
