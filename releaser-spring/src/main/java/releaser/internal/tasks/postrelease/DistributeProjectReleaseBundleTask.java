@@ -37,7 +37,7 @@ public class DistributeProjectReleaseBundleTask implements ProjectPostReleaseRel
 
 	@Override
 	public String name() {
-		return "Distribute Project Release Bundle Task";
+		return "distributeProjectReleaseBundleTask";
 	}
 
 	@Override
