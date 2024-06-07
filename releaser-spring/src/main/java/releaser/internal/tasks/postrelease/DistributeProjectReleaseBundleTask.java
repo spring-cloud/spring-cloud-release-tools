@@ -17,7 +17,6 @@
 package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
-import releaser.internal.project.ProjectVersion;
 import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.ProjectPostReleaseReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
@@ -26,44 +25,40 @@ import releaser.internal.tech.ExecutionResult;
 /**
  * @author Ryan Baxter
  */
-public class CreateProjectReleaseBundlePostReleaseTask implements ProjectPostReleaseReleaserTask {
+public class DistributeProjectReleaseBundleTask implements ProjectPostReleaseReleaserTask {
 
-	/**
-	 * Order of this task. The higher value, the lower order.
-	 */
-	public static final int ORDER = 60;
+	public int ORDER = CreateProjectReleaseBundlePostReleaseTask.ORDER + 10;
 
-	private final Releaser releaser;
+	private Releaser releaser;
 
-	public CreateProjectReleaseBundlePostReleaseTask(Releaser releaser) {
+	public DistributeProjectReleaseBundleTask(Releaser releaser) {
 		this.releaser = releaser;
 	}
 
 	@Override
 	public String name() {
-		return "createReleaseBundle";
+		return "Distribute Project Release Bundle Task";
 	}
 
 	@Override
 	public String shortName() {
-		return "b";
+		return "dprbt";
 	}
 
 	@Override
 	public String header() {
-		return "CREATING RELEASE BUNDLE";
+		return "DISTRIBUTE PROJECT RELEASE BUNDLE TASK";
 	}
 
 	@Override
 	public String description() {
-		return "Creates a release bundle for the project";
+		return "Distributes a release bundle for an individual project.";
 	}
 
 	@Override
 	public ExecutionResult runTask(Arguments args) throws BuildUnstableException {
-		return this.releaser.createReleaseBundle(args.properties.isCommercial(), args.versionFromBom,
-				args.options.dryRun, args.properties.getBundles().getRepos(),
-				new ProjectVersion(args.project).projectName);
+		return releaser.distributeProjectReleaseBundle(args.properties.isCommercial(), args.options.dryRun,
+				args.versionFromBom);
 	}
 
 	@Override

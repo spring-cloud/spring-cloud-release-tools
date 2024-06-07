@@ -121,9 +121,13 @@ public class ReleaseBundleCreator {
 		Map<String, Object> json = new HashMap<>();
 		json.put("project_key", "spring");
 		json.put("repository_key", "spring-release-bundles-v2");
-		json.put("release_bundle_name", "TNZ-" + project.projectName + "-commercial");
+		json.put("release_bundle_name", createReleaseBundleName(project.projectName));
 		json.put("release_bundle_version", project.version);
 		return json;
+	}
+
+	public static String createReleaseBundleName(String projectName) {
+		return "TNZ-" + projectName + "-commercial";
 	}
 
 	public boolean distributeReleaseTrainSourceBundle(String version) throws IOException {
@@ -166,6 +170,10 @@ public class ReleaseBundleCreator {
 		mappings.put("output", "spring-enterprise/$1");
 		List<Map<String, Object>> mappingsArray = List.of(mappings);
 		return Collections.singletonMap("mappings", mappingsArray);
+	}
+
+	public boolean distributeProjectReleaseBundle(String projectName, String version) throws IOException {
+		return distributeReleaseBundle(projectName, version, objectMapper.writeValueAsString(createDistributionJson()));
 	}
 
 }
