@@ -17,7 +17,6 @@
 package releaser.internal.tasks.postrelease;
 
 import releaser.internal.Releaser;
-import releaser.internal.project.ProjectVersion;
 import releaser.internal.spring.Arguments;
 import releaser.internal.tasks.ProjectPostReleaseReleaserTask;
 import releaser.internal.tech.BuildUnstableException;
