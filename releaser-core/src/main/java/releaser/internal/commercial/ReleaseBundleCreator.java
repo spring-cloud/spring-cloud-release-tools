@@ -18,7 +18,6 @@ package releaser.internal.commercial;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -162,9 +161,10 @@ public class ReleaseBundleCreator {
 	}
 
 	private Map<String, Object> createMappings() {
-		Map<String, Object> input = Collections.singletonMap("input", "^spring-enterprise-maven-prod-local/(\\..*)$");
-		Map<String, Object> output = Collections.singletonMap("output", "spring-enterprise/$1");
-		List<Map<String, Object>> mappingsArray = Arrays.asList(input, output);
+		Map<String, Object> mappings = new HashMap<>();;
+		mappings.put("input", "spring-enterprise-maven-prod-local/(.*)");
+		mappings.put("output", "spring-enterprise/$1");
+		List<Map<String, Object>> mappingsArray = List.of(mappings);
 		return Collections.singletonMap("mappings", mappingsArray);
 	}
 
