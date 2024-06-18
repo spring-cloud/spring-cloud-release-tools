@@ -17,8 +17,10 @@
 package releaser.cloud.spring.meta;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -26,10 +28,12 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
+import releaser.internal.commercial.ReleaseBundleCreator;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.GitTestUtils;
 import releaser.internal.options.OptionsBuilder;
 import releaser.internal.postrelease.PostReleaseActions;
+import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganClient;
 import releaser.internal.sagan.SaganUpdater;
@@ -58,6 +62,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Marcin Grzejszczak
@@ -83,17 +90,19 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	public void should_perform_a_meta_release_of_sc_release_and_consul(@TempDir File tempDirSpringCloudConsulOrigin,
 			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "2022.0.x");
-		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulProject);
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin,
+				this.springCloudConsulCommercialProject);
 		assertThatClonedConsulProjectIsInSnapshots(origin);
 		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
 		GitTestUtils.setOriginOnProjectToTmp(origin, project);
 
-		run(defaultRunner(),
-				properties("debugx=true")
-						.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
-						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
-								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
-										.bomBranch("v2022.0.2").addFixedVersions(v2022_0_4()).build()),
+		run(defaultRunner(), properties("debugx=true")
+				.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
+				.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+						tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2022.0.2")
+								.addFixedVersions(v2022_0_4()).distributeReleaseTrainSourceReleaseBundle(true)
+								.releaseTrainSourceReleaseBundle(true).projectReleaseBundle(true).commercial(true)
+								.build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
@@ -102,6 +111,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 					PostReleaseActions postReleaseActions = context.getBean(PostReleaseActions.class);
 					TestExecutionResultHandler testExecutionResultHandler = context
 							.getBean(TestExecutionResultHandler.class);
+					ReleaseBundleCreator creator = context.getBean(ReleaseBundleCreator.class);
 
 					ExecutionResult result = releaser.release(new OptionsBuilder().metaRelease(true).options());
 
@@ -115,10 +125,22 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 					// don't want to verify the docs
 					thenAllStepsWereExecutedForEachProject(nonAssertingTestProjectGitHandler);
 					thenSaganWasCalled(saganUpdater);
-					then(clonedProject(nonAssertingTestProjectGitHandler, "spring-cloud-consul").tagList().call())
-							.extracting("name").contains("refs/tags/v4.0.2");
+					then(clonedProject(nonAssertingTestProjectGitHandler, "spring-cloud-consul-commercial").tagList()
+							.call()).extracting("name").contains("refs/tags/v4.0.2");
 					thenRunUpdatedTestsWereCalled(postReleaseActions);
 					thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
+					BDDMockito.then(creator).should(times(1))
+							.createReleaseTrainSourceBundle(List.of(new ProjectVersion("spring-cloud-consul", "4.0.2"),
+									new ProjectVersion("spring-cloud-starter-build", "2022.0.4")), "2022.0.4");
+					BDDMockito.then(creator).should(times(1)).createReleaseBundle(
+							List.of("org/springframework/cloud/spring-cloud-consul*",
+									"org/springframework/cloud/spring-cloud-starter-consul*"),
+							"4.0.2", "TNZ-spring-cloud-consul-commercial");
+					BDDMockito.then(creator).should(times(1)).distributeReleaseTrainSourceBundle("2022.0.4");
+					// This should never be called when releasing a release train since
+					// distributing a release train source bundle
+					// will distribute individual project release bundles
+					verify(creator, never()).distributeReleaseBundle(anyString(), anyString(), anyString());
 				});
 	}
 
@@ -375,11 +397,10 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(1);
 					BDDMockito.then(firstTask).should()
 							.runTask(BDDMockito.argThat(arg -> arg.project.getName().equals("spring-cloud-consul")));
-					BDDMockito.then(firstTask).should(BDDMockito.never())
+					BDDMockito.then(firstTask).should(never())
 							.runTask(BDDMockito.argThat(arg -> arg.project.getName().equals("spring-cloud-release")));
-					BDDMockito.then(secondTask).should(BDDMockito.never()).runTask(BDDMockito.any(Arguments.class));
-					BDDMockito.then(postReleaseTask).should(BDDMockito.never())
-							.runTask(BDDMockito.any(Arguments.class));
+					BDDMockito.then(secondTask).should(never()).runTask(BDDMockito.any(Arguments.class));
+					BDDMockito.then(postReleaseTask).should(never()).runTask(BDDMockito.any(Arguments.class));
 				});
 	}
 
@@ -405,7 +426,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	private void thenBuildWasNeverCalledFor(BuildProjectReleaseTask build, String projectName) {
-		BDDMockito.then(build).should(BDDMockito.never())
+		BDDMockito.then(build).should(never())
 				.apply(argThat(argument -> argument.originalVersion.projectName.equals(projectName)
 						|| argument.project.getAbsolutePath().endsWith(projectName)));
 	}
@@ -437,6 +458,15 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 			given(saganClient.addRelease(anyString(), any())).willReturn(true);
 			given(saganClient.deleteRelease(anyString(), anyString())).willReturn(true);
 			return saganClient;
+		}
+
+		@Bean
+		ReleaseBundleCreator testReleaseBundleCreator() throws IOException {
+			ReleaseBundleCreator creator = BDDMockito.mock(ReleaseBundleCreator.class);
+			given(creator.createReleaseBundle(any(), anyString(), anyString())).willReturn(true);
+			given(creator.createReleaseTrainSourceBundle(any(), anyString())).willReturn(true);
+			given(creator.distributeReleaseTrainSourceBundle(anyString())).willReturn(true);
+			return creator;
 		}
 
 		@Bean

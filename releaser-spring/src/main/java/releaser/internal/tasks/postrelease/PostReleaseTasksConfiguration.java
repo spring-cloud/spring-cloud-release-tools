@@ -92,4 +92,32 @@ class PostReleaseTasksConfiguration {
 		return new UpdateStartSpringIoTrainPostReleaseTask(releaser);
 	}
 
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty("releaser.bundles.create-release-train-release-bundle")
+	CreateReleaseTrainReleaseBundlePostReleaseTask createReleaseTrainReleaseBundlePostReleaseTask(Releaser releaser) {
+		return new CreateReleaseTrainReleaseBundlePostReleaseTask(releaser);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty("releaser.bundles.create-project-release-bundle")
+	CreateProjectReleaseBundlePostReleaseTask createProjectReleaseBundlePostReleaseTask(Releaser releaser) {
+		return new CreateProjectReleaseBundlePostReleaseTask(releaser);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty("releaser.bundles.distribute-release-train-source-bundle")
+	DistributeReleaseTrainSourceBundleTask distributeReleaseBundleTask(Releaser releaser) {
+		return new DistributeReleaseTrainSourceBundleTask(releaser);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty("releaser.bundles.distribute-project-release-bundle")
+	DistributeProjectReleaseBundleTask distributeProjectReleaseBundleTask(Releaser releaser) {
+		return new DistributeProjectReleaseBundleTask(releaser);
+	}
+
 }
