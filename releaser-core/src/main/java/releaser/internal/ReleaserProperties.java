@@ -80,6 +80,8 @@ public class ReleaserProperties implements Serializable {
 
 	private boolean commercial = false;
 
+	private Bundles bundles = new Bundles();
+
 	/**
 	 * Project name to its version - overrides all versions retrieved from a release train
 	 * repository like Spring Cloud Release.
@@ -208,12 +210,21 @@ public class ReleaserProperties implements Serializable {
 		this.commercial = commercial;
 	}
 
+	public Bundles getBundles() {
+		return bundles;
+	}
+
+	public void setBundles(Bundles bundles) {
+		this.bundles = bundles;
+	}
+
 	@Override
 	public String toString() {
 		return "ReleaserProperties{" + "workingDir='" + this.workingDir + '\'' + ", git=" + this.git + ", pom="
 				+ this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan=" + this.sagan
 				+ ", fixedVersions=" + this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
-				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + '}';
+				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + ", bundles="
+				+ this.bundles + '}';
 	}
 
 	public ReleaserProperties copy() {
@@ -1559,6 +1570,100 @@ public class ReleaserProperties implements Serializable {
 		public String toString() {
 			return "Versions{" + "allVersionsFileUrl='" + this.allVersionsFileUrl + '\'' + ", bomName='" + this.bomName
 					+ '\'' + '}';
+		}
+
+	}
+
+	public static class Bundles implements Serializable {
+
+		private boolean createProjectReleaseBundle = false;
+
+		private boolean createReleaseTrainReleaseBundle = false;
+
+		private boolean distributeReleaseTrainSourceBundle = false;
+
+		private boolean distributeProjectReleaseBundle = false;
+
+		private String repoUrl = "https://usw1.packages.broadcom.com";
+
+		private String repoUsername;
+
+		private String repoAccessToken;
+
+		private Map<String, List<String>> repos;
+
+		public boolean isCreateProjectReleaseBundle() {
+			return createProjectReleaseBundle;
+		}
+
+		public void setCreateProjectReleaseBundle(boolean createProjectReleaseBundle) {
+			this.createProjectReleaseBundle = createProjectReleaseBundle;
+		}
+
+		public boolean isCreateReleaseTrainReleaseBundle() {
+			return createReleaseTrainReleaseBundle;
+		}
+
+		public void setCreateReleaseTrainReleaseBundle(boolean createReleaseTrainReleaseBundle) {
+			this.createReleaseTrainReleaseBundle = createReleaseTrainReleaseBundle;
+		}
+
+		public boolean isDistributeReleaseTrainSourceBundle() {
+			return distributeReleaseTrainSourceBundle;
+		}
+
+		public void setDistributeReleaseTrainSourceBundle(boolean distributeReleaseTrainSourceBundle) {
+			this.distributeReleaseTrainSourceBundle = distributeReleaseTrainSourceBundle;
+		}
+
+		public boolean isDistributeProjectReleaseBundle() {
+			return distributeProjectReleaseBundle;
+		}
+
+		public void setDistributeProjectReleaseBundle(boolean distributeProjectReleaseBundle) {
+			this.distributeProjectReleaseBundle = distributeProjectReleaseBundle;
+		}
+
+		public Map<String, List<String>> getRepos() {
+			return repos;
+		}
+
+		public void setRepos(Map<String, List<String>> repos) {
+			this.repos = repos;
+		}
+
+		public String getRepoUrl() {
+			return repoUrl;
+		}
+
+		public void setRepoUrl(String repoUrl) {
+			this.repoUrl = repoUrl;
+		}
+
+		public String getRepoUsername() {
+			return repoUsername;
+		}
+
+		public void setRepoUsername(String repoUsername) {
+			this.repoUsername = repoUsername;
+		}
+
+		public String getRepoAccessToken() {
+			return repoAccessToken;
+		}
+
+		public void setRepoAccessToken(String repoAccessToken) {
+			this.repoAccessToken = repoAccessToken;
+		}
+
+		@Override
+		public String toString() {
+			return "Bundles{" + "createProjectReleaseBundle=" + createProjectReleaseBundle
+					+ ", createReleaseTrainReleaseBundle=" + createReleaseTrainReleaseBundle
+					+ ", distributeReleaseTrainSourceBundle=" + distributeReleaseTrainSourceBundle
+					+ ", distributeProjectReleaseBundle=" + distributeProjectReleaseBundle + ", repoUrl='" + repoUrl
+					+ '\'' + ", repoUsername='" + repoUsername + '\'' + ", repoAccessToken='" + repoAccessToken + '\''
+					+ ", repos=" + repos + '}';
 		}
 
 	}

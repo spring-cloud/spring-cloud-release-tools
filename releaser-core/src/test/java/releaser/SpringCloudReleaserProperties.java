@@ -28,7 +28,10 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.core.io.FileSystemResource;
 
-public class SpringCloudReleaserProperties {
+public final class SpringCloudReleaserProperties {
+
+	private SpringCloudReleaserProperties() {
+	}
 
 	public static ReleaserProperties get() {
 		try {

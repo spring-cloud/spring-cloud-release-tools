@@ -33,6 +33,7 @@ public final class TestUtils {
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-core-tests");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-release");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-consul");
+		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-consul-commercial");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-static");
 	}
 
