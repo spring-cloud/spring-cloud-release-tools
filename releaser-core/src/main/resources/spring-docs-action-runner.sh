@@ -115,6 +115,7 @@ __action() {
   )
   exit_code=$?
 
+  echo "Exiting with code $exit_code"
 
   exit $exit_code
 }
