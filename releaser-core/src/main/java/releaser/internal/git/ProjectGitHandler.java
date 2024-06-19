@@ -136,7 +136,11 @@ public class ProjectGitHandler implements Closeable {
 
 	public File cloneAndCheckoutSpringDocsActions() {
 		File project = cloneProject(this.properties.getAntora().getSpringDocsActionsUrl());
-		checkoutTag(project, this.properties.getAntora().getSpringDocsActionsTag());
+		String tag = this.properties.getAntora().getSpringDocsActionsTag();
+		if (StringUtils.hasText(tag)) {
+			log.info("Checking out tag [{}] for project [{}]", tag, project.getAbsolutePath());
+			checkoutTag(project, this.properties.getAntora().getSpringDocsActionsTag());
+		}
 		return project;
 	}
 
