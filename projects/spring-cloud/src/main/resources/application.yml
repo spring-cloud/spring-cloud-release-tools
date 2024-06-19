@@ -102,8 +102,8 @@ releaser:
     bom-name: spring-cloud
   # fixed-versions:
   antora:
-    spring-docs-actions-url: https://github.com/ryanjbaxter/spring-doc-actions
-#    spring-docs-actions-tag: v0.0.16
+    spring-docs-actions-url: https://github.com/spring-io/spring-doc-actions
+    spring-docs-actions-tag: v0.0.18
     sync-antora-docs-command: "./spring-docs-action-runner.sh --docs-username {{ssh-username}} --docs-ssh-key-path {{ssh-key-path}} --docs-host docs-ip.spring.io --docs-ssh-host-key {{host-key}} --site-path {{site-path}} --github-repository {{github-repo}}"
   meta-release:
     enabled: false
