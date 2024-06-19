@@ -1116,7 +1116,7 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * Command to be executed to run Antora.
 		 */
-		private String runAntoraCommand = "./mvnw antora {{systemProps}}";
+		private String runAntoraCommand = "./mvnw antora -Pdocs {{systemProps}}";
 
 		/**
 		 * Additional system properties that should be passed to the build / deploy
