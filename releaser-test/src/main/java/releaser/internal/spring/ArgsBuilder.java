@@ -61,6 +61,7 @@ public class ArgsBuilder {
 				"releaser.git.test-samples-project-url=" + tempDirTestSamplesProject.getAbsolutePath(),
 				"releaser.git.release-train-docs-url=" + tempDirReleaseTrainDocs.getAbsolutePath(),
 				"releaser.antora.spring-docs-actions-url=" + file("/projects/spring-docs-actions").toURI(),
+				"releaser.antora.spring-docs-actions-tag=v0.0.16",
 				"releaser.maven.build-command=echo build",
 				"releaser.maven.deploy-command=echo deploy",
 				"releaser.maven.deploy-guides-command=echo guides",
