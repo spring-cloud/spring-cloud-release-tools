@@ -367,7 +367,8 @@ class CommandPicker {
 	String publishAntoraDocsCommand(File project, ReleaserProperties properties) {
 		ProjectVersion version = new ProjectVersion(project);
 		// the GitHub project for spring-cloud-starter-build is spring-cloud-release
-		String projectName = version.projectName.equals("spring-cloud-starter-build") ? "spring-cloud-release" : version.projectName;
+		String projectName = version.projectName.equals("spring-cloud-starter-build") ? "spring-cloud-release"
+				: version.projectName;
 		String repo = properties.getGit().getOrgName() + "/" + projectName;
 		String command = properties.getAntora().getSyncAntoraDocsCommand().replace("{{github-repo}}", repo)
 				.replace("{{site-path}}", project.getAbsolutePath() + "/target/antora/site");

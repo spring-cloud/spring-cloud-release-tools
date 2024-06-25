@@ -61,6 +61,7 @@ public class ArgsBuilder {
 				"releaser.git.test-samples-project-url=" + tempDirTestSamplesProject.getAbsolutePath(),
 				"releaser.git.release-train-docs-url=" + tempDirReleaseTrainDocs.getAbsolutePath(),
 				"releaser.antora.spring-docs-actions-url=" + file("/projects/spring-docs-actions").toURI(),
+				"releaser.antora.spring-docs-actions-tag=v0.0.16",
 				"releaser.maven.build-command=echo build",
 				"releaser.maven.deploy-command=echo deploy",
 				"releaser.maven.deploy-guides-command=echo guides",
@@ -195,6 +196,36 @@ public class ArgsBuilder {
 	public ArgsBuilder bomBranch(String bomBranch) {
 		removeIfPresent("releaser.pom.branch");
 		this.args.add("releaser.pom.branch=" + bomBranch);
+		return this;
+	}
+
+	public ArgsBuilder commercial(boolean commercial) {
+		removeIfPresent("releaser.commercial");
+		this.args.add("releaser.commercial=" + commercial);
+		return this;
+	}
+
+	public ArgsBuilder projectReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.create-project-release-bundle");
+		this.args.add("releaser.bundles.create-project-release-bundle=" + enable);
+		return this;
+	}
+
+	public ArgsBuilder distributeProjectReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.distribute-project-release-bundle");
+		this.args.add("releaser.bundles.distribute-project-release-bundle=" + enable);
+		return this;
+	}
+
+	public ArgsBuilder releaseTrainSourceReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.create-release-train-release-bundle");
+		this.args.add("releaser.bundles.create-release-train-release-bundle=" + enable);
+		return this;
+	}
+
+	public ArgsBuilder distributeReleaseTrainSourceReleaseBundle(boolean enable) {
+		removeIfPresent("releaser.bundles.distribute-release-train-source-bundle");
+		this.args.add("releaser.bundles.distribute-release-train-source-bundle=" + enable);
 		return this;
 	}
 
