@@ -37,6 +37,9 @@ import releaser.internal.project.Projects;
  */
 public class VersionsFromBom {
 
+	/**
+	 * Empty version.
+	 */
 	public static final VersionsFromBom EMPTY_VERSION = new VersionsFromBom();
 
 	Set<Project> projects = new HashSet<>();

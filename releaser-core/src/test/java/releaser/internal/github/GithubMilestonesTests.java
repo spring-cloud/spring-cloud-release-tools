@@ -198,6 +198,11 @@ class GithubMilestonesTests {
 			String readChangelogFromGeneratorOutput(ProjectVersion version) throws IOException {
 				return "FOOOO";
 			}
+
+			@Override
+			void downloadChangeLog() {
+
+			}
 		};
 
 		milestones.createReleaseNotesForMilestone(gaContractVersion());

@@ -113,10 +113,7 @@ class GithubMilestones {
 				boolean notPreviouslyDownloaded = DOWNLOADED_GITHUB_CHANGELOG.compareAndSet(null,
 						Files.createTempFile("releaser-changelog-generator", ".jar"));
 				if (notPreviouslyDownloaded) {
-					try (ReadableByteChannel readableByteChannel = Channels.newChannel(
-							new URL(this.properties.getGit().getGithubChangelogGeneratorUrl()).openStream())) {
-						downloadFatJarIfNotPresent(readableByteChannel);
-					}
+					downloadChangeLog();
 				}
 				contents = readChangelogFromGeneratorOutput(version);
 			}
@@ -125,6 +122,16 @@ class GithubMilestones {
 			}
 		}
 		createGithubMilestoneReleaseNotes(version, contents);
+	}
+
+	void downloadChangeLog() {
+		try (ReadableByteChannel readableByteChannel = Channels
+				.newChannel(new URL(this.properties.getGit().getGithubChangelogGeneratorUrl()).openStream())) {
+			downloadFatJarIfNotPresent(readableByteChannel);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	String readChangelogFromGeneratorOutput(ProjectVersion version) throws IOException {

@@ -1,0 +1,2 @@
+0000000000000000000000000000000000000000 da95978f91a608cab81aa2020e511e9fce0d3593 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660659298 +0200	branch: Created from HEAD
+da95978f91a608cab81aa2020e511e9fce0d3593 eedb764786313401e1058a8eda4e653d7eb89e01 Marcin Grzejszczak <mgrzejszczak@vmware.com> 1660659301 +0200	commit: Prevents unzipping files outside of the target folder

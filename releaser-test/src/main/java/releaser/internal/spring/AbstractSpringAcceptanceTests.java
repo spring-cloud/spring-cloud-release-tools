@@ -67,9 +67,15 @@ import static org.assertj.core.api.BDDAssertions.then;
  */
 public abstract class AbstractSpringAcceptanceTests {
 
+	/**
+	 * Temporary folder.
+	 */
 	@TempDir
 	public File temporaryFolder;
 
+	/**
+	 * Test POM Reader.
+	 */
 	public TestPomReader testPomReader = new TestPomReader();
 
 	public static Project newProject() {
@@ -249,6 +255,9 @@ public abstract class AbstractSpringAcceptanceTests {
 
 		private final Consumer<File> docsConsumer;
 
+		/**
+		 * Cloned projects.
+		 */
 		public Set<File> clonedProjects = new HashSet<>();
 
 		public NonAssertingTestProjectGitHandler(ReleaserProperties properties, Consumer<File> docsConsumer) {
@@ -296,8 +305,14 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public static class TestExecutionResultHandler extends SpringBatchExecutionResultHandler {
 
+		/**
+		 * Exited with success or unstable.
+		 */
 		public boolean exitedSuccessOrUnstable;
 
+		/**
+		 * Exited with exception.
+		 */
 		public boolean exitedWithException;
 
 		public TestExecutionResultHandler(BuildReportHandler buildReportHandler,

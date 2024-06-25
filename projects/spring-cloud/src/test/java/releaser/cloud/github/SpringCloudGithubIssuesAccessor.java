@@ -20,7 +20,10 @@ import org.kohsuke.github.GitHub;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.github.CustomGithubIssues;
 
-public class SpringCloudGithubIssuesAccessor {
+public final class SpringCloudGithubIssuesAccessor {
+
+	private SpringCloudGithubIssuesAccessor() {
+	}
 
 	public static CustomGithubIssues springCloud(GitHub github, ReleaserProperties releaserProperties) {
 		return new SpringCloudGithubIssues(github, releaserProperties);
