@@ -193,7 +193,6 @@ public class ProjectCommandExecutor {
 			String command = new CommandPicker(properties).publishAntoraDocsCommand(project, properties);
 			log.info("Executing command for publishing Antora docs " + command + " / " + properties);
 			String[] commands = command.split(" ");
-			// TODO fix this hack
 			for (int i = 0; i < commands.length; i++) {
 				if (commands[i].contains("{{host-key}}")) {
 					commands[i] = commands[i].replace("{{host-key}}",
