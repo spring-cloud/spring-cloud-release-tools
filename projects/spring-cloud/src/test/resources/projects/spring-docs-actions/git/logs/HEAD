@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 0d0095113b5be7f4fcdfc972268318ec902c5f13 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715194973 -0400	commit (initial): initial commit
+0d0095113b5be7f4fcdfc972268318ec902c5f13 c7c3fa38fd33170e7fbb15541066ebe746ba1ad6 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715202289 -0400	commit: moving action.sh
+c7c3fa38fd33170e7fbb15541066ebe746ba1ad6 18c66e805702c81fc2099cb09d2490f099581f34 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715260171 -0400	commit: changing permissions
+18c66e805702c81fc2099cb09d2490f099581f34 193a7a691db1f7529bbd1d7f7f4947209622486c Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715263189 -0400	commit: updating action
+193a7a691db1f7529bbd1d7f7f4947209622486c b460e89cc9afdb4ecc7c1c3e4e0e1dae0cac7e63 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715364505 -0400	commit: adding setup_ssh.sh
+b460e89cc9afdb4ecc7c1c3e4e0e1dae0cac7e63 9858d6e0d948d69e62cca0e393dfb21cfb4d7781 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715712689 -0400	commit: adding jenkins.sh
+9858d6e0d948d69e62cca0e393dfb21cfb4d7781 ba9d397eb47402a7e9d00a6e529285341a35168b Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715712751 -0400	commit: removed runme
+ba9d397eb47402a7e9d00a6e529285341a35168b 3c1914e048ad43880aecf0ce0ad4d3a5220df39b Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1715712928 -0400	commit: making jenkins.sh executable
+3c1914e048ad43880aecf0ce0ad4d3a5220df39b 018554f12b64fc2fb8a0ea306455c8d0da30b891 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1716557772 -0400	commit: removing jenkins.sh

@@ -4,3 +4,6 @@ a4d3ca059d1872050823d6518a4e5fc0f7ca4352 2578cdbfa95c501e489fd1dcd55dfdc0fdd4e6d
 f5a37ebb5050288b8d480e62db24aa7a6f76868c f5a37ebb5050288b8d480e62db24aa7a6f76868c Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1517562977 +0100	reset: moving to HEAD
 f5a37ebb5050288b8d480e62db24aa7a6f76868c f5a37ebb5050288b8d480e62db24aa7a6f76868c Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1517562980 +0100	reset: moving to f5a37eb
 f5a37ebb5050288b8d480e62db24aa7a6f76868c d4d5865c142f92aebb5dd1a7c9b745395e65873a Marcin Grzejszczak <mgrzejszczak@pivotal.io> 1517564158 +0100	commit: preparing for tests
+d4d5865c142f92aebb5dd1a7c9b745395e65873a 69424b6ef146c5a499ed0f870d3794c5289e9f71 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1714574673 -0400	checkout: moving from 1.3.x to docs-build
+69424b6ef146c5a499ed0f870d3794c5289e9f71 bc9b9ea33965b66a0df3ea0612ac9c67b295186b Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1714574687 -0400	checkout: moving from docs-build to main
+bc9b9ea33965b66a0df3ea0612ac9c67b295186b d4d5865c142f92aebb5dd1a7c9b745395e65873a Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1714574832 -0400	checkout: moving from main to 1.3.x

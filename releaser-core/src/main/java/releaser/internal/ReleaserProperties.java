@@ -78,6 +78,8 @@ public class ReleaserProperties implements Serializable {
 
 	private Versions versions = new Versions();
 
+	private Antora antora = new Antora();
+
 	private boolean commercial = false;
 
 	private Bundles bundles = new Bundles();
@@ -210,6 +212,14 @@ public class ReleaserProperties implements Serializable {
 		this.commercial = commercial;
 	}
 
+	public Antora getAntora() {
+		return antora;
+	}
+
+	public void setAntora(Antora antora) {
+		this.antora = antora;
+	}
+
 	public Bundles getBundles() {
 		return bundles;
 	}
@@ -224,7 +234,7 @@ public class ReleaserProperties implements Serializable {
 				+ this.pom + ", maven=" + this.maven + ", gradle=" + this.gradle + ", sagan=" + this.sagan
 				+ ", fixedVersions=" + this.fixedVersions + ", metaRelease=" + this.metaRelease + ", template="
 				+ this.template + ", versions=" + this.versions + ", commercial=" + this.commercial + ", bundles="
-				+ this.bundles + '}';
+				+ this.bundles + ", antora=" + this.antora + '}';
 	}
 
 	public ReleaserProperties copy() {
@@ -443,6 +453,87 @@ public class ReleaserProperties implements Serializable {
 
 		public void setDefaultEnabled(boolean defaultEnabled) {
 			this.defaultEnabled = defaultEnabled;
+		}
+
+	}
+
+	public static class Antora implements Serializable {
+
+		/**
+		 * URL to Spring Docs Actions repo.
+		 */
+		private String springDocsActionsUrl;
+
+		/**
+		 * Command to sync Antora docs.
+		 */
+		private String syncAntoraDocsCommand;
+
+		/**
+		 * Tag for Spring Docs Actions repo.
+		 */
+		private String springDocsActionsTag;
+
+		private String springDocsSshUsername;
+
+		private String springDocsSshKeyPath;
+
+		private String springDocsSshHostKey;
+
+		public String getSpringDocsActionsUrl() {
+			return springDocsActionsUrl;
+		}
+
+		public void setSpringDocsActionsUrl(String springDocsActionsUrl) {
+			this.springDocsActionsUrl = springDocsActionsUrl;
+		}
+
+		public String getSpringDocsActionsTag() {
+			return springDocsActionsTag;
+		}
+
+		public void setSpringDocsActionsTag(String springDocsActionsTag) {
+			this.springDocsActionsTag = springDocsActionsTag;
+		}
+
+		public String getSyncAntoraDocsCommand() {
+			return syncAntoraDocsCommand;
+		}
+
+		public void setSyncAntoraDocsCommand(String syncAntoraDocsCommand) {
+			this.syncAntoraDocsCommand = syncAntoraDocsCommand;
+		}
+
+		public String getSpringDocsSshUsername() {
+			return springDocsSshUsername;
+		}
+
+		public void setSpringDocsSshUsername(String springDocsSshUsername) {
+			this.springDocsSshUsername = springDocsSshUsername;
+		}
+
+		public String getSpringDocsSshKeyPath() {
+			return springDocsSshKeyPath;
+		}
+
+		public void setSpringDocsSshKeyPath(String springDocsSshKeyPath) {
+			this.springDocsSshKeyPath = springDocsSshKeyPath;
+		}
+
+		public String getSpringDocsSshHostKey() {
+			return springDocsSshHostKey;
+		}
+
+		public void setSpringDocsSshHostKey(String springDocsSshHostKey) {
+			this.springDocsSshHostKey = springDocsSshHostKey;
+		}
+
+		@Override
+		public String toString() {
+			return "Antora{" + "springDocsActionsUrl='" + springDocsActionsUrl + '\'' + ", syncAntoraDocsCommand='"
+					+ syncAntoraDocsCommand + '\'' + ", springDocsActionsTag='" + springDocsActionsTag + '\''
+					+ ", springDocsSshUsername='" + springDocsSshUsername + '\'' + ", springDocsSshKey='"
+					+ springDocsSshKeyPath + '\'' + ", springDocsSshHostKey='" + springDocsSshHostKey + '\'' + '}';
 		}
 
 	}
@@ -1033,6 +1124,11 @@ public class ReleaserProperties implements Serializable {
 				+ "--retrieveversions --version {{version}} --ghpages --auto";
 
 		/**
+		 * Command to be executed to run Antora.
+		 */
+		private String runAntoraCommand = "./mvnw antora -Pdocs {{systemProps}}";
+
+		/**
 		 * Additional system properties that should be passed to the build / deploy
 		 * commands. If present in other commands "{{systemProps}}" will be substituted
 		 * with this property.
@@ -1112,12 +1208,20 @@ public class ReleaserProperties implements Serializable {
 			this.systemProperties = systemProperties;
 		}
 
+		public String getRunAntoraCommand() {
+			return runAntoraCommand;
+		}
+
+		public void setRunAntoraCommand(String runAntoraCommand) {
+			this.runAntoraCommand = runAntoraCommand;
+		}
+
 		@Override
 		public String toString() {
 			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='" + this.deployCommand
 					+ '\'' + ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
-					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes=" + this.waitTimeInMinutes
-					+ '}';
+					+ this.generateReleaseTrainDocsCommand + '\'' + ", runAntoraCommand= " + runAntoraCommand
+					+ ", waitTimeInMinutes=" + this.waitTimeInMinutes + '}';
 		}
 
 	}
@@ -1327,6 +1431,11 @@ public class ReleaserProperties implements Serializable {
 		 */
 		private long waitTimeInMinutes = 20;
 
+		/**
+		 * Command to be executed to run Antora.
+		 */
+		private String runAntoraCommand = "./gradlew antora {{systemProps}}";
+
 		@Override
 		public String getBuildCommand() {
 			return this.buildCommand;
@@ -1411,6 +1520,14 @@ public class ReleaserProperties implements Serializable {
 			this.ignoredGradleRegex = ignoredGradleRegex;
 		}
 
+		public String getRunAntoraCommand() {
+			return runAntoraCommand;
+		}
+
+		public void setRunAntoraCommand(String runAntoraCommand) {
+			this.runAntoraCommand = runAntoraCommand;
+		}
+
 		@Override
 		public String toString() {
 			return new StringJoiner(", ", Gradle.class.getSimpleName() + "[", "]")
@@ -1420,6 +1537,7 @@ public class ReleaserProperties implements Serializable {
 					.add("deployGuidesCommand='" + deployGuidesCommand + "'")
 					.add("publishDocsCommand=" + publishDocsCommand)
 					.add("generateReleaseTrainDocsCommand='" + generateReleaseTrainDocsCommand + "'")
+					.add("runAntoraCommand='" + runAntoraCommand + "'")
 					.add("systemProperties='" + systemProperties + "'").add("waitTimeInMinutes=" + waitTimeInMinutes)
 					.toString();
 		}

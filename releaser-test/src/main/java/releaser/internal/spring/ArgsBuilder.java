@@ -39,6 +39,8 @@ public class ArgsBuilder {
 
 	private final File tempDirAllTestSample;
 
+	private File tempDirSpringDocsActions;
+
 	List<String> args = new LinkedList<>();
 
 	public ArgsBuilder(File project, File tempDirTestSamplesProject, File tempDirReleaseTrainDocs,
@@ -58,11 +60,14 @@ public class ArgsBuilder {
 				"releaser.git.documentation-url=" + file("/projects/spring-cloud-static-angel/").toURI(),
 				"releaser.git.test-samples-project-url=" + tempDirTestSamplesProject.getAbsolutePath(),
 				"releaser.git.release-train-docs-url=" + tempDirReleaseTrainDocs.getAbsolutePath(),
+				"releaser.antora.spring-docs-actions-url=" + file("/projects/spring-docs-actions").toURI(),
+				"releaser.antora.spring-docs-actions-tag=v0.0.16",
 				"releaser.maven.build-command=echo build",
 				"releaser.maven.deploy-command=echo deploy",
 				"releaser.maven.deploy-guides-command=echo guides",
 				"releaser.maven.publish-docs-command=echo docs",
 				"releaser.maven.generate-release-train-docs-command=echo releaseTrainDocs",
+				"releaser.maven.run-antora-command=echo antora",
 				"releaser.working-dir=" + project.getPath(),
 				"releaser.git.spring-project-url=" + tempDirSpringCloud.getAbsolutePath(),
 				"releaser.git.release-train-wiki-url=" + tmpGitRepo(tempDirReleaseTrainWiki).getAbsolutePath() + "/",
