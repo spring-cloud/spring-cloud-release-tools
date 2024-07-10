@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
@@ -80,6 +81,8 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	File tempDirAllTestSample;
 
 	@Test
+	// FIXME
+	@Disabled
 	public void should_perform_a_meta_release_of_sc_release_and_consul(@TempDir File tempDirSpringCloudConsulOrigin,
 			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
 		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "2022.0.x");

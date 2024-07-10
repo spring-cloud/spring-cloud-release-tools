@@ -56,7 +56,7 @@ public class PublishDocsReleaseTask implements ReleaseReleaserTask {
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		return this.releaser.publishDocs(args.properties, args.originalVersion, args.versionFromBom);
+		return ExecutionResult.skipped();
 	}
 
 	@Override
