@@ -1,21 +1,39 @@
 |===
 |Name | Default | Description
 
-|releaser.bash.build-command | `echo "{{systemProps}}"` | Command to be executed to build the project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
-|releaser.bash.deploy-command | `echo "{{systemProps}}"` | Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
-|releaser.bash.deploy-guides-command | `echo "{{systemProps}}"` | Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
-|releaser.bash.generate-release-train-docs-command | `echo "{{version}}"` | Command to be executed to generate release train documentation.
-|releaser.bash.publish-docs-command | `mkdir -p target && echo "{{version}}"` | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.antora.spring-docs-actions-tag |  | Tag for Spring Docs Actions repo.
+|releaser.antora.spring-docs-actions-url |  | URL to Spring Docs Actions repo.
+|releaser.antora.spring-docs-ssh-host-key |  | 
+|releaser.antora.spring-docs-ssh-key-path |  | 
+|releaser.antora.spring-docs-ssh-username |  | 
+|releaser.antora.sync-antora-docs-command |  | Command to sync Antora docs.
+|releaser.bash.build-command | `+++echo "{{systemProps}}"+++` | Command to be executed to build the project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.bash.deploy-command | `+++echo "{{systemProps}}"+++` | Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.bash.deploy-guides-command | `+++echo "{{systemProps}}"+++` | Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.bash.generate-release-train-docs-command | `+++echo "{{version}}"+++` | Command to be executed to generate release train documentation.
+|releaser.bash.publish-docs-command | `+++mkdir -p target && echo "{{version}}"+++` | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
 |releaser.bash.system-properties |  | Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.
-|releaser.bash.wait-time-in-minutes | `20` | Max wait time in minutes for the process to finish.
+|releaser.bash.wait-time-in-minutes | `+++20+++` | Max wait time in minutes for the process to finish.
+|releaser.bundles.create-project-release-bundle | `+++false+++` | 
+|releaser.bundles.create-release-train-release-bundle | `+++false+++` | 
+|releaser.bundles.distribute-project-release-bundle | `+++false+++` | 
+|releaser.bundles.distribute-release-train-source-bundle | `+++false+++` | 
+|releaser.bundles.repo-access-token |  | 
+|releaser.bundles.repo-url | `+++https://usw1.packages.broadcom.com+++` | 
+|releaser.bundles.repo-username |  | 
+|releaser.bundles.repos |  | 
+|releaser.commercial | `+++false+++` | 
 |releaser.fixed-versions |  | Project name to its version - overrides all versions retrieved from a release train repository like Spring Cloud Release.
-|releaser.flow.default-enabled | `true` | Should the default flow of jobs be preserved. If set to {@code false} will not register any jobs as beans, and it will be up to you to set the whole configuration of jobs.
+|releaser.flow.default-enabled | `+++true+++` | Should the default flow of jobs be preserved. If set to {@code false} will not register any jobs as beans, and it will be up to you to set the whole configuration of jobs.
 |releaser.git.all-test-sample-urls |  | Project to urls mapping. For each project will clone the test project and will update its versions.
+|releaser.git.cache-directory |  | Absolute path to a directory with cache for OkHTTP calls to GitHub.
 |releaser.git.clone-destination-dir |  | Where should the release train repo get cloned to. If {@code null} defaults to a temporary directory.
+|releaser.git.create-release-notes-for-milestone | `+++false+++` | If set to {@code false}, will not create release notes for milestone.
 |releaser.git.documentation-branch |  | Branch to check out for the documentation project.
 |releaser.git.documentation-url |  | URL to the documentation Git repository.
-|releaser.git.fetch-versions-from-git | `true` | If {@code true} then should fill the map of versions from Git. If {@code false} then picks fixed versions.
-|releaser.git.number-of-checked-milestones | `50` | In order not to iterate endlessly over milestones we introduce a threshold of milestones that we will go through to find the matching milestone.
+|releaser.git.fetch-versions-from-git | `+++true+++` | If {@code true} then should fill the map of versions from Git. If {@code false} then picks fixed versions.
+|releaser.git.github-changelog-generator-url | `+++https://github.com/spring-io/github-changelog-generator/releases/download/v0.0.8/github-changelog-generator.jar+++` | URL to the fat jar with Github Changelog Generator.
+|releaser.git.number-of-checked-milestones | `+++50+++` | In order not to iterate endlessly over milestones we introduce a threshold of milestones that we will go through to find the matching milestone.
 |releaser.git.oauth-token |  | GitHub OAuth token to be used to interact with GitHub repo.
 |releaser.git.org-name |  | The organization name on Github.
 |releaser.git.password |  | Optional Git password. If not passed keys will be used for authentication.
@@ -25,59 +43,61 @@
 |releaser.git.release-train-docs-url |  | URL to the release train documentation.
 |releaser.git.release-train-wiki-page-prefix |  | Page prefix for the release train wiki. E.g. for [Spring-Cloud-Finchley-Release-Notes] it would be [Spring-Cloud].
 |releaser.git.release-train-wiki-url |  | URL to the release train wiki.
-|releaser.git.run-updated-samples | `false` | If set to {@code false}, will not update the test samples.
+|releaser.git.run-updated-samples | `+++false+++` | If set to {@code false}, will not update the test samples.
 |releaser.git.spring-project-branch |  | Branch to check out for the release train project.
 |releaser.git.spring-project-url |  | URL to the release train project page repository.
 |releaser.git.test-samples-branch |  | Branch to check out for the test samples.
 |releaser.git.test-samples-project-url |  | URL to test samples.
-|releaser.git.update-all-test-samples | `false` | If set to {@code false}, will not clone and update the samples for all projects.
-|releaser.git.update-documentation-repo | `false` | If {@code false}, will not update the documentation repository.
-|releaser.git.update-github-milestones | `false` | If set to {@code false}, will not update Github milestones.
-|releaser.git.update-release-train-docs | `false` | If set to {@code false}, will not update the release train docs.
-|releaser.git.update-release-train-wiki | `false` | If set to {@code false}, will not clone and update the release train wiki.
-|releaser.git.update-spring-guides | `false` | If set to {@code false}, will not update Spring Guides for a release train.
-|releaser.git.update-spring-project | `false` | If set to {@code false}, will not update the Spring Project for a release train. E.g. for Spring Cloud will not update https://cloud.spring.io .
-|releaser.git.update-start-spring-io | `false` | If set to {@code false}, will not update start.spring.io for a release train.
+|releaser.git.update-all-test-samples | `+++false+++` | If set to {@code false}, will not clone and update the samples for all projects.
+|releaser.git.update-documentation-repo | `+++false+++` | If {@code false}, will not update the documentation repository.
+|releaser.git.update-github-milestones | `+++false+++` | If set to {@code false}, will not update Github milestones.
+|releaser.git.update-release-train-docs | `+++false+++` | If set to {@code false}, will not update the release train docs.
+|releaser.git.update-release-train-wiki | `+++false+++` | If set to {@code false}, will not clone and update the release train wiki.
+|releaser.git.update-spring-guides | `+++false+++` | If set to {@code false}, will not update Spring Guides for a release train.
+|releaser.git.update-spring-project | `+++false+++` | If set to {@code false}, will not update the Spring Project for a release train. E.g. for Spring Cloud will not update https://cloud.spring.io .
+|releaser.git.update-start-spring-io | `+++false+++` | If set to {@code false}, will not update start.spring.io for a release train.
 |releaser.git.username |  | Optional Git username. If not passed keys will be used for authentication.
-|releaser.gradle.build-command | `./gradlew clean build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}` | Command to be executed to build the project If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
-|releaser.gradle.deploy-command | `./gradlew publish --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}` | Command to be executed to deploy a built project.
-|releaser.gradle.deploy-guides-command | `./gradlew clean build deployGuides --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}` | Command to be executed to build and deploy guides project only.
-|releaser.gradle.generate-release-train-docs-command | `./gradlew generateReleaseTrainDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}` | Command to be executed to generate release train documentation.
-|releaser.gradle.gradle-props-substitution |  | A mapping that should be applied to {@code gradle.properties} in order to perform a substitution of properties. The mapping is from a property inside {@code gradle.properties} to the projects name. Example. In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You want this property to get updated with the value of {@code spring-cloud-contract} version. Then it's enough to do the mapping like this for this Releaser's property: {@code verifierVersion=spring-cloud-contract}.
+|releaser.gradle.build-command | `+++./gradlew clean build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}+++` | Command to be executed to build the project If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.gradle.deploy-command | `+++./gradlew publish --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}+++` | Command to be executed to deploy a built project.
+|releaser.gradle.deploy-guides-command | `+++./gradlew clean build deployGuides --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}+++` | Command to be executed to build and deploy guides project only.
+|releaser.gradle.generate-release-train-docs-command | `+++./gradlew generateReleaseTrainDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}+++` | Command to be executed to generate release train documentation.
+|releaser.gradle.gradle-props-substitution |  | A mapping that should be applied to {@code gradle.properties} in order to perform a substitution of properties. The mapping is from a property inside {@code gradle.properties} to the projects name. Example. <p> In {@code gradle.properties} you have {@code verifierVersion=1.0.0} . You want this property to get updated with the value of {@code spring-cloud-contract} version. Then it's enough to do the mapping like this for this Releaser's property: {@code verifierVersion=spring-cloud-contract}.
 |releaser.gradle.ignored-gradle-regex |  | List of regular expressions of ignored gradle props. Defaults to test projects and samples.
-|releaser.gradle.publish-docs-command | `./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}` | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
+|releaser.gradle.publish-docs-command | `+++./gradlew publishDocs --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}+++` | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
+|releaser.gradle.run-antora-command | `+++./gradlew antora {{systemProps}}+++` | Command to be executed to run Antora.
 |releaser.gradle.system-properties |  | Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.
-|releaser.gradle.wait-time-in-minutes | `20` | Max wait time in minutes for the process to finish.
-|releaser.maven.build-command | `./mvnw clean install -B -Pdocs {{systemProps}}` | Command to be executed to build the project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
-|releaser.maven.deploy-command | `./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}` | Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
-|releaser.maven.deploy-guides-command | `./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}` | Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
-|releaser.maven.generate-release-train-docs-command | `bash release_train.sh --retrieveversions --version {{version}} --ghpages --auto` | Command to be executed to generate release train documentation.
-|releaser.maven.publish-docs-command | `./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}}` | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
+|releaser.gradle.wait-time-in-minutes | `+++20+++` | Max wait time in minutes for the process to finish.
+|releaser.maven.build-command | `+++./mvnw clean install -B -Pdocs {{systemProps}}+++` | Command to be executed to build the project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.maven.deploy-command | `+++./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}+++` | Command to be executed to deploy a built project. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.maven.deploy-guides-command | `+++./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}+++` | Command to be executed to build and deploy guides project only. If present "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot version and "{{oldVersion}}" with the version before version updating.
+|releaser.maven.generate-release-train-docs-command | `+++bash release_train.sh --retrieveversions --version {{version}} --ghpages --auto+++` | Command to be executed to generate release train documentation.
+|releaser.maven.publish-docs-command | `+++./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}}+++` | Command to be executed to publish documentation. If present "{{version}}" will be replaced by the provided version.
+|releaser.maven.run-antora-command | `+++./mvnw antora -Pdocs {{systemProps}}+++` | Command to be executed to run Antora.
 |releaser.maven.system-properties |  | Additional system properties that should be passed to the build / deploy commands. If present in other commands "{{systemProps}}" will be substituted with this property.
-|releaser.maven.wait-time-in-minutes | `20` | Max wait time in minutes for the process to finish.
-|releaser.meta-release.enabled | `false` | Are we releasing the whole suite of apps or only one?
+|releaser.maven.wait-time-in-minutes | `+++20+++` | Max wait time in minutes for the process to finish.
+|releaser.meta-release.enabled | `+++false+++` | Are we releasing the whole suite of apps or only one?
 |releaser.meta-release.git-org-url |  | The URL of the Git organization. We'll append each project's name to it.
 |releaser.meta-release.projects-to-skip |  | Names of projects to skip deployment for meta-release.
-|releaser.meta-release.release-group-thread-count | `4` | Number of threads per release group. E.g. for thread count of 4 if there are 6 projects in a release group, 4 of them will be executed in parallel and 2 will wait for their turn.
-|releaser.meta-release.release-group-timeout-in-minutes | `180` | Timeout in minutes during which we're waiting for a single composite task per a project to be executed. That means that if set to e.g. 180 then a release process for a single project should take at most 180 minutes.
+|releaser.meta-release.release-group-thread-count | `+++4+++` | Number of threads per release group. E.g. for thread count of 4 if there are 6 projects in a release group, 4 of them will be executed in parallel and 2 will wait for their turn.
+|releaser.meta-release.release-group-timeout-in-minutes | `+++180+++` | Timeout in minutes during which we're waiting for a single composite task per a project to be executed. That means that if set to e.g. 180 then a release process for a single project should take at most 180 minutes.
 |releaser.meta-release.release-groups |  | If provided, allows to provide groups of projects that can be ran in parallel. E.g. {@code --releaser.meta-release.release-groups[0]=projectA,projectB,projectC} {@code --releaser.meta-release.release-groups[1]=projectD,projectE} {@code --releaser.meta-release.release-groups[2]=projectF,projectG} The order is still provided by the list of versions passed to the releaser. Basing on that order, and this value we are able to build a flow with projects.
 |releaser.meta-release.release-train-dependency-names |  | All the names of dependencies that should be updated with the release train project version.
 |releaser.meta-release.release-train-project-name |  | Name of the release train project.
 |releaser.pom.bom-version-pattern |  | The pattern to match a version property in a BOM. Remember to catch the dependency name in a group. E.g. "^(spring-cloud-.*)\\.version$".
-|releaser.pom.branch | `main` | Which branch of release train BOM should be checked out. Defaults to {@code main}.
-|releaser.pom.ignored-pom-regex | `^.*\.git/.*$` | List of regular expressions of ignored poms. Defaults to test projects and samples.
+|releaser.pom.branch | `+++main+++` | Which branch of release train BOM should be checked out. Defaults to {@code main}.
+|releaser.pom.ignored-pom-regex | `+++^.*\.git/.*$+++` | List of regular expressions of ignored poms. Defaults to test projects and samples.
 |releaser.pom.pom-with-boot-starter-parent |  | Subfolder of the pom that contains the {@code spring-boot-starer-parent} dependency.
 |releaser.pom.this-train-bom |  | Subfolder of the pom that contains the versions for the release train.
-|releaser.post-release-tasks-only | `false` | If set to {@code true} will run only post release tasks.
-|releaser.sagan.base-url | `https://spring.io` | URL to the Sagan API.
-|releaser.sagan.boot-section-file-name | `sagan-boot.adoc` | Name of the ascii doc file with boot part of this project's Sagan project page. Linked with {@link this#docsAdocsFile}.
-|releaser.sagan.docs-adocs-file | `docs/src/main/asciidoc` | Folder with asciidoctor files for docs.
-|releaser.sagan.index-section-file-name | `sagan-index.adoc` | Name of the ascii doc file with core part of this project's Sagan project page. Linked with {@link this#docsAdocsFile}.
-|releaser.sagan.update-sagan | `false` | If set to {@code false} will not update Sagan.
-|releaser.skip-post-release-tasks | `false` | If set to {@code true} will not run post release tasks.
-|releaser.template.enabled | `false` | Should template generation be enabled.
+|releaser.post-release-tasks-only | `+++false+++` | If set to {@code true} will run only post release tasks.
+|releaser.sagan.base-url | `+++https://api.spring.io+++` | URL to the Sagan API.
+|releaser.sagan.boot-section-file-name | `+++sagan-boot.adoc+++` | Name of the ascii doc file with boot part of this project's Sagan project page. Linked with {@link this#docsAdocsFile}.
+|releaser.sagan.docs-adocs-file | `+++docs/src/main/asciidoc+++` | Folder with asciidoctor files for docs.
+|releaser.sagan.index-section-file-name | `+++sagan-index.adoc+++` | Name of the ascii doc file with core part of this project's Sagan project page. Linked with {@link this#docsAdocsFile}.
+|releaser.sagan.update-sagan | `+++false+++` | If set to {@code false} will not update Sagan.
+|releaser.skip-post-release-tasks | `+++false+++` | If set to {@code true} will not run post release tasks.
+|releaser.template.enabled | `+++false+++` | Should template generation be enabled.
 |releaser.template.template-folder |  | Folder in which blog, email etc. templates are stored.
-|releaser.versions.all-versions-file-url | `https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml` | Url to a file containing all the versions. Defaults to YAML from start.spring.io.
+|releaser.versions.all-versions-file-url | `+++https://raw.githubusercontent.com/spring-io/start.spring.io/master/start-site/src/main/resources/application.yml+++` | Url to a file containing all the versions. Defaults to YAML from start.spring.io.
 |releaser.versions.bom-name |  | Name in the YAML from initilizr for BOM mappings.
 |releaser.working-dir |  | By default Releaser assumes running the program from the current working directory. If you want to change this behaviour - just change this value.
 

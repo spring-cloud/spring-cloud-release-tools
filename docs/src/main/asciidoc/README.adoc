@@ -9,7 +9,7 @@ include::spring-cloud-release-tools.adoc[]
 
 == Building
 
-include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/main/docs/src/main/asciidoc/building.adoc[]
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/4.0.x/docs/src/main/asciidoc/building.adoc[]
 
 IMPORTANT: There are 2 different versions of language level used in Spring Cloud Sleuth.
 Java 1.7 is used for main sources and Java 1.8 is used for tests.
@@ -22,4 +22,4 @@ include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-too
 
 == Contributing
 
-include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/main/docs/src/main/asciidoc/contributing.adoc[]
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/4.0.x/docs/src/main/asciidoc/contributing.adoc[]
