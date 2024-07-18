@@ -229,6 +229,18 @@ public class ArgsBuilder {
 		return this;
 	}
 
+	public ArgsBuilder antoraCommand(String command) {
+		removeIfPresent("releaser.maven.run-antora-command");
+		this.args.add("releaser.maven.run-antora-command=" + command);
+		return this;
+	}
+
+	public ArgsBuilder syncAntoraDocsCommand(String command) {
+		removeIfPresent("releaser.antora.sync-antora-docs-command");
+		this.args.add("releaser.antora.sync-antora-docs-command=" + command);
+		return this;
+	}
+
 	public String[] build() {
 		return args.toArray(new String[0]);
 	}

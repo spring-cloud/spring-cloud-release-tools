@@ -410,7 +410,8 @@ class GitRepo {
 			printLog(git);
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(e);
+			log.warn("Exception occurred while reverting the commit", e);
+			// throw new IllegalStateException(e);
 		}
 	}
 

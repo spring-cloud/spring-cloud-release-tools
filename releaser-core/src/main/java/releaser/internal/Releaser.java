@@ -186,7 +186,13 @@ public class Releaser {
 		ProjectVersion bumpedProject = bumpProject(originalVersion, newProjects);
 		log.info("Will bump versions \n{}", newProjects);
 		updateProjectFromBom(project, newProjects, originalVersion, SKIP_SNAPSHOT_ASSERTION);
-		this.projectGitHandler.commitAfterBumpingVersions(project, bumpedProject);
+		if (newProjects.size() == 1) {
+			// We are just updating the project version and not dependencies
+			this.projectGitHandler.commitAfterBumpingVersions(project, bumpedProject);
+		}
+		else {
+			this.projectGitHandler.commitAfterBumpingDependencyVersions(project, bumpedProject);
+		}
 		log.info("\nSuccessfully reverted the commit and bumped snapshot versions");
 		return ExecutionResult.success();
 	}

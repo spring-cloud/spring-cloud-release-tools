@@ -77,7 +77,7 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 						.releaseTrainBomUrl(file("/projects/spring-cloud-release/").toURI().toString());
 	}
 
-	public Map<String, String> v2022_0_4() {
+	public Map<String, String> v2022_0_6() {
 		Map<String, String> versions = new LinkedHashMap<>();
 		versions.put("spring-boot", "3.0.7");
 		versions.put("spring-cloud-build", "4.0.3");
@@ -96,7 +96,7 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 		versions.put("spring-cloud-contract", "4.0.3");
 		versions.put("spring-cloud-kubernetes", "3.0.3");
 		versions.put("spring-cloud-vault", "4.0.1");
-		versions.put("spring-cloud-release", "2022.0.4");
+		versions.put("spring-cloud-release", "2022.0.6");
 		return versions;
 	}
 

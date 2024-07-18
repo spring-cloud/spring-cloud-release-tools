@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.assertj.core.api.BDDAssertions;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -293,8 +292,19 @@ public class GitRepoTests {
 		File project = new GitRepo(this.tmpFolder)
 				.cloneProject(new URIish(this.springCloudReleaseProject.toURI().toURL()));
 
-		BDDAssertions.thenThrownBy(() -> new GitRepo(project).revert("some message"))
-				.hasMessageContaining("Won't revert the commit with id");
+		String lastCommitMessage = "";
+		try (Git git = openGitProject(project)) {
+			lastCommitMessage = git.log().call().iterator().next().getShortMessage();
+		}
+		then(lastCommitMessage).isNotEqualTo("");
+
+		new GitRepo(project).revert("some message");
+
+		// Verify that the last commit message is still the same
+		try (Git git = openGitProject(project)) {
+			RevCommit revCommit = git.log().call().iterator().next();
+			then(revCommit.getShortMessage()).isEqualTo(lastCommitMessage);
+		}
 	}
 
 }

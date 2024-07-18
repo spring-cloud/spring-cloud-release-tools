@@ -26,7 +26,7 @@ public class BumpBackToSnapshotReleaseTask implements ReleaseReleaserTask {
 	/**
 	 * Order of this task. The higher value, the lower order.
 	 */
-	public static final int ORDER = 50;
+	public static final int ORDER = 70;
 
 	private final Releaser releaser;
 
