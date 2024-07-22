@@ -32,6 +32,8 @@ public class ReleaseInput {
 
 	private String apiDocUrl = "";
 
+	private boolean isAntora = true;
+
 	public String getVersion() {
 		return this.version;
 	}
@@ -56,10 +58,18 @@ public class ReleaseInput {
 		this.apiDocUrl = apiDocUrl;
 	}
 
+	public boolean isAntora() {
+		return this.isAntora;
+	}
+
+	public void setAntora(boolean antora) {
+		this.isAntora = antora;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("version", version).append("referenceDocUrl", referenceDocUrl)
-				.append("apiDocUrl", apiDocUrl).toString();
+				.append("apiDocUrl", apiDocUrl).append("isAntora", isAntora).toString();
 
 	}
 

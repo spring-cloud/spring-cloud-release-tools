@@ -207,7 +207,18 @@ public class SaganUpdater {
 	}
 
 	private String newReferenceUrl(ProjectVersion version) {
-		return "https://docs.spring.io/" + version.projectName + "/docs/{version}/reference/html/";
+		String antoraVersions = version.majorAndMinor();
+		if (version.isSnapshot()) {
+			antoraVersions += "-SNAPSHOT";
+		}
+		//TODO uncomment the below line and remove the logic above once Contentful "Antora Version" checkbox
+		// bug is fixed.  Currently the checkbox is not being saved and is always unchecked when using the REST API
+		// and this results in the version now being computed propertly by Contentful.  Therefore we compute the version
+		// in the documentation URL ourselves instead of using the {version} placeholder and letting Contentful compute the
+		// version.  NOTE: Tests in {@link SaganUpdaterTests} will need to be updated as well once the fix is in place.
+		// return "https://docs.spring.io/" + version.projectName +
+		// "/reference/{version}/";
+		return "https://docs.spring.io/" + version.projectName + "/reference/" + antoraVersions + "/";
 	}
 
 }

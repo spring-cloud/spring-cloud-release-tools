@@ -87,6 +87,7 @@ class RestTemplateSaganClient implements SaganClient {
 		RequestEntity<ReleaseInput> request = RequestEntity
 				.post(URI.create(this.baseUrl + "/projects/" + projectName + "/releases"))
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE).body(releaseInput);
+		log.info("Request to Sagans\n\n[{}]", request);
 		ResponseEntity<Project> entity = this.restTemplate.exchange(request, Project.class);
 		boolean added = entity.getStatusCode().is2xxSuccessful();
 		log.info("Response from Sagan\n\n[{}]", entity);
