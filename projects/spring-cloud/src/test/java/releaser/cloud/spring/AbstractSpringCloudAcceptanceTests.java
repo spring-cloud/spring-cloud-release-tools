@@ -33,12 +33,16 @@ public class AbstractSpringCloudAcceptanceTests extends AbstractSpringAcceptance
 
 	public File springCloudBuildProject;
 
+	public File springCloudBusProject;
+
 	@BeforeEach
 	public void setupCloud() throws Exception {
 		this.springCloudConsulProject = new File(
 				AbstractSpringAcceptanceTests.class.getResource("/projects/spring-cloud-consul").toURI());
 		this.springCloudBuildProject = new File(
 				AbstractSpringAcceptanceTests.class.getResource("/projects/spring-cloud-build").toURI());
+		this.springCloudBusProject = new File(
+				AbstractSpringAcceptanceTests.class.getResource("/projects/spring-cloud-bus").toURI());
 		TestUtils.prepareLocalRepo();
 		FileSystemUtils.copyRecursively(file("/projects/"), this.temporaryFolder);
 	}

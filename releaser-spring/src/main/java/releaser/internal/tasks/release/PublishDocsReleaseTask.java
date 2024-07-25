@@ -26,7 +26,7 @@ public class PublishDocsReleaseTask implements ReleaseReleaserTask {
 	/**
 	 * Order of this task. The higher value, the lower order.
 	 */
-	public static final int ORDER = 40;
+	public static final int ORDER = 60;
 
 	private final Releaser releaser;
 

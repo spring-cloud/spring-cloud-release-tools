@@ -38,6 +38,7 @@ public final class TestUtils {
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-build");
 		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-static-angel");
 		prepareLocalRepo("target/test-classes/projects/", "spring-docs-actions");
+		prepareLocalRepo("target/test-classes/projects/", "spring-cloud-bus");
 	}
 
 	private static void prepareLocalRepo(String buildDir, String repoPath) throws IOException {

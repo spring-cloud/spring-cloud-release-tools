@@ -100,7 +100,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 				.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
 				.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
 						tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2022.0.2")
-								.addFixedVersions(v2022_0_4()).distributeReleaseTrainSourceReleaseBundle(true)
+								.addFixedVersions(v2022_0_6()).distributeReleaseTrainSourceReleaseBundle(true)
 								.releaseTrainSourceReleaseBundle(true).projectReleaseBundle(true).commercial(true)
 								.build()),
 				context -> {
@@ -131,12 +131,12 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 					thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
 					BDDMockito.then(creator).should(times(1))
 							.createReleaseTrainSourceBundle(List.of(new ProjectVersion("spring-cloud-consul", "4.0.2"),
-									new ProjectVersion("spring-cloud-starter-build", "2022.0.4")), "2022.0.4");
+									new ProjectVersion("spring-cloud-starter-build", "2022.0.6")), "2022.0.6");
 					BDDMockito.then(creator).should(times(1)).createReleaseBundle(
 							List.of("org/springframework/cloud/spring-cloud-consul*",
 									"org/springframework/cloud/spring-cloud-starter-consul*"),
 							"4.0.2", "TNZ-spring-cloud-consul-commercial");
-					BDDMockito.then(creator).should(times(1)).distributeReleaseTrainSourceBundle("2022.0.4");
+					BDDMockito.then(creator).should(times(1)).distributeReleaseTrainSourceBundle("2022.0.6");
 					// This should never be called when releasing a release train since
 					// distributing a release train source bundle
 					// will distribute individual project release bundles
@@ -158,7 +158,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 				.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
 				.properties(metaReleaseArgsForParallel(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
 						tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2022.0.2")
-								.addFixedVersions(v2022_0_4())
+								.addFixedVersions(v2022_0_6())
 								.metaReleaseGroups("example1,example2",
 										"spring-cloud-build,spring-cloud-consul,spring-cloud-release")
 								.build()),
@@ -207,7 +207,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 				properties("debugx=true").properties("test.metarelease=true")
 						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
 								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
-										.bomBranch("v2022.0.2").addFixedVersions(v2022_0_4()).build()),
+										.bomBranch("v2022.0.2").addFixedVersions(v2022_0_6()).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
@@ -375,7 +375,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 								"releaser.flow.default-enabled=false")
 						.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
 								tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
-										.bomBranch("v2022.0.2").addFixedVersions(v2022_0_4()).build()),
+										.bomBranch("v2022.0.2").addFixedVersions(v2022_0_6()).build()),
 				context -> {
 					SpringReleaser releaser = context.getBean(SpringReleaser.class);
 					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context

@@ -136,6 +136,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					Iterable<RevCommit> commits = listOfCommits(project);
 					Iterator<RevCommit> iterator = commits.iterator();
 					tagIsPresentInOrigin(origin, "v4.0.2");
+					commitIsPresent(iterator, "Bumping dependency versions after release");
 					commitIsPresent(iterator, "Bumping versions to 4.0.3-SNAPSHOT after release");
 					commitIsPresent(iterator, "Going back to snapshots");
 					commitIsPresent(iterator, "Update SNAPSHOT to 4.0.2");
@@ -169,6 +170,71 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 				});
 	}
 
+	// This test verifies that the actual antora documentation generation actually works
+	// during a release.
+	// We use Spring Cloud Bus as an example project and override the test antora build
+	// and sync commands in the ArgsBuilder
+	// configuration. The anotra command is the actual antora command to build the docs.
+	// The docs sync command checks that the index.html
+	// file for the release and the snapshot exist.
+	@Test
+	public void should_perform_a_release_of_sc_bus(@TempDir File tempDirSpringCloudBusOrigin,
+			@TempDir File tempDirSpringCloudBusProject) throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "v2023.0.3");
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudBusOrigin, this.springCloudBusProject);
+		pomVersionIsEqualTo(origin, "4.1.2-SNAPSHOT");
+		pomParentVersionIsEqualTo(origin, "spring-cloud-bus-dependencies", "4.1.3-SNAPSHOT");
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudBusProject, tmpFile("spring-cloud-bus"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+
+		run(this.runner, properties("debugx=true").properties(new ArgsBuilder(project, tempDirTestSamplesProject,
+				tempDirReleaseTrainDocs, tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample)
+						.releaseTrainUrl("/projects/spring-cloud-release/").bomBranch("v2023.0.3")
+						.projectName("spring-cloud-bus").expectedVersion("4.1.2")
+						.antoraCommand("./mvnw clean antora -Pdocs")
+						.syncAntoraDocsCommand(
+								"[ -f {{site-path}}/index.html ] && [ -f {{site-path}}/4.1-SNAPSHOT/index.html ]")
+						.build()),
+				context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					TestProjectGitHubHandler gitHubHandler = context.getBean(TestProjectGitHubHandler.class);
+					SaganClient saganClient = context.getBean(SaganClient.class);
+					PostReleaseActions postReleaseActions = context.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+
+					ExecutionResult result = releaser.release(new OptionsBuilder().interactive(true).options());
+
+					Iterable<RevCommit> commits = listOfCommits(project);
+					Iterator<RevCommit> iterator = commits.iterator();
+					then(GitTestUtils.openGitProject(origin).tagList().call().stream()
+							.anyMatch(r -> r.getName().equals("refs/tags/v4.1.2"))).isTrue();
+					commitIsPresent(iterator, "Bumping dependency versions after release");
+					commitIsPresent(iterator, "Bumping versions to 4.1.3-SNAPSHOT after release");
+					commitIsPresent(iterator, "Going back to snapshots");
+					commitIsPresent(iterator, "Update SNAPSHOT to 4.1.2");
+					pomVersionIsEqualTo(project, "4.1.3-SNAPSHOT");
+					pomParentVersionIsEqualTo(project, "spring-cloud-bus-dependencies", "4.1.4-SNAPSHOT");
+					then(gitHubHandler.closedMilestones).isTrue();
+					then(emailTemplate()).doesNotExist();
+					then(blogTemplate()).doesNotExist();
+					then(tweetTemplate()).doesNotExist();
+					then(releaseNotesTemplate()).doesNotExist();
+					// once for updating GA
+					// second time to update SNAPSHOT
+					BDDMockito.then(saganClient).should(times(2)).addRelease(BDDMockito.eq("spring-cloud-bus"),
+							BDDMockito.any());
+					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-bus", "4.1.2-SNAPSHOT");
+					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
+					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
+					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+				});
+	}
+
 	// issue #74
 	@Test
 	public void should_perform_a_release_of_sc_build(@TempDir File tempDirSpringCloudConsulOrigin,
@@ -198,6 +264,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					Iterator<RevCommit> iterator = commits.iterator();
 					tagIsPresentInOrigin(origin, "v2.1.6.RELEASE");
 					// we're running against camden sc-release
+					commitIsPresent(iterator, "Bumping dependency versions after release");
 					commitIsPresent(iterator, "Bumping versions to 2.1.7.SNAPSHOT after release");
 					commitIsPresent(iterator, "Going back to snapshots");
 					commitIsPresent(iterator, "Update SNAPSHOT to 2.1.6.RELEASE");

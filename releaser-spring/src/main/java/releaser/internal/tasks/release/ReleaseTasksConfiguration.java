@@ -69,4 +69,16 @@ class ReleaseTasksConfiguration {
 		return new UpdatingPomsReleaseTask(releaser);
 	}
 
+	@Bean
+	@ConditionalOnMissingBean
+	BumpBackToSnapshotsProjectOnlyReleaseTask bumpBackToSnapshotsProjectOnlyReleaseTask(Releaser releaser) {
+		return new BumpBackToSnapshotsProjectOnlyReleaseTask(releaser);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	PushSnapshotChangesForProjectOnlyReleaseTask pushSnapshotChangesForProjectOnlyReleaseTask(Releaser releaser) {
+		return new PushSnapshotChangesForProjectOnlyReleaseTask(releaser);
+	}
+
 }

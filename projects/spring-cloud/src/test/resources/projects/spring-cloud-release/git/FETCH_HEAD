@@ -1,4 +1,4 @@
-3c340cb0fda1406905eb91a26b6ad37f3a228e65		branch 'main' of github.com:spring-cloud/spring-cloud-release
+6180ef291f6ec01d97a3e3ad0f71648e08d9821e		branch 'main' of github.com:spring-cloud/spring-cloud-release
 fb730db9b3999e45c350015c6cf83be35910a159	not-for-merge	branch '1.0.0.M2' of github.com:spring-cloud/spring-cloud-release
 474b03693496665434ab2615d6500bbb0b575a5b	not-for-merge	branch '1.0.0.M3' of github.com:spring-cloud/spring-cloud-release
 7fdc875cb2b1620e8bc87ef8a27da2858eef7cd1	not-for-merge	branch '1.0.0.RC1' of github.com:spring-cloud/spring-cloud-release
@@ -24,14 +24,14 @@ cbbe80df445961eb193635e63394a3998243281b	not-for-merge	branch 'Greenwich' of git
 2b7f449fa7d0e04a786ff097c6b1bfe3f322a28d	not-for-merge	branch 'Jenkins' of github.com:spring-cloud/spring-cloud-release
 911fb79b2526a750d60c857d758dfbb834d3860a	not-for-merge	branch 'dependabot/maven/commons-io-commons-io-2.8.0' of github.com:spring-cloud/spring-cloud-release
 6d60e974c9f0e454e6c11da99a61bd4cdcfcdea9	not-for-merge	branch 'doc-as-pom' of github.com:spring-cloud/spring-cloud-release
-75b4bfe286e37d0ac4ee2b08215b5fc0bc5823a7	not-for-merge	branch 'docs-build' of github.com:spring-cloud/spring-cloud-release
+64791a98052e66ef0cec08287349086b4822fa77	not-for-merge	branch 'docs-build' of github.com:spring-cloud/spring-cloud-release
 3d7d639afa258af09c5c08fd70322d43c95e4f03	not-for-merge	branch 'fix-pom' of github.com:spring-cloud/spring-cloud-release
 4b562d1f115d48170198e75d0bd592579d267a2c	not-for-merge	branch 'forHoxton.SR5' of github.com:spring-cloud/spring-cloud-release
 1d3ec9b883f8b6c894ff0631d061e7df8f704e5f	not-for-merge	branch 'functionForStreamRelease' of github.com:spring-cloud/spring-cloud-release
 3dc7bc208faf65ac6eb29031d8d01439f4e08511	not-for-merge	branch 'functionForStreamRelease_3.0.x' of github.com:spring-cloud/spring-cloud-release
 3b1a1270cc2a01012f663519fb7d4a1c7a26d394	not-for-merge	branch 'functionForStreamRelease_4.0.x' of github.com:spring-cloud/spring-cloud-release
 5f745590cb3f5ed43e9505515760a50075b4a61e	not-for-merge	branch 'gh-pages' of github.com:spring-cloud/spring-cloud-release
-c7605514ca7be3e19247ff3b784e48f32eb3b60e	not-for-merge	branch 'jenkins-releaser-config' of github.com:spring-cloud/spring-cloud-release
+b7b4cbfd3ef5f6898aac360ed08573db0bf779d0	not-for-merge	branch 'jenkins-releaser-config' of github.com:spring-cloud/spring-cloud-release
 b603d412da7e68611e6701926be8a37694e43bd3	not-for-merge	branch 'netflix4-eureka2' of github.com:spring-cloud/spring-cloud-release
 8d9248d5a509a1df16f15074a73a2022697128e6	not-for-merge	branch 'release/e-scc1355' of github.com:spring-cloud/spring-cloud-release
 fbf3b6368c26bc96b9958036156f37055f69ebf3	not-for-merge	branch 'release/f-scc1355' of github.com:spring-cloud/spring-cloud-release
@@ -47,3 +47,6 @@ fbf3b6368c26bc96b9958036156f37055f69ebf3	not-for-merge	branch 'release/f-scc1355
 8aa3cb92a11adedbc5acfb300e721e0c7c7cd875	not-for-merge	branch 'scBuild214' of github.com:spring-cloud/spring-cloud-release
 da994d5600c15389f7fc7aa15f0414660d5343e1	not-for-merge	branch 'springCloudBuildRelease' of github.com:spring-cloud/spring-cloud-release
 eedb764786313401e1058a8eda4e653d7eb89e01	not-for-merge	branch 'unzipping' of github.com:spring-cloud/spring-cloud-release
+635cf5cbd0410fc1159f6930f14b47062b44ae75	not-for-merge	tag 'v2022.0.4' of github.com:spring-cloud/spring-cloud-release
+07f01b8524b33590c95149e2048743573c1a0971	not-for-merge	tag 'v2023.0.2' of github.com:spring-cloud/spring-cloud-release
+725fdb10dc07c30a5cb356dc10cb44859b063907	not-for-merge	tag 'v2023.0.3' of github.com:spring-cloud/spring-cloud-release

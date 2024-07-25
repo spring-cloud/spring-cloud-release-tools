@@ -26,7 +26,7 @@ public class PushChangesReleaseTask implements ReleaseReleaserTask {
 	/**
 	 * Order of this task. The higher value, the lower order.
 	 */
-	public static final int ORDER = 60;
+	public static final int ORDER = 80;
 
 	private final Releaser releaser;
 

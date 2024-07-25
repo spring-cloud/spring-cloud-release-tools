@@ -1,0 +1,14 @@
+0000000000000000000000000000000000000000 8445b044de0845b9435d5ca828a07e8a03f7c7ca Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721240374 -0400	clone: from github.com:spring-cloud/spring-cloud-bus.git
+8445b044de0845b9435d5ca828a07e8a03f7c7ca 3a0f899ba6804aeb567ed0437936b8d8b0b8c48a Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721241311 -0400	revert: Revert "Bumping versions to 4.1.3-SNAPSHOT after release"
+3a0f899ba6804aeb567ed0437936b8d8b0b8c48a 74134cf60dccfef0469a1720d7afb4ee2bb6f921 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721241320 -0400	revert: Revert "Going back to snapshots"
+74134cf60dccfef0469a1720d7afb4ee2bb6f921 5fbd5cef4a98df979047dd51dc2a1c4951c35c98 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721241324 -0400	revert: Revert "Update SNAPSHOT to 4.1.2"
+5fbd5cef4a98df979047dd51dc2a1c4951c35c98 5fbd5cef4a98df979047dd51dc2a1c4951c35c98 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721242706 -0400	checkout: moving from main to docs-build
+5fbd5cef4a98df979047dd51dc2a1c4951c35c98 5fbd5cef4a98df979047dd51dc2a1c4951c35c98 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721242743 -0400	checkout: moving from docs-build to main
+5fbd5cef4a98df979047dd51dc2a1c4951c35c98 e3e1ec9b64aafc84bdbe8e740f72e5458de72301 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721242773 -0400	checkout: moving from main to docs-build
+e3e1ec9b64aafc84bdbe8e740f72e5458de72301 5fbd5cef4a98df979047dd51dc2a1c4951c35c98 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721242793 -0400	checkout: moving from docs-build to main
+5fbd5cef4a98df979047dd51dc2a1c4951c35c98 e3e1ec9b64aafc84bdbe8e740f72e5458de72301 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721243349 -0400	checkout: moving from main to docs-build
+e3e1ec9b64aafc84bdbe8e740f72e5458de72301 af7d3bd36db12bcdbdb4d5dff0fae95f0f7ac260 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721243555 -0400	commit: updating antora sources
+af7d3bd36db12bcdbdb4d5dff0fae95f0f7ac260 5fbd5cef4a98df979047dd51dc2a1c4951c35c98 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721243563 -0400	checkout: moving from docs-build to main
+5fbd5cef4a98df979047dd51dc2a1c4951c35c98 af7d3bd36db12bcdbdb4d5dff0fae95f0f7ac260 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721243884 -0400	checkout: moving from main to docs-build
+af7d3bd36db12bcdbdb4d5dff0fae95f0f7ac260 bd817cb93cc1d46638fe8b737bb2fc5affdd5f5b Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721244230 -0400	commit: fixing pom
+bd817cb93cc1d46638fe8b737bb2fc5affdd5f5b 5fbd5cef4a98df979047dd51dc2a1c4951c35c98 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1721244236 -0400	checkout: moving from docs-build to main

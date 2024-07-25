@@ -56,6 +56,8 @@ public class ProjectGitHandler implements Closeable {
 
 	private static final String POST_RELEASE_BUMP_MSG = "Bumping versions to %s after release";
 
+	private static final String POST_RELEASE_DEPENDENCY_BUMP_MSG = "Bumping dependency versions after release";
+
 	private final ReleaserProperties properties;
 
 	public ProjectGitHandler(ReleaserProperties properties) {
@@ -87,6 +89,16 @@ public class ProjectGitHandler implements Closeable {
 		if (bumpedVersion.isSnapshot()) {
 			log.info("Snapshot version [{}] found. Will only commit the changed poms", bumpedVersion);
 			commit(project, String.format(POST_RELEASE_BUMP_MSG, bumpedVersion));
+		}
+		else {
+			log.info("Non snapshot version [{}] found. Won't do anything", bumpedVersion);
+		}
+	}
+
+	public void commitAfterBumpingDependencyVersions(File project, ProjectVersion bumpedVersion) {
+		if (bumpedVersion.isSnapshot()) {
+			log.info("Snapshot version [{}] found. Will only commit the changed poms", bumpedVersion);
+			commit(project, POST_RELEASE_DEPENDENCY_BUMP_MSG);
 		}
 		else {
 			log.info("Non snapshot version [{}] found. Won't do anything", bumpedVersion);

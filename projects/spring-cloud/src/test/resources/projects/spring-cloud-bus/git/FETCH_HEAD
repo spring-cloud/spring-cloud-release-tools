@@ -1,0 +1,23 @@
+8445b044de0845b9435d5ca828a07e8a03f7c7ca		branch 'main' of github.com:spring-cloud/spring-cloud-bus
+fe9e42180820c94988f2bc817c3fbae709bb854e	not-for-merge	branch '1.0.0.M2' of github.com:spring-cloud/spring-cloud-bus
+bd144126e14feed9603fe6cd3e5a37107d5e2e60	not-for-merge	branch '1.0.0.M3' of github.com:spring-cloud/spring-cloud-bus
+369e393115952d70edaf00f19d941c2b4cff1dd6	not-for-merge	branch '1.0.0.RC1' of github.com:spring-cloud/spring-cloud-bus
+b26be221b2bd301ddbd06af39e8bde0b38ad0f41	not-for-merge	branch '1.0.0.RELEASE' of github.com:spring-cloud/spring-cloud-bus
+e49f99094121838835bc853958e75f3a36a267d3	not-for-merge	branch '1.0.1.RELEASE' of github.com:spring-cloud/spring-cloud-bus
+1464dd0f0e070369485c44df395b992e86d87dc4	not-for-merge	branch '1.0.2.RELEASE' of github.com:spring-cloud/spring-cloud-bus
+64f0252fb8d91027c542c4c984968e41e02d9ee6	not-for-merge	branch '1.0.3.RELEASE' of github.com:spring-cloud/spring-cloud-bus
+a70dda9c68fda523b92181c9a42642d0c86565b9	not-for-merge	branch '1.0.x' of github.com:spring-cloud/spring-cloud-bus
+6bf43bfd653741cc7174657b14c06e635a8d3f81	not-for-merge	branch '1.1.x' of github.com:spring-cloud/spring-cloud-bus
+31940b2fd40c4d796c0d52d393f1962d063b8b16	not-for-merge	branch '1.2.x' of github.com:spring-cloud/spring-cloud-bus
+f00b4c2ec0d74c2c147063076455c695f02403e0	not-for-merge	branch '1.3.x' of github.com:spring-cloud/spring-cloud-bus
+2d46c687c78e322666c1b66a96a708123df2de03	not-for-merge	branch '2.0.x' of github.com:spring-cloud/spring-cloud-bus
+c3b6feea2d878c508059f3208217b35a35afa0a1	not-for-merge	branch '2.1.x' of github.com:spring-cloud/spring-cloud-bus
+7ca22f129b3edd969b3ea7d91797d05b35a115db	not-for-merge	branch '2.2.x' of github.com:spring-cloud/spring-cloud-bus
+45de9276badef94fe08061e15e9a5b85509260ff	not-for-merge	branch '3.0.x' of github.com:spring-cloud/spring-cloud-bus
+7f1a400692c814456c544ab14d7e5e434388737d	not-for-merge	branch '3.1.x' of github.com:spring-cloud/spring-cloud-bus
+9662ac236349ad36422550f38c1aee490d12d191	not-for-merge	branch '4.0.x' of github.com:spring-cloud/spring-cloud-bus
+e8b8207b2d0025be7b43f211c9ea05a36cf4759b	not-for-merge	branch 'antora' of github.com:spring-cloud/spring-cloud-bus
+798cf84f044a3882acdbbcfdc33e4b9fc2424080	not-for-merge	branch 'dependabot/maven/testcontainers.version-1.15.0' of github.com:spring-cloud/spring-cloud-bus
+e3e1ec9b64aafc84bdbe8e740f72e5458de72301	not-for-merge	branch 'docs-build' of github.com:spring-cloud/spring-cloud-bus
+33caf2d4246328459cda33b19c9064ec0b56ea38	not-for-merge	branch 'gh-pages' of github.com:spring-cloud/spring-cloud-bus
+dd7b7141ee793ec26ef08393257e028c31004eee	not-for-merge	tag 'v4.1.2' of github.com:spring-cloud/spring-cloud-bus
