@@ -38,7 +38,9 @@ releaser:
     update-start-spring-io: true
     update-spring-project: true
     run-updated-samples: true
-    update-release-train-docs: true
+    # The docs-build branch of spring-cloud-release will now publish release train docs
+    # We no longer need to have a post release task to do this so set it to false
+    update-release-train-docs: false
     update-release-train-wiki: true
     update-all-test-samples: true
     all-test-sample-urls:
