@@ -115,7 +115,7 @@ public class SaganUpdater {
 			}
 		}
 		if (shouldUpdate) {
-			this.saganClient.patchProjectDetails(project.getName(), projectDetails);
+			this.saganClient.patchProjectDetails(project.getSlug(), projectDetails);
 			log.info("Updating Sagan project with adoc data.");
 		}
 		else {
