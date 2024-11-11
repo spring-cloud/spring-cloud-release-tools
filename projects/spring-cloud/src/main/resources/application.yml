@@ -136,7 +136,9 @@ releaser:
         - "org/springframework/cloud/spring-cloud-starter-bus*"
       spring-cloud-commons:
         - "org/springframework/cloud/spring-cloud-commons*"
-        - "org/springframework/cloud/spring-cloud-starter-commons*"
+        - "org/springframework/cloud/spring-cloud-context*"
+        - "org/springframework/cloud/spring-cloud-loadbalancer*"
+        - "org/springframework/cloud/spring-cloud-starter*"
       spring-cloud-netflix:
         - "org/springframework/cloud/spring-cloud-netflix*"
         - "org/springframework/cloud/spring-cloud-starter-netflix*"
