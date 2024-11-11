@@ -91,7 +91,7 @@ public class ReleaseBundleCreator {
 		log.info("Creating release bundle with JSON [{}]", json);
 
 		ArtifactoryRequest aqlRequest = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
-				.apiUrl("lifecycle/api/v2/release_bundle").addQueryParam("project", "spring")
+				.apiUrl("lifecycle/api/v2/release_bundle").addQueryParam("project", "spring").addQueryParam("async", "false")
 				.addHeader("X-JFrog-Signing-Key-Name", "packagesKey").requestType(ArtifactoryRequest.ContentType.JSON)
 				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(json);
 		return makeArtifactoryRequest(aqlRequest);
