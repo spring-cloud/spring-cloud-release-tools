@@ -147,13 +147,13 @@ public class ReleaseBundleCreator {
 				version, json);
 		if (getDistributedReleaseBundleStatus(releaseBundleName, version)) {
 			log.info("Release bundle with name [{}] and version[{}] already distributed, deleting distributed release bundle", releaseBundleName, version);
-			if (deleteDistributedReleaseBundle(releaseBundleName, version)) {
-				log.info("Deleted distributed release bundle with name [{}] and version[{}]", releaseBundleName, version);
-			}
-			else {
-				log.error("Error deleting distributed release bundle with name [{}] and version[{}]", releaseBundleName, version);
-				return false;
-			}
+//			if (deleteDistributedReleaseBundle(releaseBundleName, version)) {
+//				log.info("Deleted distributed release bundle with name [{}] and version[{}]", releaseBundleName, version);
+//			}
+//			else {
+//				log.error("Error deleting distributed release bundle with name [{}] and version[{}]", releaseBundleName, version);
+//				return false;
+//			}
 		}
 		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
 				.apiUrl("lifecycle/api/v2/distribution/distribute/" + releaseBundleName + "/" + version)
