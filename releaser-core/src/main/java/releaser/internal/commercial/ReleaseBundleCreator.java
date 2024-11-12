@@ -167,7 +167,7 @@ public class ReleaseBundleCreator {
 		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
 				.apiUrl("lifecycle/api/v2/distribution/remote_delete/" + releaseBundleName + "/" + version)
 				.addQueryParam("project", "spring").requestType(ArtifactoryRequest.ContentType.JSON)
-				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(createDistributionJson());
+				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(createDeleteDistributionJson());
 		try {
 			return makeArtifactoryRequest(request);
 		}
@@ -193,6 +193,12 @@ public class ReleaseBundleCreator {
 		json.put("auto_create_missing_repositories", "false");
 		json.put("distribution_rules", List.of(Collections.singletonMap("site_name", "JP-SaaS")));
 		json.put("modifications", createMappings());
+		return json;
+	}
+
+	private Map<String, Object> createDeleteDistributionJson() {
+		Map<String, Object> json = new HashMap<>();
+		json.put("distribution_rules", List.of(Collections.singletonMap("site_name", "JP-SaaS")));
 		return json;
 	}
 
