@@ -135,14 +135,46 @@ public class ReleaseBundleCreator {
 				objectMapper.writeValueAsString(createDistributionJson()));
 	}
 
+	public boolean getDistributedReleaseBundleStatus(String releaseBundleName, String version) throws IOException {
+		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.GET)
+				.apiUrl("lifecycle/api/v2/distribution/export/status/" + releaseBundleName + "/" + version)
+				.addQueryParam("project", "spring").responseType(ArtifactoryRequest.ContentType.JSON);
+		return makeArtifactoryRequest(request);
+	}
+
 	public boolean distributeReleaseBundle(String releaseBundleName, String version, String json) throws IOException {
 		log.info("Distributing release bundle with name [{}] and version[{}] and JSON data [{}]", releaseBundleName,
 				version, json);
+		if (getDistributedReleaseBundleStatus(releaseBundleName, version)) {
+			log.info("Release bundle with name [{}] and version[{}] already distributed, deleting distributed release bundle", releaseBundleName, version);
+			if (deleteDistributedReleaseBundle(releaseBundleName, version)) {
+				log.info("Deleted distributed release bundle with name [{}] and version[{}]", releaseBundleName, version);
+			}
+			else {
+				log.error("Error deleting distributed release bundle with name [{}] and version[{}]", releaseBundleName, version);
+				return false;
+			}
+		}
 		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
 				.apiUrl("lifecycle/api/v2/distribution/distribute/" + releaseBundleName + "/" + version)
 				.addQueryParam("project", "spring").requestType(ArtifactoryRequest.ContentType.JSON)
 				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(json);
 		return makeArtifactoryRequest(request);
+	}
+
+	public boolean deleteDistributedReleaseBundle(String releaseBundleName, String version) {
+		log.info("Deleting distributed release bundle with name [{}] and version[{}]", releaseBundleName, version);
+		ArtifactoryRequest request = new ArtifactoryRequestImpl().method(ArtifactoryRequest.Method.POST)
+				.apiUrl("lifecycle/api/v2/distribution/remote_delete/" + releaseBundleName + "/" + version)
+				.addQueryParam("project", "spring").requestType(ArtifactoryRequest.ContentType.JSON)
+				.responseType(ArtifactoryRequest.ContentType.JSON).requestBody(createDistributionJson());
+		try {
+			return makeArtifactoryRequest(request);
+		}
+		catch (IOException e) {
+			log.error("Error deleting distributed release bundle with name [{}] and version[{}]", releaseBundleName, version, e);
+			return false;
+		}
 	}
 
 	private boolean makeArtifactoryRequest(ArtifactoryRequest request) throws IOException {
