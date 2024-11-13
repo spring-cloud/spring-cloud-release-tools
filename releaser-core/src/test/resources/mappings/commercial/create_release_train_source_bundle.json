@@ -2,7 +2,7 @@
   "id" : "0b389dc6-1b73-487d-8122-41f1c974647f",
   "name" : "create_release_train_source_bundle_mapping",
   "request" : {
-    "url" : "/lifecycle/api/v2/release_bundle?project=spring",
+    "url" : "/lifecycle/api/v2/release_bundle?async=false&project=spring",
     "method" : "POST",
     "bodyPatterns" : [ {
       "equalToJson" : "{\"release_bundle_name\": \"TNZ-spring-cloud-commercial-release\",\"release_bundle_version\": \"2022.0.7\",\"skip_docker_manifest_resolution\": false,\"source_type\": \"release_bundles\",\"source\": {\"release_bundles\": [{\"project_key\": \"spring\",\"repository_key\": \"spring-release-bundles-v2\",\"release_bundle_name\": \"TNZ-spring-cloud-build-commercial\",\"release_bundle_version\": \"4.0.8\"},{\"project_key\": \"spring\",\"repository_key\": \"spring-release-bundles-v2\",\"release_bundle_name\": \"TNZ-spring-cloud-config-commercial\",\"release_bundle_version\": \"4.0.7\"},{\"project_key\": \"spring\",\"repository_key\": \"spring-release-bundles-v2\",\"release_bundle_name\": \"TNZ-spring-cloud-starter-commercial\",\"release_bundle_version\": \"2022.0.7\"},{\"project_key\": \"spring\",\"repository_key\": \"spring-release-bundles-v2\",\"release_bundle_name\": \"TNZ-spring-cloud-vault-commercial\",\"release_bundle_version\": \"4.0.7\"}]}}",
