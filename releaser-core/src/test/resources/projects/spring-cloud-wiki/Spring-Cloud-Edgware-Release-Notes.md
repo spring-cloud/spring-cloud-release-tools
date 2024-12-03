@@ -19,6 +19,35 @@ A number of starters did not follow normal Spring Cloud naming conventions. In E
 | spring-cloud-starter-turbine-stream | spring-cloud-starter-netflix-turbine-stream | 
 | spring-cloud-starter-zuul | spring-cloud-starter-netflix-zuul | 
 
+
+
+# Edgware.SR6
+
+2019-05-23
+
+ - Spring Cloud Starter `Edgware.SR6` 
+ - Spring Cloud Release `Edgware.SR6` 
+ - Spring Cloud Security `1.2.4.RELEASE` 
+ - Spring Cloud Bus `1.3.5.RELEASE` 
+ - Spring Cloud Stream `Ditmars.SR5` 
+ - Spring Cloud Task `1.2.4.RELEASE` 
+ - Spring Cloud Netflix `1.4.7.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-netflix/issues?q=is%3Aclosed+milestone%3A1.4.7.RELEASE))
+ - Spring Cloud Sleuth `1.3.6.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/issues?q=is%3Aclosed+milestone%3A1.3.6.RELEASE))
+ - Spring Cloud Config `1.4.7.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-config/milestone/56?closed=1))
+ - Spring Cloud `Edgware.SR6` 
+ - Spring Cloud Dependencies `Edgware.SR6` 
+ - Spring Cloud Commons `1.3.6.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-commons/milestone/56?closed=1))
+ - Spring Cloud Build `1.3.13.RELEASE` 
+ - Spring Cloud Vault `1.1.3.RELEASE` (upgraded to Vault 1.1.3)
+ - Spring Cloud Zookeeper `1.2.3.RELEASE` 
+ - Spring Cloud Contract `1.2.7.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-contract/issues?q=is%3Aclosed+milestone%3A1.2.7.RELEASE))
+ - Spring Cloud Aws `1.2.4.RELEASE` 
+ - Spring Cloud Consul `1.3.6.RELEASE` 
+ - Spring Cloud Cloudfoundry `1.1.3.RELEASE` 
+ - Spring Cloud Function `1.0.2.RELEASE` 
+ - Spring Cloud Gateway `1.0.3.RELEASE` 
+
+
 # Edgware.SR5
 2018-10-16
 
@@ -144,5 +173,4 @@ A number of starters did not follow normal Spring Cloud naming conventions. In E
 - Spring Cloud Sleuth    `1.3.0.M1` ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/milestone/29?closed=1))
 - Spring Cloud Vault     `1.1.0.M1` ([issues](https://github.com/spring-cloud/spring-cloud-vault/milestone/5?closed=1))
 - Spring Cloud Gateway   `1.0.0.M1` ([issues](https://github.com/spring-cloud/spring-cloud-gateway/milestone/2?closed=1))
-
 

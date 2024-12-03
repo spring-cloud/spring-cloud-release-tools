@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2022 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import org.springframework.util.FileSystemUtils;
 
 /**
  * @author Marcin Grzejszczak
+ * @author Olga Maciaszek-Sharma
  */
 public class ReleaseTrainContentsUpdaterTests {
 
@@ -130,6 +131,24 @@ public class ReleaseTrainContentsUpdaterTests {
 	}
 
 	@Test
+	public void should_update_the_contents_of_wiki_on_GA_when_previous_release_RC() throws GitAPIException, IOException {
+		this.properties.getMetaRelease().setEnabled(true);
+		this.properties.getGit().setUpdateReleaseTrainWiki(true);
+		this.properties.getGit()
+				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
+
+		File file = this.updater.updateReleaseTrainWiki(newGACalver());
+
+		BDDAssertions.then(file).isNotNull();
+		BDDAssertions.then(calverWithRCWikiEntryContent(file)).contains("# 2024.0.0")
+				.contains(
+						"Spring Cloud Consul `4.2.0` ([issues](https://github.com/spring-cloud/spring-cloud-consul/releases/tag/v4.2.0))");
+		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator()
+						.next().getShortMessage())
+				.contains("Updating project page to release train [2024.0.0]");
+	}
+
+	@Test
 	public void should_generate_the_contents_of_wiki_when_release_train_missing() throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().setUpdateReleaseTrainWiki(true);
@@ -170,6 +189,10 @@ public class ReleaseTrainContentsUpdaterTests {
 
 	private String calverWikiEntryContent(File file) throws IOException {
 		return string(file, "Spring-Cloud-2020.0-Release-Notes.md");
+	}
+
+	private String calverWithRCWikiEntryContent(File file) throws IOException {
+		return string(file, "Spring-Cloud-2024.0-Release-Notes.md");
 	}
 
 	private String string(File file, String s) throws IOException {
@@ -270,6 +293,29 @@ public class ReleaseTrainContentsUpdaterTests {
 				new ProjectVersion("spring-cloud-gateway", "2.0.1.RELEASE"),
 				new ProjectVersion("spring-cloud-openfeign", "2.0.1.RELEASE"),
 				new ProjectVersion("spring-cloud-function", "1.0.0.RELEASE"));
+	}
+
+	Projects newGACalver() {
+		return new Projects(
+				new ProjectVersion("spring-cloud-bus", "4.2.0"),
+				new ProjectVersion("spring-cloud-commons", "4.2.0"),
+				new ProjectVersion("spring-cloud-contract", "4.2.0"),
+				new ProjectVersion("spring-cloud-config", "4.2.0"),
+				new ProjectVersion("spring-cloud-consul", "4.2.0"),
+				new ProjectVersion("spring-cloud-netflix", "4.2.0"),
+				new ProjectVersion("spring-cloud-consul", "4.2.0"),
+				new ProjectVersion("spring-cloud-stream", "4.2.0"),
+				new ProjectVersion("spring-cloud-zookeeper", "4.2.0"),
+				new ProjectVersion("spring-boot", "3.4.0"),
+				new ProjectVersion("spring-cloud-task", "3.2.0"),
+				// newer release train, current version in file is 2024.0.0-RC1
+				new ProjectVersion("spring-cloud-release", "2024.0.0"),
+				new ProjectVersion("spring-cloud-vault", "4.2.0"),
+				new ProjectVersion("spring-cloud-gateway", "4.2.0"),
+				new ProjectVersion("spring-cloud-openfeign", "4.2.0"),
+				new ProjectVersion("spring-cloud-circuitbreaker", "3.2.0"),
+				new ProjectVersion("spring-cloud-kubernetes", "3.2.0"),
+				new ProjectVersion("spring-cloud-function", "4.2.0"));
 	}
 
 }

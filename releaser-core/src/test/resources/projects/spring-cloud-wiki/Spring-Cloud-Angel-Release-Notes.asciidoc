@@ -1,5 +1,4 @@
-Spring Cloud Angel focuses on providing good out of box experience for typical use cases and extensibility mechanism to cover others.
-Many of the features are implemented by Netflix OSS, with wrappers for Spring Boot apps being the main focus of Spring Cloud.
+Spring Cloud Angel focuses on providing good out of box experience for typical use cases and extensibility mechanism to cover others. Many of the features are implemented by Netflix OSS, with wrappers for Spring Boot apps being the main focus of Spring Cloud.
 
 - Distributed/versioned configuration (git, svn, spring-cloud-config)
 - Service registration and discovery (eureka, spring-cloud-netflix)
@@ -12,39 +11,28 @@ Many of the features are implemented by Netflix OSS, with wrappers for Spring Bo
 == Main Projects
 
 === Spring Cloud Config
-
-Centralized external configuration management backed by a git repository.
-The configuration resources map directly to Spring `Environment` but could be used by non-Spring applications if desired.
+Centralized external configuration management backed by a git repository. The configuration resources map directly to Spring `Environment` but could be used by non-Spring applications if desired.
 
 === Spring Cloud Netflix
-
 Integration with various Netflix OSS components (Eureka, Hystrix, Zuul, Archaius, etc.).
 
 === Spring Cloud Bus
-
-An event bus for linking services and service instances together with distributed messaging.
-Useful for propagating state changes across a cluster (e.g. config change events).
+An event bus for linking services and service instances together with distributed messaging. Useful for propagating state changes across a cluster (e.g. config change events).
 
 === Spring Cloud Security
-
 Provides support for load-balanced OAuth2 rest client and authentication header relays in a Zuul proxy.
 
 === Spring Cloud AWS
-
-Easy integration with hosted Amazon Web Services.
-It offers a convenient way to interact with AWS provided services using well-known Spring idioms and APIs, such as the messaging or caching API. Developers can build their application around the hosted services without having to care about infrastructure or maintenance.
+Easy integration with hosted Amazon Web Services. It offers a convenient way to interact with AWS provided services using well-known Spring idioms and APIs, such as the messaging or caching API. Developers can build their application around the hosted services without having to care about infrastructure or maintenance.
 
 === Spring Cloud Connectors
-
-Makes it easy for PaaS applications in a variety of platforms to connect to backend services like databases and message brokers (the project formerly known as "Spring Cloud").
+Makes it easy for PaaS applications in a variety of platforms to connect to backend services like
+databases and message brokers (the project formerly known as "Spring Cloud").
 
 === Spring Cloud Starters
-
-Spring Boot-style starter projects to ease dependency management for consumers of Spring Cloud.
-(Discontinued as a project and merged with the other projects after Angel.SR2.)
+Spring Boot-style starter projects to ease dependency management for consumers of Spring Cloud. (Discontinued as a project and merged with the other projects after Angel.SR2.)
 
 === Spring Cloud CLI
-
 Spring Boot CLI plugin for creating Spring Cloud component applications quickly in Groovy
 
 Spring Cloud Angel builds on Spring Boot 1.2.x, and parts of it (notably the OAuth2 support that moved to Spring Boot) does not work with Spring Boot 1.3.x.
