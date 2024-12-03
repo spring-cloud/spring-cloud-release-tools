@@ -131,20 +131,18 @@ public class ReleaseTrainContentsUpdaterTests {
 	}
 
 	@Test
-	public void should_update_the_contents_of_wiki_on_GA_when_previous_release_RC() throws GitAPIException, IOException {
+	public void should_update_the_contents_of_wiki_on_GA_when_previous_release_RC()
+			throws GitAPIException, IOException {
 		this.properties.getMetaRelease().setEnabled(true);
 		this.properties.getGit().setUpdateReleaseTrainWiki(true);
-		this.properties.getGit()
-				.setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
+		this.properties.getGit().setReleaseTrainWikiUrl(this.wikiRepo.getAbsolutePath() + "/");
 
 		File file = this.updater.updateReleaseTrainWiki(newGACalver());
 
 		BDDAssertions.then(file).isNotNull();
-		BDDAssertions.then(calverWithRCWikiEntryContent(file)).contains("# 2024.0.0")
-				.contains(
-						"Spring Cloud Consul `4.2.0` ([issues](https://github.com/spring-cloud/spring-cloud-consul/releases/tag/v4.2.0))");
-		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator()
-						.next().getShortMessage())
+		BDDAssertions.then(calverWithRCWikiEntryContent(file)).contains("# 2024.0.0").contains(
+				"Spring Cloud Consul `4.2.0` ([issues](https://github.com/spring-cloud/spring-cloud-consul/releases/tag/v4.2.0))");
+		BDDAssertions.then(GitTestUtils.openGitProject(file).log().call().iterator().next().getShortMessage())
 				.contains("Updating project page to release train [2024.0.0]");
 	}
 
@@ -296,22 +294,17 @@ public class ReleaseTrainContentsUpdaterTests {
 	}
 
 	Projects newGACalver() {
-		return new Projects(
-				new ProjectVersion("spring-cloud-bus", "4.2.0"),
+		return new Projects(new ProjectVersion("spring-cloud-bus", "4.2.0"),
 				new ProjectVersion("spring-cloud-commons", "4.2.0"),
 				new ProjectVersion("spring-cloud-contract", "4.2.0"),
-				new ProjectVersion("spring-cloud-config", "4.2.0"),
-				new ProjectVersion("spring-cloud-consul", "4.2.0"),
-				new ProjectVersion("spring-cloud-netflix", "4.2.0"),
-				new ProjectVersion("spring-cloud-consul", "4.2.0"),
+				new ProjectVersion("spring-cloud-config", "4.2.0"), new ProjectVersion("spring-cloud-consul", "4.2.0"),
+				new ProjectVersion("spring-cloud-netflix", "4.2.0"), new ProjectVersion("spring-cloud-consul", "4.2.0"),
 				new ProjectVersion("spring-cloud-stream", "4.2.0"),
-				new ProjectVersion("spring-cloud-zookeeper", "4.2.0"),
-				new ProjectVersion("spring-boot", "3.4.0"),
+				new ProjectVersion("spring-cloud-zookeeper", "4.2.0"), new ProjectVersion("spring-boot", "3.4.0"),
 				new ProjectVersion("spring-cloud-task", "3.2.0"),
 				// newer release train, current version in file is 2024.0.0-RC1
 				new ProjectVersion("spring-cloud-release", "2024.0.0"),
-				new ProjectVersion("spring-cloud-vault", "4.2.0"),
-				new ProjectVersion("spring-cloud-gateway", "4.2.0"),
+				new ProjectVersion("spring-cloud-vault", "4.2.0"), new ProjectVersion("spring-cloud-gateway", "4.2.0"),
 				new ProjectVersion("spring-cloud-openfeign", "4.2.0"),
 				new ProjectVersion("spring-cloud-circuitbreaker", "3.2.0"),
 				new ProjectVersion("spring-cloud-kubernetes", "3.2.0"),

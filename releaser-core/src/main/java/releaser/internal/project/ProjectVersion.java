@@ -824,6 +824,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		public int compareTo(TrainVersionNumber o) {
 			ProjectVersion thisVersion = this.version;
 			ProjectVersion thatVersion = o.version;
+			// "" vs ""
+			if (!thatVersion.isValid() && !thisVersion.isValid()) {
+				return 0;
+			}
 			// 2020.0.0 vs ""
 			if (!thatVersion.isValid() && thisVersion.isValid()) {
 				return 1;
@@ -902,7 +906,8 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		private int calVerSuffixComparison(ProjectVersion thatVersion) {
 			// With calVer if this project version doesn't have suffix,
-			// and the other has suffix, but is not snapshot is when this project version is a GA
+			// and the other has suffix, but is not snapshot is when this project version
+			// is a GA
 			// and the other project version is a milestone or RC
 			if (this.version.assertVersion().suffix.isEmpty()) {
 				if (!(thatVersion.assertVersion().suffix.isEmpty() || thatVersion.isSnapshot())) {

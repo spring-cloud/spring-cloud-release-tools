@@ -37,7 +37,7 @@ public class ReleaseTrainContentsParserTests {
 	public void should_retrieve_latest_release_version_name() {
 		String releaseTrain = new ReleaseTrainContentsParser().latestReleaseTrainFromWiki(this.finchley);
 
-		BDDAssertions.then(releaseTrain).isEqualTo("Finchley.SR2");
+		BDDAssertions.then(releaseTrain).isEqualTo("Finchley.SR4");
 	}
 
 }
