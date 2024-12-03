@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ enum ReleaseType {
  * version;
  *
  * @author Marcin Grzejszczak
+ * @author Olga Maciaszek-Sharma
  */
 public class ProjectVersion implements Comparable<ProjectVersion>, Serializable {
 
@@ -823,6 +824,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		public int compareTo(TrainVersionNumber o) {
 			ProjectVersion thisVersion = this.version;
 			ProjectVersion thatVersion = o.version;
+			// "" vs ""
+			if (!thatVersion.isValid() && !thisVersion.isValid()) {
+				return 0;
+			}
 			// 2020.0.0 vs ""
 			if (!thatVersion.isValid() && thisVersion.isValid()) {
 				return 1;
@@ -841,6 +846,9 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			}
 			else if (thatOldTrain) {
 				return -1 * compareWithOldTrain(thisVersion, thatVersion);
+			}
+			if (thisVersion.major().equals(thatVersion.major())) {
+				return calVerSuffixComparison(thatVersion);
 			}
 			// new train comparison
 			return thisVersion.compareTo(thatVersion);
@@ -894,6 +902,20 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			Integer thisNumber = Integer.valueOf(thisVersion);
 			Integer thatNumber = Integer.valueOf(thatVersion);
 			return thisNumber.compareTo(thatNumber);
+		}
+
+		private int calVerSuffixComparison(ProjectVersion thatVersion) {
+			// With calVer if this project version doesn't have suffix,
+			// and the other has suffix, but is not snapshot is when this project version
+			// is a GA
+			// and the other project version is a milestone or RC
+			if (this.version.assertVersion().suffix.isEmpty()) {
+				if (!(thatVersion.assertVersion().suffix.isEmpty() || thatVersion.isSnapshot())) {
+					return 1;
+				}
+			}
+			return this.version.compareTo(thatVersion);
+
 		}
 
 	}

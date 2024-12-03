@@ -1,5 +1,65 @@
 Spring Cloud Finchley builds on Spring Boot 2.0.x and is not compatible with 1.x.y.
 
+
+
+
+
+# Finchley.SR4
+
+2019-06-08
+
+ - Spring Cloud Commons `2.0.4.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-commons/milestone/60?closed=1))
+ - Spring Cloud Openfeign `2.0.4.RELEASE` 
+ - Spring Cloud Dependencies `Finchley.SR4` 
+ - Spring Cloud Release `Finchley.SR4` 
+ - Spring Cloud Starter `Finchley.SR4` 
+ - Spring Cloud Stream `Elmhurst.SR3` 
+ - Spring Cloud Cloudfoundry `2.0.2.RELEASE` 
+ - Spring Cloud Task `2.0.2.RELEASE` 
+ - Spring Cloud Build `2.0.6.RELEASE` 
+ - Spring Cloud Vault `2.0.4.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-vault/milestone/32?closed=1))
+ - Spring Cloud Zookeeper `2.0.2.RELEASE` 
+ - Spring Cloud Config `2.0.5.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-config/milestone/65?closed=1))
+ - Spring Cloud Aws `2.0.3.RELEASE` 
+ - Spring Cloud Bus `2.0.2.RELEASE` 
+ - Spring Cloud `Finchley.SR4` 
+ - Spring Cloud Security `2.0.2.RELEASE` 
+ - Spring Cloud Gateway `2.0.4.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-gateway/milestone/23?closed=1))
+ - Spring Cloud Netflix `2.0.4.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-netflix/milestone/78?closed=1))
+ - Spring Cloud Sleuth `2.0.4.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/milestone/61?closed=1))
+ - Spring Cloud Consul `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-consul/milestone/36?closed=1))
+ - Spring Cloud Contract `2.0.4.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-contract/milestone/52?closed=1))
+ - Spring Cloud Function `1.0.2.RELEASE` 
+
+
+# Finchley.SR3
+
+2019-02-22
+
+ - Spring Cloud Config `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-config/milestone/57?closed=1))
+ - Spring Cloud Function `1.0.0.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-function/milestone/7?closed=1))
+ - Spring Cloud Starter `Finchley.SR3` 
+ - Spring Cloud Release `Finchley.SR3` 
+ - Spring Cloud Stream `Elmhurst.SR2` 
+ - Spring Cloud Sleuth `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-sleuth/milestone/60?closed=1))
+ - Spring Cloud Cloudfoundry `2.0.1.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-cloudfoundry/milestone/10?closed=1))
+ - Spring Cloud Zookeeper `2.0.1.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-zookeeper/milestone/25?closed=1))
+ - Spring Cloud Aws `2.0.2.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-aws/milestone/25?closed=1))
+ - Spring Cloud Task `2.0.1.RELEASE` 
+ - Spring Cloud Commons `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-commons/milestone/55?closed=1))
+ - Spring Cloud Build `2.0.5.RELEASE` 
+ - Spring Cloud Openfeign `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-openfeign/milestone/8?closed=1))
+ - Spring Cloud Vault `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-vault/milestone/26?closed=1))
+ - Spring Cloud `Finchley.SR3` 
+ - Spring Cloud Security `2.0.1.RELEASE` 
+ - Spring Cloud Bus `2.0.1.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-bus/milestone/33?closed=1))
+ - Spring Cloud Contract `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-contract/milestone/44?closed=1))
+ - Spring Cloud Consul `2.0.2.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-consul/milestone/36?closed=1))
+ - Spring Cloud Gateway `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-gateway/milestone/19?closed=1))
+ - Spring Cloud Dependencies `Finchley.SR3` 
+ - Spring Cloud Netflix `2.0.3.RELEASE` ([issues](https://github.com/spring-cloud/spring-cloud-netflix/milestone/72?closed=1))
+
+
 # Finchley.SR2
 
 2018-10-23
