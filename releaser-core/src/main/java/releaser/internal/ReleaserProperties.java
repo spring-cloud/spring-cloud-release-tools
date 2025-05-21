@@ -616,6 +616,21 @@ public class ReleaserProperties implements Serializable {
 		private boolean updateAllTestSamples = false;
 
 		/**
+		 * If set to {@code true}, we will sign any commits we make. In order to do this
+		 * GPG must contain the keys for the spring-builds user. This flag can be used to
+		 * override signing preferences in the Git config. For example, JGit will sign
+		 * commits/tags if signing is enabled the Git config (either repo config or global
+		 * config). If you do not want to sign anything then you can set this flag to
+		 * false and the releaser will not attempt to sign anything. The same is true if
+		 * signing is set to false in your Git config but you would like the releaser to
+		 * sign commits/tags, setting this flag to true would enable signing to take
+		 * place.
+		 */
+		private boolean signCommits = false;
+
+		private String signingKeyPassphrase;
+
+		/**
 		 * Project to urls mapping. For each project will clone the test project and will
 		 * update its versions.
 		 */
@@ -877,6 +892,22 @@ public class ReleaserProperties implements Serializable {
 			this.cacheDirectory = cacheDirectory;
 		}
 
+		public boolean isSignCommits() {
+			return signCommits;
+		}
+
+		public void setSignCommits(boolean signCommits) {
+			this.signCommits = signCommits;
+		}
+
+		public String getSigningKeyPassphrase() {
+			return signingKeyPassphrase;
+		}
+
+		public void setSigningKeyPassphrase(String signingKeyPassphrase) {
+			this.signingKeyPassphrase = signingKeyPassphrase;
+		}
+
 		@Override
 		public String toString() {
 			return "Git{" + "releaseTrainBomUrl='" + this.releaseTrainBomUrl + '\'' + ", documentationUrl='"
@@ -888,7 +919,8 @@ public class ReleaserProperties implements Serializable {
 					+ ", cloneDestinationDir='" + this.cloneDestinationDir + '\'' + ", fetchVersionsFromGit="
 					+ this.fetchVersionsFromGit + ", numberOfCheckedMilestones=" + this.numberOfCheckedMilestones
 					+ ", updateSpringGuides=" + this.updateSpringGuides + ", updateSpringProject="
-					+ this.updateSpringProject + ", sampleUrlsSize=" + this.allTestSampleUrls.size() + '}';
+					+ this.updateSpringProject + ", sampleUrlsSize=" + this.allTestSampleUrls.size() + ", signCommits="
+					+ this.signCommits + '}';
 		}
 
 		private static String temporaryDirectory() {

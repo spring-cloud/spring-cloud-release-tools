@@ -58,6 +58,7 @@ public class GitRepoTests {
 		this.springCloudReleaseProject = new File(
 				GitRepoTests.class.getResource("/projects/spring-cloud-release").toURI());
 		TestUtils.prepareLocalRepo();
+		// Use the constructor with signing disabled for most tests
 		this.gitRepo = new GitRepo(this.tmpFolder);
 	}
 

@@ -96,6 +96,11 @@
 			<artifactId>artifactory-java-client-services</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit.gpg.bc</artifactId>
+			<version>${org.eclipse.jgit-version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
 		</dependency>
