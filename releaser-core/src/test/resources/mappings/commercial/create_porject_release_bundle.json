@@ -2,7 +2,7 @@
   "id" : "0b389dc6-1b73-487d-8122-41f1c974647f",
   "name" : "create_project_release_bundle_mapping",
   "request" : {
-    "url" : "/lifecycle/api/v2/release_bundle?project=spring",
+    "url" : "/lifecycle/api/v2/release_bundle?async=false&project=spring",
     "method" : "POST",
     "bodyPatterns" : [ {
       "equalToJson" : "{\"release_bundle_version\":\"4.0.7\",\"release_bundle_name\":\"TNZ-spring-cloud-build-commercial\",\"source_type\":\"aql\",\"source\":{\"aql\":\"items.find({\\\"repo\\\":{\\\"$eq\\\":\\\"spring-enterprise-maven-prod-local\\\"},\\\"$or\\\":[{\\\"path\\\":{\\\"$match\\\":\\\"org/springframework/cloud/spring-cloud-build*/4.0.7\\\"}},{\\\"path\\\":{\\\"$match\\\":\\\"org/springframework/cloud/spring-cloud-starter-build*/4.0.7\\\"}},{\\\"path\\\":{\\\"$match\\\":\\\"org/springframework/cloud/spring-cloud-dependencies-parent*/4.0.7\\\"}}]}).sort({\\\"$asc\\\":[\\\"path\\\",\\\"name\\\"]})\"}}",

@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.jcraft.jsch.IdentityRepository;
@@ -48,12 +49,16 @@ import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.EmptyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.UnsupportedCredentialItem;
+import org.eclipse.jgit.lib.ConfigConstants;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileBasedConfig;
+import org.eclipse.jgit.transport.CredentialItem;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.RefSpec;
@@ -85,9 +90,17 @@ class GitRepo {
 
 	private final File basedir;
 
+	private boolean signCommits = false;
+
 	GitRepo(File basedir, ReleaserProperties properties) {
 		this.basedir = basedir;
 		this.gitFactory = new GitRepo.JGitFactory(properties);
+		this.signCommits = properties.getGit().isSignCommits();
+		if (this.signCommits) {
+			log.info("GitRepo signCommits enabled");
+			CredentialsProvider
+					.setDefault(new SigningCredentialsProvider(properties.getGit().getSigningKeyPassphrase()));
+		}
 	}
 
 	// for tests
@@ -173,13 +186,14 @@ class GitRepo {
 	void commit(String message) {
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
 			git.add().addFilepattern(".").call();
-			git.commit().setAllowEmpty(false).setMessage(message).call();
+			git.commit().setSign(this.signCommits).setAllowEmpty(false).setMessage(message).call();
 			printLog(git);
 		}
 		catch (EmptyCommitException e) {
 			log.info("There were no changes detected. Will not commit an empty commit");
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new IllegalStateException(e);
 		}
 	}
@@ -334,7 +348,7 @@ class GitRepo {
 	 */
 	void tag(String tagName) {
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
-			git.tag().setName(tagName).call();
+			git.tag().setSigned(this.signCommits).setName(tagName).call();
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -384,7 +398,26 @@ class GitRepo {
 	}
 
 	void revert(String message) {
+		Boolean originalGpgSign = null;
 		try (Git git = this.gitFactory.open(file(this.basedir))) {
+			// The revert API has no way to disable signing if the global git config has
+			// it enabled
+			// In order to make sure revert commits are not signed when we disable signing
+			// we have to set
+			// signing to false in the repos git config
+			if (!this.signCommits) {
+				FileBasedConfig clonedConfig = new FileBasedConfig(new File(file(this.basedir), ".git/config"),
+						FS.DETECTED);
+				clonedConfig.load();
+				Set<String> names = clonedConfig.getNames(ConfigConstants.CONFIG_COMMIT_SECTION);
+				if (names.contains(ConfigConstants.CONFIG_KEY_GPGSIGN)) {
+					originalGpgSign = clonedConfig.getBoolean(ConfigConstants.CONFIG_COMMIT_SECTION,
+							ConfigConstants.CONFIG_KEY_GPGSIGN, false);
+				}
+				clonedConfig.setBoolean(ConfigConstants.CONFIG_COMMIT_SECTION, null, ConfigConstants.CONFIG_KEY_GPGSIGN,
+						false);
+				clonedConfig.save();
+			}
 			RevCommit commit = git.log().setMaxCount(1).call().iterator().next();
 			String shortMessage = commit.getShortMessage();
 			String id = commit.getId().getName();
@@ -395,12 +428,28 @@ class GitRepo {
 			}
 			log.debug("The commit to be reverted is [{}]", commit);
 			git.revert().include(commit).call();
-			git.commit().setAmend(true).setMessage(message).call();
+			git.commit().setSign(this.signCommits).setAmend(true).setMessage(message).call();
 			printLog(git);
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+		finally {
+			if (originalGpgSign != null) {
+				try {
+					FileBasedConfig clonedConfig = new FileBasedConfig(new File(file(this.basedir), ".git/config"),
+							FS.DETECTED);
+					clonedConfig.load();
+					clonedConfig.setBoolean(ConfigConstants.CONFIG_COMMIT_SECTION, null,
+							ConfigConstants.CONFIG_KEY_GPGSIGN, originalGpgSign);
+					clonedConfig.save();
+				}
+				catch (Exception e) {
+					log.warn("Could not revert gpg signing configuration within cloned repo.", e);
+				}
+			}
+		}
+
 	}
 
 	String currentBranch() {
@@ -616,6 +665,53 @@ class GitRepo {
 			catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
+		}
+
+	}
+
+	static class SigningCredentialsProvider extends CredentialsProvider {
+
+		private final String passphrase;
+
+		SigningCredentialsProvider(String passphrase) {
+			this.passphrase = passphrase;
+		}
+
+		@Override
+		public boolean isInteractive() {
+			return false;
+		}
+
+		@Override
+		public boolean supports(CredentialItem... items) {
+			for (CredentialItem i : items) {
+				if (i instanceof CredentialItem.Password) {
+					continue;
+				}
+				if (i instanceof CredentialItem.StringType) {
+					if (i.getPromptText().equals("Password: ")) {
+						continue;
+					}
+				}
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public boolean get(URIish uri, CredentialItem... items) throws UnsupportedCredentialItem {
+			for (CredentialItem item : items) {
+				if (item instanceof CredentialItem.Password) {
+					log.info("Password credential found, setting value.");
+					if (!StringUtils.hasText(passphrase)) {
+						log.warn("Password credential found, but passphrase is empty, did you forget to set "
+								+ "releaser.git.signing-key-passphrase?");
+						return false;
+					}
+					((CredentialItem.Password) item).setValue(passphrase.trim().toCharArray());
+				}
+			}
+			return true;
 		}
 
 	}
