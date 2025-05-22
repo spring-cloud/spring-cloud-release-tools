@@ -111,6 +111,31 @@ image::https://raw.githubusercontent.com/spring-cloud/spring-cloud-release-tools
 . Clear the Start_From field
 . Click Rebuild
 
+=== Signing Commits and Tags
+
+The releaser can sign commits and tags when doing a release.  Signing is enabled when the flag `releaser.git.signCommits`
+is set to `true`, by default it is set to `false`.  When set to `true` you also need to set `releaser.git.signing-key-passphrase`
+to the passphrase for the key being used to sign commits.  The key used to sign commits is configured in either global or
+git repo config properties.  You can set the key to use by doing the following:
+
+```bash
+$ gpg --list-secret-keys
+$ git config --global user.signingkey
+```
+
+This will get you a list of ids of secret keys know by GPG.  Select the id of the key you want to use to sign commits
+and then set that id in your git config:
+
+```bash
+$ git config [--global] user.signingkey [keyid]
+```
+
+The releaser (JGit) will use this key along with the passphrase you set to sign commits and tags.
+
+Signing commits/tags can be enabled/disabled in Jenkins by checking the following box during a release:
+
+image::images/sign-commits.png[]
+
 === Commercial Releases
 
 See https://docs.google.com/document/d/10pk6b2Cy0OW9fzFKEHSRIys-2Z_rseqnu7CIYFXnJoM/edit#heading=h.slor8nyo3f1n[this document] from Trevor for more information on the requirement to create release bundles
