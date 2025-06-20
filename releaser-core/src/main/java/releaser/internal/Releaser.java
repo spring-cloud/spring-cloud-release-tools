@@ -159,9 +159,14 @@ public class Releaser {
 
 	public ExecutionResult publishDocs(ReleaserProperties properties, File project) {
 		File springDocsActionsProject = this.projectGitHandler.cloneAndCheckoutSpringDocsActions();
-		this.projectCommandExecutor.publishAntoraDocs(springDocsActionsProject, project, properties);
-		log.info("\nThe docs were published successfully");
-		return ExecutionResult.success();
+		try {
+			this.projectCommandExecutor.publishAntoraDocs(springDocsActionsProject, project, properties);
+			log.info("\nThe docs were published successfully");
+			return ExecutionResult.success();
+		}
+		catch (IllegalStateException e) {
+			return ExecutionResult.unstable(e);
+		}
 	}
 
 	public ExecutionResult rollbackReleaseVersion(File project, Projects projects, ProjectVersion scReleaseVersion) {
