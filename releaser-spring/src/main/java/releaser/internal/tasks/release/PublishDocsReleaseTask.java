@@ -59,7 +59,7 @@ public class PublishDocsReleaseTask implements ReleaseReleaserTask {
 		if (this.releaser.buildAntoraDocs(args.project).isSuccess()) {
 			return this.releaser.publishDocs(args.properties, args.project);
 		}
-		return ExecutionResult.failure(new RuntimeException("Failed to build Antora docs"));
+		return ExecutionResult.unstable(new RuntimeException("Failed to build Antora docs"));
 	}
 
 	@Override
