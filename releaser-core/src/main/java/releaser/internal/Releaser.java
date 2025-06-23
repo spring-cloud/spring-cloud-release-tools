@@ -98,12 +98,16 @@ public class Releaser {
 	}
 
 	public ExecutionResult buildAntoraDocs(File project) {
-		String currentBranch = projectGitHandler.currentBranch(project);
-		projectGitHandler.cloneAndCheckoutDocsBuild(project);
-		this.projectCommandExecutor.runAntora(this.releaserProperties, originalVersion(project),
-				new ProjectVersion(project), project.getAbsolutePath());
-		projectGitHandler.checkout(project, currentBranch);
-		return ExecutionResult.success();
+		try {
+			String currentBranch = projectGitHandler.currentBranch(project);
+			projectGitHandler.cloneAndCheckoutDocsBuild(project);
+			this.projectCommandExecutor.runAntora(this.releaserProperties, originalVersion(project),
+					new ProjectVersion(project), project.getAbsolutePath());
+			projectGitHandler.checkout(project, currentBranch);
+			return ExecutionResult.success();
+		} catch (Exception e) {
+			return ExecutionResult.unstable(e);
+		}
 	}
 
 	public Projects retrieveVersionsFromBom() {
