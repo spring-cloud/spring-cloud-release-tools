@@ -105,7 +105,8 @@ public class Releaser {
 					new ProjectVersion(project), project.getAbsolutePath());
 			projectGitHandler.checkout(project, currentBranch);
 			return ExecutionResult.success();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return ExecutionResult.unstable(e);
 		}
 	}
