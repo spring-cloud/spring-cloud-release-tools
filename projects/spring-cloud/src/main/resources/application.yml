@@ -58,7 +58,7 @@ releaser:
       - "^.*src/test/bats/.*$"
       - "^.*samples/standalone/[a-z]+/.*$"
   maven:
-    build-command: "./mvnw clean install -B -Pdocs {{systemProps}}"
+    build-command: "./mvnw clean install -B {{systemProps}}"
     deploy-command: "./mvnw deploy -DskipTests -B -Pfast,deploy {{systemProps}}"
     deploy-guides-command: "./mvnw clean verify deploy -B -Pguides,integration -pl guides {{systemProps}}"
     publish-docs-command: "./mvnw deploy -DskipTests -B -Pfast,deploy,docs -pl docs {{systemProps}}"
