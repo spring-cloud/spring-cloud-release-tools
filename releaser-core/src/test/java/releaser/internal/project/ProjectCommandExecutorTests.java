@@ -264,8 +264,7 @@ public class ProjectCommandExecutorTests {
 
 		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.M1"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo -Pmilestone")
-				.doesNotContain("-Pguides");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo -Pcentral").doesNotContain("-Pguides");
 	}
 
 	@Test
@@ -290,8 +289,7 @@ public class ProjectCommandExecutorTests {
 
 		builder.deploy(properties, original(), new ProjectVersion("foo", "1.0.0.RC1"));
 
-		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo -Pmilestone")
-				.doesNotContain("-Pguides");
+		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("foo -Pcentral").doesNotContain("-Pguides");
 	}
 
 	@Test

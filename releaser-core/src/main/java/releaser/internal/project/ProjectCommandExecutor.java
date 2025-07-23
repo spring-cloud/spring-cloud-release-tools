@@ -463,16 +463,12 @@ class CommandPicker {
 
 	private String appendMavenProfile(String command, ProjectVersion version, MavenProfile... profiles) {
 		String trimmedCommand = command.trim();
-		if (version.isMilestone() || version.isRc()) {
-			log.info("Adding the milestone profile to the Maven build");
-			return withProfile(trimmedCommand, MavenProfile.MILESTONE.asMavenProfile(), profiles);
-		}
-		else if (version.isRelease() || version.isServiceRelease()) {
+		if (version.isMilestone() || version.isRc() || version.isRelease() || version.isServiceRelease()) {
 			log.info("Adding the central profile to the Maven build");
 			return withProfile(trimmedCommand, MavenProfile.CENTRAL.asMavenProfile(), profiles);
 		}
 		else {
-			log.info("The version [" + version.toString() + "] is a snapshot one - will not add any profiles");
+			log.info("The version [" + version + "] is a snapshot one - will not add any profiles");
 		}
 		return trimmedCommand;
 	}
