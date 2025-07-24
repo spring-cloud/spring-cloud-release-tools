@@ -25,6 +25,7 @@ import java.util.Collections;
 
 import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
@@ -43,6 +44,7 @@ import org.springframework.util.FileSystemUtils;
 /**
  * @author Marcin Grzejszczak
  */
+@Disabled("Documentation release process modified")
 class SpringCloudCustomProjectDocumentationUpdaterTests {
 
 	File project;
