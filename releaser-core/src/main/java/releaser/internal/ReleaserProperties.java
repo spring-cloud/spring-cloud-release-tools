@@ -480,19 +480,7 @@ public class ReleaserProperties implements Serializable {
 
 		private String springDocsSshHostKey;
 
-		private String gcpProjectId;
-
 		private String gcpBucketName;
-
-		private String gcpObjectId;
-
-		public String getGcpProjectId() {
-			return gcpProjectId;
-		}
-
-		public void setGcpProjectId(String gcpProjectId) {
-			this.gcpProjectId = gcpProjectId;
-		}
 
 		public String getGcpBucketName() {
 			return gcpBucketName;
@@ -500,14 +488,6 @@ public class ReleaserProperties implements Serializable {
 
 		public void setGcpBucketName(String gcpBucketName) {
 			this.gcpBucketName = gcpBucketName;
-		}
-
-		public String getGcpObjectId() {
-			return gcpObjectId;
-		}
-
-		public void setGcpObjectId(String getObjectId) {
-			this.gcpObjectId = getObjectId;
 		}
 
 		public String getSpringDocsActionsUrl() {

@@ -60,8 +60,6 @@ public class CommercialAntoraDocsPublisher implements AntoraDocsPublisher {
 	public void publish(File project, ReleaserProperties properties) throws IOException {
 		checkAndLog();
 		String antoraSite = project.getAbsolutePath() + "/target/antora/site";
-		// TransferManager transferManager =
-		// TransferManagerConfig.newBuilder().build().getService();
 		ParallelUploadConfig.UploadBlobInfoFactory uploadBlobInfoFactory = (String bucketName, String fileName) -> {
 			ProjectVersion version = new ProjectVersion(project);
 			String blobLocation = version.projectName + "/reference" + fileName.substring(antoraSite.length());
