@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import jakarta.validation.constraints.NotBlank;
-import org.apache.commons.lang.SerializationUtils;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
@@ -479,6 +479,36 @@ public class ReleaserProperties implements Serializable {
 		private String springDocsSshKeyPath;
 
 		private String springDocsSshHostKey;
+
+		private String gcpProjectId;
+
+		private String gcpBucketName;
+
+		private String gcpObjectId;
+
+		public String getGcpProjectId() {
+			return gcpProjectId;
+		}
+
+		public void setGcpProjectId(String gcpProjectId) {
+			this.gcpProjectId = gcpProjectId;
+		}
+
+		public String getGcpBucketName() {
+			return gcpBucketName;
+		}
+
+		public void setGcpBucketName(String gcpBucketName) {
+			this.gcpBucketName = gcpBucketName;
+		}
+
+		public String getGcpObjectId() {
+			return gcpObjectId;
+		}
+
+		public void setGcpObjectId(String getObjectId) {
+			this.gcpObjectId = getObjectId;
+		}
 
 		public String getSpringDocsActionsUrl() {
 			return springDocsActionsUrl;

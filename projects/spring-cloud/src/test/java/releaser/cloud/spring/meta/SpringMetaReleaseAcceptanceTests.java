@@ -23,12 +23,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.h2.store.fs.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.BDDMockito;
 import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.commercial.ReleaseBundleCreator;
+import releaser.internal.docs.AntoraDocsPublisher;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.GitTestUtils;
 import releaser.internal.options.OptionsBuilder;
@@ -55,6 +57,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.util.FileSystemUtils;
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -62,6 +65,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -405,8 +409,8 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	private SpringApplicationBuilder defaultRunner() {
-		return new SpringApplicationBuilder(MetaReleaseConfig.class, MetaReleaseScanningConfiguration.class)
-				.web(WebApplicationType.NONE).properties("spring.jmx.enabled=false");
+		return new SpringApplicationBuilder(MetaReleaseConfig.class, MetaReleaseScanningConfiguration.class,
+				MetaReleaseDocsConfiguration.class).web(WebApplicationType.NONE).properties("spring.jmx.enabled=false");
 	}
 
 	private SpringApplicationBuilder failingBuildRunner() {
@@ -453,7 +457,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 
 		@Bean
 		SaganClient testSaganClient() {
-			SaganClient saganClient = BDDMockito.mock(SaganClient.class);
+			SaganClient saganClient = mock(SaganClient.class);
 			given(saganClient.getProject(anyString())).willReturn(newProject());
 			given(saganClient.addRelease(anyString(), any())).willReturn(true);
 			given(saganClient.deleteRelease(anyString(), anyString())).willReturn(true);
@@ -462,7 +466,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 
 		@Bean
 		ReleaseBundleCreator testReleaseBundleCreator() throws IOException {
-			ReleaseBundleCreator creator = BDDMockito.mock(ReleaseBundleCreator.class);
+			ReleaseBundleCreator creator = mock(ReleaseBundleCreator.class);
 			given(creator.createReleaseBundle(any(), anyString(), anyString())).willReturn(true);
 			given(creator.createReleaseTrainSourceBundle(any(), anyString())).willReturn(true);
 			given(creator.distributeReleaseTrainSourceBundle(anyString())).willReturn(true);
@@ -482,7 +486,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 
 		@Bean
 		PostReleaseActions myPostReleaseActions() {
-			return BDDMockito.mock(PostReleaseActions.class,
+			return mock(PostReleaseActions.class,
 					invocation -> invocation.getMethod().getReturnType().equals(ExecutionResult.class)
 							? ExecutionResult.success() : null);
 		}
@@ -501,7 +505,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 
 		@Bean
 		DocumentationUpdater testDocumentationUpdater() {
-			return BDDMockito.mock(DocumentationUpdater.class);
+			return mock(DocumentationUpdater.class);
 		}
 
 	}
@@ -510,6 +514,26 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	@ConditionalOnProperty(value = "test.metarelease", havingValue = "true", matchIfMissing = true)
 	@ComponentScan({ "releaser.internal", "releaser.cloud" })
 	static class MetaReleaseScanningConfiguration {
+
+	}
+
+	@Configuration
+	@ConditionalOnProperty(value = "test.metarelease", havingValue = "true", matchIfMissing = true)
+	@ComponentScan({ "releaser.internal", "releaser.cloud" })
+	static class MetaReleaseDocsConfiguration {
+
+		@Bean
+		@ConditionalOnProperty(value = "releaser.commercial", havingValue = "true")
+		@Primary
+		AntoraDocsPublisher testAntoraDocsPublisher() {
+			return new AntoraDocsPublisher() {
+
+				@Override
+				public void publish(File project, ReleaserProperties properties) throws IOException {
+					FileUtils.createFile("/tmp/executed_docs");
+				}
+			};
+		}
 
 	}
 
