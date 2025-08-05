@@ -201,3 +201,26 @@ To authenticate to that repo and verify the artifacts are present follow the ins
 
 NOTE:  For Broadcom employees access to the Broadcom Customer Support Portal can be found under Okta.
 
+==== Antora Docs For Commercial Projects
+
+Antora docs for commercial projects will be published to a Google Cloud Storage Bucket.
+
+The bucket name to use can be set by setting `releaser.antora.gcp-bucket-name`.
+
+===== Authentication
+
+Authentication to Google Cloud Storage is done by setting the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to
+the path to the JSON file containing the service account secret.
+
+In addition to authenticating with Google Cloud Antora will also need Git credentials to checkout the commercial repos.
+Antora uses the environment variable `GIT_CREDENTIALS` to authenticate.  For example:
+
+```bash
+$ export GIT_CREDENTIALS = https://GITHUB_PERSONAL_ACCESS_TOKEN:@github.com
+```
+
+or
+
+```bash
+$ export GIT_CREDENTIALS = https://GITHUB_USERNAME:GITHUB_PASSWORD@github.com
+```

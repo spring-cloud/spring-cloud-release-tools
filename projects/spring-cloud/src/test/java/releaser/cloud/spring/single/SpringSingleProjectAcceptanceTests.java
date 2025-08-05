@@ -174,7 +174,7 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 	// during a release.
 	// We use Spring Cloud Bus as an example project and override the test antora build
 	// and sync commands in the ArgsBuilder
-	// configuration. The anotra command is the actual antora command to build the docs.
+	// configuration. The antora command is the actual antora command to build the docs.
 	// The docs sync command checks that the index.html
 	// file for the release and the snapshot exist.
 	@Test
