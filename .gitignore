@@ -28,3 +28,4 @@ nbdist/
 _site
 effective.pom
 .sdkmanrc
+.vscode

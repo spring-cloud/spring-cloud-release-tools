@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
 import releaser.internal.commercial.ReleaseBundleCreator;
+import releaser.internal.docs.AntoraDocsPublisher;
 import releaser.internal.docs.DocumentationUpdater;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.github.ProjectGitHubHandler;
@@ -71,6 +72,8 @@ public class Releaser {
 
 	private final PostReleaseActions postReleaseActions;
 
+	private final AntoraDocsPublisher anotraDocsPublisher;
+
 	private ReleaserProperties releaserProperties;
 
 	private ReleaseBundleCreator releaseBundleCreator;
@@ -79,7 +82,7 @@ public class Releaser {
 			ProjectCommandExecutor projectCommandExecutor, ProjectGitHandler projectGitHandler,
 			ProjectGitHubHandler projectGitHubHandler, TemplateGenerator templateGenerator, GradleUpdater gradleUpdater,
 			SaganUpdater saganUpdater, DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions,
-			ReleaseBundleCreator releaseBundleCreator) {
+			ReleaseBundleCreator releaseBundleCreator, AntoraDocsPublisher antoraDocsPublisher) {
 		this.releaserProperties = releaserProperties;
 		this.projectPomUpdater = projectPomUpdater;
 		this.projectCommandExecutor = projectCommandExecutor;
@@ -91,6 +94,7 @@ public class Releaser {
 		this.documentationUpdater = documentationUpdater;
 		this.postReleaseActions = postReleaseActions;
 		this.releaseBundleCreator = releaseBundleCreator;
+		this.anotraDocsPublisher = antoraDocsPublisher;
 	}
 
 	public File clonedProjectFromOrg(String projectName) {
@@ -163,13 +167,12 @@ public class Releaser {
 	}
 
 	public ExecutionResult publishDocs(ReleaserProperties properties, File project) {
-		File springDocsActionsProject = this.projectGitHandler.cloneAndCheckoutSpringDocsActions();
 		try {
-			this.projectCommandExecutor.publishAntoraDocs(springDocsActionsProject, project, properties);
+			this.anotraDocsPublisher.publish(project, properties);
 			log.info("\nThe docs were published successfully");
 			return ExecutionResult.success();
 		}
-		catch (IllegalStateException e) {
+		catch (Exception e) {
 			return ExecutionResult.unstable(e);
 		}
 	}

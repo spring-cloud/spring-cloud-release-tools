@@ -100,6 +100,7 @@ public class ReleaserTests {
 					public boolean createReleaseBundle(String json) throws IOException {
 						return true;
 					}
+				}, (project, properties) -> {
 				}) {
 			@Override
 			ProjectVersion originalVersion(File project) {
@@ -117,6 +118,7 @@ public class ReleaserTests {
 					public boolean createReleaseBundle(String json) throws IOException {
 						return true;
 					}
+				}, (project, properties) -> {
 				});
 	}
 

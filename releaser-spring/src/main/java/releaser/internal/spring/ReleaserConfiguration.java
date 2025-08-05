@@ -19,14 +19,18 @@ package releaser.internal.spring;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.cloud.storage.transfermanager.TransferManagerConfig;
 import releaser.internal.Releaser;
 import releaser.internal.ReleaserProperties;
 import releaser.internal.ReleaserPropertiesUpdater;
 import releaser.internal.buildsystem.GradleUpdater;
 import releaser.internal.buildsystem.ProjectPomUpdater;
 import releaser.internal.commercial.ReleaseBundleCreator;
+import releaser.internal.docs.AntoraDocsPublisher;
+import releaser.internal.docs.CommercialAntoraDocsPublisher;
 import releaser.internal.docs.CustomProjectDocumentationUpdater;
 import releaser.internal.docs.DocumentationUpdater;
+import releaser.internal.docs.OpenSourceAntoraDocsPublisher;
 import releaser.internal.git.ProjectGitHandler;
 import releaser.internal.github.CustomGithubIssues;
 import releaser.internal.github.ProjectGitHubHandler;
@@ -42,6 +46,7 @@ import releaser.internal.versions.VersionsFetcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -155,10 +160,25 @@ class ReleaserConfiguration {
 			ProjectGitHandler projectGitHandler, ProjectGitHubHandler projectGitHubHandler,
 			TemplateGenerator templateGenerator, GradleUpdater gradleUpdater, SaganUpdater saganUpdater,
 			DocumentationUpdater documentationUpdater, PostReleaseActions postReleaseActions,
-			ReleaserProperties releaserProperties, ReleaseBundleCreator releaseBundleCreator) {
+			ReleaserProperties releaserProperties, ReleaseBundleCreator releaseBundleCreator,
+			AntoraDocsPublisher antoraDocsPublisher) {
 		return new Releaser(releaserProperties, projectPomUpdater, projectCommandExecutor, projectGitHandler,
 				projectGitHubHandler, templateGenerator, gradleUpdater, saganUpdater, documentationUpdater,
-				postReleaseActions, releaseBundleCreator);
+				postReleaseActions, releaseBundleCreator, antoraDocsPublisher);
+	}
+
+	@Bean
+	@ConditionalOnProperty(value = "releaser.commercial", havingValue = "true")
+	@ConditionalOnMissingBean(AntoraDocsPublisher.class)
+	AntoraDocsPublisher commercialAntoraDocsPublisher() {
+		return new CommercialAntoraDocsPublisher(TransferManagerConfig.newBuilder().build().getService());
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(AntoraDocsPublisher.class)
+	AntoraDocsPublisher openSourceAntoraDocsPublisher(ProjectCommandExecutor projectCommandExecutor,
+			ProjectGitHandler projectGitHandler) {
+		return new OpenSourceAntoraDocsPublisher(projectCommandExecutor, projectGitHandler);
 	}
 
 	@Bean

@@ -106,6 +106,10 @@ public class ProjectCommandExecutor {
 
 	public void runAntora(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain, String projectRoot) {
+		if (properties.isCommercial() && !StringUtils.hasText(System.getenv("GIT_CREDENTIALS"))) {
+			log.warn(
+					"GIT_CREDENTIALS environment variable is not set, Antora may not be able to checkout private repos.");
+		}
 		try {
 			String command = new CommandPicker(properties, projectRoot).runAntoraCommand(versionFromReleaseTrain);
 			String[] commands = replaceAllPlaceHolders(originalVersion, versionFromReleaseTrain, command).split(" ");
