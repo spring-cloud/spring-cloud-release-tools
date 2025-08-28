@@ -102,16 +102,26 @@ public class Releaser {
 	}
 
 	public ExecutionResult buildAntoraDocs(File project) {
+		String currentBranch = null;
 		try {
-			String currentBranch = projectGitHandler.currentBranch(project);
+			currentBranch = projectGitHandler.currentBranch(project);
 			projectGitHandler.cloneAndCheckoutDocsBuild(project);
 			this.projectCommandExecutor.runAntora(this.releaserProperties, originalVersion(project),
 					new ProjectVersion(project), project.getAbsolutePath());
-			projectGitHandler.checkout(project, currentBranch);
 			return ExecutionResult.success();
 		}
 		catch (Exception e) {
 			return ExecutionResult.unstable(e);
+		}
+		finally {
+			// If anything goes wrong building the docs make sure we still checkout the
+			// original branch so any subsequent tasks don't get impacted by the
+			// docs-build branch being checked out
+			if (currentBranch != null) {
+				projectGitHandler.checkout(project, currentBranch);
+			} else {
+				log.warn("Current branch is null cannot checkout original branch, this may impact subsequent tasks!");
+			}
 		}
 	}
 
