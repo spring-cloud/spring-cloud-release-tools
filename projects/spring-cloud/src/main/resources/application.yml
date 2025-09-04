@@ -168,6 +168,12 @@ releaser:
       spring-cloud-vault:
         - "org/springframework/cloud/spring-cloud-vault*"
         - "org/springframework/cloud/spring-cloud-starter-vault*"
+      spring-cloud-sleuth:
+        - "org/springframework/cloud/spring-cloud-sleuth*"
+        - "org/springframework/cloud/spring-cloud-starter-sleuth*"
+      spring-cloud-cloudfoundry:
+        - "org/springframework/cloud/spring-cloud-cloudfoundry*"
+        - "org/springframework/cloud/spring-cloud-starter-cloudfoundry*"
       # This is Spring Cloud Release, the POM id is spring-cloud-starter-build
       spring-cloud-starter-build:
         - "org/springframework/cloud/spring-cloud-starter*"
