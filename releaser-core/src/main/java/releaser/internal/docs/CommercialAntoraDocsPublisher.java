@@ -84,7 +84,7 @@ public class CommercialAntoraDocsPublisher implements AntoraDocsPublisher {
 		}
 		List<UploadResult> results = transferManager.uploadFiles(filePaths, parallelUploadConfig).getUploadResults();
 		for (UploadResult result : results) {
-			log.info("Upload for {} completed with status {}", result.getInput().getName(), result.getStatus());
+			log.info("Upload for {} completed with status {}, and message {}", result.getInput().getName(), result.getStatus(), result.getException().getMessage());
 		}
 	}
 
