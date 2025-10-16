@@ -119,7 +119,8 @@ public class Releaser {
 			// docs-build branch being checked out
 			if (currentBranch != null) {
 				projectGitHandler.checkout(project, currentBranch);
-			} else {
+			}
+			else {
 				log.warn("Current branch is null cannot checkout original branch, this may impact subsequent tasks!");
 			}
 		}

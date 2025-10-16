@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.transfermanager.ParallelUploadConfig;
 import com.google.cloud.storage.transfermanager.TransferManager;
+import com.google.cloud.storage.transfermanager.TransferStatus;
 import com.google.cloud.storage.transfermanager.UploadResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,13 +61,15 @@ public class CommercialAntoraDocsPublisher implements AntoraDocsPublisher {
 	public void publish(File project, ReleaserProperties properties) throws IOException {
 		checkAndLog();
 		String antoraSite = project.getAbsolutePath() + "/target/antora/site";
-		// This UploadBlobInfoFactory is used to alter the paths where the files will be uploaded in the bucket
+		// This UploadBlobInfoFactory is used to alter the paths where the files will be
+		// uploaded in the bucket
 		ParallelUploadConfig.UploadBlobInfoFactory uploadBlobInfoFactory = (String bucketName, String fileName) -> {
 			ProjectVersion version = new ProjectVersion(project);
-			// The spring-cloud-release docs will be under the project spring-cloud-starter-build but we want
+			// The spring-cloud-release docs will be under the project
+			// spring-cloud-starter-build but we want
 			// them uploaded under spring-cloud-release
-			String projectName = "spring-cloud-starter-build".equals(version.projectName) ? "spring-cloud-release" :
-					version.projectName;
+			String projectName = "spring-cloud-starter-build".equals(version.projectName) ? "spring-cloud-release"
+					: version.projectName;
 			String blobLocation = projectName + "/reference" + fileName.substring(antoraSite.length());
 			Optional<MediaType> mediaTypeOptional = MediaTypeFactory.getMediaType(blobLocation);
 			BlobInfo.Builder blobInfoBuilder = BlobInfo.newBuilder(bucketName, blobLocation);
@@ -83,8 +86,17 @@ public class CommercialAntoraDocsPublisher implements AntoraDocsPublisher {
 			pathStream.filter(Files::isRegularFile).forEach(filePaths::add);
 		}
 		List<UploadResult> results = transferManager.uploadFiles(filePaths, parallelUploadConfig).getUploadResults();
+		boolean failedToTransfer = false;
 		for (UploadResult result : results) {
-			log.info("Upload for {} completed with status {}", result.getInput().getName(), result.getStatus());
+			TransferStatus status = result.getStatus();
+			log.info("Upload for {} completed with status {}", result.getInput().getName(), status);
+			if (status == TransferStatus.FAILED_TO_START || status == TransferStatus.FAILED_TO_FINISH) {
+				log.warn("Transfer failed: {}", result.getException().getMessage());
+				failedToTransfer = true;
+			}
+		}
+		if (failedToTransfer) {
+			throw new IllegalStateException("One or more file transfers to GCP bucket for docs failed.");
 		}
 	}
 
