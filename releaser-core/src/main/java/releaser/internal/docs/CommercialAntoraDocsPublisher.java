@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.transfermanager.ParallelUploadConfig;
 import com.google.cloud.storage.transfermanager.TransferManager;
+import com.google.cloud.storage.transfermanager.TransferStatus;
 import com.google.cloud.storage.transfermanager.UploadResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,8 +84,17 @@ public class CommercialAntoraDocsPublisher implements AntoraDocsPublisher {
 			pathStream.filter(Files::isRegularFile).forEach(filePaths::add);
 		}
 		List<UploadResult> results = transferManager.uploadFiles(filePaths, parallelUploadConfig).getUploadResults();
+		List<UploadResult> failedResults = new ArrayList<>();
 		for (UploadResult result : results) {
-			log.info("Upload for {} completed with status {}, and message {}", result.getInput().getName(), result.getStatus(), result.getException().getMessage());
+			TransferStatus status = result.getStatus();
+			log.info("Upload for {} completed with status {}", result.getInput().getName(), status);
+			if (status == TransferStatus.FAILED_TO_START || status == TransferStatus.FAILED_TO_FINISH) {
+				log.warn("Transfer failed: {}", result.getException().getMessage());
+				failedResults.add(result);
+			}
+		}
+		if (!failedResults.isEmpty()) {
+			throw new IllegalStateException("One or more file transfers to GCP bucket for docs failed.");
 		}
 	}
 
