@@ -86,16 +86,16 @@ public class CommercialAntoraDocsPublisher implements AntoraDocsPublisher {
 			pathStream.filter(Files::isRegularFile).forEach(filePaths::add);
 		}
 		List<UploadResult> results = transferManager.uploadFiles(filePaths, parallelUploadConfig).getUploadResults();
-		List<UploadResult> failedResults = new ArrayList<>();
+		boolean failedToTransfer = false;
 		for (UploadResult result : results) {
 			TransferStatus status = result.getStatus();
 			log.info("Upload for {} completed with status {}", result.getInput().getName(), status);
 			if (status == TransferStatus.FAILED_TO_START || status == TransferStatus.FAILED_TO_FINISH) {
 				log.warn("Transfer failed: {}", result.getException().getMessage());
-				failedResults.add(result);
+				failedToTransfer = true;
 			}
 		}
-		if (!failedResults.isEmpty()) {
+		if (failedToTransfer) {
 			throw new IllegalStateException("One or more file transfers to GCP bucket for docs failed.");
 		}
 	}
