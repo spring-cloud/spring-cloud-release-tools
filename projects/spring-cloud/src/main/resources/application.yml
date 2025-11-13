@@ -103,7 +103,7 @@ releaser:
   # fixed-versions:
   antora:
     spring-docs-actions-url: https://github.com/spring-io/spring-doc-actions
-    spring-docs-actions-tag: v0.0.18
+    spring-docs-actions-tag: v0.0.21
     sync-antora-docs-command: "./spring-docs-action-runner.sh --docs-username {{ssh-username}} --docs-ssh-key-path {{ssh-key-path}} --docs-host 10.24.18.3 --docs-ssh-host-key {{host-key}} --site-path {{site-path}} --github-repository {{github-repo}}"
   meta-release:
     enabled: false
