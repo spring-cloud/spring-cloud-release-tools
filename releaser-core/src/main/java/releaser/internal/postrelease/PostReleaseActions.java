@@ -119,7 +119,7 @@ public class PostReleaseActions implements Closeable {
 		String releaseTrainVersion = projects.releaseTrain(projectProps).version;
 		Projects newProjects = addVersionForTestsProject(projects, projectVersion, releaseTrainVersion);
 		updateWithVersions(file, newProjects);
-		this.projectCommandExecutor.build(projectProps, projectVersion, projectVersion, file.getAbsolutePath());
+		this.projectCommandExecutor.build(projectProps, projectVersion, projectVersion, file.getAbsolutePath(), false);
 		return ExecutionResult.success();
 	}
 

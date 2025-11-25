@@ -61,7 +61,8 @@ public class BuildProjectReleaseTask implements DryRunReleaseReleaserTask {
 	@Override
 	public ExecutionResult runTask(Arguments args) {
 		log.info("Arguments for this release task: " + args);
-		return this.releaser.buildProject(args.properties, args.originalVersion, args.versionFromBom);
+		return this.releaser.buildProject(args.properties, args.originalVersion, args.versionFromBom,
+				args.options.dryRun);
 	}
 
 	@Override

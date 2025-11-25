@@ -106,6 +106,7 @@ public abstract class AbstractSpringAcceptanceTests {
 
 	public void clean() {
 		new File("/tmp/executed_build").delete();
+		new File("/tmp/executed_ga_build").delete();
 		new File("/tmp/executed_deploy").delete();
 		new File("/tmp/executed_docs").delete();
 		blogTemplate().delete();
