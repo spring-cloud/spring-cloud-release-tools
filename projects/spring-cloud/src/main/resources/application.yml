@@ -145,6 +145,7 @@ releaser:
         - "org/springframework/cloud/spring-cloud-starter"
         - "org/springframework/cloud/spring-cloud-starter-loadbalancer"
         - "org/springframework/cloud/spring-cloud-starter-bootstrap"
+        - "org/springframework/cloud/spring-cloud-test-support"
       spring-cloud-netflix:
         - "org/springframework/cloud/spring-cloud-netflix*"
         - "org/springframework/cloud/spring-cloud-starter-netflix*"
