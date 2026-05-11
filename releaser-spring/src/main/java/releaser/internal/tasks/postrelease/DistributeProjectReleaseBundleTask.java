@@ -57,8 +57,8 @@ public class DistributeProjectReleaseBundleTask implements ProjectPostReleaseRel
 
 	@Override
 	public ExecutionResult runTask(Arguments args) throws BuildUnstableException {
-		return releaser.distributeProjectReleaseBundle(args.properties.isCommercial(), args.options.dryRun,
-				args.versionFromBom, args.options.metaRelease);
+		return releaser.distributeProjectReleaseBundle(args.properties.isCommercial(), args.properties.isHotfix(),
+				args.options.dryRun, args.versionFromBom, args.options.metaRelease);
 	}
 
 	@Override

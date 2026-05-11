@@ -3,3 +3,6 @@
 386e26ed81099e05b791bbea27a0236abc42a455 386e26ed81099e05b791bbea27a0236abc42a455 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1719343905 -0400	checkout: moving from master to docs-build
 386e26ed81099e05b791bbea27a0236abc42a455 0945bf835a7909d9fb0f2ba89250095ae2784169 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1719343956 -0400	commit: initial commit
 0945bf835a7909d9fb0f2ba89250095ae2784169 386e26ed81099e05b791bbea27a0236abc42a455 Ryan Baxter <524254+ryanjbaxter@users.noreply.github.com> 1719343971 -0400	checkout: moving from docs-build to master
+386e26ed81099e05b791bbea27a0236abc42a455 386e26ed81099e05b791bbea27a0236abc42a455 Ryan Baxter <ryan.baxter@broadcom.com> 1778593894 -0400	checkout: moving from master to 4.1.2.x
+386e26ed81099e05b791bbea27a0236abc42a455 7e2060856705e40923f426379c6fbe415aa680eb Ryan Baxter <ryan.baxter@broadcom.com> 1778593960 -0400	commit: initial commit of commercial hotfix branch
+7e2060856705e40923f426379c6fbe415aa680eb 386e26ed81099e05b791bbea27a0236abc42a455 Ryan Baxter <ryan.baxter@broadcom.com> 1778593967 -0400	checkout: moving from 4.1.2.x to master

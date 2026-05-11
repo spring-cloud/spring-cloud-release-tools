@@ -100,6 +100,29 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 		return versions;
 	}
 
+	public Map<String, String> v2023_0_0_1() {
+		Map<String, String> versions = new LinkedHashMap<>();
+		versions.put("spring-boot", "3.3.7");
+		versions.put("spring-cloud-build", "4.1.0");
+		versions.put("spring-cloud-function", "4.1.0");
+		versions.put("spring-cloud-stream", "4.1.0");
+		versions.put("spring-cloud-commons", "4.1.0");
+		versions.put("spring-cloud-bus", "4.1.0");
+		versions.put("spring-cloud-task", "4.1.0");
+		versions.put("spring-cloud-config", "4.1.0");
+		versions.put("spring-cloud-netflix", "4.1.0");
+		versions.put("spring-cloud-openfeign", "4.1.0");
+		versions.put("spring-cloud-consul", "4.0.2.1");
+		versions.put("spring-cloud-circuitbreaker", "4.1.0");
+		versions.put("spring-cloud-gateway", "4.1.0");
+		versions.put("spring-cloud-zookeeper", "4.1.0");
+		versions.put("spring-cloud-contract", "4.1.0");
+		versions.put("spring-cloud-kubernetes", "4.1.0");
+		versions.put("spring-cloud-vault", "4.1.0");
+		versions.put("spring-cloud-release", "2023.0.0.1");
+		return versions;
+	}
+
 	public void thenAllStepsWereExecutedForEachProject(
 			NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler) {
 		nonAssertingTestProjectGitHandler.clonedProjects.stream()
