@@ -60,8 +60,8 @@ public class DistributeReleaseTrainSourceBundleTask implements TrainPostReleaseR
 
 	@Override
 	public ExecutionResult runTask(Arguments args) throws BuildUnstableException {
-		return releaser.distributeReleaseTrainSourceBundle(args.properties.isCommercial(), args.options.dryRun,
-				args.versionFromBom);
+		return releaser.distributeReleaseTrainSourceBundle(args.properties.isCommercial(), args.properties.isHotfix(),
+				args.options.dryRun, args.versionFromBom);
 	}
 
 	@Override

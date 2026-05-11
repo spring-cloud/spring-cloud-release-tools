@@ -205,6 +205,12 @@ public class ArgsBuilder {
 		return this;
 	}
 
+	public ArgsBuilder hotfix(boolean hotfix) {
+		removeIfPresent("releaser.hotfix");
+		this.args.add("releaser.hotfix=" + hotfix);
+		return this;
+	}
+
 	public ArgsBuilder projectReleaseBundle(boolean enable) {
 		removeIfPresent("releaser.bundles.create-project-release-bundle");
 		this.args.add("releaser.bundles.create-project-release-bundle=" + enable);

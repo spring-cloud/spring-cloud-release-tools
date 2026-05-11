@@ -82,6 +82,8 @@ public class ReleaserProperties implements Serializable {
 
 	private boolean commercial = false;
 
+	private boolean hotfix = false;
+
 	private Bundles bundles = new Bundles();
 
 	/**
@@ -202,6 +204,14 @@ public class ReleaserProperties implements Serializable {
 
 	public void setVersions(Versions versions) {
 		this.versions = versions;
+	}
+
+	public boolean isHotfix() {
+		return hotfix;
+	}
+
+	public void setHotfix(boolean hotfix) {
+		this.hotfix = hotfix;
 	}
 
 	public boolean isCommercial() {

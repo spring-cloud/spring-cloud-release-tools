@@ -149,6 +149,67 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 	}
 
 	@Test
+	public void should_perform_a_meta_release_of_sc_release_and_consul_hotfix(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
+			throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release-commercial/", "2023.0.0.x");
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin, this.springCloudConsulHotfixProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+
+		run(defaultRunner(), properties("debugx=true")
+				.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
+				.properties(metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs,
+						tempDirSpringCloud, tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2023.0.0.1")
+								.addFixedVersions(v2023_0_0_1()).distributeReleaseTrainSourceReleaseBundle(true)
+								.releaseTrainSourceReleaseBundle(true).projectReleaseBundle(true).commercial(true)
+								.hotfix(true).build()),
+				context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
+							.getBean(NonAssertingTestProjectGitHandler.class);
+					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
+					PostReleaseActions postReleaseActions = context.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+					ReleaseBundleCreator creator = context.getBean(ReleaseBundleCreator.class);
+
+					ExecutionResult result = releaser.release(new OptionsBuilder().metaRelease(true).options());
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
+					then(result.isFailureOrUnstable()).isFalse();
+					// consul, release
+					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(2);
+					// don't want to verify the docs
+					thenAllStepsWereExecutedForEachProject(nonAssertingTestProjectGitHandler);
+					thenSaganWasCalled(saganUpdater);
+					then(clonedProject(nonAssertingTestProjectGitHandler, "spring-cloud-consul-commercial").tagList()
+							.call()).extracting("name").contains("refs/tags/v4.0.2.1");
+					thenRunUpdatedTestsWereCalled(postReleaseActions);
+					thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
+					BDDMockito.then(creator).should(times(1))
+							.createReleaseTrainSourceBundle(
+									List.of(new ProjectVersion("spring-cloud-consul", "4.0.2.1"),
+											new ProjectVersion("spring-cloud-starter-build", "2023.0.0.1")),
+									"2023.0.0.1");
+					BDDMockito.then(creator).should(times(1)).createReleaseBundle(
+							List.of("org/springframework/cloud/spring-cloud-consul*",
+									"org/springframework/cloud/spring-cloud-starter-consul*"),
+							"4.0.2.1", "TNZ-spring-cloud-consul-commercial");
+					// we should not distribute release bundles for hotfix releases
+					BDDMockito.then(creator).should(times(0)).distributeReleaseTrainSourceBundle("2023.0.0.1");
+					// This should never be called when releasing a release train since
+					// distributing a release train source bundle
+					// will distribute individual project release bundles
+					verify(creator, never()).distributeReleaseBundle(anyString(), anyString(), anyString());
+				});
+	}
+
+	@Test
 	public void should_perform_a_meta_release_of_sc_release_and_consul_in_parallel(
 			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
 			throws Exception {

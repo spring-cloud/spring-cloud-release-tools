@@ -488,12 +488,17 @@ public class Releaser {
 		return ExecutionResult.unstable(new BuildUnstableException("Failed to create a release train source bundle"));
 	}
 
-	public ExecutionResult distributeProjectReleaseBundle(boolean isCommercial, boolean dryRun,
+	public ExecutionResult distributeProjectReleaseBundle(boolean isCommercial, boolean isHotfix, boolean dryRun,
 			ProjectVersion projectVersion, boolean isMetaRelease) {
 		if (isMetaRelease) {
 			log.warn(
 					"Even though the property to distribute a project release bundle is enabled we are skipping this task because this is a meta-release.  "
 							+ "When doing a meta-release the DistributeReleaseTrainSourceBundleTask will take care of distributing individual project release bundles.");
+			return ExecutionResult.skipped();
+		}
+		if (isHotfix) {
+			log.warn(
+					"Even though the property to distribute a project release bundle is enabled we are skipping this task because this is a hotfix.");
 			return ExecutionResult.skipped();
 		}
 		if (!shouldCreateReleaseBundle(dryRun, projectVersion.isSnapshot(), isCommercial)) {
@@ -512,9 +517,14 @@ public class Releaser {
 		return ExecutionResult.unstable(new BuildUnstableException("Failed to distribute a project release bundle"));
 	}
 
-	public ExecutionResult distributeReleaseTrainSourceBundle(boolean isCommercial, boolean dryRun,
+	public ExecutionResult distributeReleaseTrainSourceBundle(boolean isCommercial, boolean isHotfix, boolean dryRun,
 			ProjectVersion projectVersion) {
 		if (!shouldCreateReleaseBundle(dryRun, projectVersion.isSnapshot(), isCommercial)) {
+			return ExecutionResult.skipped();
+		}
+		if (isHotfix) {
+			log.warn(
+					"Even though the property to distribute a release train source bundle is enabled we are skipping this task because this is a hotfix.");
 			return ExecutionResult.skipped();
 		}
 		try {

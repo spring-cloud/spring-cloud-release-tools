@@ -30,6 +30,8 @@ public class AbstractSpringCloudMetaAcceptanceTests extends AbstractSpringMetaRe
 
 	public File springCloudConsulCommercialProject;
 
+	public File springCloudConsulHotfixProject;
+
 	public File springCloudBuildProject;
 
 	@BeforeEach
@@ -39,6 +41,8 @@ public class AbstractSpringCloudMetaAcceptanceTests extends AbstractSpringMetaRe
 		this.springCloudBuildProject = new File(
 				AbstractSpringCloudMetaAcceptanceTests.class.getResource("/projects/spring-cloud-build").toURI());
 		this.springCloudConsulCommercialProject = new File(AbstractSpringCloudMetaAcceptanceTests.class
+				.getResource("/projects/spring-cloud-consul-commercial").toURI());
+		this.springCloudConsulHotfixProject = new File(AbstractSpringCloudMetaAcceptanceTests.class
 				.getResource("/projects/spring-cloud-consul-commercial").toURI());
 	}
 
