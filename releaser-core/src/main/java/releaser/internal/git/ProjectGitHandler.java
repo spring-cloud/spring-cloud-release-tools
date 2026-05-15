@@ -321,6 +321,16 @@ public class ProjectGitHandler implements Closeable {
 		// Camden.RELEASE -> Camden
 		// Camden-SR -> Camden
 		// 2020.0.0-M1 -> 2020.0.x
+		// 2025.0.2.1-SNAPSHOT -> 2025.0.2.x
+		// 2025.0.2.1 -> 2025.0.2.x
+
+		// Check for 4-part numeric version (e.g. 2025.0.2.1 or 2025.0.2.1-SNAPSHOT)
+		String numericPart = version.contains("-") ? version.substring(0, version.indexOf("-")) : version;
+		String[] numericParts = numericPart.split("\\.");
+		if (numericParts.length == 4 && numericParts[3].matches("\\d+")) {
+			return numericParts[0] + "." + numericParts[1] + "." + numericParts[2] + ".x";
+		}
+
 		int indexOfDot = version.lastIndexOf(".");
 		int indexOfDash = version.indexOf("-");
 		int indexToPick = indexOfDot > 0 ? indexOfDot : indexOfDash;

@@ -121,6 +121,15 @@ public class ProjectGitHandlerTests {
 	}
 
 	@Test
+	public void should_retrieve_version_from_branch_for_hotfix() {
+		String branch = this.updater.branchFromVersion("2025.0.2.1-SNAPSHOT");
+		BDDAssertions.then(branch).isEqualTo("2025.0.2.x");
+
+		branch = this.updater.branchFromVersion("2025.0.2.1");
+		BDDAssertions.then(branch).isEqualTo("2025.0.2.x");
+	}
+
+	@Test
 	public void should_throw_exception_when_no_fixed_version_passed_for_the_project() {
 		BDDAssertions.thenThrownBy(() -> this.updater.cloneProjectFromOrg("spring-cloud-sleuth"))
 				.isInstanceOf(IllegalStateException.class).hasMessageContaining("You haven't provided a version");
