@@ -182,6 +182,9 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (splitVersion.isReleaseTrain() && !splitVersion.isCalverReleaseTrain()) {
 			return splitVersion;
 		}
+		if (StringUtils.hasText(splitVersion.hotfix)) {
+			return splitVersion.fullVersionWithIncrementedHotfix();
+		}
 		return splitVersion.fullVersionWithIncrementedPatch();
 	}
 
@@ -340,6 +343,22 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (suffix.isEmpty()) {
 			suffix = splitVersion.suffix;
 		}
+		if (StringUtils.hasText(splitVersion.hotfix)) {
+			int hotfix;
+			try {
+				hotfix = Integer.parseInt(splitVersion.hotfix);
+			}
+			catch (NumberFormatException nfe) {
+				throw new IllegalArgumentException(
+						"Version " + this.version + " doesn't contain a numerical HOTFIX number", nfe);
+			}
+			if (hotfix == 0) {
+				return Optional.empty();
+			}
+			String base = prefix + splitVersion.major + "." + splitVersion.minor + "." + splitVersion.patch + "."
+					+ (hotfix - 1);
+			return Optional.of(StringUtils.hasText(suffix) ? base + splitVersion.delimiter + suffix : base);
+		}
 		int patch;
 		try {
 			patch = Integer.parseInt(splitVersion.patch);
@@ -440,10 +459,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return true;
 		}
 		SplitVersion splitVersion = assertVersion();
-		if (StringUtils.isEmpty(splitVersion.suffix)) { // this is an x.y.z release
-			if (Integer.parseInt(splitVersion.patch) == 0) {
-				return true;
-			}
+		if (StringUtils.isEmpty(splitVersion.suffix)) { // this is an x.y.z or x.y.z.h
+														// release
+			String lastSegment = StringUtils.hasText(splitVersion.hotfix) ? splitVersion.hotfix : splitVersion.patch;
+			return Integer.parseInt(lastSegment) == 0;
 		}
 		return false;
 	}
@@ -470,10 +489,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return true;
 		}
 		SplitVersion splitVersion = assertVersion();
-		if (StringUtils.isEmpty(splitVersion.suffix)) { // this is an x.y.z release
-			if (Integer.parseInt(splitVersion.patch) > 0) {
-				return true;
-			}
+		if (StringUtils.isEmpty(splitVersion.suffix)) { // this is an x.y.z or x.y.z.h
+														// release
+			String lastSegment = StringUtils.hasText(splitVersion.hotfix) ? splitVersion.hotfix : splitVersion.patch;
+			return Integer.parseInt(lastSegment) > 0;
 		}
 		return false;
 	}
@@ -506,7 +525,9 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		try {
 			SplitVersion splitVersion = assertVersion();
 			if (StringUtils.isEmpty(splitVersion.suffix) && StringUtils.hasText(splitVersion.patch)) {
-				if ("0".equals(splitVersion.patch)) {
+				String lastSegment = StringUtils.hasText(splitVersion.hotfix) ? splitVersion.hotfix
+						: splitVersion.patch;
+				if ("0".equals(lastSegment)) {
 					return ReleaseType.RELEASE;
 				}
 				return ReleaseType.SR;
@@ -547,6 +568,11 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (patchComparison != 0) {
 			return patchComparison;
 		}
+		int hotfixComparison = compare(StringUtils.hasText(thisSplit.hotfix) ? thisSplit.hotfix : "0",
+				StringUtils.hasText(thatSplit.hotfix) ? thatSplit.hotfix : "0");
+		if (hotfixComparison != 0) {
+			return hotfixComparison;
+		}
 		return releaseTypeComparison;
 	}
 
@@ -563,10 +589,22 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		if (this.version == null) {
 			return false;
 		}
-		String[] splitThis = this.version.split("\\.");
-		String[] splitThat = version.split("\\.");
-		return splitThis.length == splitThat.length && splitThis[0].equals(splitThat[0])
-				&& splitThis[1].equals(splitThat[1]);
+		SplitVersion thisV = assertVersion();
+		SplitVersion thatV = assertVersion(version);
+		if (StringUtils.hasText(thisV.hotfix) && StringUtils.hasText(thatV.hotfix)) {
+			// both are hotfix versions: same branch means same major.minor.patch
+			return thisV.major.equals(thatV.major) && thisV.minor.equals(thatV.minor)
+					&& thisV.patch.equals(thatV.patch);
+		}
+		if (!StringUtils.hasText(thisV.hotfix) && !StringUtils.hasText(thatV.hotfix)) {
+			// neither is a hotfix: preserve original length-equality guard
+			String[] splitThis = this.version.split("\\.");
+			String[] splitThat = version.split("\\.");
+			return splitThis.length == splitThat.length && splitThis[0].equals(splitThat[0])
+					&& splitThis[1].equals(splitThat[1]);
+		}
+		// one has hotfix, the other does not — different branch shapes
+		return false;
 	}
 
 	public boolean isSameReleaseTrainName(String version) {
@@ -671,6 +709,8 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		final String patch;
 
+		final String hotfix;
+
 		final String delimiter;
 
 		final String suffix;
@@ -678,9 +718,16 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		// 1.0.0.RELEASE
 		// 1.0.0-RELEASE
 		private SplitVersion(String major, String minor, String patch, String delimiter, String suffix) {
+			this(major, minor, patch, "", delimiter, suffix);
+		}
+
+		// 2025.0.1.1
+		// 2025.0.1.1-SNAPSHOT
+		private SplitVersion(String major, String minor, String patch, String hotfix, String delimiter, String suffix) {
 			this.major = major;
 			this.minor = minor;
 			this.patch = patch;
+			this.hotfix = hotfix;
 			this.delimiter = delimiter;
 			this.suffix = suffix;
 			assertIfValid();
@@ -689,13 +736,14 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		// Hoxton.RELEASE
 		// Hoxton-RELEASE
 		private SplitVersion(String major, String delimiter, String suffix) {
-			this(major, "", "", delimiter, suffix);
+			this(major, "", "", "", delimiter, suffix);
 		}
 
 		private SplitVersion(String[] args, String delimiter) {
 			this.major = orDefault(args, 0);
 			this.minor = orDefault(args, 1);
 			this.patch = orDefault(args, 2);
+			this.hotfix = "";
 			this.delimiter = delimiter;
 			this.suffix = orDefault(args, 3);
 			assertIfValid();
@@ -721,6 +769,10 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			return version(args, DOT);
 		}
 
+		private static boolean isNumeric(String string) {
+			return string.matches("[0-9]+");
+		}
+
 		private static SplitVersion version(String[] args, String delimiter) {
 			// Hoxton.SR4
 			if (args.length == 2) {
@@ -730,6 +782,14 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 			// but not 1.0.3
 			else if (args.length == 3 && notNumeric(args[2])) {
 				return new SplitVersion(args[0], args[1], "", delimiter, args[2]);
+			}
+			// 2025.0.1.1 — four all-numeric segments (hotfix GA)
+			else if (args.length == 4 && isNumeric(args[3])) {
+				return new SplitVersion(args[0], args[1], args[2], args[3], delimiter, "");
+			}
+			// 2025.0.1.1-SNAPSHOT — four numeric segments + qualifier
+			else if (args.length == 5 && isNumeric(args[3])) {
+				return new SplitVersion(args[0], args[1], args[2], args[3], delimiter, args[4]);
 			}
 			return new SplitVersion(args, delimiter);
 		}
@@ -765,7 +825,12 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 
 		private SplitVersion fullVersionWithIncrementedPatch() {
 			int incrementedPatch = Integer.parseInt(patch) + 1;
-			return new SplitVersion(major, minor, Integer.toString(incrementedPatch), delimiter, suffix);
+			return new SplitVersion(major, minor, Integer.toString(incrementedPatch), hotfix, delimiter, suffix);
+		}
+
+		private SplitVersion fullVersionWithIncrementedHotfix() {
+			int incrementedHotfix = Integer.parseInt(hotfix) + 1;
+			return new SplitVersion(major, minor, patch, Integer.toString(incrementedHotfix), delimiter, suffix);
 		}
 
 		String print() {
@@ -774,7 +839,13 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 				return StringUtils.isEmpty(suffix) ? major : String.format("%s%s%s", major, delimiter, suffix);
 			}
 			else if (StringUtils.isEmpty(suffix)) {
+				if (StringUtils.hasText(hotfix)) {
+					return String.format("%s.%s.%s.%s", major, minor, patch, hotfix);
+				}
 				return String.format("%s.%s.%s", major, minor, patch);
+			}
+			if (StringUtils.hasText(hotfix)) {
+				return String.format("%s.%s.%s.%s%s%s", major, minor, patch, hotfix, delimiter, suffix);
 			}
 			return String.format("%s.%s.%s%s%s", major, minor, patch, delimiter, suffix);
 		}
@@ -793,7 +864,9 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		}
 
 		public SplitVersion withSnapshot() {
-			return new SplitVersion(major, minor, patch, delimiter, suffix());
+			// CalVer snapshots always use a hyphen separator (e.g. 2025.0.1.1-SNAPSHOT)
+			String snapshotDelimiter = StringUtils.hasText(hotfix) ? HYPHEN : delimiter;
+			return new SplitVersion(major, minor, patch, hotfix, snapshotDelimiter, suffix());
 		}
 
 		private String suffix() {
@@ -806,7 +879,7 @@ public class ProjectVersion implements Comparable<ProjectVersion>, Serializable 
 		@Override
 		public String toString() {
 			return new ToStringCreator(this).append("major", major).append("minor", minor).append("patch", patch)
-					.append("delimiter", delimiter).append("suffix", suffix).toString();
+					.append("hotfix", hotfix).append("delimiter", delimiter).append("suffix", suffix).toString();
 
 		}
 
