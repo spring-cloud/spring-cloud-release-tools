@@ -771,6 +771,109 @@ public class ProjectVersionTests {
 				.isThrownBy(() -> projectVersion("0.0.1.WHATEVER").computePreviousMajorTagPattern("v", "RELEASE"));
 	}
 
+	// ---- Hotfix (4-digit calver) version tests ----
+
+	@Test
+	public void hotfix_should_be_valid() {
+		then(ProjectVersion.isValid("2025.0.1.1")).isTrue();
+		then(ProjectVersion.isValid("2025.0.1.1-SNAPSHOT")).isTrue();
+		then(ProjectVersion.isValid("2025.0.1.0")).isTrue();
+		then(ProjectVersion.isValid("2025.0.1.0-SNAPSHOT")).isTrue();
+	}
+
+	@Test
+	public void hotfix_should_return_correct_snapshot_state() {
+		then(projectVersion("2025.0.1.1").isSnapshot()).isFalse();
+		then(projectVersion("2025.0.1.1-SNAPSHOT").isSnapshot()).isTrue();
+		then(projectVersion("2025.0.1.0").isSnapshot()).isFalse();
+		then(projectVersion("2025.0.1.0-SNAPSHOT").isSnapshot()).isTrue();
+	}
+
+	@Test
+	public void hotfix_ga_should_be_a_release_when_hotfix_is_zero() {
+		then(projectVersion("2025.0.1.0").isRelease()).isTrue();
+		then(projectVersion("2025.0.1.0").isServiceRelease()).isFalse();
+		then(projectVersion("2025.0.1.0").isReleaseOrServiceRelease()).isTrue();
+	}
+
+	@Test
+	public void hotfix_should_be_a_service_release_when_hotfix_greater_than_zero() {
+		then(projectVersion("2025.0.1.1").isRelease()).isFalse();
+		then(projectVersion("2025.0.1.1").isServiceRelease()).isTrue();
+		then(projectVersion("2025.0.1.1").isReleaseOrServiceRelease()).isTrue();
+		then(projectVersion("2025.0.1.2").isServiceRelease()).isTrue();
+	}
+
+	@Test
+	public void hotfix_snapshot_should_not_be_release_or_service_release() {
+		then(projectVersion("2025.0.1.1-SNAPSHOT").isReleaseOrServiceRelease()).isFalse();
+		then(projectVersion("2025.0.1.0-SNAPSHOT").isReleaseOrServiceRelease()).isFalse();
+	}
+
+	@Test
+	public void hotfix_should_return_correct_release_tag_name() {
+		then(projectVersion("2025.0.1.1").releaseTagName()).isEqualTo("v2025.0.1.1");
+		then(projectVersion("2025.0.1.0").releaseTagName()).isEqualTo("v2025.0.1.0");
+		then(projectVersion("2025.0.1.1-SNAPSHOT").releaseTagName()).isEmpty();
+	}
+
+	@Test
+	public void hotfix_should_bump_the_hotfix_segment() {
+		then(projectVersion("2025.0.1.1").bumpedSnapshotVersion()).isEqualTo("2025.0.1.2-SNAPSHOT");
+		then(projectVersion("2025.0.1.0").bumpedSnapshotVersion()).isEqualTo("2025.0.1.1-SNAPSHOT");
+		then(projectVersion("2025.0.1.1-SNAPSHOT").bumpedSnapshotVersion()).isEqualTo("2025.0.1.2-SNAPSHOT");
+	}
+
+	@Test
+	public void hotfix_post_release_snapshot_should_bump_hotfix() {
+		// SR (hotfix > 0) bumps
+		then(projectVersion("2025.0.1.1").postReleaseSnapshotVersion()).isEqualTo("2025.0.1.2-SNAPSHOT");
+		// GA (hotfix == 0) bumps
+		then(projectVersion("2025.0.1.0").postReleaseSnapshotVersion()).isEqualTo("2025.0.1.1-SNAPSHOT");
+		// snapshot stays
+		then(projectVersion("2025.0.1.1-SNAPSHOT").postReleaseSnapshotVersion()).isEqualTo("2025.0.1.1-SNAPSHOT");
+	}
+
+	@Test
+	public void hotfix_should_return_correct_snapshot_form() {
+		then(projectVersion("2025.0.1.1").toSnapshotVersion()).isEqualTo("2025.0.1.1-SNAPSHOT");
+		then(projectVersion("2025.0.1.0").toSnapshotVersion()).isEqualTo("2025.0.1.0-SNAPSHOT");
+	}
+
+	@Test
+	public void hotfix_should_return_correct_major_and_major_and_minor() {
+		then(projectVersion("2025.0.1.1").major()).isEqualTo("2025");
+		then(projectVersion("2025.0.1.1").majorAndMinor()).isEqualTo("2025.0");
+	}
+
+	@Test
+	public void hotfix_is_more_mature_should_distinguish_different_hotfixes() {
+		then(projectVersion("2025.0.1.2").isMoreMature(projectVersion("2025.0.1.1"))).isTrue();
+		then(projectVersion("2025.0.1.1").isMoreMature(projectVersion("2025.0.1.2"))).isFalse();
+		then(projectVersion("2025.0.1.1").isMoreMature(projectVersion("2025.0.1.1"))).isFalse();
+	}
+
+	@Test
+	public void hotfix_is_same_minor_should_match_same_hotfix_branch() {
+		then(projectVersion("2025.0.1.1").isSameMinor("2025.0.1.2")).isTrue();
+		then(projectVersion("2025.0.1.1").isSameMinor("2025.0.1.0")).isTrue();
+		then(projectVersion("2025.0.1.1").isSameMinor("2025.0.2.0")).isFalse();
+		then(projectVersion("2025.0.1.1").isSameMinor("2025.1.0.0")).isFalse();
+	}
+
+	@Test
+	public void hotfix_is_same_minor_should_return_false_when_comparing_hotfix_to_non_hotfix() {
+		then(projectVersion("2025.0.1.1").isSameMinor("2025.0.1")).isFalse();
+		then(projectVersion("2025.0.1").isSameMinor("2025.0.1.1")).isFalse();
+	}
+
+	@Test
+	public void hotfix_compute_previous_patch_tag_should_decrement_hotfix() {
+		then(projectVersion("2025.0.1.2").computePreviousPatchTag("v", "")).contains("v2025.0.1.1");
+		then(projectVersion("2025.0.1.1").computePreviousPatchTag("v", "")).contains("v2025.0.1.0");
+		then(projectVersion("2025.0.1.0").computePreviousPatchTag("v", "")).isEmpty();
+	}
+
 	private void thenPatternsForSnapshotMilestoneAndReleaseCandidateArePresent(List<Pattern> unknownTypeOfVersion) {
 		then(unknownTypeOfVersion).isNotEmpty();
 		then(unknownTypeOfVersion.get(0).pattern()).contains("SNAPSHOT");
