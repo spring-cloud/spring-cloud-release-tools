@@ -56,8 +56,8 @@ public class UpdateSaganProjectPostReleaseTask implements ProjectPostReleaseRele
 
 	@Override
 	public ExecutionResult runTask(Arguments args) {
-		if (args.properties.isCommercial()) {
-			log.info("Skipping sagan update for commercial release");
+		if (args.properties.isCommercial() || args.properties.isHotfix()) {
+			log.info("Skipping sagan update for commercial/hotfix release");
 			return ExecutionResult.skipped();
 		}
 		return this.releaser.updateSagan(args.project, args.versionFromBom, args.projects);
