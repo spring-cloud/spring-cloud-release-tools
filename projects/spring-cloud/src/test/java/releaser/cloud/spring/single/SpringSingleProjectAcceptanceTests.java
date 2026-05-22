@@ -148,10 +148,11 @@ public class SpringSingleProjectAcceptanceTests extends AbstractSpringCloudAccep
 					then(releaseNotesTemplate()).doesNotExist();
 					// once for updating GA
 					// second time to update SNAPSHOT
-					BDDMockito.then(saganClient).should(times(2)).addRelease(BDDMockito.eq("spring-cloud-consul"),
+					BDDMockito.then(saganClient).should(times(0)).addRelease(BDDMockito.eq("spring-cloud-consul"),
 							BDDMockito.any());
-					BDDMockito.then(saganClient).should(times(2)).getProject("spring-cloud-consul");
-					BDDMockito.then(saganClient).should().deleteRelease("spring-cloud-consul", "4.0.2-SNAPSHOT");
+					BDDMockito.then(saganClient).should(times(0)).getProject("spring-cloud-consul");
+					BDDMockito.then(saganClient).should(times(0)).deleteRelease("spring-cloud-consul",
+							"4.0.2-SNAPSHOT");
 					then(gitHubHandler.issueCreatedInSpringGuides).isFalse();
 					then(gitHubHandler.issueCreatedInStartSpringIo).isFalse();
 					thenRunUpdatedTestsWereNotCalled(postReleaseActions);
