@@ -189,6 +189,11 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 					thenSaganWasNotCalled(saganUpdater);
 					then(clonedProject(nonAssertingTestProjectGitHandler, "spring-cloud-consul-commercial").tagList()
 							.call()).extracting("name").contains("refs/tags/v4.0.2.1");
+					// verify the post-release version was bumped to the next hotfix
+					// snapshot
+					File consulDir = nonAssertingTestProjectGitHandler.clonedProjects.stream()
+							.filter(f -> f.getName().equals("spring-cloud-consul-commercial")).findFirst().get();
+					pomVersionIsEqualTo(consulDir, "4.0.2.2-SNAPSHOT");
 					thenRunUpdatedTestsWereCalled(postReleaseActions);
 					thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
 					BDDMockito.then(creator).should(times(1))
