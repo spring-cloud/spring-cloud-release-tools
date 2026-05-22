@@ -128,7 +128,7 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(2);
 					// don't want to verify the docs
 					thenAllStepsWereExecutedForEachProject(nonAssertingTestProjectGitHandler);
-					thenSaganWasCalled(saganUpdater);
+					thenSaganWasNotCalled(saganUpdater);
 					then(clonedProject(nonAssertingTestProjectGitHandler, "spring-cloud-consul-commercial").tagList()
 							.call()).extracting("name").contains("refs/tags/v4.0.2");
 					thenRunUpdatedTestsWereCalled(postReleaseActions);
