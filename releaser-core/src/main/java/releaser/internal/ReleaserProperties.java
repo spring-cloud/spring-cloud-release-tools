@@ -239,6 +239,16 @@ public class ReleaserProperties implements Serializable {
 		/**
 		 * @return build command
 		 */
+		String getGaReleaseBuildCommand();
+
+		/**
+		 * @param buildCommand to set
+		 */
+		void setGaReleaseBuildCommand(String buildCommand);
+
+		/**
+		 * @return build command
+		 */
 		String getBuildCommand();
 
 		/**
@@ -1038,6 +1048,14 @@ public class ReleaserProperties implements Serializable {
 		private String buildCommand = "./mvnw clean install -B -Pdocs {{systemProps}}";
 
 		/**
+		 * Command to be executed during a dry run build. If present "{{version}}" will be
+		 * replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
+		 * version and "{{oldVersion}}" with the version before version updating. By
+		 * default the value is the same as null.
+		 **/
+		private String gaReleaseBuildCommand = null;
+
+		/**
 		 * Command to be executed to deploy a built project. If present "{{version}}" will
 		 * be replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
 		 * version and "{{oldVersion}}" with the version before version updating.
@@ -1075,6 +1093,19 @@ public class ReleaserProperties implements Serializable {
 		 * Max wait time in minutes for the process to finish.
 		 */
 		private long waitTimeInMinutes = 20;
+
+		@Override
+		public String getGaReleaseBuildCommand() {
+			if (this.gaReleaseBuildCommand == null) {
+				return this.getBuildCommand();
+			}
+			return this.gaReleaseBuildCommand;
+		}
+
+		@Override
+		public void setGaReleaseBuildCommand(String buildCommand) {
+			this.gaReleaseBuildCommand = buildCommand;
+		}
 
 		@Override
 		public String getBuildCommand() {
@@ -1146,8 +1177,9 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='" + this.deployCommand
-					+ '\'' + ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
+			return "Maven{" + "buildCommand='" + this.buildCommand + '\'' + ", dryRunBuildCommand='"
+					+ this.gaReleaseBuildCommand + '\'' + ", deployCommand='" + this.deployCommand + '\''
+					+ ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
 					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes=" + this.waitTimeInMinutes
 					+ '}';
 		}
@@ -1167,6 +1199,14 @@ public class ReleaserProperties implements Serializable {
 		 * version and "{{oldVersion}}" with the version before version updating.
 		 */
 		private String buildCommand = "echo \"{{systemProps}}\"";
+
+		/**
+		 * Command to be executed to build the project during a GA release. If present
+		 * "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with
+		 * the bumped snapshot version and "{{oldVersion}}" with the version before
+		 * version updating. By default the value is null.
+		 */
+		private String gaReleaseBuildCommand = null;
 
 		/**
 		 * Command to be executed to deploy a built project. If present "{{version}}" will
@@ -1208,6 +1248,19 @@ public class ReleaserProperties implements Serializable {
 		private long waitTimeInMinutes = 20;
 
 		@Override
+		public String getGaReleaseBuildCommand() {
+			if (this.gaReleaseBuildCommand == null) {
+				return this.getBuildCommand();
+			}
+			return this.gaReleaseBuildCommand;
+		}
+
+		@Override
+		public void setGaReleaseBuildCommand(String buildCommand) {
+			this.gaReleaseBuildCommand = buildCommand;
+		}
+
+		@Override
 		public String getBuildCommand() {
 			return this.buildCommand;
 		}
@@ -1277,8 +1330,9 @@ public class ReleaserProperties implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Bash{" + "buildCommand='" + this.buildCommand + '\'' + ", deployCommand='" + this.deployCommand
-					+ '\'' + ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
+			return "Bash{" + "buildCommand='" + this.buildCommand + '\'' + ", dryRunBuildCommand='"
+					+ this.gaReleaseBuildCommand + '\'' + ", deployCommand='" + this.deployCommand + '\''
+					+ ", publishDocsCommand=" + this.publishDocsCommand + "generateReleaseTrainDocsCommand='"
 					+ this.generateReleaseTrainDocsCommand + '\'' + ", waitTimeInMinutes=" + this.waitTimeInMinutes
 					+ '}';
 		}
@@ -1320,11 +1374,19 @@ public class ReleaserProperties implements Serializable {
 		private List<String> ignoredGradleRegex = new ArrayList<>();
 
 		/**
-		 * Command to be executed to build the project If present "{{version}}" will be
+		 * Command to be executed to build the project. If present "{{version}}" will be
 		 * replaced by the provided version. "{{nextVersion}}" with the bumped snapshot
 		 * version and "{{oldVersion}}" with the version before version updating.
 		 **/
 		private String buildCommand = "./gradlew clean build publishToMavenLocal --console=plain -PnextVersion={{nextVersion}} -PoldVersion={{oldVersion}} -PcurrentVersion={{version}} {{systemProps}}";
+
+		/**
+		 * Command to be executed to build the project during a dry run. If present
+		 * "{{version}}" will be replaced by the provided version. "{{nextVersion}}" with
+		 * the bumped snapshot version and "{{oldVersion}}" with the version before
+		 * version updating. By default the value is null.
+		 */
+		private String gaReleaseBuildCommand = null;
 
 		/**
 		 * Command to be executed to deploy a built project.
@@ -1358,6 +1420,19 @@ public class ReleaserProperties implements Serializable {
 		 * Max wait time in minutes for the process to finish.
 		 */
 		private long waitTimeInMinutes = 20;
+
+		@Override
+		public String getGaReleaseBuildCommand() {
+			if (this.gaReleaseBuildCommand == null) {
+				return this.getBuildCommand();
+			}
+			return this.gaReleaseBuildCommand;
+		}
+
+		@Override
+		public void setGaReleaseBuildCommand(String buildCommand) {
+			this.gaReleaseBuildCommand = buildCommand;
+		}
 
 		@Override
 		public String getBuildCommand() {
@@ -1448,7 +1523,8 @@ public class ReleaserProperties implements Serializable {
 			return new StringJoiner(", ", Gradle.class.getSimpleName() + "[", "]")
 					.add("gradlePropsSubstitution=" + gradlePropsSubstitution)
 					.add("ignoredGradleRegex=" + ignoredGradleRegex).add("buildCommand='" + buildCommand + "'")
-					.add("deployCommand='" + deployCommand + "'")
+					.add("dryRunBuildCommand='" + gaReleaseBuildCommand + "'")
+					.add("buildCommand='" + buildCommand + "'").add("deployCommand='" + deployCommand + "'")
 					.add("deployGuidesCommand='" + deployGuidesCommand + "'")
 					.add("publishDocsCommand=" + publishDocsCommand)
 					.add("generateReleaseTrainDocsCommand='" + generateReleaseTrainDocsCommand + "'")

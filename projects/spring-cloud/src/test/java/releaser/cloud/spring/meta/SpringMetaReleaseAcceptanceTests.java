@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -37,6 +38,7 @@ import releaser.internal.project.ProjectVersion;
 import releaser.internal.project.Projects;
 import releaser.internal.sagan.SaganClient;
 import releaser.internal.sagan.SaganUpdater;
+import releaser.internal.spring.ArgsBuilder;
 import releaser.internal.spring.Arguments;
 import releaser.internal.spring.SpringReleaser;
 import releaser.internal.tasks.ReleaseReleaserTask;
@@ -85,6 +87,64 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 
 	@TempDir
 	File tempDirAllTestSample;
+
+	private void should_perform_a_meta_release_of_sc_release_and_consul(File tempDirSpringCloudConsulOrigin,
+			File tempDirSpringCloudConsulProject, boolean dryRun,
+			Consumer<NonAssertingTestProjectGitHandler> stepAsserter, ArgsBuilder argsBuilder) throws Exception {
+		checkoutReleaseTrainBranch("/projects/spring-cloud-release/", "2022.0.x");
+
+		run(defaultRunner(),
+				properties("debugx=true")
+						.properties("test.metarelease=true", "releaser.git.create-release-notes-for-milestone=false")
+						.properties(argsBuilder.build()),
+				context -> {
+					SpringReleaser releaser = context.getBean(SpringReleaser.class);
+					NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler = context
+							.getBean(NonAssertingTestProjectGitHandler.class);
+					SaganUpdater saganUpdater = context.getBean(SaganUpdater.class);
+					PostReleaseActions postReleaseActions = context.getBean(PostReleaseActions.class);
+					TestExecutionResultHandler testExecutionResultHandler = context
+							.getBean(TestExecutionResultHandler.class);
+					ReleaseBundleCreator creator = context.getBean(ReleaseBundleCreator.class);
+
+					ExecutionResult result = releaser
+							.release(new OptionsBuilder().metaRelease(true).dryRun(dryRun).options());
+
+					// print results
+					testExecutionResultHandler.accept(result);
+					then(testExecutionResultHandler.exitedSuccessOrUnstable).isTrue();
+
+					then(result.isFailureOrUnstable()).isFalse();
+					// consul, release
+					then(nonAssertingTestProjectGitHandler.clonedProjects).hasSize(2);
+					// don't want to verify the docs
+					stepAsserter.accept(nonAssertingTestProjectGitHandler);
+					ProjectVersion projectVersion = new ProjectVersion(tempDirSpringCloudConsulOrigin);
+					if (!dryRun && !projectVersion.isSnapshot()) {
+						thenSaganWasCalled(saganUpdater);
+						then(clonedProject(nonAssertingTestProjectGitHandler, "spring-cloud-consul-commercial")
+								.tagList().call()).extracting("name").contains("refs/tags/v4.0.2");
+						thenRunUpdatedTestsWereCalled(postReleaseActions);
+						thenUpdateReleaseTrainDocsWasCalled(postReleaseActions);
+						BDDMockito.then(creator).should(times(1))
+								.createReleaseTrainSourceBundle(
+										List.of(new ProjectVersion("spring-cloud-consul", "4.0.2"),
+												new ProjectVersion("spring-cloud-starter-build", "2022.0.4")),
+										"2022.0.4");
+						BDDMockito.then(creator).should(times(1)).createReleaseBundle(
+								List.of("org/springframework/cloud/spring-cloud-consul*",
+										"org/springframework/cloud/spring-cloud-starter-consul*"),
+								"4.0.2", "TNZ-spring-cloud-consul-commercial");
+						BDDMockito.then(creator).should(times(1)).distributeReleaseTrainSourceBundle("2022.0.4");
+						// This should never be called when releasing a release train
+						// since
+						// distributing a release train source bundle
+						// will distribute individual project release bundles
+						verify(creator, never()).distributeReleaseBundle(anyString(), anyString(), anyString());
+					}
+
+				});
+	}
 
 	@Test
 	public void should_perform_a_meta_release_of_sc_release_and_consul(@TempDir File tempDirSpringCloudConsulOrigin,
@@ -142,6 +202,63 @@ public class SpringMetaReleaseAcceptanceTests extends AbstractSpringCloudMetaAcc
 					// will distribute individual project release bundles
 					verify(creator, never()).distributeReleaseBundle(anyString(), anyString(), anyString());
 				});
+	}
+
+	@Test
+	public void should_perform_a_meta_release_of_sc_release_and_consul_ga(@TempDir File tempDirSpringCloudConsulOrigin,
+			@TempDir File tempDirSpringCloudConsulProject) throws Exception {
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin,
+				this.springCloudConsulCommercialProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		should_perform_a_meta_release_of_sc_release_and_consul(tempDirSpringCloudConsulOrigin,
+				tempDirSpringCloudConsulProject, false, this::thenAllStepsWereExecutedForEachProjectDuringGaRelease,
+				metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs, tempDirSpringCloud,
+						tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2022.0.2")
+								.addFixedVersions(v2022_0_4()).distributeReleaseTrainSourceReleaseBundle(true)
+								.releaseTrainSourceReleaseBundle(true).projectReleaseBundle(true).commercial(true)
+								.mavenGaReleaseBuildCommand("echo '{{profiles}}' > /tmp/executed_ga_build"));
+	}
+
+	@Test
+	public void should_perform_a_snapshot_meta_release_of_sc_release_and_consul_ga(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
+			throws Exception {
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin,
+				this.springCloudConsulCommercialProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		should_perform_a_meta_release_of_sc_release_and_consul(tempDirSpringCloudConsulOrigin,
+				tempDirSpringCloudConsulProject, false, this::thenAllStepsWereExecutedForEachProject,
+				metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs, tempDirSpringCloud,
+						tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2022.0.2")
+								.addFixedVersions(v2022_0_4_SNAPSHOT()).distributeReleaseTrainSourceReleaseBundle(true)
+								.releaseTrainSourceReleaseBundle(true).projectReleaseBundle(true).commercial(true)
+								.mavenGaReleaseBuildCommand("echo '{{profiles}}' > /tmp/executed_ga_build"));
+	}
+
+	@Test
+	public void should_perform_a_dry_run_meta_release_of_sc_release_and_consul_ga(
+			@TempDir File tempDirSpringCloudConsulOrigin, @TempDir File tempDirSpringCloudConsulProject)
+			throws Exception {
+		File origin = cloneToTemporaryDirectory(tempDirSpringCloudConsulOrigin,
+				this.springCloudConsulCommercialProject);
+		assertThatClonedConsulProjectIsInSnapshots(origin);
+		File project = cloneToTemporaryDirectory(tempDirSpringCloudConsulProject, tmpFile("spring-cloud-consul"));
+		GitTestUtils.setOriginOnProjectToTmp(origin, project);
+		should_perform_a_meta_release_of_sc_release_and_consul(tempDirSpringCloudConsulOrigin,
+				tempDirSpringCloudConsulProject, true, this::thenAllDryRunStepsWereExecutedForEachProject,
+				metaReleaseArgs(project, tempDirTestSamplesProject, tempDirReleaseTrainDocs, tempDirSpringCloud,
+						tempDirReleaseTrainWiki, tempDirAllTestSample).bomBranch("v2022.0.2")
+								.addFixedVersions(v2022_0_4()).distributeReleaseTrainSourceReleaseBundle(true)
+								.releaseTrainSourceReleaseBundle(true).projectReleaseBundle(true).commercial(true)
+								// Because this is a dry run we should not run the GA
+								// release build command,
+								// thenAllDryRunStepsWereExecutedForEachProject verifies
+								// just the build command was run
+								.mavenGaReleaseBuildCommand("echo '{{profiles}}' > /tmp/executed_ga_build"));
 	}
 
 	@Test

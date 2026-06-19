@@ -123,8 +123,8 @@ public class Releaser {
 	}
 
 	public ExecutionResult buildProject(ReleaserProperties properties, ProjectVersion originalVersion,
-			ProjectVersion versionFromBom) {
-		this.projectCommandExecutor.build(properties, originalVersion, versionFromBom);
+			ProjectVersion versionFromBom, boolean dryRun) {
+		this.projectCommandExecutor.build(properties, originalVersion, versionFromBom, dryRun);
 		log.info("\nProject was successfully built");
 		return ExecutionResult.success();
 	}

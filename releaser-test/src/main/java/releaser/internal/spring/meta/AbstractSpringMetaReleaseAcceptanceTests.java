@@ -100,6 +100,29 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 		return versions;
 	}
 
+	public Map<String, String> v2022_0_4_SNAPSHOT() {
+		Map<String, String> versions = new LinkedHashMap<>();
+		versions.put("spring-boot", "3.0.7-SNAPSHOT");
+		versions.put("spring-cloud-build", "4.0.3-SNAPSHOT");
+		versions.put("spring-cloud-function", "4.0.3-SNAPSHOT");
+		versions.put("spring-cloud-stream", "4.0.3-SNAPSHOT");
+		versions.put("spring-cloud-commons", "4.0.3-SNAPSHOT");
+		versions.put("spring-cloud-bus", "4.0.1-SNAPSHOT");
+		versions.put("spring-cloud-task", "3.0.3-SNAPSHOT");
+		versions.put("spring-cloud-config", "4.0.3-SNAPSHOT");
+		versions.put("spring-cloud-netflix", "4.0.2-SNAPSHOT");
+		versions.put("spring-cloud-openfeign", "4.0.3-SNAPSHOT");
+		versions.put("spring-cloud-consul", "4.0.2-SNAPSHOT");
+		versions.put("spring-cloud-circuitbreaker", "3.0.2-SNAPSHOT");
+		versions.put("spring-cloud-gateway", "4.0.6-SNAPSHOT");
+		versions.put("spring-cloud-zookeeper", "4.0.0-SNAPSHOT");
+		versions.put("spring-cloud-contract", "4.0.3-SNAPSHOT");
+		versions.put("spring-cloud-kubernetes", "3.0.3-SNAPSHOT");
+		versions.put("spring-cloud-vault", "4.0.1-SNAPSHOT");
+		versions.put("spring-cloud-release", "2022.0.4-SNAPSHOT");
+		return versions;
+	}
+
 	public void thenAllStepsWereExecutedForEachProject(
 			NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler) {
 		nonAssertingTestProjectGitHandler.clonedProjects.stream()
@@ -107,6 +130,18 @@ public abstract class AbstractSpringMetaReleaseAcceptanceTests extends AbstractS
 					then(Arrays.asList("spring-cloud-starter-build", "spring-cloud-consul"))
 							.contains(pom(project).getArtifactId());
 					then(new File("/tmp/executed_build")).exists();
+					then(new File("/tmp/executed_deploy")).exists();
+					then(new File("/tmp/executed_docs")).exists();
+				});
+	}
+
+	public void thenAllStepsWereExecutedForEachProjectDuringGaRelease(
+			NonAssertingTestProjectGitHandler nonAssertingTestProjectGitHandler) {
+		nonAssertingTestProjectGitHandler.clonedProjects.stream()
+				.filter(f -> !f.getName().contains("angel") && !f.getName().equals("spring-cloud")).forEach(project -> {
+					then(Arrays.asList("spring-cloud-starter-build", "spring-cloud-consul"))
+							.contains(pom(project).getArtifactId());
+					then(new File("/tmp/executed_ga_build")).exists();
 					then(new File("/tmp/executed_deploy")).exists();
 					then(new File("/tmp/executed_docs")).exists();
 				});

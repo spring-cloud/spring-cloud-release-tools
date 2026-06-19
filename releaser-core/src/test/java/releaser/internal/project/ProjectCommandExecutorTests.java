@@ -86,7 +86,7 @@ public class ProjectCommandExecutorTests {
 		ProjectCommandExecutor builder = projectBuilder(properties);
 
 		builder.build(properties, original(), new ProjectVersion("foo", "1.0.0.BUILD-SNAPSHOT"),
-				tmpFile("/builder/resolved").getPath());
+				tmpFile("/builder/resolved").getPath(), false);
 
 		then(asString(tmpFile("/builder/resolved/resolved.log"))).contains("resolved.log");
 	}

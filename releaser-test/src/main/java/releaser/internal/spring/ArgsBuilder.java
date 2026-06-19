@@ -115,6 +115,12 @@ public class ArgsBuilder {
 		return this;
 	}
 
+	public ArgsBuilder mavenGaReleaseBuildCommand(String command) throws Exception {
+		removeIfPresent("releaser.maven.ga-release-build-command");
+		this.args.add("releaser.maven.ga-release-build-command=" + command);
+		return this;
+	}
+
 	public ArgsBuilder mavenDeployCommand(String command) throws Exception {
 		removeIfPresent("releaser.maven.deploy-command");
 		this.args.add("releaser.maven.deploy-command=" + command);

@@ -54,7 +54,12 @@ public class ProjectCommandExecutor {
 
 	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
 			ProjectVersion versionFromReleaseTrain) {
-		build(properties, originalVersion, versionFromReleaseTrain, properties.getWorkingDir());
+		build(properties, originalVersion, versionFromReleaseTrain, properties.getWorkingDir(), false);
+	}
+
+	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
+			ProjectVersion versionFromReleaseTrain, boolean dryRyn) {
+		build(properties, originalVersion, versionFromReleaseTrain, properties.getWorkingDir(), dryRyn);
 	}
 
 	public String version(ReleaserProperties properties) {
@@ -82,9 +87,19 @@ public class ProjectCommandExecutor {
 	}
 
 	public void build(ReleaserProperties properties, ProjectVersion originalVersion,
-			ProjectVersion versionFromReleaseTrain, String projectRoot) {
+			ProjectVersion versionFromReleaseTrain, String projectRoot, boolean dryRun) {
 		try {
-			String command = new CommandPicker(properties, projectRoot).buildCommand(versionFromReleaseTrain);
+			CommandPicker commandPicker = new CommandPicker(properties, projectRoot);
+			boolean useGaReleaseBuildCommand = !dryRun && !versionFromReleaseTrain.isSnapshot();
+			String command;
+			if (useGaReleaseBuildCommand) {
+				log.info(
+						"We are not doing a dry run and not releasing a snapshot so will use GA release build command");
+				command = commandPicker.gaReleaseBuildCommand(versionFromReleaseTrain);
+			}
+			else {
+				command = commandPicker.buildCommand(versionFromReleaseTrain);
+			}
 			String[] commands = replaceAllPlaceHolders(originalVersion, versionFromReleaseTrain, command).split(" ");
 			runCommand(properties, projectRoot, commands);
 			assertNoHtmlFilesInDocsContainUnresolvedTags(projectRoot);
@@ -305,6 +320,17 @@ class CommandPicker {
 			return mavenCommandWithSystemProps(releaserProperties.getMaven().getBuildCommand(), version);
 		}
 		return bashCommandWithSystemProps(releaserProperties.getBash().getBuildCommand());
+	}
+
+	String gaReleaseBuildCommand(ProjectVersion version) {
+		log.info("Running GA release build command.");
+		if (projectType == ProjectType.GRADLE) {
+			return gradleCommandWithSystemProps(releaserProperties.getGradle().getGaReleaseBuildCommand());
+		}
+		else if (projectType == ProjectType.MAVEN) {
+			return mavenCommandWithSystemProps(releaserProperties.getMaven().getGaReleaseBuildCommand(), version);
+		}
+		return bashCommandWithSystemProps(releaserProperties.getBash().getGaReleaseBuildCommand());
 	}
 
 	String version() {
